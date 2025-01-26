@@ -1,0 +1,715 @@
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useProductStore } from "../../../stores/useProductStore.js";
+import useProcurementStore from "../../../stores/useProcurementStore.js";
+import { useSupplierStore } from "../../../stores/useSupplierStore.js";
+import toast from "react-hot-toast";
+import Sidebar from "../layouts/Sidebar";
+import axios from "axios";
+import axiosInstance from "../../../lib/axios.js";
+
+const Procurement = () => {
+  const { data: authData } = useQuery({ queryKey: ["authUser"] });
+  const authUser = authData?.user;
+  console.log("authUser:", authUser);
+
+  const {
+    procurements,
+    loading,
+    error,
+    fetchProcurements,
+    deleteProcurement,
+  } = useProcurementStore();
+
+  const { fetchProductsBySupplier, productsBySupplier } = useProductStore();
+  const { fetchSupplierById } = useSupplierStore();
+
+  // Local states
+  const [selectedPDF, setSelectedPDF] = useState(null);
+  const [selectedProcurement, setSelectedProcurement] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({});
+  const [supplierProducts, setSupplierProducts] = useState([]);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+
+  const [productData, setProductData] = useState({
+    productName: "",
+    SKU: "",
+    category: "",
+    baseUnitPrice: 0,
+    baseCurrency: "USD",
+    unitPrice: 0,
+    quantity: 0,
+  });
+
+  const calculateTotalCost = (products) =>
+    products.reduce((acc, p) => acc + p.quantity * p.unitPrice, 0);
+
+  useEffect(() => {
+    fetchProcurements();
+  }, [fetchProcurements]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (formData.supplierId) {
+      fetchProductsBySupplier(formData.supplierId)
+        .then(() => {
+          setSupplierProducts(productsBySupplier);
+        })
+        .catch(() => {
+          toast.error("Failed to load products.");
+        });
+    }
+  }, [formData.supplierId, fetchProductsBySupplier, productsBySupplier]);
+
+  // Calculate total cost when products change
+  useEffect(() => {
+    if (formData.products) {
+      const newTotalCost = calculateTotalCost(formData.products);
+      if (newTotalCost !== formData.totalCost) {
+        setFormData((prev) => ({ ...prev, totalCost: newTotalCost }));
+      }
+    }
+  }, [formData.products]);
+
+  const fetchExchangeRate = async (base, to) => {
+    try {
+      const APP_ID = "c0a27335761440d6a00427823918124b";
+      const response = await axios.get(
+        `https://openexchangerates.org/api/latest.json?app_id=${APP_ID}`
+      );
+      const rates = response.data.rates;
+
+      if (!rates[base]) {
+        throw new Error(`Base currency ${base} not supported`);
+      }
+      if (!rates[to]) {
+        throw new Error(`Target currency ${to} not supported`);
+      }
+
+      return rates[to] / rates[base];
+    } catch (error) {
+      console.error("Error fetching exchange rate:", error);
+      toast.error("Failed to fetch exchange rate.");
+      return null;
+    }
+  };
+
+  const convertProductPrices = async (
+    products,
+    supplierCurrency,
+    targetCurrency
+  ) => {
+    console.log("Converting prices:", { supplierCurrency, targetCurrency });
+
+    if (supplierCurrency === targetCurrency) {
+      console.log("No conversion needed, currencies are the same.");
+      return products;
+    }
+
+    const rate = await fetchExchangeRate(supplierCurrency, targetCurrency);
+    if (!rate) {
+      toast.error("Failed to fetch exchange rate.");
+      return products;
+    }
+
+    console.log("Conversion rate:", rate);
+
+    return products.map((product) => {
+      const basePrice = product.baseUnitPrice || product.unitPrice || 0;
+      return {
+        ...product,
+        unitPrice: parseFloat((basePrice * rate).toFixed(2)),
+        total: parseFloat((basePrice * rate * product.quantity).toFixed(2)),
+      };
+    });
+  };
+
+  const handleEditClick = async (procurement) => {
+    setSelectedProcurement(procurement);
+
+    try {
+      const supplierDetails = await fetchSupplierById(procurement.supplierId);
+      setSelectedSupplier(supplierDetails);
+
+      const productsWithPrices = procurement.products.map((p) => {
+        const basePrice = p.baseUnitPrice ?? p.unitPrice ?? 0;
+        return {
+          ...p,
+          baseUnitPrice: basePrice,
+          convertedUnitPrice: basePrice,
+        };
+      });
+
+      setFormData({
+        ...procurement,
+        products: productsWithPrices,
+      });
+      setIsModalOpen(true);
+    } catch (err) {
+      console.error("Error fetching supplier details or products:", err);
+      toast.error("Failed to fetch supplier details or products.");
+    }
+  };
+
+  const handleDeleteClick = async (id) => {
+    if (window.confirm("Are you sure you want to delete this procurement?")) {
+      await deleteProcurement(id);
+      toast.success("Procurement deleted successfully!");
+    }
+  };
+
+  const handleAddProduct = (e) => {
+    e.preventDefault();
+
+    if (!productData.productName) {
+      toast.error("Please select a product first.");
+      return;
+    }
+    if (!productData.quantity || +productData.quantity <= 0) {
+      toast.error("Please enter a valid quantity.");
+      return;
+    }
+
+    setFormData((prev) => {
+      const existingIndex = (prev.products || []).findIndex(
+        (p) => p.SKU === productData.SKU
+      );
+
+      let updatedProducts;
+      if (existingIndex !== -1) {
+        updatedProducts = [...prev.products];
+        const existingProduct = updatedProducts[existingIndex];
+        const newQuantity = existingProduct.quantity + productData.quantity;
+        updatedProducts[existingIndex] = {
+          ...existingProduct,
+          quantity: newQuantity,
+          total: newQuantity * existingProduct.unitPrice,
+        };
+        toast.success("Product quantity updated successfully!");
+      } else {
+        const newProduct = {
+          ...productData,
+          total: productData.quantity * productData.unitPrice,
+        };
+        updatedProducts = [...(prev.products || []), newProduct];
+        toast.success("Product added successfully!");
+      }
+
+      return {
+        ...prev,
+        products: updatedProducts,
+      };
+    });
+
+    setProductData({
+      productName: "",
+      SKU: "",
+      category: "",
+      baseUnitPrice: 0,
+      baseCurrency: "USD",
+      unitPrice: 0,
+      quantity: 0,
+    });
+  };
+
+  const handleModalSave = async () => {
+    if (!formData.products || formData.products.length === 0) {
+      toast.error("You must have at least one product in the procurement.");
+      return;
+    }
+
+    if (!formData.totalCost || formData.totalCost <= 0) {
+      toast.error("Total cost cannot be zero.");
+      return;
+    }
+
+    try {
+      const updatedTotalCost = calculateTotalCost(formData.products || []);
+      const updatedData = {
+        ...formData,
+        totalCost: updatedTotalCost,
+        updateStatus: "pending update",
+      };
+
+      if (selectedProcurement.status !== "completed") {
+        // עדכון ישיר כאשר הסטטוס אינו complete
+        const response = await axiosInstance.put(
+          `/procurement/${selectedProcurement._id}`,
+          {
+            ...formData,
+            totalCost: updatedTotalCost,
+          }
+        );
+        if (response.data.success) {
+          toast.success("Procurement updated successfully!");
+          setIsModalOpen(false);
+        } else {
+          toast.error("Failed to update procurement: " + response.data.message);
+        }
+      } else {
+        // יצירת pending update כאשר הסטטוס הוא complete
+        const response = await axiosInstance.post("/updateProcurement", {
+          ProcurementId: selectedProcurement._id,
+          updatedData,
+        });
+        await axiosInstance.put(`/procurement/${selectedProcurement._id}`, {
+          statusUpdate: "pending update",
+          ProcurementId: selectedProcurement._id,
+        });
+
+        if (response.data.success) {
+          toast.success("Pending update created successfully!");
+          setIsModalOpen(false);
+        } else {
+          toast.error(
+            "Failed to create pending update: " + response.data.message
+          );
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to process update. " + err.message);
+    }
+  };
+
+  const supplierId = formData.supplierId;
+
+  return (
+    <div className="flex min-h-screen bg-gradient-to-r from-gray-900 via-gray-800 to-black">
+      <Sidebar />
+
+      <div className="container mx-auto max-w-6xl p-6 text-gray-300">
+        <h1 className="text-2xl font-bold text-blue-300 mb-6">
+          Procurement Records
+        </h1>
+
+        {loading && <p>Loading procurements...</p>}
+
+        {!loading && procurements.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {procurements.map((record) => (
+              <div
+                key={record._id}
+                className="bg-gray-700 rounded-lg p-4 shadow-lg text-gray-300"
+              >
+                <h2 className="text-lg font-bold text-blue-300 mb-2">
+                  {record.PurchaseOrder}
+                </h2>
+                <p>
+                  <strong>Supplier:</strong> {record.supplierName}
+                </p>
+                <p>
+                  <strong>Total Cost:</strong> {record.totalCost}{" "}
+                  {record.currency || "₪"}
+                </p>
+                <p>
+                  <strong>Purchase Date:</strong>{" "}
+                  {new Date(record.purchaseDate).toLocaleDateString()}
+                </p>
+                <p>
+                  <strong>Status:</strong> {record.status || "Pending"}
+                </p>
+
+                <button
+                  className="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                  onClick={() => setSelectedPDF(record.summeryProcurement)}
+                >
+                  View PDF
+                </button>
+
+                {record.status !== "completed" ||
+                  (record.statusUpdate === null && (
+                    <>
+                      <button
+                        className="mt-2 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+                        onClick={() => handleEditClick(record)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="mt-2 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+                        onClick={() => handleDeleteClick(record._id)}
+                      >
+                        Delete
+                      </button>
+                    </>
+                  ))}
+              </div>
+            ))}
+          </div>
+        ) : (
+          !loading && <p>No procurement records found.</p>
+        )}
+
+        {selectedPDF && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+            <div className="bg-gray-900 p-6 rounded shadow-lg w-3/4 h-3/4 flex flex-col">
+              <button
+                className="self-end bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600"
+                onClick={() => setSelectedPDF(null)}
+              >
+                Close
+              </button>
+              <iframe
+                src={selectedPDF}
+                title="Procurement PDF"
+                className="w-full h-full mt-4 border rounded"
+              ></iframe>
+            </div>
+          </div>
+        )}
+
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+            <div className="bg-gray-900 p-6 rounded shadow-lg w-3/4 max-h-[90vh] overflow-y-auto">
+              <h2 className="text-xl font-bold text-blue-300 mb-4">
+                Edit Procurement
+              </h2>
+              <form>
+                {/* שדות עריכה עבור רכישה */}
+                <div className="mb-4">
+                  <label className="block text-gray-300 mb-2">
+                    Purchase Order
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.PurchaseOrder || ""}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        PurchaseOrder: e.target.value,
+                      })
+                    }
+                    className="w-full p-2 rounded bg-gray-800 text-gray-300"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-gray-300 mb-2">Total Cost</label>
+                  <input
+                    type="number"
+                    value={formData.totalCost || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, totalCost: e.target.value })
+                    }
+                    className="w-full p-2 rounded bg-gray-800 text-gray-300"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-gray-300 mb-2">Currency</label>
+                  <input
+                    type="text"
+                    value={formData.currency || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, currency: e.target.value })
+                    }
+                    className="w-full p-2 rounded bg-gray-800 text-gray-300"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-gray-300 mb-2">
+                    Purchase Date
+                  </label>
+                  <input
+                    type="date"
+                    value={
+                      formData.purchaseDate
+                        ? formData.purchaseDate.slice(0, 10)
+                        : ""
+                    }
+                    onChange={(e) =>
+                      setFormData({ ...formData, purchaseDate: e.target.value })
+                    }
+                    className="w-full p-2 rounded bg-gray-800 text-gray-300"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-gray-300 mb-2">
+                    Delivery Date
+                  </label>
+                  <input
+                    type="date"
+                    value={
+                      formData.deliveryDate
+                        ? formData.deliveryDate.slice(0, 10)
+                        : ""
+                    }
+                    onChange={(e) =>
+                      setFormData({ ...formData, deliveryDate: e.target.value })
+                    }
+                    className="w-full p-2 rounded bg-gray-800 text-gray-300"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-gray-300 mb-2">Notes</label>
+                  <textarea
+                    value={formData.notes || ""}
+                    onChange={(e) =>
+                      setFormData({ ...formData, notes: e.target.value })
+                    }
+                    className="w-full p-2 rounded bg-gray-800 text-gray-300"
+                  ></textarea>
+                </div>
+
+                <h3 className="text-lg font-bold text-blue-300 mb-4">
+                  Products in Procurement
+                </h3>
+                <table className="w-full text-gray-300 mb-4">
+                  <thead>
+                    <tr>
+                      <th className="border border-gray-700 p-2">Name</th>
+                      <th className="border border-gray-700 p-2">SKU</th>
+                      <th className="border border-gray-700 p-2">Category</th>
+                      <th className="border border-gray-700 p-2">Quantity</th>
+                      <th className="border border-gray-700 p-2">Unit Price</th>
+                      <th className="border border-gray-700 p-2">Total</th>
+                      <th className="border border-gray-700 p-2">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {formData.products?.map((product, index) => (
+                      <tr key={index}>
+                        <td className="border border-gray-700 p-2">
+                          {product.productName}
+                        </td>
+                        <td className="border border-gray-700 p-2">
+                          {product.SKU}
+                        </td>
+                        <td className="border border-gray-700 p-2">
+                          {product.category}
+                        </td>
+                        <td className="border border-gray-700 p-2">
+                          <input
+                            type="number"
+                            value={product.quantity}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                products: formData.products.map((p, i) =>
+                                  i === index
+                                    ? { ...p, quantity: +e.target.value }
+                                    : p
+                                ),
+                              })
+                            }
+                            className="w-full p-2 bg-gray-800 rounded"
+                          />
+                        </td>
+                        <td className="border border-gray-700 p-2">
+                          <input
+                            type="number"
+                            value={product.unitPrice || ""}
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                products: formData.products.map((p, i) =>
+                                  i === index
+                                    ? { ...p, unitPrice: +e.target.value }
+                                    : p
+                                ),
+                              })
+                            }
+                            className="w-full p-2 bg-gray-800 rounded"
+                          />
+                        </td>
+                        <td className="border border-gray-700 p-2">
+                          {product.quantity * product.unitPrice || 0}
+                        </td>
+                        <td className="border border-gray-700 p-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newProducts = formData.products.filter(
+                                (_, i) => i !== index
+                              );
+                              setFormData({
+                                ...formData,
+                                products: newProducts,
+                              });
+                            }}
+                            className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600"
+                          >
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                <h3 className="text-lg font-bold text-blue-300 mb-4">
+                  Add a New Product
+                </h3>
+                <div className="bg-gray-800 p-4 rounded">
+                  <label className="block text-gray-300 mb-2">
+                    Select Product
+                  </label>
+                  <select
+                    disabled={!supplierId}
+                    value={
+                      supplierProducts.find((p) => p.SKU === productData.SKU)
+                        ?._id || ""
+                    }
+                    onChange={(e) => {
+                      const selectedId = e.target.value;
+                      const prod = supplierProducts.find(
+                        (p) => p._id === selectedId
+                      );
+
+                      if (prod) {
+                        const supplierBaseCurrency =
+                          selectedSupplier?.baseCurrency || "USD";
+                        const selectedCurrency = formData.currency || "USD";
+
+                        if (!supplierBaseCurrency || !selectedCurrency) {
+                          toast.error(
+                            "Supplier's currency data missing for conversion."
+                          );
+                          return;
+                        }
+
+                        fetchExchangeRate(
+                          supplierBaseCurrency,
+                          selectedCurrency
+                        )
+                          .then((rate) => {
+                            if (!rate) {
+                              toast.error("Failed to fetch conversion rate.");
+                              return;
+                            }
+
+                            const convertedPrice = (
+                              prod.unitPrice * rate
+                            ).toFixed(2);
+
+                            setProductData({
+                              productName: prod.productName,
+                              SKU: prod.SKU,
+                              category: prod.category,
+                              baseUnitPrice: prod.unitPrice || 0,
+                              baseCurrency: supplierBaseCurrency,
+                              unitPrice: parseFloat(convertedPrice),
+                              quantity: 1,
+                            });
+                          })
+                          .catch(() => {
+                            toast.error("Failed to convert currency.");
+                          });
+                      } else {
+                        setProductData({
+                          productName: "",
+                          SKU: "",
+                          category: "",
+                          baseUnitPrice: 0,
+                          baseCurrency: "USD",
+                          unitPrice: 0,
+                          quantity: 0,
+                        });
+                      }
+                    }}
+                    className="w-full p-2 rounded bg-gray-700"
+                  >
+                    <option value="">-- Select a Product --</option>
+                    {supplierProducts.map((product) => (
+                      <option key={product._id} value={product._id}>
+                        {product.productName || "Unnamed Product"}
+                      </option>
+                    ))}
+                  </select>
+
+                  <div className="mt-4 grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-gray-300 text-sm">SKU</label>
+                      <input
+                        type="text"
+                        value={productData.SKU}
+                        readOnly
+                        placeholder="SKU"
+                        className="w-full p-2 rounded bg-gray-700"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-gray-300 text-sm">Category</label>
+                      <input
+                        type="text"
+                        value={productData.category}
+                        readOnly
+                        placeholder="Category"
+                        className="w-full p-2 rounded bg-gray-700"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-gray-300 text-sm">
+                        Unit Price
+                      </label>
+                      <input
+                        type="number"
+                        value={productData.unitPrice}
+                        readOnly
+                        placeholder="Unit Price"
+                        className="w-full p-2 rounded bg-gray-700"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-gray-300 text-sm">Quantity</label>
+                      <input
+                        type="number"
+                        value={productData.quantity}
+                        onChange={(e) =>
+                          setProductData((prev) => ({
+                            ...prev,
+                            quantity: +e.target.value,
+                          }))
+                        }
+                        placeholder="Quantity"
+                        className="w-full p-2 rounded bg-gray-700"
+                        disabled={!supplierId}
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleAddProduct}
+                    className="bg-green-600 py-2 px-4 text-white rounded mt-4 hover:bg-green-700"
+                    disabled={!supplierId}
+                  >
+                    Add Product
+                  </button>
+                </div>
+
+                <div className="flex justify-end mt-6">
+                  <button
+                    type="button"
+                    className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mr-2"
+                    onClick={() => setIsModalOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                    onClick={handleModalSave}
+                  >
+                    Save
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Procurement;

@@ -1,0 +1,197 @@
+[
+  {
+    "currencyCode": "ILS",
+    "currencyName": "Israeli New Shekel",
+    "symbol": "ILS"
+  },
+  {
+    "currencyCode": "USD",
+    "currencyName": "United States Dollar",
+    "symbol": "$"
+  },
+  {
+    "currencyCode": "EUR",
+    "currencyName": "Euro",
+    "symbol": "€"
+  },
+  {
+    "currencyCode": "JPY",
+    "currencyName": "Japanese Yen",
+    "symbol": "¥"
+  },
+  {
+    "currencyCode": "GBP",
+    "currencyName": "British Pound Sterling",
+    "symbol": "£"
+  },
+  {
+    "currencyCode": "AUD",
+    "currencyName": "Australian Dollar",
+    "symbol": "A$"
+  },
+  {
+    "currencyCode": "CAD",
+    "currencyName": "Canadian Dollar",
+    "symbol": "C$"
+  },
+  {
+    "currencyCode": "CHF",
+    "currencyName": "Swiss Franc",
+    "symbol": "CHF"
+  },
+  {
+    "currencyCode": "CNY",
+    "currencyName": "Chinese Yuan",
+    "symbol": "¥"
+  },
+  {
+    "currencyCode": "HKD",
+    "currencyName": "Hong Kong Dollar",
+    "symbol": "HK$"
+  },
+  {
+    "currencyCode": "NZD",
+    "currencyName": "New Zealand Dollar",
+    "symbol": "NZ$"
+  },
+  {
+    "currencyCode": "SEK",
+    "currencyName": "Swedish Krona",
+    "symbol": "kr"
+  },
+  {
+    "currencyCode": "SGD",
+    "currencyName": "Singapore Dollar",
+    "symbol": "S$"
+  },
+  {
+    "currencyCode": "NOK",
+    "currencyName": "Norwegian Krone",
+    "symbol": "kr"
+  },
+  {
+    "currencyCode": "KRW",
+    "currencyName": "South Korean Won",
+    "symbol": "₩"
+  },
+  {
+    "currencyCode": "TRY",
+    "currencyName": "Turkish Lira",
+    "symbol": "₺"
+  },
+  {
+    "currencyCode": "RUB",
+    "currencyName": "Russian Ruble",
+    "symbol": "₽"
+  },
+  {
+    "currencyCode": "INR",
+    "currencyName": "Indian Rupee",
+    "symbol": "₹"
+  },
+  {
+    "currencyCode": "BRL",
+    "currencyName": "Brazilian Real",
+    "symbol": "R$"
+  },
+  {
+    "currencyCode": "ZAR",
+    "currencyName": "South African Rand",
+    "symbol": "R"
+  },
+  {
+    "currencyCode": "MXN",
+    "currencyName": "Mexican Peso",
+    "symbol": "$"
+  },
+  {
+    "currencyCode": "THB",
+    "currencyName": "Thai Baht",
+    "symbol": "฿"
+  },
+  {
+    "currencyCode": "PLN",
+    "currencyName": "Polish Zloty",
+    "symbol": "zł"
+  },
+  {
+    "currencyCode": "AED",
+    "currencyName": "United Arab Emirates Dirham",
+    "symbol": "د.إ"
+  },
+  {
+    "currencyCode": "SAR",
+    "currencyName": "Saudi Riyal",
+    "symbol": "﷼"
+  },
+  {
+    "currencyCode": "EGP",
+    "currencyName": "Egyptian Pound",
+    "symbol": "£"
+  },
+  {
+    "currencyCode": "DKK",
+    "currencyName": "Danish Krone",
+    "symbol": "kr"
+  },
+  {
+    "currencyCode": "MYR",
+    "currencyName": "Malaysian Ringgit",
+    "symbol": "RM"
+  },
+  {
+    "currencyCode": "PHP",
+    "currencyName": "Philippine Peso",
+    "symbol": "₱"
+  },
+  {
+    "currencyCode": "IDR",
+    "currencyName": "Indonesian Rupiah",
+    "symbol": "Rp"
+  },
+  {
+    "currencyCode": "VND",
+    "currencyName": "Vietnamese Dong",
+    "symbol": "₫"
+  },
+  {
+    "currencyCode": "ARS",
+    "currencyName": "Argentine Peso",
+    "symbol": "$"
+  },
+  {
+    "currencyCode": "CLP",
+    "currencyName": "Chilean Peso",
+    "symbol": "$"
+  },
+  {
+    "currencyCode": "COP",
+    "currencyName": "Colombian Peso",
+    "symbol": "$"
+  },
+  {
+    "currencyCode": "PEN",
+    "currencyName": "Peruvian Sol",
+    "symbol": "S/"
+  },
+  {
+    "currencyCode": "NGN",
+    "currencyName": "Nigerian Naira",
+    "symbol": "₦"
+  },
+  {
+    "currencyCode": "GHS",
+    "currencyName": "Ghanaian Cedi",
+    "symbol": "₵"
+  },
+  {
+    "currencyCode": "KWD",
+    "currencyName": "Kuwaiti Dinar",
+    "symbol": "د.ك"
+  },
+  {
+    "currencyCode": "JOD",
+    "currencyName": "Jordanian Dinar",
+    "symbol": "د.ا"
+  }
+]

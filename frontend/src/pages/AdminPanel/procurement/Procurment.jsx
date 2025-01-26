@@ -1,3 +1,4 @@
+// src/pages/procurement/Procurement.jsx
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useProductStore } from "../../../stores/useProductStore.js";
@@ -7,19 +8,19 @@ import toast from "react-hot-toast";
 import Sidebar from "../layouts/Sidebar";
 import axios from "axios";
 import axiosInstance from "../../../lib/axios.js";
+import currency from "../finance/currency.json";
+
+// ייבוא jsPDF ו-jspdf-autotable
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const Procurement = () => {
   const { data: authData } = useQuery({ queryKey: ["authUser"] });
   const authUser = authData?.user;
   console.log("authUser:", authUser);
 
-  const {
-    procurements,
-    loading,
-    error,
-    fetchProcurements,
-    deleteProcurement,
-  } = useProcurementStore();
+  const { procurements, loading, error, fetchProcurements, deleteProcurement } =
+    useProcurementStore();
 
   const { fetchProductsBySupplier, productsBySupplier } = useProductStore();
   const { fetchSupplierById } = useSupplierStore();
@@ -218,6 +219,83 @@ const Procurement = () => {
     });
   };
 
+  // פונקציית יצירת PDF
+  const createPDF = async (procurementData) => {
+    const currencySymbol = getCurrencySymbol(procurementData.currency);
+    const pdf = new jsPDF();
+
+    // כותרת
+    pdf.setFontSize(22);
+    pdf.setTextColor(0, 0, 128);
+    pdf.text("Procurement Order", 105, 15, { align: "center" });
+
+    pdf.setFontSize(10);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(`Company: ${authUser?.company || "N/A"}`, 10, 20);
+    pdf.text(`Date: ${new Date().toLocaleDateString()}`, 10, 25);
+    pdf.text(`Address: ${procurementData.DeliveryAddress || "N/A"}`, 10, 30);
+
+    // פרטי ספק
+    pdf.text(`Supplier: ${procurementData.supplierName || "N/A"}`, 150, 20);
+    pdf.text(`Phone: ${selectedSupplier?.Phone || "N/A"}`, 150, 25);
+    pdf.text(`Email: ${selectedSupplier?.Email || "N/A"}`, 150, 30);
+
+    pdf.setDrawColor(200, 200, 200);
+    pdf.line(10, 35, 200, 35);
+
+    // טבלת מוצרים
+    const columns = [
+      { header: "Product Name", dataKey: "productName" },
+      { header: "SKU", dataKey: "SKU" },
+      { header: "Category", dataKey: "category" },
+      { header: "Quantity", dataKey: "quantity" },
+      { header: "Unit Price", dataKey: "unitPrice" },
+      { header: "Total", dataKey: "total" },
+    ];
+
+    const rows = procurementData.products.map((prod) => ({
+      productName: prod.productName,
+      SKU: prod.SKU,
+      category: prod.category,
+      quantity: prod.quantity,
+      unitPrice: `${prod.unitPrice} ${currencySymbol}`,
+      total: `${prod.total} ${currencySymbol}`,
+    }));
+
+    pdf.autoTable({
+      startY: 40,
+      head: [columns.map((c) => c.header)],
+      body: rows.map((r) => Object.values(r)),
+      styles: { fontSize: 10, textColor: [0, 0, 0] },
+      headStyles: {
+        fillColor: [0, 0, 128],
+        textColor: [255, 255, 255],
+        fontStyle: "bold",
+      },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
+      margin: { top: 10, right: 10, bottom: 10, left: 10 },
+    });
+
+    // סה"כ
+    pdf.setFontSize(14);
+    pdf.text(
+      `Total Cost: ${procurementData.totalCost} ${currencySymbol}`,
+      10,
+      pdf.autoTable.previous.finalY + 10
+    );
+
+    // המרת PDF ל-Base64
+    const base64PDF = pdf.output("datauristring").split(",")[1];
+
+    return base64PDF;
+  };
+
+  // פונקציית קבלת סימן מטבע
+  const getCurrencySymbol = (currencyCode) => {
+    const selected = currency.find((cur) => cur.currencyCode === currencyCode);
+    return selected ? selected.symbol : "";
+  };
+
   const handleModalSave = async () => {
     if (!formData.products || formData.products.length === 0) {
       toast.error("You must have at least one product in the procurement.");
@@ -237,18 +315,29 @@ const Procurement = () => {
         updateStatus: "pending update",
       };
 
+      // יצירת PDF מהנתונים המעודכנים
+      const pdfBase64 = await createPDF(updatedData);
+      if (!pdfBase64) {
+        toast.error("Failed to create PDF.");
+        return;
+      }
+
+      // הוספת PDF לנתונים הנשלחים לשרת
+      const dataToSend = {
+        ...updatedData,
+        summeryProcurement: pdfBase64, // Assuming the server expects this field
+      };
+
       if (selectedProcurement.status !== "completed") {
         // עדכון ישיר כאשר הסטטוס אינו complete
         const response = await axiosInstance.put(
           `/procurement/${selectedProcurement._id}`,
-          {
-            ...formData,
-            totalCost: updatedTotalCost,
-          }
+          dataToSend
         );
         if (response.data.success) {
           toast.success("Procurement updated successfully!");
           setIsModalOpen(false);
+          fetchProcurements(); // רענון הנתונים
         } else {
           toast.error("Failed to update procurement: " + response.data.message);
         }
@@ -256,7 +345,7 @@ const Procurement = () => {
         // יצירת pending update כאשר הסטטוס הוא complete
         const response = await axiosInstance.post("/updateProcurement", {
           ProcurementId: selectedProcurement._id,
-          updatedData,
+          updatedData: dataToSend,
         });
         await axiosInstance.put(`/procurement/${selectedProcurement._id}`, {
           statusUpdate: "pending update",
@@ -266,6 +355,7 @@ const Procurement = () => {
         if (response.data.success) {
           toast.success("Pending update created successfully!");
           setIsModalOpen(false);
+          fetchProcurements(); // רענון הנתונים
         } else {
           toast.error(
             "Failed to create pending update: " + response.data.message
@@ -323,23 +413,22 @@ const Procurement = () => {
                   View PDF
                 </button>
 
-                {record.status !== "completed" ||
-                  (record.statusUpdate === null && (
-                    <>
-                      <button
-                        className="mt-2 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
-                        onClick={() => handleEditClick(record)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="mt-2 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
-                        onClick={() => handleDeleteClick(record._id)}
-                      >
-                        Delete
-                      </button>
-                    </>
-                  ))}
+                {record.statusUpdate === null && (
+                  <>
+                    <button
+                      className="mt-2 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+                      onClick={() => handleEditClick(record)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="mt-2 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+                      onClick={() => handleDeleteClick(record._id)}
+                    >
+                      Delete
+                    </button>
+                  </>
+                )}
               </div>
             ))}
           </div>
@@ -357,7 +446,7 @@ const Procurement = () => {
                 Close
               </button>
               <iframe
-                src={selectedPDF}
+                src={`data:application/pdf;base64,${selectedPDF}`}
                 title="Procurement PDF"
                 className="w-full h-full mt-4 border rounded"
               ></iframe>

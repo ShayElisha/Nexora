@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../../lib/axios";
 import { Link } from "react-router-dom";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import SignatureCanvas from "react-signature-canvas"; // ייבוא ספריית החתימה
 import toast from "react-hot-toast";
 // אייקון פעמון
@@ -143,6 +143,7 @@ const Navbar = () => {
 
   const handleSignature = async () => {
     togglePopup(); // Open the popup
+    setShowNotifications(false); // סגירת התראות כאשר נפתח פופאפ חתימות
   };
 
   const handleOpenModal = (pdfUrl, itemId, type, budgetDetails = null) => {
@@ -157,6 +158,10 @@ const Navbar = () => {
     }
 
     setShowModal(true);
+
+    // סגירת פופאפים אחרים בעת פתיחת מודאל
+    setShowPopup(false);
+    setShowNotifications(false);
   };
 
   const handleCloseModal = () => {
@@ -220,6 +225,7 @@ const Navbar = () => {
 
   const handleNotificationsClick = () => {
     setShowNotifications((prev) => !prev);
+    setShowPopup(false); // סגירת פופאפ חתימות כאשר נפתח פופאפ התראות
     // Refetch to ensure updated notifications
     refetchAdminNotifications();
   };
@@ -252,6 +258,13 @@ const Navbar = () => {
       toast.error("Failed to mark notification as read.");
     }
   };
+
+  // ניקוי timeout בעת unmount
+  useEffect(() => {
+    return () => {
+      clearTimeout(hoverTimeout);
+    };
+  }, []);
 
   // אין החזרות מוקדמות, כל ה-hooks נקראים תמיד
 
@@ -310,7 +323,7 @@ const Navbar = () => {
                   { to: "/dashboard/finance/Budgets", text: "Budget Records" },
                   {
                     to: "/dashboard/finance/add-budget",
-                    text: "Create budget Record",
+                    text: "Create Budget Record",
                   },
                 ],
               },
@@ -327,7 +340,7 @@ const Navbar = () => {
               {
                 label: "Employees",
                 links: [
-                  { to: "/dashboard/employees", text: "employees" },
+                  { to: "/dashboard/employees", text: "Employees" },
                   {
                     to: "/dashboard/Signup",
                     text: "New Employee",
@@ -361,6 +374,10 @@ const Navbar = () => {
                       <li key={i}>
                         <Link
                           to={link.to}
+                          onClick={() => {
+                            setShowPopup(false);
+                            setShowNotifications(false);
+                          }}
                           className="block px-4 py-2 hover:bg-blue-500 hover:text-white transition duration-200"
                         >
                           {link.text}
@@ -522,7 +539,10 @@ const Navbar = () => {
                       </ul>
 
                       <button
-                        onClick={togglePopup}
+                        onClick={() => {
+                          setShowPopup(false);
+                          setShowNotifications(false);
+                        }}
                         className="mt-3 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                       >
                         Close

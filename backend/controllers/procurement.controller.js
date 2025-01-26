@@ -436,15 +436,37 @@ export const updateProcurementRecord = async (req, res) => {
     "summeryProcurementUrl",
     "currentSignatures",
     "currentSignerIndex",
-    "signers",
     "statusUpdate",
   ];
+
+  let summeryProcurementUrl = "";
+
+  // אם ה-PDF נשלח, העלה אותו ל-Cloudinary
+  if (updates.summeryProcurement) {
+    try {
+      const uploadResult = await uploadToCloudinaryFile(
+        updates.summeryProcurement,
+        "procurement_pdfs" // ציון התיקייה ב-Cloudinary
+      );
+      summeryProcurementUrl = uploadResult.secure_url;
+    } catch (uploadError) {
+      console.error("Error uploading summary:", uploadError);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to upload PDF summary.",
+      });
+    }
+  }
 
   // סינון השדות המותרים לעדכון
   const sanitizedUpdates = Object.keys(updates)
     .filter((key) => allowedUpdates.includes(key))
     .reduce((obj, key) => {
-      obj[key] = updates[key];
+      if (key === "summeryProcurement" && summeryProcurementUrl) {
+        obj["summeryProcurement"] = summeryProcurementUrl;
+      } else if (key !== "summeryProcurement") {
+        obj[key] = updates[key];
+      }
       return obj;
     }, {});
 

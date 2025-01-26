@@ -28,7 +28,6 @@ export const getBudgets = async (req, res) => {
     const companyId = decodedToken.companyId;
 
     const budgets = await Budget.find({ companyId });
-    console.log("budgets => ", budgets);
 
     return res.status(200).json({
       success: true,

@@ -324,7 +324,7 @@ const AddProcurement = () => {
       category: prod.category,
       quantity: prod.quantity,
       unitPrice: `${prod.unitPrice} ${currencySymbol}`,
-      total: `${prod.total} ${currencySymbol}`,
+      total: `${prod.unitPrice * prod.quantity} ${currencySymbol}`,
     }));
 
     pdf.autoTable({
@@ -492,8 +492,6 @@ const AddProcurement = () => {
 
   // 6) handleSubmit
   const handleSubmit = () => {
-    console.log("Submitting data:", formData, products);
-
     if (newSigners.length === 0) {
       toast.error(
         "Signature list cannot be empty. Please add at least one signer."

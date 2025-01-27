@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 // אייקון פעמון
 import { FaBell } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import i18n from "i18next";
 
 const Navbar = () => {
   const { t } = useTranslation();
@@ -23,11 +24,7 @@ const Navbar = () => {
   const queryClient = useQueryClient();
 
   // Fetch authenticated user data
-  const {
-    data: authData,
-    isLoading: authLoading,
-    isError: authError,
-  } = useQuery({
+  const { data: authData } = useQuery({
     queryKey: ["authUser"],
     queryFn: async () => {
       const response = await axiosInstance.get("/auth/me");
@@ -61,7 +58,13 @@ const Navbar = () => {
       await axiosInstance.post("/auth/logout");
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["authUser"]);
+      queryClient.clear(); // מנקה את כל המטמון, כולל המשתמש
+      localStorage.removeItem("authUser"); // הסר נתוני משתמש אם מאוחסנים מקומית
+      window.location.href = "/login"; // ניתוב מיידי לדף ההתחברות
+    },
+    onError: (error) => {
+      console.error("Logout failed:", error);
+      toast.error("Failed to log out. Please try again.");
     },
   });
 
@@ -606,7 +609,11 @@ const Navbar = () => {
 
                   {showNotifications && (
                     <div
-                      className="absolute right-0 mt-2 bg-white p-3 rounded shadow-md w-[500px] z-50 text-gray-800"
+                      className={`absolute ${
+                        i18n.language === "he"
+                          ? "-left-7"
+                          : "right-0 translate-x-4"
+                      } mt-2 bg-white p-3 rounded shadow-md w-[500px] z-50 text-gray-800`}
                       style={{ maxHeight: "500px", overflowY: "auto" }}
                     >
                       <h3 className="font-bold mb-2 text-lg border-b pb-2">

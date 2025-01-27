@@ -75,14 +75,10 @@ const PricingPlans = () => {
     try {
       const response = await axiosInstance.post(
         "/payment/create-subscription",
-        {
-          plan_name: planName,
-          duration,
-        }
+        { plan_name: planName, duration },
+        { withCredentials: true } // וודא שהעוגיה נשלחת
       );
-      if (response.data?.session.url) {
-        window.location.href = response.data.session.url;
-      }
+      window.location.href = response.data.session.url;
     } catch (error) {
       console.error("Error creating payment session:", error.response?.data);
     }

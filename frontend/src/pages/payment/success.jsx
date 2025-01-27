@@ -11,6 +11,8 @@ const Success = () => {
   const query = new URLSearchParams(window.location.search);
   const sessionId = query.get("session_id"); // Extract session ID from the success URL
 
+  console.log("Sending session ID:", sessionId);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const hasFetched = useRef(false); // Add a ref to prevent multiple calls
@@ -30,6 +32,7 @@ const Success = () => {
       const response = await axiosInstance.post("/payment/save-payment", {
         sessionId,
       });
+      console.log("Server response:", response.data);
 
       // Handle success response
       if (response.data.success) {

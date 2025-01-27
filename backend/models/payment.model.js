@@ -7,7 +7,6 @@ const paymentSchema = new mongoose.Schema({
     ref: "Company",
     required: true,
   }, // Company identifier
-  stripeCustomerId: { type: String, required: true }, // Stripe customer ID
   amount: { type: Number, required: true }, // Payment amount
   currency: { type: String, required: true }, // Currency of the payment
   planName: { type: String }, // Name of the subscription plan (optional)

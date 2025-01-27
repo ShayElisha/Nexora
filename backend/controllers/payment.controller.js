@@ -49,11 +49,18 @@ export const getAllPlans = (req, res) => {
 /**
  * Unified function to handle payment creation, saving details, and sending emails.
  */
-export const handlePayment = async (req, res) => {
+// Function to create a Stripe checkout session
+export const createPaymentSession = async (req, res) => {
   try {
-    const { plan_name, duration, sessionId } = req.body;
+    const { plan_name, duration } = req.body;
+    console.log("Received plan_name:", plan_name, "duration:", duration);
 
-    // Step 1: Validate the selected plan
+    if (!plan_name || !duration) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing plan details" });
+    }
+
     const plan = plans.find(
       (_plan) => _plan.plan_name === plan_name && _plan.duration === duration
     );
@@ -63,7 +70,7 @@ export const handlePayment = async (req, res) => {
         .json({ success: false, message: "Plan not found" });
     }
 
-    // Step 2: Extract and verify JWT token
+    // Extract and verify JWT token
     const token = req.cookies["company_jwt"];
     if (!token) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
@@ -72,7 +79,7 @@ export const handlePayment = async (req, res) => {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const companyId = decodedToken.companyId;
 
-    // Step 3: Check if the company exists
+    // Check if the company exists
     const company = await Company.findById(companyId);
     if (!company) {
       return res
@@ -80,102 +87,133 @@ export const handlePayment = async (req, res) => {
         .json({ success: false, message: "Company not found" });
     }
 
-    let session;
+    // Create a new Stripe Checkout session (without stripeCustomerId)
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      payment_method_types: ["card"],
+      line_items: [{ price: plan.plan_id, quantity: 1 }],
+      success_url: `${process.env.CLIENT_URL}/payment/completed?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.CLIENT_URL}/payment/cancelled?session_id={CHECKOUT_SESSION_ID}`,
+      metadata: {
+        companyId: companyId,
+        companyName: company.name,
+        planName: plan_name,
+        duration: duration,
+      },
+    });
 
-    // If no sessionId is provided, create a new Stripe Checkout session
+    return res.status(200).json({ success: true, session });
+  } catch (err) {
+    console.error("Error creating payment session:", err.message);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
+export const savePayment = async (req, res) => {
+  try {
+    console.log("Received request body:", req.body);
+    const { sessionId } = req.body;
+
     if (!sessionId) {
-      session = await stripe.checkout.sessions.create({
-        mode: "subscription",
-        payment_method_types: ["card"],
-        line_items: [
-          {
-            price: plan.plan_id,
-            quantity: 1,
-          },
-        ],
-        customer: company.stripeCustomerId || undefined, // Attach existing customer if available
-        success_url: `${process.env.CLIENT_URL}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.CLIENT_URL}/payment/cancel?session_id={CHECKOUT_SESSION_ID}`,
-        metadata: {
-          companyId: companyId,
-          companyName: company.name,
-          planName: plan_name,
-          duration: duration,
-        },
-      });
-
-      return res.status(200).json({ success: true, session });
+      return res
+        .status(400)
+        .json({ success: false, message: "Session ID is required" });
     }
 
-    // Step 4: If sessionId exists, process the payment
-    session = await stripe.checkout.sessions.retrieve(sessionId);
-    if (!session) {
+    let session;
+    try {
+      session = await stripe.checkout.sessions.retrieve(sessionId);
+    } catch (error) {
+      console.error("Stripe session retrieval failed:", error.message);
       return res
         .status(404)
         .json({ success: false, message: "Stripe session not found" });
     }
 
+    if (!session || !session.subscription) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid session data" });
+    }
+
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription
     );
-
-    if (session.payment_status === "paid") {
-      // Save payment details
-      const payment = new Payment({
-        sessionId,
-        companyId,
-        stripeCustomerId: company.stripeCustomerId,
-        amount: session.amount_total / 100,
-        currency: session.currency,
-        planName: plan_name,
-        startDate: new Date(),
-        endDate: new Date(subscription.current_period_end * 1000),
-      });
-
-      await payment.save();
-
-      // Update company subscription details
-      company.subscription.plan = plan_name;
-      company.subscription.paymentStatus = "Paid";
-      company.subscription.subscriptionId = subscription.id;
-      await company.save();
-
-      // Get the invoice PDF URL
-      const invoicePdfUrl = await getInvoicePdfUrl(subscription.latest_invoice);
-
-      // Generate invoice data
-      const invoiceData = {
-        companyId,
-        planName: plan_name,
-        amount: session.amount_total / 100,
-        currency: session.currency,
-        paymentDate: new Date(),
-        invoicePdfUrl,
-      };
-
-      // Send welcome email with the invoice attached
-      await sendCombinedWelcomeInvoiceEmail(company.email, company.name, {
-        ...invoiceData,
-        invoiceId: subscription.latest_invoice,
-      });
-
-      return res.status(200).json({
-        success: true,
-        message: "Payment saved successfully and email sent.",
-        payment,
-        company,
-      });
-    } else {
+    if (!session.metadata) {
       return res
         .status(400)
-        .json({ success: false, message: "Payment not completed." });
+        .json({ success: false, message: "Session metadata is missing" });
     }
-  } catch (err) {
-    console.error("Error handling payment:", err.message);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
+
+    const { companyId, planName, duration } = session.metadata;
+
+    if (!companyId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Company ID is missing in metadata" });
+    }
+
+    const company = await Company.findById(companyId);
+    if (!company) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Company not found" });
+    }
+
+    if (session.payment_status !== "paid") {
+      return res
+        .status(400)
+        .json({ success: false, message: "Payment not completed yet" });
+    }
+
+    // Save payment without stripeCustomerId
+    const payment = new Payment({
+      sessionId,
+      companyId,
+      amount: session.amount_total / 100,
+      currency: session.currency,
+      planName,
+      startDate: new Date(),
+      endDate: new Date(subscription.current_period_end * 1000),
     });
+
+    await payment.save();
+    console.log("Payment saved successfully:", payment);
+
+    company.subscription = {
+      plan: planName,
+      paymentStatus: "Paid",
+      subscriptionId: subscription.id,
+    };
+    await company.save();
+
+    const invoicePdfUrl = await stripe.invoices
+      .retrieve(subscription.latest_invoice)
+      .then((inv) => inv.invoice_pdf);
+
+    await sendCombinedWelcomeInvoiceEmail(company.email, company.name, {
+      companyId,
+      planName,
+      amount: session.amount_total / 100,
+      currency: session.currency,
+      paymentDate: new Date(),
+      invoicePdfUrl,
+      invoiceId: subscription.latest_invoice,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Payment saved successfully and email sent.",
+      payment,
+      company,
+    });
+  } catch (err) {
+    console.error("Error saving payment:", err.message);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };
 

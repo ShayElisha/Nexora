@@ -4,9 +4,11 @@ import axiosInstance from "../../../lib/axios";
 import Sidebar from "../layouts/Sidebar";
 import toast from "react-hot-toast";
 import currencyList from "./currency.json";
+import { useTranslation } from "react-i18next";
 
 const AddFinance = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   // Fetch authenticated user data
   const { data: authData } = useQuery({
@@ -81,7 +83,7 @@ const AddFinance = () => {
       <Sidebar />
       <div className="container mx-auto max-w-4xl p-8 bg-gray-800 rounded-lg shadow-xl">
         <h1 className="text-3xl font-bold text-blue-400 mb-6 text-center">
-          Add Finance Record
+          {t("finance.add_record")}
         </h1>
         <form
           onSubmit={handleSubmit}
@@ -90,7 +92,7 @@ const AddFinance = () => {
           {/* Transaction Date */}
           <div>
             <label className="block text-gray-400 font-medium mb-1">
-              Transaction Date:
+              {t("finance.transaction_date")}:
             </label>
             <input
               type="date"
@@ -105,7 +107,7 @@ const AddFinance = () => {
           {/* Transaction Type */}
           <div>
             <label className="block text-gray-400 font-medium mb-1">
-              Transaction Type:
+              {t("finance.transaction_type")}:
             </label>
             <select
               name="transactionType"
@@ -114,16 +116,16 @@ const AddFinance = () => {
               className="w-full px-2 py-1 border border-gray-700 bg-gray-700 rounded-md text-gray-300"
               required
             >
-              <option value="Income">Income</option>
-              <option value="Expense">Expense</option>
-              <option value="Transfer">Transfer</option>
+              <option value="Income">{t("finance.income")}</option>
+              <option value="Expense">{t("finance.expense")}</option>
+              <option value="Transfer">{t("finance.transfer")}</option>
             </select>
           </div>
 
           {/* Transaction Amount */}
           <div>
             <label className="block text-gray-400 font-medium mb-1">
-              Transaction Amount:
+              {t("finance.amount")}:
             </label>
             <input
               type="number"
@@ -138,7 +140,7 @@ const AddFinance = () => {
           {/* Currency */}
           <div>
             <label className="block text-gray-400 font-medium mb-1">
-              Currency:
+              {t("budget.currency")}:
             </label>
             <select
               name="transactionCurrency"
@@ -161,7 +163,7 @@ const AddFinance = () => {
           {/* Category */}
           <div>
             <label className="block text-gray-400 font-medium mb-1">
-              Category:
+              {t("finance.Category")}:
             </label>
             <input
               type="text"
@@ -176,7 +178,7 @@ const AddFinance = () => {
           {/* Bank Account */}
           <div>
             <label className="block text-gray-400 font-medium mb-1">
-              Bank Account:
+              {t("finance.Bank_Account")}:
             </label>
             <input
               type="text"
@@ -191,7 +193,7 @@ const AddFinance = () => {
           {/* Transaction Status */}
           <div>
             <label className="block text-gray-400 font-medium mb-1">
-              Transaction Status:
+              {t("finance.Transaction_Status")}:
             </label>
             <select
               name="transactionStatus"
@@ -209,7 +211,7 @@ const AddFinance = () => {
           {/* Supplier */}
           <div>
             <label className="block text-gray-400 font-medium mb-1">
-              Supplier:
+              {t("finance.supplier")}:
             </label>
             <select
               name="supplierId"
@@ -217,7 +219,7 @@ const AddFinance = () => {
               onChange={handleChange}
               className="w-full px-2 py-1 border border-gray-700 bg-gray-700 rounded-md text-gray-300"
             >
-              <option value="">Select a supplier</option>
+              <option value="">{t("finance.select_supplier")}</option>
               {suppliersData?.map((supplier) => (
                 <option key={supplier._id} value={supplier._id}>
                   {supplier.SupplierName}
@@ -229,7 +231,7 @@ const AddFinance = () => {
           {/* Attachment URL */}
           <div>
             <label className="block text-gray-400 font-medium mb-1">
-              Attachment URL:
+              {t("finance.Attachment_URL")}:
             </label>
             <input
               type="text"
@@ -243,7 +245,7 @@ const AddFinance = () => {
           {/* Invoice Number */}
           <div>
             <label className="block text-gray-400 font-medium mb-1">
-              Invoice Number:
+              {t("finance.Invoice_Number")}:
             </label>
             <input
               type="text"
@@ -257,7 +259,7 @@ const AddFinance = () => {
           {/* Transaction Description */}
           <div className="col-span-full">
             <label className="block text-gray-400 font-medium mb-1">
-              Transaction Description:
+              {t("finance.Transaction_Description")}:
             </label>
             <textarea
               name="transactionDescription"
@@ -275,8 +277,8 @@ const AddFinance = () => {
               disabled={createFinanceMutation.isLoading}
             >
               {createFinanceMutation.isLoading
-                ? "Submitting..."
-                : "Add Finance Record"}
+                ? t("finance.submitting")
+                : t("finance.add_record")}
             </button>
           </div>
         </form>

@@ -1,28 +1,33 @@
+// src/components/Footer.jsx
+import { useTranslation } from "react-i18next";
+
 const Footer = () => {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-gray-900 text-gray-300 py-6">
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
         {/* Section 1: Logo and Description */}
         <div className="mb-4 md:mb-0">
-          <h1 className="text-blue-400 text-xl font-bold">NEXORA</h1>
-          <p className="text-sm mt-2">
-            Simplifying business management, one solution at a time.
-          </p>
+          <h1 className="text-blue-400 text-xl font-bold">
+            {t("footer.company_name")}
+          </h1>
+          <p className="text-sm mt-2">{t("footer.description")}</p>
         </div>
 
         {/* Section 2: Links */}
         <div className="mb-4 md:mb-0 flex flex-col md:flex-row gap-4">
           <a href="/about" className="hover:text-blue-400">
-            About Us
+            {t("footer.about_us")}
           </a>
           <a href="/services" className="hover:text-blue-400">
-            Services
+            {t("footer.services")}
           </a>
           <a href="/contact" className="hover:text-blue-400">
-            Contact
+            {t("footer.contact")}
           </a>
           <a href="/privacy" className="hover:text-blue-400">
-            Privacy Policy
+            {t("footer.privacy_policy")}
           </a>
         </div>
 
@@ -66,7 +71,8 @@ const Footer = () => {
       {/* Bottom Section */}
       <div className="mt-6 border-t border-gray-700 pt-4 text-center text-sm">
         <p>
-          &copy; {new Date().getFullYear()} Your Company. All rights reserved.
+          &copy; {t("footer.current_year", { year: new Date().getFullYear() })}{" "}
+          {t("footer.company_name")}. {t("footer.all_rights_reserved")}
         </p>
       </div>
     </footer>

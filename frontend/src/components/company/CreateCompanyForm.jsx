@@ -4,8 +4,11 @@ import axiosInstance from "../../lib/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const CreateCompanyForm = () => {
+  const { t } = useTranslation();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -29,12 +32,12 @@ const CreateCompanyForm = () => {
       return res.data;
     },
     onSuccess: () => {
-      toast.success("Company created successfully");
+      toast.success(t("company.success_message"));
       navigate("/pricing-plans");
     },
     onError: (error) => {
       console.log("Error details:", error.response?.data);
-      toast.error(error.response.data.message || "Something went wrong");
+      toast.error(error.response.data.message || t("company.error_message"));
     },
   });
 
@@ -66,58 +69,68 @@ const CreateCompanyForm = () => {
     >
       {/* Input Fields */}
       {[
-        { label: "Company Name", value: name, setValue: setName, type: "text" },
         {
-          label: "Company Email",
+          label: t("company.name"),
+          value: name,
+          setValue: setName,
+          type: "text",
+        },
+        {
+          label: t("company.email"),
           value: email,
           setValue: setEmail,
           type: "email",
         },
         {
-          label: "Company Phone",
+          label: t("company.phone"),
           value: phone,
           setValue: setPhone,
           type: "tel",
         },
         {
-          label: "Company Website",
+          label: t("company.website"),
           value: website,
           setValue: setWebsite,
           type: "text",
         },
-        { label: "Company Logo", value: logo, setValue: setLogo, type: "text" },
         {
-          label: "Company Tax ID",
+          label: t("company.logo"),
+          value: logo,
+          setValue: setLogo,
+          type: "text",
+        },
+        {
+          label: t("company.tax_id"),
           value: taxId,
           setValue: setTaxId,
           type: "text",
         },
         {
-          label: "Company Street",
+          label: t("company.street"),
           value: address.street,
           setValue: (value) => handleAddressChange("street", value),
           type: "text",
         },
         {
-          label: "Company City",
+          label: t("company.city"),
           value: address.city,
           setValue: (value) => handleAddressChange("city", value),
           type: "text",
         },
         {
-          label: "Company State",
+          label: t("company.state"),
           value: address.state,
           setValue: (value) => handleAddressChange("state", value),
           type: "text",
         },
         {
-          label: "Company Postal Code",
+          label: t("company.postal_code"),
           value: address.postalCode,
           setValue: (value) => handleAddressChange("postalCode", value),
           type: "text",
         },
         {
-          label: "Company Country",
+          label: t("company.country"),
           value: address.country,
           setValue: (value) => handleAddressChange("country", value),
           type: "text",
@@ -129,7 +142,7 @@ const CreateCompanyForm = () => {
         >
           <input
             type={field.type}
-            name={field.name || field.label.toLowerCase().replace(" ", "")}
+            name={field.label.toLowerCase().replace(" ", "")}
             placeholder={field.label}
             value={field.value}
             onChange={(e) => field.setValue(e.target.value)}
@@ -145,15 +158,23 @@ const CreateCompanyForm = () => {
           onChange={(e) => setIndustry(e.target.value)}
           className="w-full bg-transparent outline-none text-gray-700 placeholder-zinc-700"
         >
-          <option value="">Select Industry</option>
-          <option value="Technology">Technology</option>
-          <option value="Retail">Retail</option>
-          <option value="Finance">Finance</option>
-          <option value="Healthcare">Healthcare</option>
-          <option value="Education">Education</option>
-          <option value="Real Estate">Real Estate</option>
-          <option value="Manufacturing">Manufacturing</option>
-          <option value="Other">Other</option>
+          <option value="">{t("company.select_industry")}</option>
+          <option value="Technology">
+            {t("company.industries.technology")}
+          </option>
+          <option value="Retail">{t("company.industries.retail")}</option>
+          <option value="Finance">{t("company.industries.finance")}</option>
+          <option value="Healthcare">
+            {t("company.industries.healthcare")}
+          </option>
+          <option value="Education">{t("company.industries.education")}</option>
+          <option value="Real Estate">
+            {t("company.industries.real_estate")}
+          </option>
+          <option value="Manufacturing">
+            {t("company.industries.manufacturing")}
+          </option>
+          <option value="Other">{t("company.industries.other")}</option>
         </select>
       </div>
 
@@ -167,7 +188,7 @@ const CreateCompanyForm = () => {
           {isLoading ? (
             <Loader className="size-5 animate-spin" />
           ) : (
-            "Create Company"
+            t("company.create_button")
           )}
         </button>
       </div>

@@ -1,5 +1,5 @@
-// src/pages/ProductForm.jsx
 import { Loader } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const ProductForm = ({
   fieldDefinitions,
@@ -11,6 +11,8 @@ const ProductForm = ({
   handleChange,
   handleSubmit,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -20,7 +22,7 @@ const ProductForm = ({
       {fieldDefinitions.map(({ name, type, label }) => (
         <div key={name}>
           <label className="block text-gray-400 font-medium mb-1">
-            {label}
+            {t(`product.fields.${name}`)}
           </label>
           {type !== "textarea" ? (
             <input
@@ -43,14 +45,16 @@ const ProductForm = ({
             />
           )}
           {errors[name] && (
-            <p className="mt-1 text-sm text-red-500">{errors[name]}</p>
+            <p className="mt-1 text-sm text-red-500">{t(errors[name])}</p>
           )}
         </div>
       ))}
 
       {/* 2) Supplier dropdown */}
       <div>
-        <label className="block text-gray-400 font-medium mb-1">Supplier</label>
+        <label className="block text-gray-400 font-medium mb-1">
+          {t("product.fields.supplier")}
+        </label>
         <select
           name="supplierId"
           value={formData.supplierId || ""}
@@ -59,10 +63,10 @@ const ProductForm = ({
           disabled={suppliersIsLoading}
         >
           {suppliersIsLoading ? (
-            <option>Loading suppliers...</option>
+            <option>{t("product.loading_suppliers")}</option>
           ) : (
             <>
-              <option value="">Select a supplier</option>
+              <option value="">{t("product.select_supplier")}</option>
               {suppliers.map((s) => (
                 <option key={s._id} value={s._id}>
                   {s.SupplierName}
@@ -72,7 +76,7 @@ const ProductForm = ({
           )}
         </select>
         {errors.supplierId && (
-          <p className="mt-1 text-sm text-red-500">{errors.supplierId}</p>
+          <p className="mt-1 text-sm text-red-500">{t(errors.supplierId)}</p>
         )}
       </div>
 
@@ -86,7 +90,7 @@ const ProductForm = ({
           {isLoading ? (
             <Loader className="size-6 animate-spin" />
           ) : (
-            "Add Product"
+            t("product.add_product_button")
           )}
         </button>
       </div>

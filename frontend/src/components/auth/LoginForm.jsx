@@ -6,8 +6,11 @@ import axiosInstance from "../../lib/axios";
 import { useQueryClient } from "@tanstack/react-query";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { Loader } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const LoginForm = () => {
+  const { t } = useTranslation();
+
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -51,7 +54,7 @@ const LoginForm = () => {
           htmlFor="email"
           className="block text-sm font-medium text-gray-700"
         >
-          Email
+          {t("auth.email")}
         </label>
         <div className="relative">
           <FiMail className="absolute left-3 top-3 text-gray-400" />
@@ -59,7 +62,7 @@ const LoginForm = () => {
             id="email"
             name="email"
             type="email"
-            placeholder="Enter your email"
+            placeholder={t("auth.enter_email")}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.email}
@@ -72,7 +75,9 @@ const LoginForm = () => {
           />
         </div>
         {formik.touched.email && formik.errors.email && (
-          <p className="mt-1 text-sm text-red-600">{formik.errors.email}</p>
+          <p className="mt-1 text-sm text-red-600">
+            {t(`auth.errors.${formik.errors.email}`)}
+          </p>
         )}
       </div>
 
@@ -82,7 +87,7 @@ const LoginForm = () => {
           htmlFor="password"
           className="block text-sm font-medium text-gray-700"
         >
-          Password
+          {t("auth.password")}
         </label>
         <div className="relative">
           <FiLock className="absolute left-3 top-3 text-gray-400" />
@@ -90,7 +95,7 @@ const LoginForm = () => {
             id="password"
             name="password"
             type={showPassword ? "text" : "password"}
-            placeholder="Enter your password"
+            placeholder={t("auth.enter_password")}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.password}
@@ -110,7 +115,9 @@ const LoginForm = () => {
           </button>
         </div>
         {formik.touched.password && formik.errors.password && (
-          <p className="mt-1 text-sm text-red-600">{formik.errors.password}</p>
+          <p className="mt-1 text-sm text-red-600">
+            {t(`auth.errors.${formik.errors.password}`)}
+          </p>
         )}
       </div>
 
@@ -121,7 +128,11 @@ const LoginForm = () => {
           disabled={loading}
           className="w-full flex justify-center py-2 px-4 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:bg-blue-400 transition duration-300"
         >
-          {loading ? <Loader className="size-5 animate-spin" /> : "Login"}
+          {loading ? (
+            <Loader className="size-5 animate-spin" />
+          ) : (
+            t("auth.login")
+          )}
         </button>
       </div>
     </form>

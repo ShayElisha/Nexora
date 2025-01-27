@@ -6,8 +6,10 @@ import SignatureCanvas from "react-signature-canvas"; // ייבוא ספריית
 import toast from "react-hot-toast";
 // אייקון פעמון
 import { FaBell } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const Navbar = () => {
+  const { t } = useTranslation();
   // הגדרות useState ו-useRef
   const [showPopup, setShowPopup] = useState(false); // מצב הצגת חלונית חתימות
   const [selectedPDF, setSelectedPDF] = useState(null); // PDF to display in modal
@@ -285,75 +287,96 @@ const Navbar = () => {
             <li>
               <Link
                 to="/dashboard"
-                className="hover:text-blue-400 transition duration-300"
+                className="hover:text-blue-400 ml-2 transition duration-300"
               >
-                Dashboard
+                {t("navbar.dashboard")}
               </Link>
             </li>
 
             {/* Dropdowns */}
             {[
               {
-                label: "Products",
+                label: t("navbar.products"),
                 links: [
-                  { to: "/dashboard/products", text: "All Products" },
-                  { to: "/dashboard/add-product", text: "Add Product" },
+                  { to: "/dashboard/products", text: t("navbar.all_products") },
+                  {
+                    to: "/dashboard/add-product",
+                    text: t("navbar.add_product"),
+                  },
                 ],
               },
               {
-                label: "Supplier",
+                label: t("navbar.supplier"),
                 links: [
-                  { to: "/dashboard/supplier", text: "All Suppliers" },
-                  { to: "/dashboard/add-supplier", text: "Add Supplier" },
+                  {
+                    to: "/dashboard/supplier",
+                    text: t("navbar.all_suppliers"),
+                  },
+                  {
+                    to: "/dashboard/add-supplier",
+                    text: t("navbar.add_supplier"),
+                  },
                 ],
               },
               {
-                label: "Finance",
+                label: t("navbar.finance"),
                 links: [
-                  { to: "/dashboard/finance", text: "Finance Records" },
+                  {
+                    to: "/dashboard/finance",
+                    text: t("navbar.finance_records"),
+                  },
                   {
                     to: "/dashboard/add-finance-record",
-                    text: "Create Finance Record",
+                    text: t("navbar.create_finance_record"),
                   },
                 ],
               },
               {
-                label: "Budget",
+                label: t("navbar.budget"),
                 links: [
-                  { to: "/dashboard/finance/Budgets", text: "Budget Records" },
+                  {
+                    to: "/dashboard/finance/budgets",
+                    text: t("navbar.budget_records"),
+                  },
                   {
                     to: "/dashboard/finance/add-budget",
-                    text: "Create Budget Record",
+                    text: t("navbar.create_budget_record"),
                   },
                 ],
               },
               {
-                label: "Procurement",
+                label: t("navbar.procurement"),
                 links: [
-                  { to: "/dashboard/Procurement", text: "Procurement" },
                   {
-                    to: "/dashboard/add-Procurement-record",
-                    text: "Create Procurement Record",
+                    to: "/dashboard/procurement",
+                    text: t("navbar.procurement"),
                   },
-                ],
-              },
-              {
-                label: "Employees",
-                links: [
-                  { to: "/dashboard/employees", text: "Employees" },
                   {
-                    to: "/dashboard/Signup",
-                    text: "New Employee",
+                    to: "/dashboard/add-procurement-record",
+                    text: t("navbar.create_procurement_record"),
                   },
                 ],
               },
               {
-                label: "Signatures",
+                label: t("navbar.employees"),
                 links: [
-                  { to: "/dashboard/historySignature", text: "My Signature" },
+                  {
+                    to: "/dashboard/employees",
+                    text: t("navbar.all_employees"),
+                  },
+                  { to: "/dashboard/signup", text: t("navbar.new_employee") },
+                ],
+              },
+              {
+                label: t("navbar.signatures"),
+                links: [
+                  {
+                    to: "/dashboard/historySignature",
+                    text: t("navbar.my_signature"),
+                  },
                   {
                     to: "/dashboard/historyAllSignature",
-                    text: "All Signatures",
+                    text: t("navbar.all_signatures"),
                   },
                 ],
               },
@@ -414,7 +437,7 @@ const Navbar = () => {
                   {showPopup && (
                     <div className="absolute mt-2 bg-white text-gray-800 shadow-lg rounded-md p-4 w-96">
                       <h3 className="text-lg font-bold mb-2">
-                        Documents Requiring Signature (All yours)
+                        {t("navbar.Signatures.documents_requiring_signature")}
                       </h3>
                       <ul>
                         {/* Procurement Documents */}
@@ -430,7 +453,6 @@ const Navbar = () => {
                           ).length;
                           const remainingSigners = totalSigners - signedCount;
 
-                          // Check if PurchaseOrder exists
                           if (!item.PurchaseOrder) {
                             console.warn(
                               `PurchaseOrder is missing for procurement ${item._id}`
@@ -441,7 +463,9 @@ const Navbar = () => {
                           return (
                             <li key={item._id} className="mb-3 border-b pb-2">
                               <div>
-                                <strong>Purchase Order:</strong>{" "}
+                                <strong>
+                                  {t("navbar.Signatures.purchase_order")}:
+                                </strong>{" "}
                                 {item.PurchaseOrder}
                               </div>
 
@@ -456,18 +480,20 @@ const Navbar = () => {
                                   }
                                   className="mt-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300"
                                 >
-                                  Sign Now
+                                  {t("navbar.Signatures.sign_now")}
                                 </button>
                               ) : (
                                 <>
                                   <p className="text-sm text-gray-600">
-                                    Next signer:{" "}
+                                    {t("navbar.Signatures.next_signer")}:{" "}
                                     {nextSigner
                                       ? `${nextSigner.name} (${nextSigner.role})`
-                                      : "No next signer"}
+                                      : t("navbar.Signatures.no_next_signer")}
                                   </p>
                                   <p className="text-sm text-gray-600">
-                                    {remainingSigners} signers left to sign.
+                                    {t("navbar.Signatures.remaining_signers", {
+                                      count: remainingSigners,
+                                    })}
                                   </p>
                                 </>
                               )}
@@ -491,14 +517,22 @@ const Navbar = () => {
                           return (
                             <li key={item._id} className="mb-3 border-b pb-2">
                               <div>
-                                <strong>Budget Name:</strong>{" "}
+                                <strong>
+                                  {t("navbar.Signatures.budget_name")}:
+                                </strong>{" "}
                                 {item.departmentOrProjectName}
                               </div>
                               <div>
-                                <strong>Amount:</strong> ${item.amount}
+                                <strong>
+                                  {t("navbar.Signatures.amount")}:
+                                </strong>{" "}
+                                ${item.amount}
                               </div>
                               <div>
-                                <strong>Department:</strong> {item.department}
+                                <strong>
+                                  {t("navbar.Signatures.department")}:
+                                </strong>{" "}
+                                {item.department}
                               </div>
 
                               {isMyTurn ? (
@@ -518,18 +552,20 @@ const Navbar = () => {
                                   }
                                   className="mt-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition duration-300"
                                 >
-                                  Sign Now
+                                  {t("navbar.Signatures.sign_now")}
                                 </button>
                               ) : (
                                 <>
                                   <p className="text-sm text-gray-600">
-                                    Next signer:{" "}
+                                    {t("navbar.Signatures.next_signer")}:{" "}
                                     {nextSigner
                                       ? `${nextSigner.name} (${nextSigner.role})`
-                                      : "No next signer"}
+                                      : t("navbar.Signatures.no_next_signer")}
                                   </p>
                                   <p className="text-sm text-gray-600">
-                                    {remainingSigners} signers left to sign.
+                                    {t("navbar.Signatures.remaining_signers", {
+                                      count: remainingSigners,
+                                    })}
                                   </p>
                                 </>
                               )}
@@ -545,7 +581,7 @@ const Navbar = () => {
                         }}
                         className="mt-3 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                       >
-                        Close
+                        {t("buttons.close")}
                       </button>
                     </div>
                   )}
@@ -557,7 +593,7 @@ const Navbar = () => {
                 <div className="relative">
                   <button
                     onClick={handleNotificationsClick}
-                    className="relative"
+                    className="relative mr-4"
                   >
                     <FaBell size={24} />
                     {/* Badge לכמות התראות לא נקראו (אם יש) */}
@@ -574,10 +610,10 @@ const Navbar = () => {
                       style={{ maxHeight: "500px", overflowY: "auto" }}
                     >
                       <h3 className="font-bold mb-2 text-lg border-b pb-2">
-                        Notifications
+                        {t("notifications.title")}
                       </h3>
                       {isLoadingNotifications ? (
-                        <p>Loading notifications...</p>
+                        <p>{t("notifications.loading")}</p>
                       ) : adminNotifications?.length > 0 ? (
                         adminNotifications.map((notification) => (
                           <div
@@ -598,7 +634,9 @@ const Navbar = () => {
                                 deleteNotification(notification._id);
                               }}
                               className="absolute top-0.5 right-1 px-1 py-0.5 bg-red-500 text-white rounded-full hover:bg-red-600 text-xs"
-                              aria-label="Delete notification"
+                              aria-label={t(
+                                "navbar.notifications.notification_deleted"
+                              )}
                             >
                               &times;
                             </button>
@@ -614,7 +652,7 @@ const Navbar = () => {
                           </div>
                         ))
                       ) : (
-                        <p>No notifications found.</p>
+                        <p>{t("navbar.notifications.no_notifications")}</p>
                       )}
                     </div>
                   )}
@@ -629,14 +667,16 @@ const Navbar = () => {
                 />
               </div>
               <span className="hidden md:block font-medium">
-                Hello {firstName} {lastName}
+                {t("navbar.profile.hello", { firstName, lastName })}{" "}
               </span>
               <button
                 onClick={() => logout()}
                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition duration-300"
                 disabled={isLoggingOut}
               >
-                {isLoggingOut ? "Logging out..." : "Logout"}
+                {isLoggingOut
+                  ? t("navbar.profile.logging_out")
+                  : t("navbar.profile.logout")}
               </button>
             </>
           ) : (
@@ -644,7 +684,7 @@ const Navbar = () => {
               to="/login"
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300"
             >
-              Login
+              {t("navbar.profile.login")}
             </Link>
           )}
         </div>

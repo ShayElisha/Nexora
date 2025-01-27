@@ -2,6 +2,7 @@ import { Navigate, Route, Routes, Outlet } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "./lib/axios";
+import "../src/components/layout/i18n.js"; // וודא שזה נמצא בתחילת הקובץ
 
 import Layout from "./components/layout/Layout";
 import HomePage from "./pages/HomePage";

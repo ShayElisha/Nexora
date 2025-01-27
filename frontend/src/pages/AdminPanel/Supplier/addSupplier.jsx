@@ -4,9 +4,11 @@ import Sidebar from "../layouts/Sidebar";
 import toast from "react-hot-toast";
 import axiosInstance from "../../../lib/axios";
 import currencyList from "../finance/currency.json";
+import { useTranslation } from "react-i18next";
 
 const AddSupplier = ({ authUser }) => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const [supplierData, setSupplierData] = useState({
     companyId: authUser?.user?.companyId || "",
@@ -70,12 +72,12 @@ const AddSupplier = ({ authUser }) => {
       <div className="flex-1 flex justify-center items-center">
         <div className="bg-gray-800 rounded-lg shadow-xl p-8 max-w-lg w-full">
           <h2 className="text-2xl font-bold text-center text-blue-400 mb-6">
-            Add New Supplier
+            {t("supplier.add_new_supplier")}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-gray-300 font-medium">
-                Supplier Name
+                {t("supplier.name")}
               </label>
               <input
                 type="text"
@@ -89,7 +91,9 @@ const AddSupplier = ({ authUser }) => {
             </div>
 
             <div>
-              <label className="block text-gray-300 font-medium">Contact</label>
+              <label className="block text-gray-300 font-medium">
+                {t("supplier.contact")}
+              </label>
               <input
                 type="text"
                 name="Contact"
@@ -101,7 +105,9 @@ const AddSupplier = ({ authUser }) => {
             </div>
 
             <div>
-              <label className="block text-gray-300 font-medium">Phone</label>
+              <label className="block text-gray-300 font-medium">
+                {t("supplier.phone")}
+              </label>
               <input
                 type="text"
                 name="Phone"
@@ -113,7 +119,9 @@ const AddSupplier = ({ authUser }) => {
             </div>
 
             <div>
-              <label className="block text-gray-300 font-medium">Email</label>
+              <label className="block text-gray-300 font-medium">
+                {t("supplier.email")}
+              </label>
               <input
                 type="email"
                 name="Email"
@@ -125,7 +133,9 @@ const AddSupplier = ({ authUser }) => {
             </div>
 
             <div>
-              <label className="block text-gray-300 font-medium">Address</label>
+              <label className="block text-gray-300 font-medium">
+                {t("supplier.address")}
+              </label>
               <input
                 type="text"
                 name="Address"
@@ -138,7 +148,7 @@ const AddSupplier = ({ authUser }) => {
 
             <div>
               <label className="block text-gray-300 font-medium">
-                Bank Account
+                {t("supplier.bank_account")}
               </label>
               <input
                 type="text"
@@ -151,7 +161,9 @@ const AddSupplier = ({ authUser }) => {
             </div>
 
             <div>
-              <label className="block text-gray-300 font-medium">Rating</label>
+              <label className="block text-gray-300 font-medium">
+                {t("supplier.rating")}
+              </label>
               <input
                 type="number"
                 name="Rating"
@@ -164,7 +176,7 @@ const AddSupplier = ({ authUser }) => {
             </div>
             <div>
               <label className="block text-gray-400 font-medium mb-1">
-                Currency:
+                {t("supplier.currency")}
               </label>
               <select
                 name="transactionCurrency"
@@ -193,7 +205,7 @@ const AddSupplier = ({ authUser }) => {
                   onChange={handleInputChange}
                   className="mr-2"
                 />
-                Active
+                {t("supplier.active")}
               </label>
             </div>
 
@@ -202,7 +214,9 @@ const AddSupplier = ({ authUser }) => {
               className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
               disabled={addSupplierMutation.isLoading}
             >
-              {addSupplierMutation.isLoading ? "Adding..." : "Add Supplier"}
+              {addSupplierMutation.isLoading
+                ? t("supplier.adding")
+                : t("supplier.add_button")}
             </button>
           </form>
         </div>

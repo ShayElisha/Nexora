@@ -3,8 +3,10 @@ import axiosInstance from "../../../lib/axios";
 import Sidebar from "../layouts/Sidebar";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const SupplierList = () => {
+  const { t } = useTranslation();
   const [suppliers, setSuppliers] = useState([]);
   const [error, setError] = useState(null);
 
@@ -27,7 +29,7 @@ const SupplierList = () => {
       setError(null);
     },
     onError: (err) => {
-      toast.error(err.response?.data?.message || "Failed to fetch suppliers.");
+      toast.error(err.response?.data?.message || t("supplier.fetch_failed"));
       setError(err.message);
     },
   });
@@ -49,7 +51,7 @@ const SupplierList = () => {
   if (!isLoggedIn) {
     return (
       <div className="flex justify-center items-center h-96">
-        <p className="text-red-500">User is not authenticated.</p>
+        <p className="text-red-500">{t("supplier.not_authenticated")}</p>
       </div>
     );
   }
@@ -59,7 +61,7 @@ const SupplierList = () => {
       <Sidebar className="w-1/5 bg-gray-800 p-4" />
       <div className="flex-1 py-12 px-6">
         <h2 className="text-3xl font-bold text-blue-400 mb-6 text-center">
-          Supplier List
+          {t("supplier.list_title")}
         </h2>
         {error ? (
           <p className="text-red-500 text-center">{error}</p>
@@ -73,22 +75,38 @@ const SupplierList = () => {
                 <h3 className="text-blue-400 font-semibold mb-2">
                   {supplier.SupplierName}
                 </h3>
-                <p>Contact: {supplier.Contact || "N/A"}</p>
-                <p>Email: {supplier.Email || "N/A"}</p>
-                <p>Phone: {supplier.Phone || "N/A"}</p>
-                <p>Rating: {supplier.Rating || "N/A"}</p>
+                <p>
+                  {t("supplier.contact")}:{" "}
+                  {supplier.Contact || t("supplier.not_available")}
+                </p>
+                <p>
+                  {t("supplier.email")}:{" "}
+                  {supplier.Email || t("supplier.not_available")}
+                </p>
+                <p>
+                  {t("supplier.phone")}:{" "}
+                  {supplier.Phone || t("supplier.not_available")}
+                </p>
+                <p>
+                  {t("supplier.rating")}:{" "}
+                  {supplier.Rating || t("supplier.not_available")}
+                </p>
                 <p
                   className={`text-sm font-semibold ${
                     supplier.IsActive ? "text-green-500" : "text-red-500"
                   }`}
                 >
-                  {supplier.IsActive ? "Active" : "Inactive"}
+                  {supplier.IsActive
+                    ? t("supplier.active")
+                    : t("supplier.inactive")}
                 </p>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-center text-gray-400">No suppliers found.</p>
+          <p className="text-center text-gray-400">
+            {t("supplier.no_suppliers")}
+          </p>
         )}
       </div>
     </div>

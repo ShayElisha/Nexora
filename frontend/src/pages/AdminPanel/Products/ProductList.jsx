@@ -4,9 +4,11 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import Sidebar from "../layouts/Sidebar";
 import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const EditInventoryModal = ({ item, onClose }) => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     quantity: item?.quantity || 0,
@@ -61,11 +63,15 @@ const EditInventoryModal = ({ item, onClose }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white p-6 rounded-lg w-full max-w-lg">
-        <h2 className="text-2xl font-bold mb-4">Edit Inventory Item</h2>
+        <h2 className="text-2xl font-bold mb-4">
+          {t("inventory.edit_inventory_item")}
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Quantity */}
           <div>
-            <label className="block text-gray-700">Quantity:</label>
+            <label className="block text-gray-700">
+              {t("inventory.quantity")}:
+            </label>
             <input
               type="number"
               name="quantity"
@@ -74,13 +80,17 @@ const EditInventoryModal = ({ item, onClose }) => {
               className="w-full p-2 border rounded"
             />
             {errors.quantity && (
-              <p className="text-red-500 text-sm">{errors.quantity}</p>
+              <p className="text-red-500 text-sm">
+                {t("errors.quantity_required")}
+              </p>
             )}
           </div>
 
           {/* Min Stock Level */}
           <div>
-            <label className="block text-gray-700">Min Stock Level:</label>
+            <label className="block text-gray-700">
+              {t("inventory.min_stock_level")}:
+            </label>
             <input
               type="number"
               name="minStockLevel"
@@ -89,13 +99,17 @@ const EditInventoryModal = ({ item, onClose }) => {
               className="w-full p-2 border rounded"
             />
             {errors.minStockLevel && (
-              <p className="text-red-500 text-sm">{errors.minStockLevel}</p>
+              <p className="text-red-500 text-sm">
+                {t("errors.min_stock_level_required")}
+              </p>
             )}
           </div>
 
           {/* Reorder Quantity */}
           <div>
-            <label className="block text-gray-700">Reorder Quantity:</label>
+            <label className="block text-gray-700">
+              {t("inventory.reorder_quantity")}:
+            </label>
             <input
               type="number"
               name="reorderQuantity"
@@ -104,13 +118,17 @@ const EditInventoryModal = ({ item, onClose }) => {
               className="w-full p-2 border rounded"
             />
             {errors.reorderQuantity && (
-              <p className="text-red-500 text-sm">{errors.reorderQuantity}</p>
+              <p className="text-red-500 text-sm">
+                {t("errors.reorder_quantity_required")}
+              </p>
             )}
           </div>
 
           {/* Batch Number */}
           <div>
-            <label className="block text-gray-700">Batch Number:</label>
+            <label className="block text-gray-700">
+              {t("inventory.batch_number")}
+            </label>
             <input
               type="text"
               name="batchNumber"
@@ -119,13 +137,17 @@ const EditInventoryModal = ({ item, onClose }) => {
               className="w-full p-2 border rounded"
             />
             {errors.batchNumber && (
-              <p className="text-red-500 text-sm">{errors.batchNumber}</p>
+              <p className="text-red-500 text-sm">
+                {t("errors.batch_number_required")}
+              </p>
             )}
           </div>
 
           {/* Expiration Date */}
           <div>
-            <label className="block text-gray-700">Expiration Date:</label>
+            <label className="block text-gray-700">
+              {t("inventory.expiration_date")}:
+            </label>
             <input
               type="date"
               name="expirationDate"
@@ -134,13 +156,17 @@ const EditInventoryModal = ({ item, onClose }) => {
               className="w-full p-2 border rounded"
             />
             {errors.expirationDate && (
-              <p className="text-red-500 text-sm">{errors.expirationDate}</p>
+              <p className="text-red-500 text-sm">
+                {t("errors.expiration_date_required")}
+              </p>
             )}
           </div>
 
           {/* Shelf Location */}
           <div>
-            <label className="block text-gray-700">Shelf Location:</label>
+            <label className="block text-gray-700">
+              {t("inventory.shelf_location")}:
+            </label>
             <input
               type="text"
               name="shelfLocation"
@@ -149,7 +175,9 @@ const EditInventoryModal = ({ item, onClose }) => {
               className="w-full p-2 border rounded"
             />
             {errors.shelfLocation && (
-              <p className="text-red-500 text-sm">{errors.shelfLocation}</p>
+              <p className="text-red-500 text-sm">
+                {t("errors.shelf_location_required")}
+              </p>
             )}
           </div>
 
@@ -160,13 +188,13 @@ const EditInventoryModal = ({ item, onClose }) => {
               onClick={onClose}
               className="px-4 py-2 bg-gray-500 text-white rounded"
             >
-              Cancel
+              {t("buttons.cancel")}
             </button>
             <button
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded"
             >
-              Save
+              {t("buttons.save")}
             </button>
           </div>
         </form>
@@ -181,6 +209,7 @@ const ProductList = () => {
   const [error, setError] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const { t } = useTranslation();
 
   // בקשת המשתמש המחובר
   const { data: authData, error: authError } = useQuery({
@@ -272,7 +301,7 @@ const ProductList = () => {
 
       <div className="container mx-auto p-6 bg-gray-800 rounded-lg shadow-lg">
         <h1 className="text-3xl font-bold text-blue-400 mb-6 text-center">
-          Product & Inventory List
+          {t("inventory.Product_Inventory_List")}
         </h1>
 
         {/* הצגת שגיאה גלובלית אם קיימת */}
@@ -283,17 +312,17 @@ const ProductList = () => {
             <thead>
               <tr>
                 {[
-                  "Image",
-                  "SKU",
-                  "Barcode",
-                  "Product Name",
-                  "Unit Price",
-                  "Category",
-                  "Supplier Name",
-                  "Quantity",
-                  "Min Stock Level",
-                  "Reorder Qty",
-                  "Actions",
+                  t("inventory.image"),
+                  t("inventory.sku"),
+                  t("inventory.barcode"),
+                  t("inventory.product_name"),
+                  t("inventory.unit_price"),
+                  t("inventory.category"),
+                  t("inventory.supplier_name"),
+                  t("inventory.quantity"),
+                  t("inventory.min_stock_level"),
+                  t("inventory.reorder_qty"),
+                  t("inventory.actions"),
                 ].map((header) => (
                   <th key={header} className="py-3 px-6 text-left bg-gray-600">
                     {header}
@@ -331,13 +360,24 @@ const ProductList = () => {
                         "No Image"
                       )}
                     </td>
-                    <td className="py-2 px-6">{item.SKU || "N/A"}</td>
-                    <td className="py-2 px-6">{item.barcode || "N/A"}</td>
-                    <td className="py-2 px-6">{item.productName || "N/A"}</td>
-                    <td className="py-2 px-6">{item.unitPrice || "N/A"}</td>
-                    <td className="py-2 px-6">{item.category || "N/A"}</td>
-                    <td className="py-2 px-6">{item.supplierName || "N/A"}</td>
-                    {/* כאן ניגשים למלאי דרך item.inventory */}
+                    <td className="py-2 px-6">
+                      {item.SKU || t("inventory.not_available")}
+                    </td>
+                    <td className="py-2 px-6">
+                      {item.barcode || t("inventory.not_available")}
+                    </td>
+                    <td className="py-2 px-6">
+                      {item.productName || t("inventory.not_available")}
+                    </td>
+                    <td className="py-2 px-6">
+                      {item.unitPrice || t("inventory.not_available")}
+                    </td>
+                    <td className="py-2 px-6">
+                      {item.category || t("inventory.not_available")}
+                    </td>
+                    <td className="py-2 px-6">
+                      {item.supplierName || t("inventory.not_available")}
+                    </td>
                     <td className="py-2 px-6">
                       {item.inventory?.quantity ?? 0}
                     </td>
@@ -352,10 +392,10 @@ const ProductList = () => {
                         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none"
                         onClick={() => handleEdit(item._id)}
                       >
-                        Edit
+                        {t("inventory.edit")}
                       </button>
                       <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none">
-                        Delete
+                        {t("inventory.delete")}
                       </button>
                     </td>
                   </tr>

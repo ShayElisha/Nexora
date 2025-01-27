@@ -2,13 +2,15 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Sidebar from "../layouts/Sidebar";
 import toast from "react-hot-toast";
-
 import { useProductAdminStore } from "../../../stores/useProductAdminStore";
 import { useSupplierStore } from "../../../stores/useSupplierStore";
 import axiosInstance from "../../../lib/axios";
 import ProductForm from "../components/ProductForm";
+import { useTranslation } from "react-i18next";
 
 const AddProduct = () => {
+  const { t } = useTranslation();
+
   // Zustand for products
   const { createProduct, isLoading: productIsLoading } = useProductAdminStore();
 
@@ -37,21 +39,17 @@ const AddProduct = () => {
     category: "",
     supplierId: "",
     supplierName: "",
-    productImage: "", // Updated for file upload
+    productImage: "",
   });
 
-  console.log(formData);
   const [errors, setErrors] = useState({});
 
-  // Fetch suppliers once on mount
   useEffect(() => {
     fetchSuppliers();
   }, [fetchSuppliers]);
 
-  // React Query client for refreshing cache
   const queryClient = useQueryClient();
 
-  // Mutation to create product and upload image
   const { mutate: createNewProduct } = useMutation({
     mutationFn: async (productData) => {
       const response = await axiosInstance.post("/product", productData);
@@ -59,7 +57,7 @@ const AddProduct = () => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries(["products"]);
-      toast.success("Product added successfully");
+      toast.success(t("product.success_message"));
 
       const product = data.data;
       const defaultInventory = {
@@ -81,7 +79,7 @@ const AddProduct = () => {
     },
     onError: (error) => {
       toast.error(
-        `Failed to create product: ${
+        `${t("product.error_message")}: ${
           error.response?.data?.error || error.message
         }`
       );
@@ -103,19 +101,19 @@ const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validations
     const newErrors = {};
-    if (!formData.supplierId) newErrors.supplierId = "Supplier is required.";
+    if (!formData.supplierId)
+      newErrors.supplierId = t("product.errors.supplier_required");
     if (!formData.productName)
-      newErrors.productName = "Product Name is required.";
-    if (!formData.unitPrice) newErrors.unitPrice = "Unit Price is required.";
+      newErrors.productName = t("product.errors.name_required");
+    if (!formData.unitPrice)
+      newErrors.unitPrice = t("product.errors.price_required");
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    // בניית payload לשליחה כ־JSON
     const payload = {
       companyId: formData.companyId,
       SKU: formData.SKU,
@@ -134,18 +132,17 @@ const AddProduct = () => {
       const reader = new FileReader();
       reader.readAsDataURL(formData.productImage);
       reader.onloadend = () => {
-        payload.productImage = reader.result; // מחרוזת Base64
+        payload.productImage = reader.result;
         createNewProduct(payload);
       };
       reader.onerror = () => {
-        toast.error("Failed to read the image file.");
+        toast.error(t("product.errors.image_upload_failed"));
       };
     } else {
       createNewProduct(payload);
     }
   };
 
-  // Keep companyId in sync with the user data
   useEffect(() => {
     if (authUser?.company) {
       setFormData((prev) => ({
@@ -155,22 +152,21 @@ const AddProduct = () => {
     }
   }, [authUser]);
 
-  // Form fields
   const fieldDefinitions = [
-    { name: "SKU", type: "text", label: "SKU" },
-    { name: "barcode", type: "text", label: "Barcode" },
-    { name: "productName", type: "text", label: "Product Name" },
-    { name: "unitPrice", type: "number", label: "Unit Price" },
-    { name: "category", type: "text", label: "Category" },
+    { name: "SKU", type: "text", label: t("product.fields.sku") },
+    { name: "barcode", type: "text", label: t("product.fields.barcode") },
+    { name: "productName", type: "text", label: t("product.fields.name") },
+    { name: "unitPrice", type: "number", label: t("product.fields.price") },
+    { name: "category", type: "text", label: t("product.fields.category") },
     {
       name: "productDescription",
       type: "textarea",
-      label: "Product Description",
+      label: t("product.fields.description"),
     },
     {
       name: "productImage",
       type: "file",
-      label: "Product Image",
+      label: t("product.fields.image"),
     },
   ];
 
@@ -179,13 +175,12 @@ const AddProduct = () => {
       <Sidebar />
       <div className="container mx-auto max-w-4xl p-8 bg-gray-800 rounded-lg shadow-xl">
         <h1 className="text-3xl font-bold text-blue-400 mb-6 text-center">
-          Add New Product
+          {t("product.add_new_product")}
         </h1>
 
-        {/* Show supplier fetch errors if needed */}
         {suppliersError && (
           <div className="mb-4 text-red-500 text-center">
-            Failed to load suppliers: {suppliersError}
+            {t("product.errors.load_suppliers_failed")}: {suppliersError}
           </div>
         )}
 

@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
 import CreateCompanyForm from "../../components/company/CreateCompanyForm";
+import { useTranslation } from "react-i18next";
 
 const CreateCompanyPage = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       {/* Header Section */}
@@ -9,10 +12,10 @@ const CreateCompanyPage = () => {
         <img
           className="mx-auto size-36 border-4 border-white rounded-full shadow-lg"
           src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="Nexora"
+          alt={t("company.logo_alt")}
         />
         <h2 className="text-3xl font-extrabold text-zinc-900 mt-4">
-          Start your company journey
+          {t("company.start_journey")}
         </h2>
       </div>
 
@@ -28,7 +31,7 @@ const CreateCompanyPage = () => {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-white text-zinc-900">
-                  Already have a company?
+                  {t("company.already_have")}
                 </span>
               </div>
             </div>
@@ -39,7 +42,7 @@ const CreateCompanyPage = () => {
                 to="/login"
                 className="w-full max-w-xs flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-zinc-800 hover:bg-zinc-900"
               >
-                Login
+                {t("company.login_button")}
               </Link>
             </div>
           </div>

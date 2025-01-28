@@ -1,49 +1,62 @@
 // src/components/procurement/PaymentAndShipping.jsx
 import currency from "../../finance/currency.json";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const PaymentAndShipping = ({
   formData,
   handleFormChange,
   handleCurrencyChange,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div>
       <h2 className="text-lg font-bold text-blue-400 mb-4">
-        Payment & Shipping
+        {t("procurement.payment_shipping")}
       </h2>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label>Payment Method:</label>
+          <label className="block text-gray-300 mb-2">
+            {t("procurement.payment_method")}:
+          </label>
           <select
             name="PaymentMethod"
             value={formData.PaymentMethod}
             onChange={handleFormChange}
             className="w-full p-2 rounded bg-gray-700"
           >
-            <option value="">Select Payment Method</option>
-            <option value="Cash">Cash</option>
-            <option value="Credit Card">Credit Card</option>
-            <option value="Bank Transfer">Bank Transfer</option>
+            <option value="">{t("procurement.select_payment_method")}</option>
+            <option value="Cash">{t("procurement.cash")}</option>
+            <option value="Credit Card">{t("procurement.credit_card")}</option>
+            <option value="Bank Transfer">
+              {t("procurement.bank_transfer")}
+            </option>
           </select>
         </div>
         <div>
-          <label>Payment Terms:</label>
+          <label className="block text-gray-300 mb-2">
+            {t("procurement.payment_terms")}:
+          </label>
           <select
             name="PaymentTerms"
             value={formData.PaymentTerms}
             onChange={handleFormChange}
             className="w-full p-2 rounded bg-gray-700"
           >
-            <option value="">Select Payment Terms</option>
-            <option value="Due on receipt">Due on receipt</option>
-            <option value="Net 30 days">Net 30 days</option>
-            <option value="Net 45 days">Net 45 days</option>
-            <option value="Net 60 days">Net 60 days</option>
+            <option value="">{t("procurement.select_payment_terms")}</option>
+            <option value="Due on receipt">
+              {t("procurement.due_on_receipt")}
+            </option>
+            <option value="Net 30 days">{t("procurement.net_30_days")}</option>
+            <option value="Net 45 days">{t("procurement.net_45_days")}</option>
+            <option value="Net 60 days">{t("procurement.net_60_days")}</option>
           </select>
         </div>
         <div>
-          <label>Delivery Address:</label>
+          <label className="block text-gray-300 mb-2">
+            {t("procurement.delivery_address")}:
+          </label>
           <input
             type="text"
             name="DeliveryAddress"
@@ -53,21 +66,27 @@ const PaymentAndShipping = ({
           />
         </div>
         <div>
-          <label>Shipping Method:</label>
+          <label className="block text-gray-300 mb-2">
+            {t("procurement.shipping_method")}:
+          </label>
           <select
             name="ShippingMethod"
             value={formData.ShippingMethod}
             onChange={handleFormChange}
             className="w-full p-2 rounded bg-gray-700"
           >
-            <option value="">Select Shipping Method</option>
-            <option value="Air Freight">Air Freight</option>
-            <option value="Sea Freight">Sea Freight</option>
-            <option value="Land Freight">Land Freight</option>
+            <option value="">{t("procurement.select_shipping_method")}</option>
+            <option value="Air Freight">{t("procurement.air_freight")}</option>
+            <option value="Sea Freight">{t("procurement.sea_freight")}</option>
+            <option value="Land Freight">
+              {t("procurement.land_freight")}
+            </option>
           </select>
         </div>
         <div>
-          <label>Shipping Cost:</label>
+          <label className="block text-gray-300 mb-2">
+            {t("procurement.shipping_cost")}:
+          </label>
           <input
             type="number"
             name="shippingCost"
@@ -77,8 +96,11 @@ const PaymentAndShipping = ({
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="currency" className="block text-gray-300 font-medium">
-            Currency:
+          <label
+            htmlFor="currency"
+            className="block text-gray-300 font-medium mb-2"
+          >
+            {t("procurement.currency")}:
           </label>
           <select
             id="currency"
@@ -86,16 +108,14 @@ const PaymentAndShipping = ({
             value={formData.currency}
             onChange={(e) => {
               if (!formData.supplierId) {
-                toast.error(
-                  "Please select a supplier before changing the currency."
-                );
+                toast.error(t("procurement.please_select_supplier_first"));
                 return;
               }
               handleCurrencyChange(e);
             }}
             className="w-full p-2 rounded bg-gray-700 text-gray-300"
           >
-            <option value="">Select Currency</option>
+            <option value="">{t("procurement.select_currency")}</option>
             {currency.map((cur) => (
               <option key={cur.currencyCode} value={cur.currencyCode}>
                 {cur.currencyName} ({cur.symbol})

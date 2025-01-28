@@ -5,8 +5,10 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import Sidebar from "../layouts/Sidebar";
 import SignaturesModal from "../Procurement/components/SignaturesModal";
+import { useTranslation } from "react-i18next";
 
 const AddBudget = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -130,12 +132,12 @@ const AddBudget = () => {
       <Sidebar />
       <div className="container mx-auto p-8 bg-white shadow-lg rounded-lg">
         <h1 className="text-3xl font-bold text-gray-700 mb-6">
-          Add New Budget
+          {t("budget.create_budget")}
         </h1>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-gray-700 font-medium">
-              Department/Project Name:
+              {t("budget.department_project_name")}:
             </label>
             <input
               type="text"
@@ -148,7 +150,7 @@ const AddBudget = () => {
           </div>
           <div>
             <label className="block text-gray-700 font-medium">
-              Budget Amount:
+              {t("budget.budget_amount")}:
             </label>
             <input
               type="number"
@@ -160,7 +162,10 @@ const AddBudget = () => {
             />
           </div>
           <div>
-            <label className="block text-gray-700 font-medium">Currency:</label>
+            <label className="block text-gray-700 font-medium">
+              {" "}
+              {t("budget.currency")}: :
+            </label>
             <select
               name="currency"
               value={formData.currency}
@@ -175,7 +180,7 @@ const AddBudget = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-gray-700 font-medium">
-                Start Date:
+                {t("budget.start_date")}:
               </label>
               <input
                 type="date"
@@ -187,7 +192,7 @@ const AddBudget = () => {
             </div>
             <div>
               <label className="block text-gray-700 font-medium">
-                End Date:
+                {t("budget.end_date")}:
               </label>
               <input
                 type="date"
@@ -199,7 +204,10 @@ const AddBudget = () => {
             </div>
           </div>
           <div>
-            <label className="block text-gray-700 font-medium">Status:</label>
+            <label className="block text-gray-700 font-medium">
+              {" "}
+              {t("budget.status")}: :
+            </label>
             <select
               name="status"
               value={formData.status}
@@ -212,7 +220,10 @@ const AddBudget = () => {
             </select>
           </div>
           <div>
-            <label className="block text-gray-700 font-medium">Notes:</label>
+            <label className="block text-gray-700 font-medium">
+              {" "}
+              {t("budget.notes")}: :
+            </label>
             <textarea
               name="notes"
               value={formData.notes}
@@ -226,7 +237,7 @@ const AddBudget = () => {
             onClick={() => setShowSignatureModal(true)}
             className="bg-purple-600 text-white py-3 px-6 rounded-lg shadow-lg hover:bg-purple-700 transition"
           >
-            Select Signers
+            {t("budget.select_signers")}
           </button>
 
           {newSigners.length > 0 && (
@@ -248,7 +259,7 @@ const AddBudget = () => {
             type="submit"
             className="w-full bg-green-600 text-white py-3 rounded-lg shadow-lg hover:bg-green-700 transition"
           >
-            Create Budget
+            {t("budget.create_budget")}
           </button>
         </form>
       </div>

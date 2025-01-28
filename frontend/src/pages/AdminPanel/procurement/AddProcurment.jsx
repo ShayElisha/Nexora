@@ -22,10 +22,13 @@ import PreviewModal from "./components/PreviewModal";
 
 // JSON
 import currency from "../finance/currency.json";
+import { useTranslation } from "react-i18next";
 
 import axiosInstance from "../../../lib/axios";
 
 const AddProcurement = () => {
+  const { t } = useTranslation();
+
   const queryClient = useQueryClient();
   const { data: authData } = useQuery({ queryKey: ["authUser"] });
   const authUser = authData?.user;
@@ -101,10 +104,16 @@ const AddProcurement = () => {
 
   // ----------------- useEffect ----------------- //
   useEffect(() => {
-    fetchSuppliers().catch(() => toast.error("Failed to load suppliers"));
-    fetchEmployees().catch(() => toast.error("Failed to load employees"));
-    fetchSignatureLists().catch(() => toast.error("Failed to load signatures"));
-  }, [fetchSuppliers, fetchEmployees, fetchSignatureLists]);
+    fetchSuppliers().catch(() =>
+      toast.error(t("procurement.failed_to_load_suppliers"))
+    );
+    fetchEmployees().catch(() =>
+      toast.error(t("procurement.failed_to_load_employees"))
+    );
+    fetchSignatureLists().catch(() =>
+      toast.error(t("procurement.failed_to_load_signatures"))
+    );
+  }, [fetchSuppliers, fetchEmployees, fetchSignatureLists, t]);
 
   // ----------------- Mutations ----------------- //
   const { mutate: addProcurementMutation } = useMutation({
@@ -117,13 +126,14 @@ const AddProcurement = () => {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("Procurement created successfully!");
+      toast.success(t("procurement.procurement_created_successfully"));
       queryClient.invalidateQueries(["procurement"]);
       resetForm();
     },
     onError: (error) => {
       toast.error(
-        error?.response?.data?.message || "Failed to create procurement."
+        error?.response?.data?.message ||
+          t("procurement.failed_to_create_procurement")
       );
     },
   });
@@ -152,16 +162,16 @@ const AddProcurement = () => {
       const rates = response.data.rates;
 
       if (!rates[base]) {
-        throw new Error(`Base currency ${base} not supported`);
+        throw new Error(t("procurement.base_currency_not_supported", { base }));
       }
       if (!rates[to]) {
-        throw new Error(`Target currency ${to} not supported`);
+        throw new Error(t("procurement.target_currency_not_supported", { to }));
       }
 
       const finalRate = rates[to] / rates[base];
       return finalRate;
     } catch (error) {
-      console.error("Error fetching exchange rate:", error);
+      toast.error(t("procurement.fetch_conversion_error"));
       throw error;
     }
   };
@@ -209,7 +219,7 @@ const AddProcurement = () => {
     try {
       // אם לא נבחר ספק, אין מה להמיר
       if (!selectedSupplier) {
-        toast.error("Please select a supplier first.");
+        toast.error(t("procurement.please_select_supplier_first"));
         return;
       }
 
@@ -271,7 +281,7 @@ const AddProcurement = () => {
       setProducts(updatedProductList);
       setTotalCost(parseFloat(newTotalCost.toFixed(2)));
     } catch (error) {
-      toast.error("Failed to convert currency for the selected supplier.");
+      toast.error(t("procurement.failed_to_convert_currency"));
       console.error("Currency conversion error:", error);
     }
   };
@@ -290,32 +300,52 @@ const AddProcurement = () => {
     const pdf = new jsPDF();
 
     // כותרת
-    pdf.setFontSize(22);
-    pdf.setTextColor(0, 0, 128);
-    pdf.text("Procurement Order", 105, 15, { align: "center" });
-
     pdf.setFontSize(10);
     pdf.setTextColor(0, 0, 0);
-    pdf.text(`Company: ${authUser?.company || "N/A"}`, 10, 20);
-    pdf.text(`Date: ${new Date().toLocaleDateString()}`, 10, 25);
-    pdf.text(`Address: ${formData.DeliveryAddress || "N/A"}`, 10, 30);
+    pdf.text(
+      `${t("procurement.company")}: ${authUser?.company || "N/A"}`,
+      10,
+      20
+    );
+    pdf.text(
+      `${t("procurement.date")}: ${new Date().toLocaleDateString()}`,
+      10,
+      25
+    );
+    pdf.text(
+      `${t("procurement.address")}: ${formData.DeliveryAddress || "N/A"}`,
+      10,
+      30
+    );
 
     // פרטי ספק
-    pdf.text(`Supplier: ${formData.supplierName || "N/A"}`, 150, 20);
-    pdf.text(`Phone: ${selectedSupplier?.Phone || "N/A"}`, 150, 25);
-    pdf.text(`Email: ${selectedSupplier?.Email || "N/A"}`, 150, 30);
+    pdf.text(
+      `${t("procurement.supplier")}: ${formData.supplierName || "N/A"}`,
+      150,
+      20
+    );
+    pdf.text(
+      `${t("procurement.phone")}: ${selectedSupplier?.Phone || "N/A"}`,
+      150,
+      25
+    );
+    pdf.text(
+      `${t("procurement.email")}: ${selectedSupplier?.Email || "N/A"}`,
+      150,
+      30
+    );
 
     pdf.setDrawColor(200, 200, 200);
     pdf.line(10, 35, 200, 35);
 
     // טבלת מוצרים
     const columns = [
-      { header: "Product Name", dataKey: "productName" },
-      { header: "SKU", dataKey: "SKU" },
-      { header: "Category", dataKey: "category" },
-      { header: "Quantity", dataKey: "quantity" },
-      { header: "Unit Price", dataKey: "unitPrice" },
-      { header: "Total", dataKey: "total" },
+      { header: t("procurement.product_name"), dataKey: "productName" },
+      { header: t("procurement.sku"), dataKey: "SKU" },
+      { header: t("procurement.category"), dataKey: "category" },
+      { header: t("procurement.quantity"), dataKey: "quantity" },
+      { header: t("procurement.unit_price"), dataKey: "unitPrice" },
+      { header: t("procurement.total"), dataKey: "total" },
     ];
 
     const rows = products.map((prod) => ({
@@ -344,7 +374,7 @@ const AddProcurement = () => {
     // סה"כ
     pdf.setFontSize(14);
     pdf.text(
-      `Total Cost: ${totalCost} ${currencySymbol}`,
+      `${t("procurement.total_cost")}: ${totalCost} ${currencySymbol}`,
       10,
       pdf.autoTable.previous.finalY + 10
     );
@@ -402,7 +432,7 @@ const AddProcurement = () => {
     // טוען מוצרים של הספק
     if (supplierId) {
       fetchProductsBySupplier(supplierId).catch(() =>
-        toast.error("Failed to load products.")
+        toast.error(t("procurement.failed_to_load_products"))
       );
     }
   };
@@ -412,7 +442,7 @@ const AddProcurement = () => {
 
     // בדיקה אם כל השדות נדרשים מולאו
     if (!productName || !SKU || !category || unitPrice <= 0 || quantity <= 0) {
-      toast.error("Please fill all product fields with valid values.");
+      toast.error(t("procurement.please_fill_all_product_fields"));
       return;
     }
 
@@ -434,7 +464,7 @@ const AddProcurement = () => {
         updatedProducts[existingProductIndex].unitPrice;
 
       setProducts(updatedProducts);
-      toast.success("Product quantity updated successfully!");
+      toast.success(t("procurement.product_quantity_updated_successfully"));
     } else {
       // אם המוצר לא קיים, הוסף אותו למערך המוצרים
       const finalPrice = parseFloat(unitPrice);
@@ -453,7 +483,7 @@ const AddProcurement = () => {
 
       const updatedProducts = [...products, newProduct];
       setProducts(updatedProducts);
-      toast.success("Product added successfully!");
+      toast.success(t("procurement.product_added_successfully"));
     }
 
     // עדכון העלות הכוללת
@@ -480,7 +510,7 @@ const AddProcurement = () => {
       !formData.DeliveryAddress ||
       products.length === 0
     ) {
-      toast.error("Please fill all required fields.");
+      toast.error(t("procurement.please_fill_all_required_fields"));
       return;
     }
 
@@ -493,19 +523,17 @@ const AddProcurement = () => {
   // 6) handleSubmit
   const handleSubmit = () => {
     if (newSigners.length === 0) {
-      toast.error(
-        "Signature list cannot be empty. Please add at least one signer."
-      );
+      toast.error(t("procurement.signature_list_cannot_be_empty"));
       return;
     }
     if (!formData.summeryProcurement) {
-      toast.error("PDF summary not generated. Please try again.");
+      toast.error(t("procurement.pdf_summary_not_generated"));
       return;
     }
 
     // כאן אפשר להוסיף בדיקות נוספות לדרישות ספציפיות
     if (!formData.supplierId || products.length === 0) {
-      toast.error("Please ensure supplier details and products are provided.");
+      toast.error(t("procurement.ensure_supplier_and_products"));
       return;
     }
 
@@ -556,13 +584,13 @@ const AddProcurement = () => {
       <Sidebar />
       <div className="flex-1 p-6 bg-gray-800 text-gray-300">
         <h1 className="text-2xl font-bold text-blue-300 mb-6">
-          Add Procurement
+          {t("procurement.add_procurement")}
         </h1>
 
         {/* ספקים */}
         <div className="mb-6">
           <h2 className="text-lg font-bold text-blue-400 mb-4">
-            Supplier Details
+            {t("procurement.supplier_details")}
           </h2>
           <SupplierSelect
             supplierId={formData.supplierId}
@@ -572,13 +600,16 @@ const AddProcurement = () => {
           {selectedSupplier && (
             <div className="p-4 bg-gray-700 rounded-md mt-2">
               <p>
-                <strong>Phone:</strong> {selectedSupplier.Phone || "N/A"}
+                <strong>{t("procurement.phone")}:</strong>{" "}
+                {selectedSupplier.Phone || "N/A"}
               </p>
               <p>
-                <strong>Email:</strong> {selectedSupplier.Email || "N/A"}
+                <strong>{t("procurement.email")}:</strong>{" "}
+                {selectedSupplier.Email || "N/A"}
               </p>
               <p>
-                <strong>Address:</strong> {selectedSupplier.Address || "N/A"}
+                <strong>{t("procurement.address")}:</strong>{" "}
+                {selectedSupplier.Address || "N/A"}
               </p>
             </div>
           )}
@@ -596,12 +627,15 @@ const AddProcurement = () => {
           onClick={() => setShowSignatureModal(true)}
           className="bg-purple-600 py-2 px-4 text-white rounded mt-4"
         >
-          Select Signature Requirements
+          {t("procurement.select_signature_requirements")}
         </button>
 
         {newSigners.length > 0 && (
           <div className="p-4 mt-4 bg-gray-700 rounded-md">
-            <h4 className="text-blue-400 font-bold mb-2">Current Signers:</h4>
+            <h4 className="text-blue-400 font-bold mb-2">
+              {" "}
+              {t("procurement.current_signers")}: :
+            </h4>
             <ul className="list-disc list-inside">
               {newSigners.map((signer, index) => (
                 <li key={index} className="text-gray-200">
@@ -632,7 +666,10 @@ const AddProcurement = () => {
 
         {/* מוצרים */}
         <div className="mt-4">
-          <h2 className="text-lg font-bold text-blue-400 mb-4">Products</h2>
+          <h2 className="text-lg font-bold text-blue-400 mb-4">
+            {" "}
+            {t("procurement.products")}
+          </h2>
         </div>
         <ProductSelector
           supplierId={formData.supplierId}
@@ -652,17 +689,29 @@ const AddProcurement = () => {
         {products.length > 0 && (
           <div className="mb-6">
             <h2 className="text-lg font-bold text-blue-400 mb-4">
-              Products List
+              {t("procurement.products_list")}
             </h2>
             <table className="w-full border-collapse">
               <thead>
                 <tr>
-                  <th className="border border-gray-700 p-2">Name</th>
-                  <th className="border border-gray-700 p-2">SKU</th>
-                  <th className="border border-gray-700 p-2">Category</th>
-                  <th className="border border-gray-700 p-2">Quantity</th>
-                  <th className="border border-gray-700 p-2">Unit Price</th>
-                  <th className="border border-gray-700 p-2">Total</th>
+                  <th className="border border-gray-700 p-2">
+                    {t("procurement.name")}
+                  </th>
+                  <th className="border border-gray-700 p-2">
+                    {t("procurement.sku")}
+                  </th>
+                  <th className="border border-gray-700 p-2">
+                    {t("procurement.category")}
+                  </th>
+                  <th className="border border-gray-700 p-2">
+                    {t("procurement.quantity")}
+                  </th>
+                  <th className="border border-gray-700 p-2">
+                    {t("procurement.unit_price")}
+                  </th>
+                  <th className="border border-gray-700 p-2">
+                    {t("procurement.total")}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -685,7 +734,8 @@ const AddProcurement = () => {
               </tbody>
             </table>
             <p className="text-right mt-4 font-bold">
-              Total Cost: {totalCost} {getCurrencySymbol(formData.currency)}
+              {t("procurement.total_cost")}: {totalCost}{" "}
+              {getCurrencySymbol(formData.currency)}
             </p>
           </div>
         )}
@@ -696,8 +746,8 @@ const AddProcurement = () => {
           onClick={handlePreview}
           className="bg-blue-600 py-2 px-4 text-white rounded mt-4"
         >
-          Preview Procurement
-        </button>
+          {t("procurement.preview_procurement")}
+          </button>
 
         <PreviewModal
           showModal={showPreviewModal}

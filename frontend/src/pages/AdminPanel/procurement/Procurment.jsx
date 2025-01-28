@@ -9,12 +9,15 @@ import Sidebar from "../layouts/Sidebar";
 import axios from "axios";
 import axiosInstance from "../../../lib/axios.js";
 import currency from "../finance/currency.json";
+import { useTranslation } from "react-i18next";
 
 // ייבוא jsPDF ו-jspdf-autotable
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
 const Procurement = () => {
+  const { t } = useTranslation();
+
   const { data: authData } = useQuery({ queryKey: ["authUser"] });
   const authUser = authData?.user;
   console.log("authUser:", authUser);
@@ -376,10 +379,10 @@ const Procurement = () => {
 
       <div className="container mx-auto max-w-6xl p-6 text-gray-300">
         <h1 className="text-2xl font-bold text-blue-300 mb-6">
-          Procurement Records
+          {t("procurement.records_title")}
         </h1>
 
-        {loading && <p>Loading procurements...</p>}
+        {loading && <p>{t("procurement.loading")}</p>}
 
         {!loading && procurements.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -392,25 +395,27 @@ const Procurement = () => {
                   {record.PurchaseOrder}
                 </h2>
                 <p>
-                  <strong>Supplier:</strong> {record.supplierName}
+                  <strong>{t("procurement.supplier")}:</strong>{" "}
+                  {record.supplierName}
                 </p>
                 <p>
-                  <strong>Total Cost:</strong> {record.totalCost}{" "}
-                  {record.currency || "₪"}
+                  <strong>{t("procurement.total_cost")}:</strong>{" "}
+                  {record.totalCost} {record.currency || "₪"}
                 </p>
                 <p>
-                  <strong>Purchase Date:</strong>{" "}
+                  <strong>{t("procurement.purchase_date")}:</strong>{" "}
                   {new Date(record.purchaseDate).toLocaleDateString()}
                 </p>
                 <p>
-                  <strong>Status:</strong> {record.status || "Pending"}
+                  <strong>{t("procurement.status")}:</strong>{" "}
+                  {record.status || "Pending"}
                 </p>
 
                 <button
                   className="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
                   onClick={() => setSelectedPDF(record.summeryProcurement)}
                 >
-                  View PDF
+                  {t("procurement.view_pdf")}
                 </button>
 
                 {record.statusUpdate === null && (
@@ -419,13 +424,13 @@ const Procurement = () => {
                       className="mt-2 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
                       onClick={() => handleEditClick(record)}
                     >
-                      Edit
+                      {t("procurement.edit")}
                     </button>
                     <button
                       className="mt-2 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
                       onClick={() => handleDeleteClick(record._id)}
                     >
-                      Delete
+                      {t("procurement.delete")}
                     </button>
                   </>
                 )}
@@ -443,7 +448,7 @@ const Procurement = () => {
                 className="self-end bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600"
                 onClick={() => setSelectedPDF(null)}
               >
-                Close
+                {t("procurement.close")}
               </button>
               <iframe
                 src={`data:application/pdf;base64,${selectedPDF}`}
@@ -458,13 +463,13 @@ const Procurement = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
             <div className="bg-gray-900 p-6 rounded shadow-lg w-3/4 max-h-[90vh] overflow-y-auto">
               <h2 className="text-xl font-bold text-blue-300 mb-4">
-                Edit Procurement
+                {t("procurement.edit_title")}
               </h2>
               <form>
                 {/* שדות עריכה עבור רכישה */}
                 <div className="mb-4">
                   <label className="block text-gray-300 mb-2">
-                    Purchase Order
+                    {t("procurement.purchase_order")}
                   </label>
                   <input
                     type="text"
@@ -480,7 +485,10 @@ const Procurement = () => {
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-gray-300 mb-2">Total Cost</label>
+                  <label className="block text-gray-300 mb-2">
+                    {" "}
+                    {t("procurement.total_cost")}
+                  </label>
                   <input
                     type="number"
                     value={formData.totalCost || ""}
@@ -492,7 +500,9 @@ const Procurement = () => {
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-gray-300 mb-2">Currency</label>
+                  <label className="block text-gray-300 mb-2">
+                    {t("procurement.currency")}
+                  </label>
                   <input
                     type="text"
                     value={formData.currency || ""}
@@ -505,7 +515,7 @@ const Procurement = () => {
 
                 <div className="mb-4">
                   <label className="block text-gray-300 mb-2">
-                    Purchase Date
+                    {t("procurement.purchase_date")}{" "}
                   </label>
                   <input
                     type="date"
@@ -523,7 +533,7 @@ const Procurement = () => {
 
                 <div className="mb-4">
                   <label className="block text-gray-300 mb-2">
-                    Delivery Date
+                    {t("procurement.delivery_date")}{" "}
                   </label>
                   <input
                     type="date"
@@ -540,7 +550,9 @@ const Procurement = () => {
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-gray-300 mb-2">Notes</label>
+                  <label className="block text-gray-300 mb-2">
+                    {t("procurement.notes")}
+                  </label>
                   <textarea
                     value={formData.notes || ""}
                     onChange={(e) =>
@@ -551,18 +563,32 @@ const Procurement = () => {
                 </div>
 
                 <h3 className="text-lg font-bold text-blue-300 mb-4">
-                  Products in Procurement
+                  {t("procurement.products_in_procurement")}
                 </h3>
                 <table className="w-full text-gray-300 mb-4">
                   <thead>
                     <tr>
-                      <th className="border border-gray-700 p-2">Name</th>
-                      <th className="border border-gray-700 p-2">SKU</th>
-                      <th className="border border-gray-700 p-2">Category</th>
-                      <th className="border border-gray-700 p-2">Quantity</th>
-                      <th className="border border-gray-700 p-2">Unit Price</th>
-                      <th className="border border-gray-700 p-2">Total</th>
-                      <th className="border border-gray-700 p-2">Actions</th>
+                      <th className="border border-gray-700 p-2">
+                        {t("procurement.product_name")}
+                      </th>
+                      <th className="border border-gray-700 p-2">
+                        {t("procurement.sku")}
+                      </th>
+                      <th className="border border-gray-700 p-2">
+                        {t("procurement.category")}
+                      </th>
+                      <th className="border border-gray-700 p-2">
+                        {t("procurement.quantity")}
+                      </th>
+                      <th className="border border-gray-700 p-2">
+                        {t("procurement.unit_price")}
+                      </th>
+                      <th className="border border-gray-700 p-2">
+                        {t("procurement.total")}
+                      </th>
+                      <th className="border border-gray-700 p-2">
+                        {t("procurement.actions")}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -628,7 +654,7 @@ const Procurement = () => {
                             }}
                             className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600"
                           >
-                            Remove
+                            {t("procurement.Remove")}
                           </button>
                         </td>
                       </tr>
@@ -637,11 +663,11 @@ const Procurement = () => {
                 </table>
 
                 <h3 className="text-lg font-bold text-blue-300 mb-4">
-                  Add a New Product
+                  {t("procurement.AddNewProduct")}
                 </h3>
                 <div className="bg-gray-800 p-4 rounded">
                   <label className="block text-gray-300 mb-2">
-                    Select Product
+                    {t("procurement.select_product")}{" "}
                   </label>
                   <select
                     disabled={!supplierId}
@@ -661,9 +687,7 @@ const Procurement = () => {
                         const selectedCurrency = formData.currency || "USD";
 
                         if (!supplierBaseCurrency || !selectedCurrency) {
-                          toast.error(
-                            "Supplier's currency data missing for conversion."
-                          );
+                          toast.error(t("procurement.currency_error"));
                           return;
                         }
 
@@ -692,7 +716,9 @@ const Procurement = () => {
                             });
                           })
                           .catch(() => {
-                            toast.error("Failed to convert currency.");
+                            toast.error(
+                              t("procurement.fetch_conversion_error")
+                            );
                           });
                       } else {
                         setProductData({
@@ -708,49 +734,58 @@ const Procurement = () => {
                     }}
                     className="w-full p-2 rounded bg-gray-700"
                   >
-                    <option value="">-- Select a Product --</option>
+                    <option value="">
+                      -- {t("procurement.select_product_placeholder")} --
+                    </option>
                     {supplierProducts.map((product) => (
                       <option key={product._id} value={product._id}>
-                        {product.productName || "Unnamed Product"}
+                        {product.productName ||
+                          t("procurement.unnamed_product")}
                       </option>
                     ))}
                   </select>
 
                   <div className="mt-4 grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-gray-300 text-sm">SKU</label>
+                      <label className="text-gray-300 text-sm">
+                        {t("procurement.sku")}
+                      </label>
                       <input
                         type="text"
                         value={productData.SKU}
                         readOnly
-                        placeholder="SKU"
-                        className="w-full p-2 rounded bg-gray-700"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-gray-300 text-sm">Category</label>
-                      <input
-                        type="text"
-                        value={productData.category}
-                        readOnly
-                        placeholder="Category"
+                        placeholder={t("procurement.sku_placeholder")}
                         className="w-full p-2 rounded bg-gray-700"
                       />
                     </div>
                     <div>
                       <label className="text-gray-300 text-sm">
-                        Unit Price
+                        {t("procurement.category")}
+                      </label>
+                      <input
+                        type="text"
+                        value={productData.category}
+                        readOnly
+                        placeholder={t("procurement.category_placeholder")}
+                        className="w-full p-2 rounded bg-gray-700"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-gray-300 text-sm">
+                        {t("procurement.unit_price")}{" "}
                       </label>
                       <input
                         type="number"
                         value={productData.unitPrice}
                         readOnly
-                        placeholder="Unit Price"
+                        placeholder={t("procurement.unit_price_placeholder")}
                         className="w-full p-2 rounded bg-gray-700"
                       />
                     </div>
                     <div>
-                      <label className="text-gray-300 text-sm">Quantity</label>
+                      <label className="text-gray-300 text-sm">
+                        {t("procurement.quantity")}
+                      </label>
                       <input
                         type="number"
                         value={productData.quantity}
@@ -760,7 +795,7 @@ const Procurement = () => {
                             quantity: +e.target.value,
                           }))
                         }
-                        placeholder="Quantity"
+                        placeholder={t("procurement.quantity_placeholder")}
                         className="w-full p-2 rounded bg-gray-700"
                         disabled={!supplierId}
                       />
@@ -772,7 +807,7 @@ const Procurement = () => {
                     className="bg-green-600 py-2 px-4 text-white rounded mt-4 hover:bg-green-700"
                     disabled={!supplierId}
                   >
-                    Add Product
+                    {t("procurement.add_product")}
                   </button>
                 </div>
 
@@ -782,14 +817,14 @@ const Procurement = () => {
                     className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mr-2"
                     onClick={() => setIsModalOpen(false)}
                   >
-                    Cancel
+                    {t("procurement.cancel")}
                   </button>
                   <button
                     type="button"
                     className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
                     onClick={handleModalSave}
                   >
-                    Save
+                    {t("procurement.save")}
                   </button>
                 </div>
               </form>

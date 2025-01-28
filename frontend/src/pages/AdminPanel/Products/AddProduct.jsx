@@ -153,7 +153,7 @@ const AddProduct = () => {
   }, [authUser]);
 
   const fieldDefinitions = [
-    { name: "SKU", type: "text", label: t("product.fields.sku") },
+    { name: "sku", type: "text", label: t("product.fields.sku") },
     { name: "barcode", type: "text", label: t("product.fields.barcode") },
     { name: "productName", type: "text", label: t("product.fields.name") },
     { name: "unitPrice", type: "number", label: t("product.fields.price") },

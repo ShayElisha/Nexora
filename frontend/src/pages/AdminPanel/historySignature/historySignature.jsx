@@ -1,8 +1,12 @@
+// src/components/procurement/HistorySignature.jsx
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../../lib/axios";
 import Sidebar from "../layouts/Sidebar";
+import { useTranslation } from "react-i18next";
 
 const HistorySignature = () => {
+  const { t } = useTranslation(); // שימוש במילון 'historySignature'
+
   const [signatures, setSignatures] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,17 +24,24 @@ const HistorySignature = () => {
         if (response.data.success) {
           setSignatures(response.data.data);
         } else {
-          setError(response.data.message);
+          setError(
+            response.data.message ||
+              t("historySignature.errors.procurement_error")
+          );
         }
       } catch (err) {
-        setError("Failed to fetch signatures." + err);
+        setError(
+          t("historySignature.errors.failed_to_fetch_signatures", {
+            message: err.message,
+          })
+        );
       } finally {
         setLoading(false);
       }
     };
 
     fetchSignatures();
-  }, []);
+  }, [t]); // הוספת t כתלות כדי להבטיח עדכון תרגומים בעת שינוי השפה
 
   const openModal = (content) => {
     setModalContent(content);
@@ -42,41 +53,69 @@ const HistorySignature = () => {
     setIsModalOpen(false);
   };
 
-  if (loading) return <div className="text-center">Loading...</div>;
-  if (error) return <div className="text-center text-red-500">{error}</div>;
+  if (loading) {
+    return (
+      <div className="flex">
+        <Sidebar />
+        <div className="ml-64 p-6 max-w-7xl mx-auto text-center">
+          <p>{t("historySignature.loading")}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex">
+        <Sidebar />
+        <div className="ml-64 p-6 max-w-7xl mx-auto text-center text-red-500">
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex">
       <Sidebar />
       <div className="ml-64 p-6 max-w-7xl mx-auto">
+        {/* ===================== Signatures History Table ===================== */}
         <h2 className="text-2xl font-bold mb-6 text-center">
-          My Signatures History
+          {t("historySignature.mySignaturesHistory")}
         </h2>
         {signatures.length === 0 ? (
-          <p className="text-center text-gray-500">No signatures found.</p>
+          <p className="text-center text-gray-500">
+            {t("no_signatures_found")}
+          </p>
         ) : (
           <table className="min-w-full border-collapse border border-gray-300">
             <thead className="bg-gray-100">
               <tr>
                 <th className="border border-gray-300 px-4 py-2">
-                  Purchase Order
+                  {t("historySignature.purchaseOrder")}
                 </th>
                 <th className="border border-gray-300 px-4 py-2">
-                  Supplier Name
+                  {t("historySignature.supplierName")}
                 </th>
-                <th className="border border-gray-300 px-4 py-2">Document</th>
-                <th className="border border-gray-300 px-4 py-2">Signature</th>
-                <th className="border border-gray-300 px-4 py-2">Signed At</th>
+                <th className="border border-gray-300 px-4 py-2">
+                  {t("historySignature.document")}
+                </th>
+                <th className="border border-gray-300 px-4 py-2">
+                  {t("historySignature.signature")}
+                </th>
+                <th className="border border-gray-300 px-4 py-2">
+                  {t("historySignature.signedAt")}
+                </th>
               </tr>
             </thead>
             <tbody>
               {signatures.map((signature, index) => (
                 <tr key={index} className="hover:bg-gray-50">
                   <td className="border border-gray-300 px-4 py-2">
-                    {signature.purchaseOrder || "N/A"}
+                    {signature.purchaseOrder || t("historySignature.n_a")}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
-                    {signature.supplierName || "N/A"}
+                    {signature.supplierName || t("historySignature.n_a")}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
                     {signature.documentUrl ? (
@@ -86,42 +125,42 @@ const HistorySignature = () => {
                             <iframe
                               src={signature.documentUrl}
                               className="w-full h-96"
-                              title="Document Viewer"
+                              title={t("historySignature.documentViewer")}
                             />
                           )
                         }
                         className="text-blue-500 hover:underline"
                       >
-                        View Document
+                        {t("historySignature.viewDocument")}
                       </button>
                     ) : (
-                      "No Document"
+                      t("historySignature.no_document")
                     )}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
                     {signature.signatureUrl ? (
                       <img
                         src={signature.signatureUrl}
-                        alt="Signature"
+                        alt={t("historySignature.signature")}
                         className="w-20 h-auto cursor-pointer"
                         onClick={() =>
                           openModal(
                             <img
                               src={signature.signatureUrl}
-                              alt="Signature"
+                              alt={t("historySignature.signature")}
                               className="w-full h-auto"
                             />
                           )
                         }
                       />
                     ) : (
-                      "No Signature"
+                      t("historySignature.no_signature")
                     )}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
                     {signature.signedAt
                       ? new Date(signature.signedAt).toLocaleString()
-                      : "N/A"}
+                      : t("historySignature.n_a")}
                   </td>
                 </tr>
               ))}
@@ -129,14 +168,15 @@ const HistorySignature = () => {
           </table>
         )}
 
+        {/* ===================== Modal ===================== */}
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white rounded p-6 max-w-3xl w-full relative">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-3xl w-full relative">
               <button
                 onClick={closeModal}
                 className="absolute top-2 right-2 text-gray-500 hover:text-black"
               >
-                X
+                ✖
               </button>
               {modalContent}
             </div>

@@ -1,5 +1,6 @@
 // src/components/procurement/SignaturesModal.jsx
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const SignaturesModal = ({
   isOpen,
@@ -15,6 +16,8 @@ const SignaturesModal = ({
   deleteSignatureList,
   createSignatureList,
 }) => {
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   const handleSaveSignatureList = async () => {
@@ -41,7 +44,7 @@ const SignaturesModal = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-gray-900 p-8 rounded-lg shadow-xl w-3/4 max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-bold text-purple-400 mb-6 text-center">
-          Signature Requirements Management
+          {t("signature_modal.title")}
         </h2>
 
         {/* כפתור יצירת רשימה חדשה */}
@@ -50,7 +53,7 @@ const SignaturesModal = ({
             onClick={() => setIsCreatingNewList(true)}
             className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded mr-4"
           >
-            Create New Signature List
+            {t("signature_modal.create_new_list")}
           </button>
         </div>
 
@@ -58,7 +61,7 @@ const SignaturesModal = ({
         {isCreatingNewList && (
           <div className="mb-8 pb-6 border-b border-gray-700">
             <h3 className="text-xl text-blue-300 font-semibold mb-4">
-              Create New Signature List
+              {t("signature_modal.new_list_title")}
             </h3>
             <div className="space-y-4">
               <input
@@ -72,7 +75,7 @@ const SignaturesModal = ({
               {/* בחירת עובדים להוספה */}
               <div>
                 <h4 className="text-blue-400 font-medium mb-2">
-                  Select Employees to Add:
+                  {t("signature_modal.select_employees")}
                 </h4>
                 <select
                   onChange={(e) => {
@@ -94,7 +97,9 @@ const SignaturesModal = ({
                   }}
                   className="bg-gray-800 text-gray-200 p-2 rounded"
                 >
-                  <option value="">Select Employee</option>
+                  <option value="">
+                    {t("signature_modal.select_employee")}
+                  </option>
                   {employees.map((emp) => (
                     <option key={emp._id} value={emp._id}>
                       {emp.name} {emp.lastName} - {emp.role}
@@ -107,7 +112,7 @@ const SignaturesModal = ({
               {newSigners.length > 0 && (
                 <div className="mt-4">
                   <h4 className="text-blue-400 font-medium">
-                    New List Signers:
+                    {t("signature_modal.new_list_signers")}
                   </h4>
                   <ul className="mt-2 space-y-2">
                     {newSigners.map((signer, index) => (
@@ -126,7 +131,7 @@ const SignaturesModal = ({
                           }
                           className="text-red-500 font-bold hover:underline"
                         >
-                          Remove
+                          {t("signature_modal.remove")}
                         </button>
                       </li>
                     ))}
@@ -139,22 +144,24 @@ const SignaturesModal = ({
               onClick={handleSaveSignatureList}
               className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-bold py-3 px-6 rounded-lg mt-6 shadow-lg transform transition-transform duration-300 hover:scale-105"
             >
-              Save Signature List
+              {t("signature_modal.save_list")}
             </button>
           </div>
         )}
 
         <div>
           <h3 className="text-xl text-blue-300 font-semibold mb-4">
-            Existing Signature Lists
+            {t("signature_modal.existing_lists_title")}
           </h3>
           {signatureLists.length > 0 ? (
             <table className="w-full border-collapse rounded-lg overflow-hidden shadow-md">
               <thead>
                 <tr className="bg-gradient-to-r from-gray-800 to-gray-900 text-gray-200">
-                  <th className="p-4">List Name</th>
-                  <th className="p-4">Signers</th>
-                  <th className="p-4 text-center">Actions</th>
+                  <th className="p-4">{t("signature_modal.list_name")}</th>
+                  <th className="p-4">{t("signature_modal.signers")}</th>
+                  <th className="p-4 text-center">
+                    {t("signature_modal.actions")}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -179,7 +186,7 @@ const SignaturesModal = ({
                         onClick={() => deleteSignatureList(list._id)}
                         className="bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white py-1 px-4 rounded-full shadow-md transform transition-transform duration-300 hover:scale-105"
                       >
-                        Delete
+                        {t("signature_modal.delete")}
                       </button>
                       <button
                         onClick={() => {
@@ -189,7 +196,7 @@ const SignaturesModal = ({
                         }}
                         className="bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white py-1 px-4 rounded-full shadow-md transform transition-transform duration-300 hover:scale-105"
                       >
-                        Use This List
+                        {t("signature_modal.use_list")}
                       </button>
                     </td>
                   </tr>
@@ -198,7 +205,7 @@ const SignaturesModal = ({
             </table>
           ) : (
             <p className="text-gray-400 text-center text-lg">
-              No signature lists available.
+              {t("signature_modal.no_lists_available")}
             </p>
           )}
         </div>
@@ -208,7 +215,7 @@ const SignaturesModal = ({
             onClick={onClose}
             className="bg-gradient-to-r from-gray-500 to-gray-700 hover:from-gray-600 hover:to-gray-800 text-white py-2 px-6 rounded-full shadow-lg transform transition-transform duration-300 hover:scale-105"
           >
-            Close
+            {t("signature_modal.close")}
           </button>
         </div>
       </div>

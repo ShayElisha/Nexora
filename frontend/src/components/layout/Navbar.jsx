@@ -610,7 +610,7 @@ const Navbar = () => {
                   {showNotifications && (
                     <div
                       className={`absolute ${
-                        i18n.language === "he"
+                        i18n.language === "he" || i18n.language === "ar"
                           ? "-left-7"
                           : "right-0 translate-x-4"
                       } mt-2 bg-white p-3 rounded shadow-md w-[500px] z-50 text-gray-800`}

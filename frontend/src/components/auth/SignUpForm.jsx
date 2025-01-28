@@ -1,3 +1,4 @@
+// src/components/auth/SignUpForm.jsx
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
@@ -8,9 +9,11 @@ import axiosInstance from "../../lib/axios";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { User, Mail, Lock, Eye, EyeOff, MapPin, Send, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const SignUpForm = () => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation(); // שימוש במילון 'signUpForm'
 
   // Fetch authenticated user data
   const { data: authData } = useQuery({
@@ -26,29 +29,38 @@ const SignUpForm = () => {
 
   // Validation Schema
   const validationSchema = Yup.object({
-    name: Yup.string().required("First name is required"),
-    lastName: Yup.string().required("Last name is required"),
+    name: Yup.string().required(t("signUpForm.validation.first_name_required")),
+    lastName: Yup.string().required(
+      t("signUpForm.validation.last_name_required")
+    ),
     email: Yup.string()
-      .email("Invalid email format")
-      .required("Email is required"),
+      .email(t("signUpForm.validation.invalid_email_format"))
+      .required(t("signUpForm.validation.email_required")),
     password: Yup.string()
-      .min(8, "Password must be at least 8 characters")
-      .matches(/[A-Z]/, "Password must contain an uppercase letter")
-      .matches(/[0-9]/, "Password must contain a number")
+      .min(8, t("signUpForm.validation.password_min", { count: 8 }))
+      .matches(/[A-Z]/, t("signUpForm.validation.password_uppercase"))
+      .matches(/[0-9]/, t("signUpForm.validation.password_number"))
       .matches(
         /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/,
-        "Password must contain a special character"
+        t("signUpForm.validation.password_special_char")
       )
-      .required("Password is required"),
-    phone: Yup.string().required("Phone number is required"),
+      .required(t("signUpForm.validation.password_required")),
+    phone: Yup.string().required(t("signUpForm.validation.phone_required")),
     gender: Yup.string()
-      .oneOf(["Male", "Female", "Other"], "Gender is required")
-      .required("Gender is required"), // Move here
+      .oneOf(
+        ["Male", "Female", "Other"],
+        t("signUpForm.validation.gender_required")
+      )
+      .required(t("signUpForm.validation.gender_required")),
     address: Yup.object({
-      street: Yup.string().required("Street is required"),
-      city: Yup.string().required("City is required"),
-      country: Yup.string().required("Country is required"),
-      postalCode: Yup.string().required("Postal code is required"),
+      street: Yup.string().required(t("signUpForm.validation.street_required")),
+      city: Yup.string().required(t("signUpForm.validation.city_required")),
+      country: Yup.string().required(
+        t("signUpForm.validation.country_required")
+      ),
+      postalCode: Yup.string().required(
+        t("signUpForm.validation.postal_code_required")
+      ),
     }),
   });
 
@@ -60,7 +72,7 @@ const SignUpForm = () => {
       email: "",
       password: "",
       phone: "",
-      gender: "", // Ensure this matches the schema
+      gender: "",
       identity: "",
       role: "",
       profileImage: "",
@@ -82,7 +94,7 @@ const SignUpForm = () => {
       formData.append("email", values.email);
       formData.append("password", values.password);
       formData.append("phone", values.phone);
-      formData.append("gender", values.gender); // Append with the correct name
+      formData.append("gender", values.gender);
       formData.append("identity", values.identity || "");
       formData.append("role", values.role || "");
 
@@ -105,13 +117,13 @@ const SignUpForm = () => {
         });
 
         if (response.data.success) {
-          toast.success("Signup successful! You can now log in.");
+          toast.success(t("messages.signup_success"));
           navigate("/login");
         } else {
-          toast.error(response.data.message || "Signup failed");
+          toast.error(response.data.message || t("messages.signup_failed"));
         }
       } catch (error) {
-        toast.error(error.response?.data?.message || "An error occurred");
+        toast.error(error.response?.data?.message || t("errors.general_error"));
       } finally {
         setLoading(false);
       }
@@ -122,27 +134,29 @@ const SignUpForm = () => {
     setProfileImageFile(null);
     setProfileImageUrl("");
   };
+
   useEffect(() => {
     if (!authUser) {
       formik.setFieldValue("role", "Admin");
     }
   }, [authUser]);
+
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
       {/* Row 1: First Name & Last Name */}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
         <InputField
-          label="First Name"
+          label={t("signUpForm.form.first_name")}
           icon={<User />}
           name="name"
-          placeholder="Enter your first name"
+          placeholder={t("signUpForm.placeholders.first_name")}
           formik={formik}
         />
         <InputField
-          label="Last Name"
+          label={t("signUpForm.form.last_name")}
           icon={<User />}
           name="lastName"
-          placeholder="Enter your last name"
+          placeholder={t("signUpForm.placeholders.last_name")}
           formik={formik}
         />
       </div>
@@ -150,45 +164,49 @@ const SignUpForm = () => {
       {/* Row 2: Email & Password */}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
         <InputField
-          label="Email"
+          label={t("signUpForm.form.email")}
           icon={<Mail />}
           name="email"
-          placeholder="Enter your email"
+          placeholder={t("signUpForm.placeholders.email")}
           formik={formik}
         />
         <PasswordField
-          label="Password"
+          label={t("signUpForm.form.password")}
           icon={<Lock />}
           name="password"
-          placeholder="Enter your password"
+          placeholder={t("signUpForm.placeholders.password")}
           formik={formik}
           showPassword={showPassword}
           setShowPassword={setShowPassword}
         />
       </div>
+
+      {/* Row 3: Identity & Gender */}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
         <InputField
-          label="Identity"
+          label={t("signUpForm.form.identity")}
           icon={<User />} // אם יש לך אייקון אחר שמתאים, תוכל להחליף את זה
           name="identity"
-          placeholder="Enter your identity"
+          placeholder={t("signUpForm.placeholders.identity")}
           formik={formik}
         />
         <div className="flex flex-col space-y-2">
-          <label className="text-sm font-medium text-gray-700">Gender</label>
+          <label className="text-sm font-medium text-gray-700">
+            {t("signUpForm.form.gender")}
+          </label>
           <div className="flex items-center space-x-4">
-            <label className="flex items-center">
+            <label className="flex items-center text-gray-300">
               <input
                 type="radio"
-                name="gender" // Ensure this matches the `initialValues` and backend
+                name="gender"
                 value="Male"
                 checked={formik.values.gender === "Male"}
                 onChange={formik.handleChange}
                 className="form-radio"
               />
-              <span className="ml-2">Male</span>
+              <span className="ml-2">{t("signUpForm.options.male")}</span>
             </label>
-            <label className="flex items-center">
+            <label className="flex items-center text-gray-300">
               <input
                 type="radio"
                 name="gender"
@@ -197,9 +215,9 @@ const SignUpForm = () => {
                 onChange={formik.handleChange}
                 className="form-radio"
               />
-              <span className="ml-2">Female</span>
+              <span className="ml-2">{t("signUpForm.options.female")}</span>
             </label>
-            <label className="flex items-center">
+            <label className="flex items-center text-gray-300">
               <input
                 type="radio"
                 name="gender"
@@ -208,7 +226,7 @@ const SignUpForm = () => {
                 onChange={formik.handleChange}
                 className="form-radio"
               />
-              <span className="ml-2">Other</span>
+              <span className="ml-2">{t("signUpForm.options.other")}</span>
             </label>
           </div>
           {formik.touched.gender && formik.errors.gender && (
@@ -217,20 +235,20 @@ const SignUpForm = () => {
         </div>
       </div>
 
-      {/* Row 3: Phone */}
+      {/* Row 4: Phone */}
       <div className="flex-1">
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Phone
+          {t("signUpForm.form.phone")}
         </label>
         <PhoneInput
           country={"us"}
           enableSearch
-          searchPlaceholder="Search..."
+          searchPlaceholder={t("signUpForm.placeholders.search_country")}
           containerClass="react-tel-input w-full"
           inputClass="!w-full !h-10 !pl-10 !border-gray-300 !rounded-md focus:!border-blue-500 focus:!ring-1 focus:!ring-blue-500 focus:!bg-blue-50 text-gray-800"
           buttonClass="!bg-gray-100 hover:!bg-gray-200 !border !border-gray-300"
           searchClass="!w-full !border !border-gray-300 !rounded-md focus:!ring-1 focus:!ring-blue-500 focus:!border-blue-500 focus:!bg-blue-50 px-2 py-1"
-          placeholder="Enter phone number"
+          placeholder={t("signUpForm.placeholders.enter_phone")}
           value={formik.values.phone}
           onChange={(phone) => formik.setFieldValue("phone", phone)}
         />
@@ -239,27 +257,29 @@ const SignUpForm = () => {
         )}
       </div>
 
-      {/* Row 4: Address (Street & City) */}
+      {/* Row 5: Address (Street & City) */}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
         <InputField
-          label="Street"
+          label={t("signUpForm.form.street")}
           icon={<MapPin />}
           name="address.street"
-          placeholder="Enter your street"
+          placeholder={t("signUpForm.placeholders.street")}
           formik={formik}
         />
         <InputField
-          label="City"
+          label={t("signUpForm.form.city")}
           icon={<MapPin />}
           name="address.city"
-          placeholder="Enter your city"
+          placeholder={t("signUpForm.placeholders.city")}
           formik={formik}
         />
       </div>
+
+      {/* Row 6: Role */}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
         <div className="flex-1">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Role
+            {t("signUpForm.form.role")}
           </label>
           <div className="relative">
             <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
@@ -268,14 +288,14 @@ const SignUpForm = () => {
             <input
               type="text"
               name="role"
-              placeholder="Enter your role"
-              value={authUser ? formik.values.role : "Admin"} // אם יש משתמש מחובר, הערך מגיע מ-Formik
-              readOnly={!authUser} // אם אין משתמש מחובר, השדה הופך ל-ReadOnly
-              onChange={authUser ? formik.handleChange : undefined} // מאפשר שינוי רק אם יש משתמש מחובר
+              placeholder={t("signUpForm.placeholders.role")}
+              value={authUser ? formik.values.role : "Admin"}
+              readOnly={!authUser}
+              onChange={authUser ? formik.handleChange : undefined}
               className={`pl-10 w-full py-2 rounded-md border shadow-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${
                 authUser
-                  ? "bg-white border-gray-300" // רקע רגיל למשתמש מחובר
-                  : "bg-gray-100 border-gray-400 cursor-not-allowed" // רקע אפור ומצב לא נגיש
+                  ? "bg-white border-gray-300"
+                  : "bg-gray-100 border-gray-400 cursor-not-allowed"
               }`}
             />
           </div>
@@ -285,20 +305,20 @@ const SignUpForm = () => {
         </div>
       </div>
 
-      {/* Row 5: Address (Country & Postal Code) */}
+      {/* Row 7: Address (Country & Postal Code) */}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
         <InputField
-          label="Country"
+          label={t("signUpForm.form.country")}
           icon={<MapPin />}
           name="address.country"
-          placeholder="Enter your country"
+          placeholder={t("signUpForm.placeholders.country")}
           formik={formik}
         />
         <InputField
-          label="Postal Code"
+          label={t("signUpForm.form.postal_code")}
           icon={<MapPin />}
           name="address.postalCode"
-          placeholder="Enter your postal code"
+          placeholder={t("signUpForm.placeholders.postal_code")}
           formik={formik}
         />
       </div>
@@ -306,7 +326,7 @@ const SignUpForm = () => {
       {/* Profile Image at the end */}
       <div className="flex-1">
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Profile Image
+          {t("signUpForm.form.profile_image")}
         </label>
         <div className="relative flex items-center gap-2">
           <button
@@ -325,7 +345,7 @@ const SignUpForm = () => {
           />
           <input
             type="text"
-            placeholder="Upload image file Or enter image URL"
+            placeholder={t("signUpForm.placeholders.upload_image_or_url")}
             value={profileImageUrl}
             onChange={(e) => setProfileImageUrl(e.target.value)}
             onBlur={formik.handleBlur}
@@ -342,7 +362,7 @@ const SignUpForm = () => {
                   ? URL.createObjectURL(profileImageFile)
                   : profileImageUrl
               }
-              alt="Preview"
+              alt={t("signUpForm.form.image_preview")}
               className="w-16 h-16 rounded-full object-cover"
             />
             <button
@@ -362,7 +382,9 @@ const SignUpForm = () => {
         disabled={loading}
         className="w-full py-2 mt-6 bg-blue-600 text-white font-medium rounded-md shadow-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
       >
-        {loading ? "Signing Up..." : "Sign Up"}
+        {loading
+          ? t("signUpForm.buttons.signing_up")
+          : t("signUpForm.buttons.sign_up")}
       </button>
     </form>
   );

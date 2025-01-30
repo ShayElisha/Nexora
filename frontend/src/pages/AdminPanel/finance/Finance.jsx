@@ -132,7 +132,7 @@ const Finance = () => {
                             ? "text-green-400"
                             : doc.transactionStatus === t("finance.pending")
                             ? "text-yellow-400"
-                            : "text-red-400"
+                            : "text-green-400"
                         }`}
                       >
                         {t(`finance.${doc.transactionStatus.toLowerCase()}`)}

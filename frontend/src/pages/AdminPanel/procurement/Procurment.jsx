@@ -262,7 +262,7 @@ const Procurement = () => {
       category: prod.category,
       quantity: prod.quantity,
       unitPrice: `${prod.unitPrice} ${currencySymbol}`,
-      total: `${prod.total} ${currencySymbol}`,
+      total: `${prod.unitPrice * prod.quantity} ${currencySymbol}`,
     }));
 
     pdf.autoTable({
@@ -451,7 +451,7 @@ const Procurement = () => {
                 {t("procurement.close")}
               </button>
               <iframe
-                src={`data:application/pdf;base64,${selectedPDF}`}
+                src={`${selectedPDF}`}
                 title="Procurement PDF"
                 className="w-full h-full mt-4 border rounded"
               ></iframe>

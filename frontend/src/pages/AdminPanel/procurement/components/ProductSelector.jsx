@@ -126,6 +126,7 @@ const ProductSelector = ({
                 const convertedPrice = (prod.unitPrice * rate).toFixed(2);
 
                 setProductData({
+                  productId: prod._id,
                   productName: prod.productName,
                   SKU: prod.SKU,
                   category: prod.category,
@@ -142,6 +143,7 @@ const ProductSelector = ({
               });
           } else {
             setProductData({
+              productId: "",
               productName: "",
               SKU: "",
               category: "",

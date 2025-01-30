@@ -65,6 +65,7 @@ const AddProcurement = () => {
   const [totalCost, setTotalCost] = useState(0);
 
   const [productData, setProductData] = useState({
+    productId: "",
     productName: "",
     SKU: "",
     category: "",
@@ -437,14 +438,29 @@ const AddProcurement = () => {
     }
   };
   const handleAddProduct = () => {
-    const { productName, SKU, category, unitPrice, quantity, baseUnitPrice } =
-      productData;
+    const {
+      productId,
+      productName,
+      SKU,
+      category,
+      unitPrice,
+      quantity,
+      baseUnitPrice,
+    } = productData;
 
     // בדיקה אם כל השדות נדרשים מולאו
-    if (!productName || !SKU || !category || unitPrice <= 0 || quantity <= 0) {
-      toast.error(t("procurement.please_fill_all_product_fields"));
-      return;
-    }
+    if (
+      !productId ||
+      !productName ||
+      !SKU ||
+      !category ||
+      unitPrice <= 0 ||
+      quantity <= 0
+    ) {
+       toast.error(t("procurement.please_fill_all_product_fields"));
+    console.log("Missing fields:", productData); // לוג נוסף
+    return;
+  }
 
     const qty = parseInt(quantity, 10);
 
@@ -471,6 +487,7 @@ const AddProcurement = () => {
       const finalTotal = finalPrice * qty;
 
       const newProduct = {
+        productId,
         productName,
         SKU,
         category,
@@ -747,7 +764,7 @@ const AddProcurement = () => {
           className="bg-blue-600 py-2 px-4 text-white rounded mt-4"
         >
           {t("procurement.preview_procurement")}
-          </button>
+        </button>
 
         <PreviewModal
           showModal={showPreviewModal}

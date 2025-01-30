@@ -36,6 +36,7 @@ const BudgetSchema = new mongoose.Schema({
       unitPrice: { type: Number },
       totalPrice: { type: Number },
       addedAt: { type: Date, default: Date.now },
+      employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "employees" },
     },
   ],
   notes: { type: String },

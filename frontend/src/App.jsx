@@ -24,6 +24,7 @@ import AddFinance from "./pages/AdminPanel/Finance/AddFinance";
 import Users from "./pages/AdminPanel/Users/Users";
 import AddProcurment from "./pages/AdminPanel/Procurement/AddProcurment";
 import Procurement from "./pages/AdminPanel/Procurement/Procurment";
+import ReceiptPurchase from "./pages/AdminPanel/Procurement/ReceiptPurchase.jsx";
 import HistorySignature from "./pages/AdminPanel/HistorySignature/HistorySignature";
 import AllSignatures from "./pages/AdminPanel/HistorySignature/AllSignatures";
 import UpdateForSupplier from "./pages/SupplierPage/updateForSupplier";
@@ -113,6 +114,10 @@ const App = () => {
           <Route path="add-procurement-record" element={<AddProcurment />} />
           <Route path="signup" element={<EmployeeSignup />} />
           <Route path="procurement" element={<Procurement />} />
+          <Route
+            path="procurement/approveProcurment"
+            element={<ReceiptPurchase />}
+          />
           <Route path="historySignature" element={<HistorySignature />} />
           <Route path="historyAllSignature" element={<AllSignatures />} />
         </Route>

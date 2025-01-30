@@ -8,6 +8,7 @@ import {
   signProcurement,
   getEmployeeSignatures,
   getAllSignatures,
+  receivedOrder,
 } from "../controllers/procurement.controller.js";
 import { protectRoute } from "../middleware/protectRoute.js";
 
@@ -24,5 +25,6 @@ router.post("/:id/sign", signProcurement);
 // Add this route to your procurement routes
 router.get("/signatures", getEmployeeSignatures);
 router.get("/all-signatures", getAllSignatures);
+router.put("/:id/receive", receivedOrder);
 
 export default router;

@@ -12,7 +12,7 @@ export const useProductAdminStore = create((set) => ({
   createProduct: async (newProduct) => {
     if (
       !newProduct.companyId ||
-      !newProduct.SKU ||
+      !newProduct.sku ||
       !newProduct.barcode ||
       !newProduct.productName ||
       !newProduct.unitPrice ||

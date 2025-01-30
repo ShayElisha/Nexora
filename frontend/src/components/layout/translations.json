@@ -657,7 +657,11 @@
           "category": "Category",
           "productDescription": "Product Description",
           "productImage": "Product Image",
-          "supplier": "Supplier"
+          "supplier": "Supplier",
+          "length": "Length",
+          "width": "Width",
+          "height": "Height",
+          "volume": "Volume"
         }
       },
       "supplier": {
@@ -1376,7 +1380,11 @@
           "category": "קטגוריה",
           "productDescription": "תיאור המוצר",
           "productImage": "תמונת המוצר",
-          "supplier": "ספק"
+          "supplier": "ספק",
+          "length": "אורך",
+          "width": "רוחב",
+          "height": "גובה",
+          "volume": "נפח"
         }
       },
       "supplier": {
@@ -2042,7 +2050,11 @@
           "category": "Категория",
           "productDescription": "Описание товара",
           "productImage": "Изображение товара",
-          "supplier": "Поставщик"
+          "supplier": "Поставщик",
+          "length": "Длина",
+          "width": "Ширина",
+          "height": "Высота",
+          "volume": "Объем"
         }
       },
       "supplier": {
@@ -2756,7 +2768,11 @@
           "category": "カテゴリー",
           "productDescription": "商品説明",
           "productImage": "商品画像",
-          "supplier": "サプライヤー"
+          "supplier": "サプライヤー",
+          "length": "長さ",
+          "width": "幅",
+          "height": "高さ",
+          "volume": "体積"
         }
       },
       "supplier": {
@@ -3469,7 +3485,11 @@
           "category": "Catégorie",
           "productDescription": "Description du produit",
           "productImage": "Image du produit",
-          "supplier": "Fournisseur"
+          "supplier": "Fournisseur",
+          "length": "Longueur",
+          "width": "Largeur",
+          "height": "Hauteur",
+          "volume": "Volume"
         }
       },
       "supplier": {
@@ -4182,7 +4202,11 @@
           "category": "Categoría",
           "productDescription": "Descripción del producto",
           "productImage": "Imagen del producto",
-          "supplier": "Proveedor"
+          "supplier": "Proveedor",
+          "length": "Longitud",
+          "width": "Ancho",
+          "height": "Altura",
+          "volume": "Volumen"
         }
       },
       "supplier": {
@@ -4896,7 +4920,11 @@
           "category": "الفئة",
           "productDescription": "وصف المنتج",
           "productImage": "صورة المنتج",
-          "supplier": "المورد"
+          "supplier": "المورد",
+          "length": "الطول",
+          "width": "العرض",
+          "height": "الارتفاع",
+          "volume": "الحجم"
         }
       },
       "supplier": {

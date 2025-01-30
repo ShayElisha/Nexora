@@ -8,6 +8,7 @@ import {
   createSubscriptionEndingEmail,
   createProcurementEmail,
   createProcurementUpdateEmail,
+  createProcurementDiscrepancyEmail,
 } from "./emailHandlers.js";
 
 // Load environment variables
@@ -163,6 +164,34 @@ export const sendProcurementUpdateEmail = async (
     console.log("Procurement update email sent: " + info.response);
   } catch (error) {
     console.error("Error sending procurement update email:", error);
+    throw error;
+  }
+};
+export const sendProcurementDiscrepancyEmail = async (
+  email,
+  supplierName,
+  companyName,
+  orderNumber,
+  discrepancies
+) => {
+  try {
+    const emailData = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: `Discrepancy in Purchase Order ${orderNumber}`,
+      html: createProcurementDiscrepancyEmail(
+        supplierName,
+        companyName,
+        orderNumber,
+        discrepancies
+      ),
+      category: "ERP Notifications", // Optional category
+    };
+
+    const info = await transporter.sendMail(emailData);
+    console.log("Procurement discrepancy email sent: " + info.response);
+  } catch (error) {
+    console.error("Error sending procurement discrepancy email:", error);
     throw error;
   }
 };

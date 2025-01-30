@@ -49,13 +49,13 @@ const Layout = ({ children }) => {
         <div className="relative">
           <button
             type="button"
-            className="inline-flex items-center px-4 py-2 border rounded-md bg-white text-gray-700 shadow-md"
+            className="inline-flex items-center px-4 py-2 border rounded-md z-20 bg-white text-gray-700 shadow-md"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
             <FaGlobe className="mr-2" /> {t("language.change_language")}
           </button>
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 bg-white shadow-md rounded-md z-10">
+            <div className="absolute right-0 mt-2 bg-white shadow-md rounded-md z-20">
               {Object.keys(flagMap).map((lng) => (
                 <button
                   key={lng}

@@ -181,7 +181,10 @@ const Products = () => {
                 <strong>{t("products.in_stock")}:</strong>
                 {product.inventory.quantity}
               </p>
-
+              <p className="text-lg font-semibold text-orange-600 text-left col-span-2 ">
+                <strong>{t("products.shelf_location")}:</strong>
+                {product.inventory.shelfLocation}
+              </p>
               <div className="flex items-center justify-center gap-6 col-span-2 mt-4">
                 <button
                   onClick={() => updateCart(product._id, -1)}

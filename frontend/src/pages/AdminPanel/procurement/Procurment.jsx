@@ -418,22 +418,23 @@ const Procurement = () => {
                   {t("procurement.view_pdf")}
                 </button>
 
-                {record.statusUpdate === null && (
-                  <>
-                    <button
-                      className="mt-2 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
-                      onClick={() => handleEditClick(record)}
-                    >
-                      {t("procurement.edit")}
-                    </button>
-                    <button
-                      className="mt-2 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
-                      onClick={() => handleDeleteClick(record._id)}
-                    >
-                      {t("procurement.delete")}
-                    </button>
-                  </>
-                )}
+                {record.statusUpdate === null &&
+                  record.orderStatus != "Delivered" && (
+                    <>
+                      <button
+                        className="mt-2 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+                        onClick={() => handleEditClick(record)}
+                      >
+                        {t("procurement.edit")}
+                      </button>
+                      <button
+                        className="mt-2 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+                        onClick={() => handleDeleteClick(record._id)}
+                      >
+                        {t("procurement.delete")}
+                      </button>
+                    </>
+                  )}
               </div>
             ))}
           </div>

@@ -67,7 +67,7 @@ const AddProcurement = () => {
   const [productData, setProductData] = useState({
     productId: "",
     productName: "",
-    SKU: "",
+    sku: "",
     category: "",
     unitPrice: "",
     quantity: "",
@@ -266,7 +266,7 @@ const AddProcurement = () => {
       const updatedProductList = products.map((product) => {
         if (product.supplierId === selectedSupplier._id) {
           const updatedProduct = updatedProducts.find(
-            (upd) => upd.SKU === product.SKU
+            (upd) => upd.sku === product.sku
           );
           return updatedProduct || product;
         }
@@ -342,7 +342,7 @@ const AddProcurement = () => {
     // טבלת מוצרים
     const columns = [
       { header: t("procurement.product_name"), dataKey: "productName" },
-      { header: t("procurement.sku"), dataKey: "SKU" },
+      { header: t("procurement.sku"), dataKey: "sku" },
       { header: t("procurement.category"), dataKey: "category" },
       { header: t("procurement.quantity"), dataKey: "quantity" },
       { header: t("procurement.unit_price"), dataKey: "unitPrice" },
@@ -441,7 +441,7 @@ const AddProcurement = () => {
     const {
       productId,
       productName,
-      SKU,
+      sku,
       category,
       unitPrice,
       quantity,
@@ -452,21 +452,21 @@ const AddProcurement = () => {
     if (
       !productId ||
       !productName ||
-      !SKU ||
+      !sku ||
       !category ||
       unitPrice <= 0 ||
       quantity <= 0
     ) {
-       toast.error(t("procurement.please_fill_all_product_fields"));
-    console.log("Missing fields:", productData); // לוג נוסף
-    return;
-  }
+      toast.error(t("procurement.please_fill_all_product_fields"));
+      console.log("Missing fields:", productData); // לוג נוסף
+      return;
+    }
 
     const qty = parseInt(quantity, 10);
 
     // בדיקה אם המוצר כבר קיים ברשימה
     const existingProductIndex = products.findIndex(
-      (product) => product.SKU === SKU
+      (product) => product.sku === sku
     );
 
     if (existingProductIndex > -1) {
@@ -489,7 +489,7 @@ const AddProcurement = () => {
       const newProduct = {
         productId,
         productName,
-        SKU,
+        sku,
         category,
         quantity: qty,
         unitPrice: finalPrice,
@@ -510,7 +510,7 @@ const AddProcurement = () => {
     // איפוס שדות המוצר שנבחר
     setProductData({
       productName: "",
-      SKU: "",
+      sku: "",
       category: "",
       baseUnitPrice: 0,
       baseCurrency: "USD",

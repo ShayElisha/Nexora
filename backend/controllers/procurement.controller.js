@@ -70,13 +70,13 @@ export const createProcurementRecord = async (req, res) => {
   try {
     // Validate products
     const validatedProducts = products.map((product) => {
-      const { productId, productName, SKU, category, unitPrice, quantity } =
+      const { productId, productName, sku, category, unitPrice, quantity } =
         product;
 
       if (
         !productId ||
         !productName ||
-        !SKU ||
+        !sku ||
         !category ||
         !unitPrice ||
         !quantity
@@ -663,9 +663,16 @@ export const receivedOrder = async (req, res) => {
           message: `Invalid received quantity for product "${product.productName}".`,
         });
       }
+      const maxReceivableQty = product.quantity - product.receivedQuantity;
+      if (receivedQty > maxReceivableQty) {
+        return res.status(400).json({
+          success: false,
+          message: `Cannot receive more than ordered. Product "${product.productName}" - Ordered: ${product.quantity}, Already Received: ${product.receivedQuantity}, Attempted: ${receivedQty}`,
+        });
+      }
 
       // עדכון הכמות שהתקבלה במוצר
-      product.receivedQuantity = receivedQty;
+      product.receivedQuantity += receivedQty;
 
       // בדיקה האם יש הבדל בין הכמות שהתקבלה לבין הכמות שהוזמנה
       if (receivedQty !== product.quantity) {
@@ -741,34 +748,45 @@ export const receivedOrder = async (req, res) => {
 
       procurement.notes = `The purchase order was closed with quantity differences: ${discrepancyDetails}`;
 
-      // הגדרת discrepanciesArray
-      const discrepanciesArray = procurement.products
-        .filter((product) => product.receivedQuantity !== product.quantity)
-        .map((product) => ({
-          productName: product.productName,
-          orderedQuantity: product.quantity,
-          receivedQuantity: product.receivedQuantity,
-        }));
+      const allProductsReceived = procurement.products.every(
+        (product) => product.receivedQuantity === product.quantity
+      );
 
-      console.log("discrepanciesArray:", discrepanciesArray);
-      console.log("is array:", Array.isArray(discrepanciesArray));
-      try {
-        // שליחת המייל עם מערך ההבדלים
-        await sendProcurementDiscrepancyEmail(
-          supplierEmail,
-          supplierName,
-          companyName, // Assuming 'company' has a 'name' field
-          procurement.PurchaseOrder, // Assuming 'PurchaseOrder' is the order number
-          discrepanciesArray
-        );
+      if (allProductsReceived) {
+        procurement.orderStatus = "Delivered";
+        procurement.receivedDate = new Date();
+        procurement.notes +=
+          " | All missing quantities have now been received. Order closed.";
+      } else {
+        // הגדרת discrepanciesArray
+        const discrepanciesArray = procurement.products
+          .filter((product) => product.receivedQuantity !== product.quantity)
+          .map((product) => ({
+            productName: product.productName,
+            orderedQuantity: product.quantity,
+            receivedQuantity: product.receivedQuantity,
+          }));
 
-        console.log("Procurement discrepancy email sent successfully.");
-      } catch (emailError) {
-        console.error(
-          "Failed to send procurement discrepancy email:",
-          emailError
-        );
-        // Optionally, handle the email sending failure (e.g., retry, notify admin, etc.)
+        console.log("discrepanciesArray:", discrepanciesArray);
+        console.log("is array:", Array.isArray(discrepanciesArray));
+        try {
+          // שליחת המייל עם מערך ההבדלים
+          await sendProcurementDiscrepancyEmail(
+            supplierEmail,
+            supplierName,
+            companyName, // Assuming 'company' has a 'name' field
+            procurement.PurchaseOrder, // Assuming 'PurchaseOrder' is the order number
+            discrepanciesArray
+          );
+
+          console.log("Procurement discrepancy email sent successfully.");
+        } catch (emailError) {
+          console.error(
+            "Failed to send procurement discrepancy email:",
+            emailError
+          );
+          // Optionally, handle the email sending failure (e.g., retry, notify admin, etc.)
+        }
       }
     } else if (hasDiscrepancy && allowCloseWithDiscrepancy) {
       procurement.orderStatus = "Delivered";

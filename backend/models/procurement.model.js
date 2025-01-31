@@ -7,11 +7,12 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
   productName: { type: String, required: true },
-  SKU: { type: String, required: true },
+  sku: { type: String, required: true },
   category: { type: String, required: true },
   unitPrice: { type: Number, required: true },
   quantity: { type: Number, required: true },
-  total: { type: Number, required: true }, // יחושב אוטומטית על בסיס unitPrice * quantity
+  receivedQuantity: { type: Number, default: 0 },
+  total: { type: Number, required: true },
 });
 
 const procurementSchema = new mongoose.Schema({

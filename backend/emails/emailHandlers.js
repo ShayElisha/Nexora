@@ -169,7 +169,11 @@ export function createSubscriptionEndingEmail(company, name) {
   `;
 }
 
-export function createProcurementEmail(supplierName, companyName, purchaseOrderUrl) {
+export function createProcurementEmail(
+  supplierName,
+  companyName,
+  purchaseOrderUrl
+) {
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -196,7 +200,11 @@ export function createProcurementEmail(supplierName, companyName, purchaseOrderU
     </html>
   `;
 }
-export function createProcurementUpdateEmail(supplierName, companyName, procurementOrderId) {
+export function createProcurementUpdateEmail(
+  supplierName,
+  companyName,
+  procurementOrderId
+) {
   const updateUrl = `http://localhost:5173/supplier/updateProcurement/${procurementOrderId}`;
 
   return `
@@ -220,6 +228,76 @@ export function createProcurementUpdateEmail(supplierName, companyName, procurem
         </div>
         <p>If you have any questions or need further assistance, please feel free to contact us.</p>
         <p>Best regards,<br>The ${companyName} Team</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+export function createProcurementDiscrepancyEmail(
+  supplierName,
+  companyName,
+  orderNumber,
+  discrepancies
+) {
+  // Generate table rows for each product discrepancy
+  const discrepancyRows = discrepancies
+    .map(
+      (product) => `
+    <tr>
+      <td class="border border-gray-300 px-4 py-2">${product.productName}</td>
+      <td class="border border-gray-300 px-4 py-2 text-center">${product.orderedQuantity}</td>
+      <td class="border border-gray-300 px-4 py-2 text-center">${product.receivedQuantity}</td>
+    </tr>
+  `
+    )
+    .join("");
+
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Procurement Order Update</title>
+      <!-- Include Tailwind CSS via CDN -->
+      <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-100 font-sans">
+      <div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+        <!-- Header Section -->
+        <div class="bg-green-600 text-white text-center py-4">
+          <h1 class="text-2xl font-bold">Procurement Order Update</h1>
+        </div>
+        
+        <!-- Body Section -->
+        <div class="p-6">
+          <!-- Greeting -->
+          <p class="text-lg mb-2"><strong>Hello ${supplierName},</strong></p>
+          
+          <!-- Introduction -->
+          <p class="mb-2">We would like to inform you that the received quantity for Purchase Order <strong>${orderNumber}</strong> from <strong>${companyName}</strong> is lower than the ordered quantity.</p>
+          
+          <!-- Discrepancy Details -->
+          <p class="mb-4">Below are the details of the discrepancies:</p>
+          
+          <!-- Discrepancy Table -->
+          <table class="min-w-full table-auto mb-6">
+            <thead>
+              <tr class="bg-green-100">
+                <th class="px-4 py-2">Product Name</th>
+                <th class="px-4 py-2">Ordered Quantity</th>
+                <th class="px-4 py-2">Received Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${discrepancyRows}
+            </tbody>
+          </table>
+          
+          
+          <p class="mt-6">If you have any questions or need further assistance, please do not hesitate to contact us.</p>
+          <p class="mt-4">Best regards,<br>The <strong>${companyName}</strong> Team</p>
+        </div>
       </div>
     </body>
     </html>

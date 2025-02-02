@@ -31,7 +31,7 @@ const AddProduct = () => {
   // Local form state for product
   const [formData, setFormData] = useState({
     companyId: authUser?.company,
-    SKU: "",
+    sku: "",
     barcode: "",
     productName: "",
     productDescription: "",
@@ -40,6 +40,9 @@ const AddProduct = () => {
     supplierId: "",
     supplierName: "",
     productImage: "",
+    length: "",
+    width: "",
+    height: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -58,6 +61,23 @@ const AddProduct = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries(["products"]);
       toast.success(t("product.success_message"));
+
+      // איפוס הטופס
+      setFormData({
+        companyId: authUser?.company,
+        sku: "",
+        barcode: "",
+        productName: "",
+        productDescription: "",
+        unitPrice: "",
+        category: "",
+        supplierId: "",
+        supplierName: "",
+        productImage: "",
+        length: "",
+        width: "",
+        height: "",
+      });
 
       const product = data.data;
       const defaultInventory = {
@@ -116,7 +136,7 @@ const AddProduct = () => {
 
     const payload = {
       companyId: formData.companyId,
-      SKU: formData.SKU,
+      sku: formData.sku,
       barcode: formData.barcode,
       productName: formData.productName,
       productDescription: formData.productDescription,
@@ -126,8 +146,12 @@ const AddProduct = () => {
       supplierName:
         suppliers.find((s) => s._id === formData.supplierId)?.SupplierName ||
         "",
+      length: formData.length,
+      width: formData.width,
+      height: formData.height,
     };
 
+    console.log("payload: " + JSON.stringify(payload, null, 2));
     if (formData.productImage) {
       const reader = new FileReader();
       reader.readAsDataURL(formData.productImage);
@@ -152,8 +176,15 @@ const AddProduct = () => {
     }
   }, [authUser]);
 
+  const calculateVolume = () => {
+    const length = parseFloat(formData.length) || 0;
+    const width = parseFloat(formData.width) || 0;
+    const height = parseFloat(formData.height) || 0;
+    return length * width * height;
+  };
+
   const fieldDefinitions = [
-    { name: "SKU", type: "text", label: t("product.fields.sku") },
+    { name: "sku", type: "text", label: t("product.fields.sku") },
     { name: "barcode", type: "text", label: t("product.fields.barcode") },
     { name: "productName", type: "text", label: t("product.fields.name") },
     { name: "unitPrice", type: "number", label: t("product.fields.price") },
@@ -168,6 +199,9 @@ const AddProduct = () => {
       type: "file",
       label: t("product.fields.image"),
     },
+    { name: "length", type: "number", label: t("product.fields.length") }, // Added field
+    { name: "width", type: "number", label: t("product.fields.width") }, // Added field
+    { name: "height", type: "number", label: t("product.fields.height") }, // Added field
   ];
 
   return (
@@ -194,6 +228,10 @@ const AddProduct = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
         />
+
+        <div className="mt-6 text-center text-blue-300">
+          {t("product.fields.volume")}: {calculateVolume().toFixed(3)} m³
+        </div>
       </div>
     </div>
   );

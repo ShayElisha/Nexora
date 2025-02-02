@@ -1,7 +1,12 @@
 import Procurement from "../models/procurement.model.js";
 import Supplier from "../models/suppliers.model.js";
 import Company from "../models/companies.model.js";
-import { sendProcurementEmailWithPDF } from "../emails/emailService.js";
+import Product from "../models/product.model.js";
+import Inventory from "../models/inventory.model.js";
+import {
+  sendProcurementEmailWithPDF,
+  sendProcurementDiscrepancyEmail,
+} from "../emails/emailService.js";
 
 import jwt from "jsonwebtoken";
 import cloudinary, {
@@ -65,9 +70,17 @@ export const createProcurementRecord = async (req, res) => {
   try {
     // Validate products
     const validatedProducts = products.map((product) => {
-      const { productName, SKU, category, unitPrice, quantity } = product;
+      const { productId, productName, SKU, category, unitPrice, quantity } =
+        product;
 
-      if (!productName || !SKU || !category || !unitPrice || !quantity) {
+      if (
+        !productId ||
+        !productName ||
+        !SKU ||
+        !category ||
+        !unitPrice ||
+        !quantity
+      ) {
         throw new Error(
           "Each product must include productName, SKU, category, unitPrice, and quantity."
         );
@@ -75,6 +88,7 @@ export const createProcurementRecord = async (req, res) => {
 
       return {
         ...product,
+        productId,
         unitPrice: parseFloat(unitPrice),
         quantity: parseInt(quantity, 10),
         total: parseFloat(unitPrice) * parseInt(quantity, 10),
@@ -574,5 +588,241 @@ export const searchProcurements = async (req, res) => {
       message: "Error searching procurements",
       error: error.message,
     });
+  }
+};
+
+export const receivedOrder = async (req, res) => {
+  // קבלת ה-ID מהפרמטרים של ה-URL
+  const { id } = req.params;
+
+  // קבלת receivedQuantities ו-allowCloseWithDiscrepancy מה-body
+  const { receivedQuantities, allowCloseWithDiscrepancy } = req.body;
+  console.log(allowCloseWithDiscrepancy);
+
+  // קבלת הטוקן מהקוקיז
+  const token = req.cookies["auth_token"];
+
+  // אימות: בדיקה אם הטוקן קיים
+  if (!token) {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
+
+  let decodedToken;
+  try {
+    decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    return res.status(401).json({ success: false, message: "Invalid token" });
+  }
+
+  // בדיקה אם הטוקן מכיל companyId
+  if (!decodedToken || !decodedToken.companyId) {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
+
+  const companyId = decodedToken.companyId;
+
+  try {
+    // מציאת תעודת הרכש לפי ה-ID ו-companyId והפעלת populate ל-products.productId
+    const procurement = await Procurement.findOne({
+      _id: id,
+      companyId,
+    }).populate("products.productId");
+
+    if (!procurement) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Procurement not found" });
+    }
+
+    // דגל לבדיקה האם יש הבדלים
+    let hasDiscrepancy = false;
+
+    // מעבר על כל מוצר בתעודת הרכש
+    for (const product of procurement.products) {
+      if (!product.productId) {
+        return res.status(400).json({
+          success: false,
+          message: `ProductId not found for product ${product.productName}`,
+        });
+      }
+
+      // שימוש ב-`toString()` כדי לוודא שהמפתח הוא מחרוזת
+      const productIdStr = product.productId._id.toString();
+      const receivedQty = receivedQuantities[productIdStr];
+
+      if (receivedQty === undefined) {
+        return res.status(400).json({
+          success: false,
+          message: `Received quantity for product "${product.productName}" is missing.`,
+        });
+      }
+
+      if (isNaN(receivedQty) || receivedQty < 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Invalid received quantity for product "${product.productName}".`,
+        });
+      }
+
+      // עדכון הכמות שהתקבלה במוצר
+      product.receivedQuantity = receivedQty;
+
+      // בדיקה האם יש הבדל בין הכמות שהתקבלה לבין הכמות שהוזמנה
+      if (receivedQty !== product.quantity) {
+        hasDiscrepancy = true;
+      }
+
+      // מציאת המוצר במסד הנתונים על פי productId
+      const productDoc = await Product.findById(product.productId._id);
+
+      if (!productDoc) {
+        return res.status(400).json({
+          success: false,
+          message: `Product with id "${product.productId._id}" not found.`,
+        });
+      }
+
+      // עדכון המלאי
+      let inventory = await Inventory.findOne({
+        companyId: companyId,
+        productId: product.productId._id, // שימוש ב-_id
+      });
+
+      if (!inventory) {
+        // יצירת רשומת מלאי חדשה אם אין
+        inventory = new Inventory({
+          companyId: companyId,
+          productId: product.productId._id,
+          quantity: receivedQty,
+        });
+        console.log(
+          `Created new inventory for product "${product.productName}", Quantity: ${receivedQty}`
+        );
+      } else {
+        // עדכון מלאי קיים
+        inventory.quantity += receivedQty;
+        console.log(
+          `Updated inventory for product "${product.productName}", New Quantity: ${inventory.quantity}`
+        );
+      }
+
+      await inventory.save();
+    }
+
+    console.log(`Discrepancies found: ${hasDiscrepancy}`);
+
+    const supplier = await Supplier.findById(procurement.supplierId);
+    if (!supplier) {
+      return res.status(400).json({
+        success: false,
+        message: "Supplier not found",
+      });
+    }
+    const supplierEmail = supplier.Email;
+    const supplierName = supplier.SupplierName;
+    const company = await Company.findById(companyId);
+    if (!company) {
+      return res.status(400).json({
+        success: false,
+        message: "Company not found",
+      });
+    }
+    const companyName = company.name;
+    if (hasDiscrepancy && allowCloseWithDiscrepancy == false) {
+      procurement.orderStatus = "In Progress";
+      procurement.receivedDate = new Date();
+      const discrepancyDetails = procurement.products
+        .filter((product) => product.receivedQuantity !== product.quantity)
+        .map(
+          (product) =>
+            `Product "${product.productName}" - Ordered: ${product.quantity}, Received: ${product.receivedQuantity}`
+        )
+        .join("; ");
+
+      procurement.notes = `The purchase order was closed with quantity differences: ${discrepancyDetails}`;
+
+      // הגדרת discrepanciesArray
+      const discrepanciesArray = procurement.products
+        .filter((product) => product.receivedQuantity !== product.quantity)
+        .map((product) => ({
+          productName: product.productName,
+          orderedQuantity: product.quantity,
+          receivedQuantity: product.receivedQuantity,
+        }));
+
+      console.log("discrepanciesArray:", discrepanciesArray);
+      console.log("is array:", Array.isArray(discrepanciesArray));
+      try {
+        // שליחת המייל עם מערך ההבדלים
+        await sendProcurementDiscrepancyEmail(
+          supplierEmail,
+          supplierName,
+          companyName, // Assuming 'company' has a 'name' field
+          procurement.PurchaseOrder, // Assuming 'PurchaseOrder' is the order number
+          discrepanciesArray
+        );
+
+        console.log("Procurement discrepancy email sent successfully.");
+      } catch (emailError) {
+        console.error(
+          "Failed to send procurement discrepancy email:",
+          emailError
+        );
+        // Optionally, handle the email sending failure (e.g., retry, notify admin, etc.)
+      }
+    } else if (hasDiscrepancy && allowCloseWithDiscrepancy) {
+      procurement.orderStatus = "Delivered";
+      const discrepancyDetails = procurement.products
+        .filter((product) => product.receivedQuantity !== product.quantity)
+        .map(
+          (product) =>
+            `Product "${product.productName}" - Ordered: ${product.quantity}, Received: ${product.receivedQuantity}`
+        )
+        .join("; ");
+
+      procurement.notes = `The purchase order was closed with quantity differences: ${discrepancyDetails}`;
+      procurement.receivedDate = new Date();
+
+      // הגדרת discrepanciesArray
+      const discrepanciesArray = procurement.products
+        .filter((product) => product.receivedQuantity !== product.quantity)
+        .map((product) => ({
+          productName: product.productName,
+          orderedQuantity: product.quantity,
+          receivedQuantity: product.receivedQuantity,
+        }));
+
+      try {
+        // שליחת המייל עם מערך ההבדלים
+        await sendProcurementDiscrepancyEmail(
+          supplierEmail,
+          supplierName,
+          companyName, // Assuming 'company' has a 'name' field
+          procurement.PurchaseOrder, // Assuming 'PurchaseOrder' is the order number
+          discrepanciesArray
+        );
+
+        console.log("Procurement discrepancy email sent successfully.");
+      } catch (emailError) {
+        console.error(
+          "Failed to send procurement discrepancy email:",
+          emailError
+        );
+        // Optionally, handle the email sending failure (e.g., retry, notify admin, etc.)
+      }
+    } else {
+      procurement.orderStatus = "Delivered";
+      procurement.receivedDate = new Date();
+    }
+
+    await procurement.save();
+
+    res.json({
+      success: true,
+      message: "Received quantities updated successfully!",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };

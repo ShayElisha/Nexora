@@ -3,6 +3,7 @@ import axiosInstance from "../../../lib/axios";
 import { toast } from "react-hot-toast";
 // נוספה יבוא של useQueryClient
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -15,8 +16,8 @@ const Products = () => {
   const [budgets, setBudgets] = useState([]);
   const [selectedBudget, setSelectedBudget] = useState("");
 
-  // הוספנו את השורה הזאת כדי שנוכל להשתמש ב-invalidateQueries
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -67,7 +68,7 @@ const Products = () => {
   // שליחת הנתונים לאחר בחירת תקציב
   const handleSubmitInventoryUpdate = async () => {
     if (!selectedBudget) {
-      toast.warn("Please select a budget.");
+      toast.warn(t("products.errors.no_budget_selected"));
       return;
     }
 
@@ -85,7 +86,7 @@ const Products = () => {
       });
 
     if (selectedProducts.length === 0) {
-      toast.warn("No products selected.");
+      toast.warn(t("products.errors.no_products_in_cart"));
       return;
     }
 
@@ -107,28 +108,29 @@ const Products = () => {
       });
 
       // 4) הצלחה
-      toast.success("Inventory and budget updated successfully!");
+      toast.success(t("products.success.inventory_updated"));
       setUpdating(false);
 
-      // >>> שינוי מינימלי: invalidateQueries + איפוס עגלה וסגירת מודאל
-      queryClient.invalidateQueries(); // ניתן לשים מפתחות ספציפיים, למשל ["inventory"] או ["budget"] וכו'
+      queryClient.invalidateQueries();
       setCart({});
       setShowModal(false);
     } catch (err) {
       console.error("Error:", err);
-      toast.error(
-        `Failed to update: ${err.response?.data?.message || err.message}`
-      );
+      toast.error(t("products.errors.update_failed", { message: err.message }));
       setUpdating(false);
     }
   };
 
   if (loading)
-    return <p className="text-center text-gray-500 text-xl">Loading...</p>;
+    return (
+      <p className="text-center text-gray-500 text-xl">
+        {t("products.loading")}
+      </p>
+    );
   if (error)
     return (
       <p className="text-center text-red-500 text-xl">
-        Error loading products: {error}
+        {t("products.error", { error })}
       </p>
     );
 
@@ -144,7 +146,7 @@ const Products = () => {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">
-        Product Details
+        {t("products.title")}
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {products.map((product) => (
@@ -163,21 +165,26 @@ const Products = () => {
               </h2>
 
               <p className="text-gray-500 text-sm text-right">
-                <strong>SKU:</strong> {product.SKU}
+                <strong>{t("products.sku")}:</strong> {product.SKU}
               </p>
               <p className="text-gray-500 text-sm text-left">
-                <strong>Category:</strong> {product.category}
+                <strong>{t("products.category")}:</strong> {product.category}
               </p>
 
               <p className="text-lg font-semibold text-green-600 text-right">
-                <strong>Unit Price:</strong> ${product.unitPrice}
+                <strong>{t("products.unit_price")}:</strong> $
+                {product.unitPrice}
               </p>
 
               {/* כמות במלאי */}
               <p className="text-lg font-semibold text-orange-600 text-left col-span-2 text-center">
-                <strong>In Stock:</strong> {product.inventory.quantity}
+                <strong>{t("products.in_stock")}:</strong>
+                {product.inventory.quantity}
               </p>
-
+              <p className="text-lg font-semibold text-orange-600 text-left col-span-2 ">
+                <strong>{t("products.shelf_location")}:</strong>
+                {product.inventory.shelfLocation}
+              </p>
               <div className="flex items-center justify-center gap-6 col-span-2 mt-4">
                 <button
                   onClick={() => updateCart(product._id, -1)}
@@ -207,7 +214,7 @@ const Products = () => {
           onClick={() => setShowModal(true)}
           className="px-8 py-4 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
         >
-          Review & Update Inventory
+          {t("products.review_update_inventory")}
         </button>
       </div>
 
@@ -224,14 +231,14 @@ const Products = () => {
             </button>
 
             <h2 className="text-2xl font-bold mb-4 text-center">
-              Select Budget
+              {t("products.modal.title")}{" "}
             </h2>
             <select
               className="w-full p-2 border border-gray-300 rounded-md mb-4"
               value={selectedBudget}
               onChange={(e) => setSelectedBudget(e.target.value)}
             >
-              <option value="">Select Budget</option>
+              <option value="">{t("products.modal.selected_Budget")}</option>
               {budgets.map((budget) => (
                 <option key={budget._id} value={budget._id}>
                   {budget.departmentOrProjectName} - amount: ${budget.amount}
@@ -240,10 +247,12 @@ const Products = () => {
             </select>
 
             <h3 className="text-lg font-semibold mb-4 text-center">
-              Cart Summary
+              {t("products.modal.Cart_Summary")}{" "}
             </h3>
             {cartItems.length === 0 ? (
-              <p className="text-gray-500 text-center">No products selected.</p>
+              <p className="text-gray-500 text-center">
+                {t("products.modal.no_products")}
+              </p>
             ) : (
               <>
                 <ul className="text-gray-700 mb-4">
@@ -274,7 +283,7 @@ const Products = () => {
               className="px-6 py-3 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition duration-300 w-full"
               disabled={updating}
             >
-              {updating ? "Updating..." : "Submit"}
+              {updating ? t("products.updating") : t("products.submit")}
             </button>
           </div>
         </div>

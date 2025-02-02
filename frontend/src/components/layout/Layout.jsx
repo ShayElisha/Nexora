@@ -3,14 +3,16 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { useTranslation } from "react-i18next";
 import { FaGlobe } from "react-icons/fa";
-import "./translations.json";
+
+// אם אתה משתמש בדגלים חיצוניים כמו react-world-flags
+import Flag from "react-world-flags";
 
 const Layout = ({ children }) => {
-  const { t, i18n } = useTranslation(); // ייבוא פונקציות תרגום
+  const { t, i18n } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const changeLanguage = (lng) => {
-    i18n.changeLanguage(lng); // שינוי שפה
+    i18n.changeLanguage(lng);
     setIsDropdownOpen(false);
   };
 
@@ -18,6 +20,20 @@ const Layout = ({ children }) => {
     en: "ltr",
     he: "rtl",
     ru: "ltr",
+    es: "ltr",
+    fr: "ltr",
+    ar: "rtl",
+    ja: "ltr",
+  };
+
+  const flagMap = {
+    en: "us", // United States
+    he: "il", // Israel
+    ru: "ru", // Russia
+    es: "es", // Spain
+    fr: "fr", // France
+    ar: "sa", // Saudi Arabia
+    ja: "jp", // Japan
   };
 
   useEffect(() => {
@@ -30,22 +46,23 @@ const Layout = ({ children }) => {
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <div className="flex justify-end p-4">
-        <div className="fixed z-20 relative">
+        <div className="relative">
           <button
             type="button"
-            className=" inline-flex items-center px-4 py-2 border rounded-md bg-white text-gray-700"
+            className="inline-flex items-center px-4 py-2 border rounded-md z-20 bg-white text-gray-700 shadow-md"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
             <FaGlobe className="mr-2" /> {t("language.change_language")}
           </button>
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 bg-white shadow-md rounded-md">
-              {["en", "he", "ru"].map((lng) => (
+            <div className="absolute right-0 mt-2 bg-white shadow-md rounded-md z-20">
+              {Object.keys(flagMap).map((lng) => (
                 <button
                   key={lng}
                   onClick={() => changeLanguage(lng)}
-                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left"
+                  className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left"
                 >
+                  <Flag code={flagMap[lng]} className="w-5 h-5 mr-2 rounded" />
                   {t(`${lng}`)}
                 </button>
               ))}

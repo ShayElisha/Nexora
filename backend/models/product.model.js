@@ -7,7 +7,7 @@ const productSchema = new mongoose.Schema(
       ref: "Company",
       required: true,
     },
-    SKU: {
+    sku: {
       type: String,
       required: [true, "SKU is required"],
       unique: true,
@@ -37,6 +37,22 @@ const productSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Supplier",
       required: [true, "Supplier ID is required"],
+    },
+    length: {
+      type: Number,
+      require: false,
+    },
+    width: {
+      type: Number,
+      require: false,
+    },
+    height: {
+      type: Number,
+      require: false,
+    },
+    volume: {
+      type: Number,
+      required: false,
     },
     supplierName: {
       type: String,

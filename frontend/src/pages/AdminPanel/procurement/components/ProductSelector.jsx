@@ -1,6 +1,8 @@
+// src/components/procurement/ProductSelector.jsx
 import { useEffect, useState } from "react";
 import { useProductStore } from "../../../../stores/useProductStore.js";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const ProductSelector = ({
   supplierId,
@@ -12,6 +14,7 @@ const ProductSelector = ({
   fetchExchangeRate,
   formData,
 }) => {
+  const { t } = useTranslation();
   const { fetchProductsBySupplier } = useProductStore();
   const [products, setProducts] = useState([]);
   const [availableStock, setAvailableStock] = useState(null);
@@ -21,7 +24,7 @@ const ProductSelector = ({
       fetchProductsBySupplier(supplierId)
         .then((data) => {
           if (!data || data.length === 0) {
-            toast.error("No products found for this supplier.");
+            toast.error(t("procurement.no_products_found_for_supplier"));
             return;
           }
 
@@ -40,13 +43,13 @@ const ProductSelector = ({
             shelfLocation: item.inventory.shelfLocation || "",
           }));
           setProducts(formattedProducts);
-          toast.success("Products loaded successfully!");
+          toast.success(t("procurement.products_loaded_successfully"));
         })
         .catch(() => {
-          toast.error("Failed to load products for supplier");
+          toast.error(t("procurement.failed_to_load_products_for_supplier"));
         });
     }
-  }, [supplierId, fetchProductsBySupplier]);
+  }, [supplierId, fetchProductsBySupplier, t]);
 
   useEffect(() => {
     if (!productData || !selectedSupplier || !formData.currency) return;
@@ -66,7 +69,7 @@ const ProductSelector = ({
     fetchExchangeRate(supplierBaseCurrency, selectedCurrency)
       .then((rate) => {
         if (!rate) {
-          toast.error("Failed to fetch conversion rate.");
+          toast.error(t("procurement.failed_to_fetch_conversion_rate"));
           return;
         }
         const convertedPrice = (productData.baseUnitPrice * rate).toFixed(2);
@@ -77,7 +80,7 @@ const ProductSelector = ({
         }));
       })
       .catch(() => {
-        toast.error("Failed to convert currency.");
+        toast.error(t("procurement.failed_to_convert_currency"));
       });
   }, [
     formData.currency,
@@ -86,11 +89,14 @@ const ProductSelector = ({
     fetchExchangeRate,
     setProductData,
     productData,
+    t,
   ]);
 
   return (
     <div className="bg-gray-800 p-4 rounded">
-      <label className="block text-gray-300 mb-2">Select Product</label>
+      <label className="block text-gray-300 mb-2">
+        {t("procurement.select_product")}
+      </label>
       <select
         disabled={!supplierId || products.length === 0}
         value={products.find((p) => p.SKU === productData.SKU)?._id || ""}
@@ -106,20 +112,21 @@ const ProductSelector = ({
             const selectedCurrency = formData.currency || "USD";
 
             if (!supplierBaseCurrency || !selectedCurrency) {
-              toast.error("Supplier's currency data missing for conversion.");
+              toast.error(t("procurement.currency_error"));
               return;
             }
 
             fetchExchangeRate(supplierBaseCurrency, selectedCurrency)
               .then((rate) => {
                 if (!rate) {
-                  toast.error("Failed to fetch conversion rate.");
+                  toast.error(t("procurement.conversion_error"));
                   return;
                 }
 
                 const convertedPrice = (prod.unitPrice * rate).toFixed(2);
 
                 setProductData({
+                  productId: prod._id,
                   productName: prod.productName,
                   SKU: prod.SKU,
                   category: prod.category,
@@ -132,10 +139,11 @@ const ProductSelector = ({
                 handleCurrencyChange({ target: { value: selectedCurrency } });
               })
               .catch(() => {
-                toast.error("Failed to convert currency.");
+                toast.error(t("procurement.failed_to_convert_currency"));
               });
           } else {
             setProductData({
+              productId: "",
               productName: "",
               SKU: "",
               category: "",
@@ -149,51 +157,63 @@ const ProductSelector = ({
         }}
         className="w-full p-2 rounded bg-gray-700"
       >
-        <option value="">-- Select a Product --</option>
+        <option value="">{`-- ${t(
+          "procurement.select_product_placeholder"
+        )} --`}</option>
         {products.map((product) => (
           <option key={product._id} value={product._id}>
-            {product.productName || "Unnamed Product"}
+            {product.productName || t("procurement.unnamed_product")}
           </option>
         ))}
       </select>
 
       {availableStock !== null && (
-        <p className="text-gray-300 mt-2">Available Stock: {availableStock}</p>
+        <p className="text-gray-300 mt-2">
+          {t("procurement.available_stock")}: {availableStock}
+        </p>
       )}
 
       <div className="mt-4 grid grid-cols-2 gap-4">
         <div>
-          <label className="text-gray-300 text-sm">SKU</label>
+          <label className="text-gray-300 text-sm">
+            {t("procurement.sku")}
+          </label>
           <input
             type="text"
             value={productData.SKU}
             readOnly
-            placeholder="SKU"
+            placeholder={t("procurement.sku_placeholder")}
             className="w-full p-2 rounded bg-gray-700"
           />
         </div>
         <div>
-          <label className="text-gray-300 text-sm">Category</label>
+          <label className="text-gray-300 text-sm">
+            {t("procurement.category")}
+          </label>
           <input
             type="text"
             value={productData.category}
             readOnly
-            placeholder="Category"
+            placeholder={t("procurement.category_placeholder")}
             className="w-full p-2 rounded bg-gray-700"
           />
         </div>
         <div>
-          <label className="text-gray-300 text-sm">Unit Price</label>
+          <label className="text-gray-300 text-sm">
+            {t("procurement.unit_price")}
+          </label>
           <input
             type="number"
             value={productData.unitPrice}
             readOnly
-            placeholder="Unit Price"
+            placeholder={t("procurement.unit_price_placeholder")}
             className="w-full p-2 rounded bg-gray-700"
           />
         </div>
         <div>
-          <label className="text-gray-300 text-sm">Quantity</label>
+          <label className="text-gray-300 text-sm">
+            {t("procurement.quantity")}
+          </label>
           <input
             type="number"
             value={productData.quantity}
@@ -203,7 +223,7 @@ const ProductSelector = ({
                 quantity: +e.target.value,
               }))
             }
-            placeholder="Quantity"
+            placeholder={t("procurement.quantity_placeholder")}
             className="w-full p-2 rounded bg-gray-700"
             disabled={!supplierId}
           />
@@ -215,7 +235,7 @@ const ProductSelector = ({
         className="bg-green-600 py-2 px-4 text-white rounded mt-4 hover:bg-green-700"
         disabled={!supplierId}
       >
-        Add Product
+        {t("procurement.add_product")}
       </button>
     </div>
   );

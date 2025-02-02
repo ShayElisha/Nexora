@@ -1,8 +1,12 @@
+// src/components/procurement/Users.jsx
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../../../lib/axios";
 import Sidebar from "../layouts/Sidebar";
+import { useTranslation } from "react-i18next";
 
 const Users = () => {
+  const { t } = useTranslation(); // שימוש במילון 'users'
+
   // Fetch users using useQuery
   const {
     data: users = [],
@@ -23,30 +27,32 @@ const Users = () => {
       <div className="flex-1 p-8">
         <div className="container mx-auto max-w-6xl bg-gray-800 p-6 rounded-lg shadow-xl">
           <h1 className="text-3xl font-bold text-blue-400 mb-6 text-center">
-            Users List
+            {t("users.users_list")}
           </h1>
           {isLoading ? (
             <div className="flex justify-center items-center h-64">
-              <p className="text-white">Loading...</p>
+              <p className="text-white">{t("users.loading")}</p>
             </div>
           ) : isError ? (
             <div className="flex justify-center items-center h-64 text-red-500">
-              {error.message || "Failed to load users"}
+              {error.message || t("users.failed_to_load_users")}
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full bg-gray-900 text-white rounded-lg overflow-hidden">
                 <thead>
                   <tr className="bg-gray-700">
-                    <th className="py-2 px-4">Profile Image</th>
-                    <th className="py-2 px-4">Name</th>
-                    <th className="py-2 px-4">Last Name</th>
-                    <th className="py-2 px-4">Email</th>
-                    <th className="py-2 px-4">Phone</th>
-                    <th className="py-2 px-4">Role</th>
-                    <th className="py-2 px-4">Address</th>
-                    <th className="py-2 px-4">Projects</th>
-                    <th className="py-2 px-4">Performance Reviews</th>
+                    <th className="py-2 px-4">{t("users.profile_image")}</th>
+                    <th className="py-2 px-4">{t("users.name")}</th>
+                    <th className="py-2 px-4">{t("users.last_name")}</th>
+                    <th className="py-2 px-4">{t("users.email")}</th>
+                    <th className="py-2 px-4">{t("users.phone")}</th>
+                    <th className="py-2 px-4">{t("users.role")}</th>
+                    <th className="py-2 px-4">{t("users.address")}</th>
+                    <th className="py-2 px-4">{t("users.projects")}</th>
+                    <th className="py-2 px-4">
+                      {t("users.performance_reviews")}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -65,17 +71,21 @@ const Users = () => {
                       <td className="py-2 px-4">{user.phone}</td>
                       <td className="py-2 px-4">{user.role}</td>
                       <td className="py-2 px-4">
-                        {user.address?.deletedAt ? "Deleted" : "Active"}
+                        {user.address?.deletedAt
+                          ? t("users.deleted")
+                          : t("users.active")}
                       </td>
                       <td className="py-2 px-4">
                         {user.projects.length > 0
                           ? user.projects.join(", ")
-                          : "No Projects"}
+                          : t("users.no_projects")}
                       </td>
                       <td className="py-2 px-4">
                         {user.performanceReviews.length > 0
-                          ? `${user.performanceReviews.length} Reviews`
-                          : "No Reviews"}
+                          ? `${user.performanceReviews.length} ${t(
+                              "users.reviews"
+                            )}`
+                          : t("users.no_reviews")}
                       </td>
                     </tr>
                   ))}

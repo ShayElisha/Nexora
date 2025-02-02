@@ -1,3 +1,4 @@
+// src/components/procurement/layouts/Sidebar.jsx
 import {
   FiHome,
   FiSettings,
@@ -7,43 +8,58 @@ import {
   FiMessageCircle,
 } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
-const menuItems = [
-  { name: "Dashboard", icon: <FiHome />, path: "/Dashboard" },
-  { name: "Products", icon: <FiBarChart2 />, path: "/Dashboard/Products" },
-  { name: "Add Products", icon: <FiUsers />, path: "/Dashboard/add-product" },
-  { name: "Supplier", icon: <FiSettings />, path: "/Dashboard/Supplier" },
-  { name: "Add Supplier", icon: <FiBell />, path: "/Dashboard/add-supplier" },
-  { name: "Finance", icon: <FiBell />, path: "/Dashboard/Finance" },
-  {
-    name: "Add Finance",
-    icon: <FiBell />,
-    path: "/Dashboard/add-finance-record",
-  },
-  { name: "Procurement", icon: <FiBell />, path: "/Dashboard/Procurement" },
-  {
-    name: "Add Procurement",
-    icon: <FiBell />,
-    path: "/Dashboard/add-Procurement-record",
-  },
-  {
-    name: "employees",
-    icon: <FiMessageCircle />,
-    path: "/dashboard/employees",
-  },
-  {
-    name: "New employee",
-    icon: <FiMessageCircle />,
-    path: "/dashboard/Signup",
-  },
-];
+const Sidebar = () => {
+  const { t } = useTranslation(); // הגדרת namespace 'sidebar'
 
-function Sidebar() {
+  const menuItems = [
+    { nameKey: "dashboard", icon: <FiHome />, path: "/Dashboard" },
+    { nameKey: "products", icon: <FiBarChart2 />, path: "/Dashboard/Products" },
+    {
+      nameKey: "addProducts",
+      icon: <FiUsers />,
+      path: "/Dashboard/add-product",
+    },
+    { nameKey: "supplier", icon: <FiSettings />, path: "/Dashboard/Supplier" },
+    {
+      nameKey: "addSupplier",
+      icon: <FiBell />,
+      path: "/Dashboard/add-supplier",
+    },
+    { nameKey: "finance", icon: <FiBell />, path: "/Dashboard/Finance" },
+    {
+      nameKey: "addFinance",
+      icon: <FiBell />,
+      path: "/Dashboard/add-finance-record",
+    },
+    {
+      nameKey: "procurement",
+      icon: <FiBell />,
+      path: "/Dashboard/Procurement",
+    },
+    {
+      nameKey: "addProcurement",
+      icon: <FiBell />,
+      path: "/Dashboard/add-Procurement-record",
+    },
+    {
+      nameKey: "employees",
+      icon: <FiMessageCircle />,
+      path: "/dashboard/employees",
+    },
+    {
+      nameKey: "newEmployee",
+      icon: <FiMessageCircle />,
+      path: "/dashboard/Signup",
+    },
+  ];
+
   return (
     <div className="w-64 bg-gray-900 text-gray-200 h-screen shadow-lg flex flex-col">
       {/* כותרת עליונה */}
       <div className="p-4 text-2xl font-bold border-b border-gray-700">
-        Admin Panel
+        {t("sidebar.adminPanel")}
       </div>
 
       {/* רשימת תפריטים */}
@@ -55,13 +71,13 @@ function Sidebar() {
               className="flex items-center gap-4 p-4 cursor-pointer rounded-md transition-all duration-300 hover:bg-gray-800 hover:text-blue-400"
             >
               <span className="text-xl">{item.icon}</span>
-              <span>{item.name}</span>
+              <span>{t(`sidebar.menu.${item.nameKey}`)}</span>
             </Link>
           </li>
         ))}
       </ul>
     </div>
   );
-}
+};
 
 export default Sidebar;

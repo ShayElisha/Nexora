@@ -322,6 +322,7 @@ const ProductList = () => {
                   t("inventory.quantity"),
                   t("inventory.min_stock_level"),
                   t("inventory.reorder_qty"),
+                  t("inventory.volume"),
                   t("inventory.actions"),
                 ].map((header) => (
                   <th key={header} className="py-3 px-6 text-left bg-gray-600">
@@ -386,6 +387,17 @@ const ProductList = () => {
                     </td>
                     <td className="py-2 px-6">
                       {item.inventory?.reorderQuantity ?? 0}
+                    </td>
+                    <td className="py-2 px-6">
+                      {item.height && item.width && item.length ? (
+                        <>
+                          {item.height} × {item.width} × {item.length} ={" "}
+                          {item.volume ||
+                            item.height * item.width * item.length}
+                        </>
+                      ) : (
+                        <>{(item.value = "N/A")}</>
+                      )}
                     </td>
                     <td className="py-2 px-6 flex space-x-2">
                       <button

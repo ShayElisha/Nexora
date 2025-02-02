@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../../lib/axios";
 import Sidebar from "../layouts/Sidebar";
+import { useTranslation } from "react-i18next";
 
 const AllSignatures = () => {
+  const { t } = useTranslation(); // שימוש במילון 'allSignatures'
+
   const [documents, setDocuments] = useState([]);
   const [budgetSignatures, setBudgetSignatures] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,10 +29,12 @@ const AllSignatures = () => {
           // If success is false, append or set an error message
           setError((prevError) =>
             prevError
-              ? prevError +
-                " | " +
-                (procurementResponse.data.message || "Procurement error")
-              : procurementResponse.data.message || "Procurement error"
+              ? `${prevError} | ${
+                  procurementResponse.data.message ||
+                  t("allSignatures.errors.procurement_error")
+                }`
+              : procurementResponse.data.message ||
+                t("allSignatures.errors.procurement_error")
           );
         }
 
@@ -44,15 +49,17 @@ const AllSignatures = () => {
         } else {
           setError((prevError) =>
             prevError
-              ? prevError +
-                " | " +
-                (budgetResponse.data.message || "Budget error")
-              : budgetResponse.data.message || "Budget error"
+              ? `${prevError} | ${
+                  budgetResponse.data.message || t("allSignatures.errors.budget_error")
+                }`
+              : budgetResponse.data.message || t("allSignatures.errors.budget_error")
           );
         }
       } catch (err) {
         // Catch any request or network errors
-        setError("Failed to fetch documents: " + err.message);
+        setError(
+          t("allSignatures.errors.failed_to_fetch_documents", { message: err.message })
+        );
       } finally {
         // Always hide the loading indicator
         setLoading(false);
@@ -73,7 +80,7 @@ const AllSignatures = () => {
   };
 
   if (loading) {
-    return <div className="text-center">Loading...</div>;
+    return <div className="text-center">{t("allSignatures.loading")}</div>;
   }
 
   if (error) {
@@ -84,28 +91,35 @@ const AllSignatures = () => {
     <div className="flex">
       <Sidebar />
       <div className="ml-64 p-6 max-w-7xl mx-auto">
-        {/* ===================== Procurement Signatures Table ===================== */}
-        <h2 className="text-2xl font-bold mb-6 text-center">All Documents</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          {t("allSignatures.allDocuments")}
+        </h2>
 
         {documents.length === 0 ? (
-          <p className="text-center text-gray-500">No documents found.</p>
+          <p className="text-center text-gray-500">{t("allSignatures.no_documents_found")}</p>
         ) : (
           <div className="max-h-[600px] overflow-auto mb-8 border border-gray-300">
             <table className="min-w-full border-collapse">
               <thead className="bg-gray-100">
                 <tr>
                   <th className="border border-gray-300 px-4 py-2">
-                    Purchase Order
+                    {t("allSignatures.purchaseOrder")}
                   </th>
                   <th className="border border-gray-300 px-4 py-2">
-                    Supplier Name
+                    {t("allSignatures.supplierName")}
                   </th>
                   <th className="border border-gray-300 px-4 py-2">
-                    Approval Status
+                    {t("allSignatures.approvalStatus")}
                   </th>
-                  <th className="border border-gray-300 px-4 py-2">Signers</th>
-                  <th className="border border-gray-300 px-4 py-2">Document</th>
-                  <th className="border border-gray-300 px-4 py-2">Status</th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    {t("allSignatures.signers")}
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    {t("allSignatures.document")}
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    {t("allSignatures.status")}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -118,7 +132,7 @@ const AllSignatures = () => {
                       {doc.supplierName || "N/A"}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {doc.approvalStatus || "Pending"}
+                      {doc.approvalStatus || ("allSignatures.pending")}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       <ul className="max-h-20 overflow-y-scroll space-y-4">
@@ -137,7 +151,7 @@ const AllSignatures = () => {
                                     openModal(
                                       <img
                                         src={signer.signatureUrl}
-                                        alt="Signature"
+                                        alt={t("allSignatures.signature")}
                                         className="w-full h-auto"
                                       />
                                     )
@@ -145,16 +159,16 @@ const AllSignatures = () => {
                                 />
                               ) : (
                                 <div className="w-12 h-12 flex items-center justify-center bg-gray-200 text-gray-500 text-sm border border-gray-300 rounded-md">
-                                  No Image
+                                  {t("allSignatures.no_image")}
                                 </div>
                               )}
                             </div>
                             <div>
                               <p className="font-medium text-gray-700">
-                                {signer.name || "Unknown"}
+                                {signer.name || t("allSignatures.unknown")}
                               </p>
                               <p className="text-sm text-gray-500">
-                                {signer.hasSigned ? "Signed" : "Pending"}
+                                {signer.hasSigned ? t("allSignatures.signed") : t("allSignatures.pending")}
                               </p>
                             </div>
                           </li>
@@ -168,21 +182,21 @@ const AllSignatures = () => {
                             openModal(
                               <iframe
                                 src={doc.summeryProcurement}
-                                title="Document Viewer"
+                                title={t("allSignatures.documentViewer")}
                                 className="w-full h-96"
                               ></iframe>
                             )
                           }
                           className="text-blue-500 hover:underline"
                         >
-                          View Document
+                          {t("allSignatures.viewDocument")}
                         </button>
                       ) : (
-                        "No Document"
+                        t("allSignatures.no_document")
                       )}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {doc.status || "N/A"}
+                      {doc.status || t("allSignatures.n_a")}
                     </td>
                   </tr>
                 ))}
@@ -193,11 +207,12 @@ const AllSignatures = () => {
 
         {/* ===================== Budget Signatures Table ===================== */}
         <h2 className="text-2xl font-bold mb-6 text-center">
-          Budget Signatures
+          {t("allSignatures.budgetSignatures")}
         </h2>
+
         {budgetSignatures.length === 0 ? (
           <p className="text-center text-gray-500">
-            No budget signatures found.
+            {t("no_budget_signatures_found")}
           </p>
         ) : (
           <div className="max-h-[600px] overflow-auto border border-gray-300">
@@ -205,35 +220,43 @@ const AllSignatures = () => {
               <thead className="bg-gray-100">
                 <tr>
                   <th className="border border-gray-300 px-4 py-2">
-                    Budget Item
+                    {t("allSignatures.budgetItem")}
                   </th>
                   <th className="border border-gray-300 px-4 py-2">
-                    start Date
+                    {t("allSignatures.startDate")}
                   </th>
-                  <th className="border border-gray-300 px-4 py-2">endDate</th>
-                  <th className="border border-gray-300 px-4 py-2">Amount</th>
-                  <th className="border border-gray-300 px-4 py-2">Signers</th>
-                  <th className="border border-gray-300 px-4 py-2">Status</th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    {t("allSignatures.endDate")}
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    {t("allSignatures.amount")}
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    {t("allSignatures.signers")}
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    {t("allSignatures.status")}
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {budgetSignatures.map((budgetItem, index) => (
                   <tr key={index} className="hover:bg-gray-50">
                     <td className="border border-gray-300 px-4 py-2">
-                      {budgetItem.departmentOrProjectName || "N/A"}
+                      {budgetItem.departmentOrProjectName || t("allSignatures.n_a")}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {budgetItem.startDate
                         ? new Date(budgetItem.startDate).toLocaleDateString()
-                        : "N/A"}
+                        : t("allSignatures.n_a")}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {budgetItem.endDate
                         ? new Date(budgetItem.startDate).toLocaleDateString()
-                        : "N/A"}{" "}
+                        : t("allSignatures.n_a")}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {budgetItem.amount || "N/A"}
+                      {budgetItem.amount || t("allSignatures.n_a")}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       <ul className="max-h-20 overflow-y-scroll space-y-4">
@@ -246,13 +269,13 @@ const AllSignatures = () => {
                               {signer.signatureUrl ? (
                                 <img
                                   src={signer.signatureUrl}
-                                  alt="Signature"
+                                  alt={t("allSignatures.signature")}
                                   className="w-12 h-12 object-contain border border-gray-300 rounded-md cursor-pointer"
                                   onClick={() =>
                                     openModal(
                                       <img
                                         src={signer.signatureUrl}
-                                        alt="Signature"
+                                        alt={t("allSignatures.signature")}
                                         className="w-full h-auto"
                                       />
                                     )
@@ -260,16 +283,16 @@ const AllSignatures = () => {
                                 />
                               ) : (
                                 <div className="w-12 h-12 flex items-center justify-center bg-gray-200 text-gray-500 text-sm border border-gray-300 rounded-md">
-                                  No Image
-                                </div>
+                                  {t("allSignatures.no_image")}
+                                  </div>
                               )}
                             </div>
                             <div>
                               <p className="font-medium text-gray-700">
-                                {signer.name || "Unknown"}
+                                {signer.name || t("allSignatures.unknown")}
                               </p>
                               <p className="text-sm text-gray-500">
-                                {signer.hasSigned ? "Signed" : "Pending"}
+                                {signer.hasSigned ? t("allSignatures.signed") : t("allSignatures.pending")}
                               </p>
                             </div>
                           </li>
@@ -277,7 +300,7 @@ const AllSignatures = () => {
                       </ul>
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {budgetItem.status || "N/A"}
+                      {budgetItem.status || t("allSignatures.n_a")}
                     </td>
                   </tr>
                 ))}

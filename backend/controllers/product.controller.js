@@ -45,7 +45,7 @@ export const createProduct = async (req, res) => {
   try {
     const {
       companyId,
-      SKU,
+      sku,
       barcode,
       productName,
       unitPrice,
@@ -54,12 +54,16 @@ export const createProduct = async (req, res) => {
       supplierName,
       productDescription,
       productImage,
+      length,
+      width,
+      height,
+      volume,
     } = req.body;
 
     // בדיקת שדות חובה
     if (
       !companyId ||
-      !SKU ||
+      !sku ||
       !barcode ||
       !productName ||
       !unitPrice ||
@@ -84,7 +88,7 @@ export const createProduct = async (req, res) => {
 
     const newProduct = new Product({
       companyId,
-      SKU,
+      sku,
       barcode,
       productName,
       productDescription,
@@ -93,6 +97,10 @@ export const createProduct = async (req, res) => {
       supplierId,
       supplierName,
       productImage: productImageURL || "",
+      length,
+      width,
+      height,
+      volume,
     });
 
     await newProduct.save();
@@ -113,6 +121,9 @@ export const updateProduct = async (req, res) => {
       supplierId,
       supplierName,
       productImage,
+      length,
+      width,
+      height,
     } = req.body;
 
     const product = await Product.findById(req.params.id);
@@ -131,8 +142,10 @@ export const updateProduct = async (req, res) => {
     product.supplierId = supplierId || product.supplierId;
     product.supplierName = supplierName || product.supplierName;
     product.productImage = productImage || product.productImage;
-
-    await product.save();
+    product.length = length || product.length;
+    (product.width = width || product.width),
+      (product.height = height || product.height),
+      await product.save();
     res.status(200).json({ success: true, data: product });
   } catch (err) {
     res

@@ -145,22 +145,39 @@ export const updateBudget = async (req, res) => {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid authentication token." });
+    }
+
     const employeeId = decodedToken.employeeId;
     const budgetId = req.params.id;
-    const itemsToAdd = req.body.items; // נניח שב-Frontend שולחים { items: [...] }
+    const itemsToAdd = req.body.items;
 
+    // בדיקת תקינות מזהה התקציב
     if (!mongoose.Types.ObjectId.isValid(budgetId)) {
       return res
         .status(400)
         .json({ success: false, message: "Invalid budget ID format." });
     }
 
+    // מציאת התקציב במסד הנתונים
     const budget = await Budget.findById(budgetId);
     if (!budget) {
       return res
         .status(404)
         .json({ success: false, message: `Budget not found: ${budgetId}` });
+    }
+
+    // הוספת employeeId לכל פריט חדש
+    if (itemsToAdd && Array.isArray(itemsToAdd)) {
+      itemsToAdd.forEach((item) => {
+        item.employeeId = employeeId;
+      });
     }
 
     // חישוב סכום ההוצאה
@@ -177,11 +194,14 @@ export const updateBudget = async (req, res) => {
     budget.updatedAt = new Date();
 
     await budget.save();
+
     if (!employeeId) {
       console.error(
         "Error: employeeId is missing, notification will not be sent."
       );
     }
+
+    // בדיקת חציית התקציב ושליחת התראה אם נדרש
     if (budget.spentAmount > budget.amount) {
       console.log(
         `Budget exceeded for: ${budget.departmentOrProjectName}, sending notification...`

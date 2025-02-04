@@ -20,36 +20,45 @@ const ProductSelector = ({
   const [availableStock, setAvailableStock] = useState(null);
 
   useEffect(() => {
-    if (supplierId) {
-      fetchProductsBySupplier(supplierId)
-        .then((data) => {
-          if (!data || data.length === 0) {
-            toast.error(t("procurement.no_products_found_for_supplier"));
-            return;
-          }
+    if (!supplierId) return;
 
-          const formattedProducts = data.map((item) => ({
-            _id: item._id,
-            SKU: item.SKU,
-            productName: item.productName,
-            category: item.category,
-            unitPrice: item.unitPrice,
-            supplierId: item.supplierId,
-            supplierName: item.supplierName,
-            productImage: item.productImage,
-            quantity: item.inventory.quantity || 0, // Use default value if not available
-            minStockLevel: item.inventory.minStockLevel || 0,
-            reorderQuantity: item.inventory.reorderQuantity || 0,
-            shelfLocation: item.inventory.shelfLocation || "",
-          }));
-          setProducts(formattedProducts);
-          toast.success(t("procurement.products_loaded_successfully"));
-        })
-        .catch(() => {
-          toast.error(t("procurement.failed_to_load_products_for_supplier"));
+    fetchProductsBySupplier(supplierId)
+      .then((data) => {
+        if (!data || data.length === 0) {
+          toast.error(t("procurement.no_products_found_for_supplier"));
+          return;
+        }
+
+        const formattedProducts = data.map((item) => ({
+          _id: item._id,
+          sku: item.sku,
+          productName: item.productName,
+          category: item.category,
+          unitPrice: item.unitPrice,
+          supplierId: item.supplierId,
+          supplierName: item.supplierName,
+          productImage: item.productImage,
+          quantity: item.inventory?.quantity ?? 0,
+          minStockLevel: item.inventory?.minStockLevel ?? 0,
+          reorderQuantity: item.inventory?.reorderQuantity ?? 0,
+          shelfLocation: item.inventory?.shelfLocation ?? "",
+        }));
+
+        setProducts((prevProducts) => {
+          if (
+            JSON.stringify(prevProducts) !== JSON.stringify(formattedProducts)
+          ) {
+            return formattedProducts;
+          }
+          return prevProducts;
         });
-    }
-  }, [supplierId, fetchProductsBySupplier, t]);
+
+        toast.success(t("procurement.products_loaded_successfully"));
+      })
+      .catch(() => {
+        toast.error(t("procurement.failed_to_load_products_for_supplier"));
+      });
+  }, [supplierId]);
 
   useEffect(() => {
     if (!productData || !selectedSupplier || !formData.currency) return;
@@ -99,7 +108,7 @@ const ProductSelector = ({
       </label>
       <select
         disabled={!supplierId || products.length === 0}
-        value={products.find((p) => p.SKU === productData.SKU)?._id || ""}
+        value={products.find((p) => p.sku === productData.sku)?._id || ""}
         onChange={(e) => {
           const selectedId = e.target.value;
           const prod = products.find((p) => p._id === selectedId);
@@ -128,7 +137,7 @@ const ProductSelector = ({
                 setProductData({
                   productId: prod._id,
                   productName: prod.productName,
-                  SKU: prod.SKU,
+                  sku: prod.sku,
                   category: prod.category,
                   baseUnitPrice: prod.unitPrice || 0,
                   baseCurrency: supplierBaseCurrency,
@@ -145,7 +154,7 @@ const ProductSelector = ({
             setProductData({
               productId: "",
               productName: "",
-              SKU: "",
+              sku: "",
               category: "",
               baseUnitPrice: 0,
               baseCurrency: "USD",
@@ -180,7 +189,7 @@ const ProductSelector = ({
           </label>
           <input
             type="text"
-            value={productData.SKU}
+            value={productData.sku}
             readOnly
             placeholder={t("procurement.sku_placeholder")}
             className="w-full p-2 rounded bg-gray-700"

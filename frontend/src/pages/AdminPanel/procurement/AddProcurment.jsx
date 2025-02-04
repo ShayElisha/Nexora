@@ -67,7 +67,7 @@ const AddProcurement = () => {
   const [productData, setProductData] = useState({
     productId: "",
     productName: "",
-    SKU: "",
+    sku: "",
     category: "",
     unitPrice: "",
     quantity: "",
@@ -266,7 +266,7 @@ const AddProcurement = () => {
       const updatedProductList = products.map((product) => {
         if (product.supplierId === selectedSupplier._id) {
           const updatedProduct = updatedProducts.find(
-            (upd) => upd.SKU === product.SKU
+            (upd) => upd.sku === product.sku
           );
           return updatedProduct || product;
         }
@@ -297,6 +297,7 @@ const AddProcurement = () => {
   }, [products]);
   // ----------------- Create PDF ----------------- //
   const createPDF = async () => {
+    // שימוש ב-t עם override לשפה אנגלית
     const currencySymbol = getCurrencySymbol(formData.currency);
     const pdf = new jsPDF();
 
@@ -304,34 +305,46 @@ const AddProcurement = () => {
     pdf.setFontSize(10);
     pdf.setTextColor(0, 0, 0);
     pdf.text(
-      `${t("procurement.company")}: ${authUser?.company || "N/A"}`,
+      `${t("procurement.company", { lng: "en" })}: ${
+        authUser?.company || "N/A"
+      }`,
       10,
       20
     );
     pdf.text(
-      `${t("procurement.date")}: ${new Date().toLocaleDateString()}`,
+      `${t("procurement.date", { lng: "en" })}: ${new Date().toLocaleDateString(
+        "en-US"
+      )}`,
       10,
       25
     );
     pdf.text(
-      `${t("procurement.address")}: ${formData.DeliveryAddress || "N/A"}`,
+      `${t("procurement.address", { lng: "en" })}: ${
+        formData.DeliveryAddress || "N/A"
+      }`,
       10,
       30
     );
 
     // פרטי ספק
     pdf.text(
-      `${t("procurement.supplier")}: ${formData.supplierName || "N/A"}`,
+      `${t("procurement.supplier", { lng: "en" })}: ${
+        formData.supplierName || "N/A"
+      }`,
       150,
       20
     );
     pdf.text(
-      `${t("procurement.phone")}: ${selectedSupplier?.Phone || "N/A"}`,
+      `${t("procurement.phone", { lng: "en" })}: ${
+        selectedSupplier?.Phone || "N/A"
+      }`,
       150,
       25
     );
     pdf.text(
-      `${t("procurement.email")}: ${selectedSupplier?.Email || "N/A"}`,
+      `${t("procurement.email", { lng: "en" })}: ${
+        selectedSupplier?.Email || "N/A"
+      }`,
       150,
       30
     );
@@ -341,17 +354,23 @@ const AddProcurement = () => {
 
     // טבלת מוצרים
     const columns = [
-      { header: t("procurement.product_name"), dataKey: "productName" },
-      { header: t("procurement.sku"), dataKey: "SKU" },
-      { header: t("procurement.category"), dataKey: "category" },
-      { header: t("procurement.quantity"), dataKey: "quantity" },
-      { header: t("procurement.unit_price"), dataKey: "unitPrice" },
-      { header: t("procurement.total"), dataKey: "total" },
+      {
+        header: t("procurement.product_name", { lng: "en" }),
+        dataKey: "productName",
+      },
+      { header: t("procurement.sku", { lng: "en" }), dataKey: "sku" },
+      { header: t("procurement.category", { lng: "en" }), dataKey: "category" },
+      { header: t("procurement.quantity", { lng: "en" }), dataKey: "quantity" },
+      {
+        header: t("procurement.unit_price", { lng: "en" }),
+        dataKey: "unitPrice",
+      },
+      { header: t("procurement.total", { lng: "en" }), dataKey: "total" },
     ];
 
     const rows = products.map((prod) => ({
       productName: prod.productName,
-      SKU: prod.SKU,
+      sku: prod.SKU,
       category: prod.category,
       quantity: prod.quantity,
       unitPrice: `${prod.unitPrice} ${currencySymbol}`,
@@ -375,7 +394,9 @@ const AddProcurement = () => {
     // סה"כ
     pdf.setFontSize(14);
     pdf.text(
-      `${t("procurement.total_cost")}: ${totalCost} ${currencySymbol}`,
+      `${t("procurement.total_cost", {
+        lng: "en",
+      })}: ${totalCost} ${currencySymbol}`,
       10,
       pdf.autoTable.previous.finalY + 10
     );
@@ -441,7 +462,7 @@ const AddProcurement = () => {
     const {
       productId,
       productName,
-      SKU,
+      sku,
       category,
       unitPrice,
       quantity,
@@ -452,21 +473,21 @@ const AddProcurement = () => {
     if (
       !productId ||
       !productName ||
-      !SKU ||
+      !sku ||
       !category ||
       unitPrice <= 0 ||
       quantity <= 0
     ) {
-       toast.error(t("procurement.please_fill_all_product_fields"));
-    console.log("Missing fields:", productData); // לוג נוסף
-    return;
-  }
+      toast.error(t("procurement.please_fill_all_product_fields"));
+      console.log("Missing fields:", productData); // לוג נוסף
+      return;
+    }
 
     const qty = parseInt(quantity, 10);
 
     // בדיקה אם המוצר כבר קיים ברשימה
     const existingProductIndex = products.findIndex(
-      (product) => product.SKU === SKU
+      (product) => product.sku === sku
     );
 
     if (existingProductIndex > -1) {
@@ -489,7 +510,7 @@ const AddProcurement = () => {
       const newProduct = {
         productId,
         productName,
-        SKU,
+        sku,
         category,
         quantity: qty,
         unitPrice: finalPrice,
@@ -510,7 +531,7 @@ const AddProcurement = () => {
     // איפוס שדות המוצר שנבחר
     setProductData({
       productName: "",
-      SKU: "",
+      sku: "",
       category: "",
       baseUnitPrice: 0,
       baseCurrency: "USD",

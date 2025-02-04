@@ -14,10 +14,13 @@ import {
   updateCategoryAllocation,
   signBudget,
   assignToBudget,
+  getBudgetByDepartments,
 } from "../controllers/Budget.controller.js";
 import { protectRoute } from "../middleware/protectRoute.js";
 
 const router = Router();
+
+router.get("/by-department/:departmentId", getBudgetByDepartments);
 
 // נתיב בסיסי לקבלת כל התקציבים ויצירתם
 router.get("/", getBudgets);

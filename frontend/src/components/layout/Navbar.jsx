@@ -383,6 +383,37 @@ const Navbar = () => {
                   },
                 ],
               },
+              {
+                label: "department",
+                links: [
+                  {
+                    to: "/dashboard/department/Add-Department",
+                    text: "Add Department",
+                  },
+                ],
+              },
+              {
+                label: "Tasks",
+                links: [
+                  {
+                    to: "/dashboard/tasks",
+                    text: "tasks",
+                  },
+                  {
+                    to: "/dashboard/tasks/Add-Tasks",
+                    text: "Add-Tasks",
+                  },
+                ],
+              },
+              {
+                label: "calender",
+                links: [
+                  {
+                    to: "/dashboard/Events",
+                    text: "Events",
+                  },
+                ],
+              },
             ].map((dropdown, index) => (
               <li
                 key={index}

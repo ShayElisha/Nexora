@@ -58,6 +58,7 @@ export const createProduct = async (req, res) => {
       width,
       height,
       volume,
+      productType,
     } = req.body;
 
     // בדיקת שדות חובה
@@ -69,7 +70,8 @@ export const createProduct = async (req, res) => {
       !unitPrice ||
       !category ||
       !supplierId ||
-      !supplierName
+      !supplierName ||
+      !productType
     ) {
       return res
         .status(400)
@@ -101,6 +103,7 @@ export const createProduct = async (req, res) => {
       width,
       height,
       volume,
+      productType,
     });
 
     await newProduct.save();
@@ -124,6 +127,7 @@ export const updateProduct = async (req, res) => {
       length,
       width,
       height,
+      productType,
     } = req.body;
 
     const product = await Product.findById(req.params.id);
@@ -145,7 +149,8 @@ export const updateProduct = async (req, res) => {
     product.length = length || product.length;
     (product.width = width || product.width),
       (product.height = height || product.height),
-      await product.save();
+      (product.productType = productType || product.productType);
+    await product.save();
     res.status(200).json({ success: true, data: product });
   } catch (err) {
     res

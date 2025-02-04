@@ -32,6 +32,10 @@ import Budgets from "./pages/AdminPanel/finance/Budgets";
 import AddOrEditBudget from "./pages/AdminPanel/finance/AddOrEditBudget";
 import BudgetDetails from "./pages/AdminPanel/finance/BudgetDetails";
 import Products from "./pages/employeePages/manageProducts/Products";
+import Events from "./pages/AdminPanel/events/Events.jsx";
+import CreateTask from "./pages/AdminPanel/Tasks/CreateTask.jsx";
+import Add_Department from "./pages/AdminPanel/departments/Add_Department.jsx";
+import TasksList from "./pages/AdminPanel/Tasks/TasksList.jsx";
 
 const App = () => {
   const { data: authUser, isLoading } = useQuery({
@@ -99,6 +103,7 @@ const App = () => {
         <Route path="/dashboard" element={<AdminRoute authUser={authUser} />}>
           <Route index element={<Dashboard />} />
           <Route path="products" element={<ProductList />} />
+          <Route path="Events" element={<Events />} />
           <Route path="add-product" element={<AddProduct />} />
           <Route path="add-supplier" element={<AddSupplier />} />
           <Route path="supplier" element={<Supplier />} />
@@ -120,6 +125,12 @@ const App = () => {
           />
           <Route path="historySignature" element={<HistorySignature />} />
           <Route path="historyAllSignature" element={<AllSignatures />} />
+          <Route path="tasks/Add-Tasks" element={<CreateTask />} />
+          <Route path="tasks" element={<TasksList />} />
+          <Route
+            path="department/Add-Department"
+            element={<Add_Department />}
+          />
         </Route>
       </Routes>
       <Toaster />

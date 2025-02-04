@@ -300,7 +300,7 @@ const ReceiptPurchase = () => {
                         <input
                           type="number"
                           min="0"
-                          max={product.quantity}
+                          max={product.quantity && product.receivedQuantity}
                           value={
                             receivedQuantities[product.productId.toString()] ||
                             ""

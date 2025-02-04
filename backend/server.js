@@ -20,6 +20,10 @@ import notificationRoutes from "./routes/notification.route.js";
 import updateProcurementRoute from "./routes/UpdateProcurement.route.js";
 import budgetRoutes from "./routes/budget.route.js";
 import productsRoutes from "./routes/product.route.js";
+import eventsRoutes from "./routes/events.route.js";
+import taskRouter from "./routes/tasks.route.js";
+import departmentRouter from "./routes/department.route.js";
+
 dotenv.config();
 
 const app = express();
@@ -49,6 +53,9 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/updateProcurement", updateProcurementRoute);
 app.use("/api/budget", budgetRoutes);
 app.use("/api/product", productsRoutes);
+app.use("/api/events", eventsRoutes);
+app.use("/api/tasks", taskRouter);
+app.use("/api/departments", departmentRouter);
 
 app.post("/save-pdf", (req, res) => {
   const { pdfData, fileName } = req.body;

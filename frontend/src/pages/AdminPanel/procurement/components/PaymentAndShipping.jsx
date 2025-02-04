@@ -60,7 +60,7 @@ const PaymentAndShipping = ({
           <input
             type="text"
             name="DeliveryAddress"
-            value={formData.DeliveryAddress}
+            value={formData.DeliveryAddress || ""}
             onChange={handleFormChange}
             className="w-full p-2 rounded bg-gray-700"
           />

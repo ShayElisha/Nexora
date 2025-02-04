@@ -612,3 +612,40 @@ export const assignToBudget = async (req, res) => {
     res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 };
+export const getBudgetByDepartments = async (req, res) => {
+  try {
+    const token = req.cookies["auth_token"];
+    const { departmentId } = req.query; // שינוי מ-req.params ל-req.query
+
+    // בדיקת אימות
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decodedToken) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const companyId = decodedToken.companyId;
+    if (!companyId || companyId === "null" || !departmentId) {
+      return res
+        .status(400)
+        .json({ error: "companyId and departmentId are required." });
+    }
+
+    // חיפוש על פי companyId ו-departmentId
+    const budget = await Budget.findOne({ companyId, departmentId });
+
+    if (!budget) {
+      return res
+        .status(404)
+        .json({ error: "Budget not found for this department." });
+    }
+
+    res.status(200).json({ success: true, data: budget });
+  } catch (error) {
+    console.error("Error fetching budget by department:", error);
+    res.status(500).json({ error: error.message });
+  }
+};

@@ -1,5 +1,7 @@
 import Companies from "../models/companies.model.js";
 import { generateCompanyToken } from "../config/utils/generateToken.js";
+import { SendRegistrationEmployee } from "../emails/emailService.js";
+import jwt from "jsonwebtoken";
 
 // Create a new company
 export const createCompany = async (req, res) => {
@@ -86,6 +88,47 @@ export const getAllCompanies = async (req, res) => {
       success: false,
       message: "Error getting companies",
       error: error.message,
+    });
+  }
+};
+export const sendSignUpLink = async (req, res) => {
+  try {
+    const token = req.cookies["auth_token"];
+
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const companyId = decodedToken.companyId;
+
+    const { email } = req.body;
+    if (!email) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email is required" });
+    }
+
+    const company = await Companies.findById(companyId);
+    if (!company) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Company not found" });
+    }
+
+    const companyName = company.name;
+    const signUpUrl = "http://localhost:5173/signup";
+
+    await SendRegistrationEmployee(email, companyName, signUpUrl);
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Sign-up email sent successfully" });
+  } catch (error) {
+    console.error("Error in sendSignUpLink:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
     });
   }
 };

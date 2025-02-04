@@ -2,6 +2,7 @@
 import Procurement from "../models/procurement.model.js";
 import Notification from "../models/notification.model.js";
 import Budget from "../models/budget.model.js";
+import Event from "../models/events.model.js";
 
 import Company from "../models/companies.model.js"; // ייבוא מודל העובד
 import jwt from "jsonwebtoken";
@@ -317,5 +318,132 @@ cron.schedule("0 0 * * *", async () => {
     console.log(`Deleted ${result.deletedCount} expired notifications.`);
   } catch (error) {
     console.error("Error cleaning up expired notifications:", error);
+  }
+});
+const reminderEventsLogic = async (companyId) => {
+  try {
+    // הגדרת הזמנים לצורך השוואות
+    const now = new Date();
+    const twoHours = 2 * 60 * 60 * 1000; // 2 שעות במילישניות
+    const oneDay = 24 * 60 * 60 * 1000; // 24 שעות במילישניות
+
+    // שליפת האירועים של החברה הרצויה
+    const events = await Event.find({ companyId });
+    const notifications = [];
+
+    // מעבר על כל אירוע
+    for (const event of events) {
+      // נבנה אובייקט Date שמגלם את התאריך והשעה של האירוע
+      const startDateTime = new Date(event.startDate);
+
+      // אם יש ערך בשדה startTime (פורמט "HH:MM"), נמיר ונגדיר על האובייקט
+      if (event.startTime) {
+        const [hour, minute] = event.startTime.split(":").map(Number);
+        startDateTime.setHours(hour, minute, 0, 0);
+      }
+
+      // מחשבים כמה זמן נשאר עד תחילת האירוע
+      const timeUntilStart = startDateTime - now;
+
+      // אם האירוע כבר התחיל או עבר (timeUntilStart <= 0) - לא שולחים תזכורת
+      if (timeUntilStart <= 0) {
+        continue;
+      }
+
+      let message;
+
+      if (event.eventType === "meeting") {
+        if (timeUntilStart < twoHours && !event.twoHoursReminderSent) {
+          message = `Reminder: There is a meeting in under two hours (Event: "${event.title}").`;
+          event.twoHoursReminderSent = true;
+        } else if (timeUntilStart < oneDay && !event.dayReminderSent) {
+          message = `Reminder: There is a meeting in under one day (Event: "${event.title}").`;
+          event.dayReminderSent = true;
+        }
+      } else if (event.eventType === "holiday") {
+        if (timeUntilStart < oneDay && !event.dayReminderSent) {
+          message = `Reminder: A holiday starts in under one day (Event: "${event.title}").`;
+          event.dayReminderSent = true;
+        }
+      } else {
+        if (timeUntilStart < twoHours && !event.twoHoursReminderSent) {
+          message = `Reminder: Your event "${event.title}" starts in under two hours.`;
+          event.twoHoursReminderSent = true;
+        } else if (timeUntilStart < oneDay && !event.dayReminderSent) {
+          message = `Reminder: Your event "${event.title}" starts in under 24 hours.`;
+          event.dayReminderSent = true;
+        }
+      }
+
+      if (message) {
+        const notification = new Notification({
+          companyId,
+          content: message,
+          type: "Reminder",
+          employeeId: event.createdBy,
+        });
+
+        await notification.save();
+        notifications.push(notification);
+        await event.save();
+      }
+    }
+
+    return notifications;
+  } catch (error) {
+    console.error("Error in reminderEventsLogic:", error);
+    throw error;
+  }
+};
+
+// בקר (Controller) - אם תרצה להפעיל את הלוגיקה ידנית דרך קריאת API
+export const reminderEventsController = async (req, res) => {
+  try {
+    const token = req.cookies["auth_token"];
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decodedToken) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const companyId = decodedToken.companyId;
+    const notifications = await reminderEventsLogic(companyId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Event reminders created",
+      data: notifications,
+    });
+  } catch (error) {
+    console.error("Error creating event reminders:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error creating event reminders",
+      error: error.message,
+    });
+  }
+};
+
+cron.schedule("*/1 * * * *", async () => {
+  console.log("Running cron job for event reminders...");
+  try {
+    const companies = await Company.find();
+
+    for (const company of companies) {
+      const companyId = company._id.toString();
+      try {
+        const eventNotifications = await reminderEventsLogic(companyId);
+      } catch (error) {
+        console.error(
+          `Error creating event notifications for company ${companyId}:`,
+          error
+        );
+      }
+    }
+  } catch (error) {
+    console.error("Error in event reminders cron job:", error);
   }
 });

@@ -61,6 +61,12 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    productType: {
+      type: String,
+      enum: ["purchase", "sale", "both"],
+      default: "purchase",
+      required: true,
+    },
   },
   {
     timestamps: true,

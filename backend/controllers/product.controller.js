@@ -1,6 +1,7 @@
 import Product from "../models/product.model.js";
-import cloudinary, { uploadToCloudinary } from "../config/lib/cloudinary.js";
+import cloudinary, {extractPublicId, uploadToCloudinary } from "../config/lib/cloudinary.js";
 import jwt from "jsonwebtoken";
+import Inventory from "../models/inventory.model.js";
 
 export const getProducts = async (req, res) => {
   try {
@@ -61,6 +62,7 @@ export const createProduct = async (req, res) => {
       productType,
     } = req.body;
 
+    console.log(req.body);
     // בדיקת שדות חובה
     if (
       !companyId ||
@@ -69,8 +71,6 @@ export const createProduct = async (req, res) => {
       !productName ||
       !unitPrice ||
       !category ||
-      !supplierId ||
-      !supplierName ||
       !productType
     ) {
       return res
@@ -161,12 +161,50 @@ export const updateProduct = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
+    // נניח שה-token נמצא בעוגייה בשם "auth_token"
+    const token = req.cookies["auth_token"];
+    if (!token) {
+      return res.status(401).json({ success: false, error: "Unauthorized" });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const companyId = decodedToken.companyId;
+
+    // חיפוש המוצר תוך כדי סינון לפי companyId
+    const pro = await Product.findOne({ _id: req.params.id, companyId });
+    if (!pro) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Product not found" });
+    }
+
+    console.log("Product image URL:", pro.productImage);
+    // מחיקת התמונה ב־Cloudinary (אם קיימת)
+    if (pro.productImage) {
+      const publicId = extractPublicId(pro.productImage);
+      if (publicId) {
+        // חשוב לא להשתמש שוב בשם "res", מכיוון שזה קונפליקט עם response
+        const deletionResult = await cloudinary.uploader.destroy(publicId);
+        console.log("Deletion result:", deletionResult);
+      } else {
+        console.log("Could not extract public_id from URL");
+      }
+    }
+
+    // מחיקת המוצר ממסד הנתונים
+    const product = await Product.findOneAndDelete({
+      _id: req.params.id,
+      companyId,
+    });
     if (!product) {
       return res
         .status(404)
         .json({ success: false, error: "Product not found" });
     }
+    const inventory = await Inventory.findOne({ productId: req.params.id });
+    if (inventory) {
+      await inventory.deleteOne();
+    }
+
     res
       .status(200)
       .json({ success: true, message: "Product deleted successfully" });
@@ -174,3 +212,4 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ success: false, error: "Invalid product ID" });
   }
 };
+

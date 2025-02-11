@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import SignatureCanvas from "react-signature-canvas"; // ייבוא ספריית החתימה
 import toast from "react-hot-toast";
-// אייקון פעמון
 import { FaBell } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import i18n from "i18next";
@@ -13,9 +12,9 @@ const Navbar = () => {
   const { t } = useTranslation();
   // הגדרות useState ו-useRef
   const [showPopup, setShowPopup] = useState(false); // מצב הצגת חלונית חתימות
-  const [selectedPDF, setSelectedPDF] = useState(null); // PDF to display in modal
-  const [showModal, setShowModal] = useState(false); // Modal state
-  const signaturePadRef = useRef(null); // Reference to signature canvas
+  const [selectedPDF, setSelectedPDF] = useState(null); // PDF להצגה במודאל
+  const [showModal, setShowModal] = useState(false); // מצב מודאל
+  const signaturePadRef = useRef(null); // Reference ל-signature canvas
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [selectedBudget, setSelectedBudget] = useState(null);
   const [selectedDocumentType, setSelectedDocumentType] = useState(null);
@@ -23,7 +22,7 @@ const Navbar = () => {
 
   const queryClient = useQueryClient();
 
-  // Fetch authenticated user data
+  // Fetch נתוני המשתמש המאומת
   const { data: authData } = useQuery({
     queryKey: ["authUser"],
     queryFn: async () => {
@@ -49,7 +48,7 @@ const Navbar = () => {
   };
 
   const handleMouseLeave = () => {
-    hoverTimeout = setTimeout(() => setHoveredDropdown(null), 300); // Delay of 300ms
+    hoverTimeout = setTimeout(() => setHoveredDropdown(null), 300); // Delay 300ms
   };
 
   // Logout mutation
@@ -58,9 +57,9 @@ const Navbar = () => {
       await axiosInstance.post("/auth/logout");
     },
     onSuccess: () => {
-      queryClient.clear(); // מנקה את כל המטמון, כולל המשתמש
-      localStorage.removeItem("authUser"); // הסר נתוני משתמש אם מאוחסנים מקומית
-      window.location.href = "/login"; // ניתוב מיידי לדף ההתחברות
+      queryClient.clear(); // מנקה את כל המטמון
+      localStorage.removeItem("authUser");
+      window.location.href = "/login";
     },
     onError: (error) => {
       console.error("Logout failed:", error);
@@ -68,7 +67,7 @@ const Navbar = () => {
     },
   });
 
-  // Fetch procurement data, enabled only if user is logged in
+  // Fetch procurement data (if logged in)
   const {
     data: procurementData,
     error: procurementError,
@@ -79,10 +78,10 @@ const Navbar = () => {
       const response = await axiosInstance.get("/procurement");
       return response.data.data;
     },
-    enabled: isLoggedIn, // Only fetch if logged in
+    enabled: isLoggedIn,
   });
 
-  // Fetch budget data, enabled only if user is logged in
+  // Fetch budget data (if logged in)
   const {
     data: badgerData,
     error: budgetError,
@@ -93,10 +92,10 @@ const Navbar = () => {
       const response = await axiosInstance.get("/budget");
       return response.data.data;
     },
-    enabled: isLoggedIn, // Only fetch if logged in
+    enabled: isLoggedIn,
   });
 
-  // Fetch admin notifications, enabled only if user is admin
+  // Fetch admin notifications (if logged in and Admin)
   const {
     data: adminNotifications,
     isLoading: isLoadingNotifications,
@@ -126,8 +125,6 @@ const Navbar = () => {
         )
     ) || [];
 
-  console.log("badgerData:", badgerData);
-
   // Filter budget items requiring signature
   const budgetRequiringSignature = badgerData?.filter(
     (item) =>
@@ -138,33 +135,27 @@ const Navbar = () => {
       )
   );
 
-  console.log("budgetRequiringSignature:", budgetRequiringSignature);
-
   const isSigner =
     !!itemsRequiringSignature.length || !!budgetRequiringSignature?.length;
 
-  // Functions to control signature modal
+  // Functions controlling signature modal
   const togglePopup = () => setShowPopup((prev) => !prev);
 
   const handleSignature = async () => {
-    togglePopup(); // Open the popup
-    setShowNotifications(false); // סגירת התראות כאשר נפתח פופאפ חתימות
+    togglePopup(); // פתח את הפופאפ
+    setShowNotifications(false); // סגור התראות
   };
 
   const handleOpenModal = (pdfUrl, itemId, type, budgetDetails = null) => {
     setSelectedPDF(pdfUrl);
     setSelectedItemId(itemId);
-    setSelectedDocumentType(type); // Set document type to 'budget' or 'procurement'
-
+    setSelectedDocumentType(type); // 'budget' או 'procurement'
     if (type === "budget") {
-      setSelectedBudget(budgetDetails); // Store budget details for modal
+      setSelectedBudget(budgetDetails);
     } else {
-      setSelectedBudget(null); // Clear budget details when procurement is selected
+      setSelectedBudget(null);
     }
-
     setShowModal(true);
-
-    // סגירת פופאפים אחרים בעת פתיחת מודאל
     setShowPopup(false);
     setShowNotifications(false);
   };
@@ -176,30 +167,25 @@ const Navbar = () => {
 
   const handleSaveSignature = async () => {
     if (signaturePadRef.current && selectedItemId) {
-      const signatureData = signaturePadRef.current.toDataURL(); // Get signature as a data URL
-
+      const signatureData = signaturePadRef.current.toDataURL();
       let endpoint = "";
-
       if (selectedDocumentType === "procurement") {
         endpoint = `/procurement/${selectedItemId}/sign`;
       } else if (selectedDocumentType === "budget") {
         endpoint = `/budget/${selectedItemId}/sign`;
       }
-
       if (!endpoint) {
         toast.error("Invalid document type.");
         return;
       }
-
       try {
         await axiosInstance.post(endpoint, {
           employeeId: authUser.employeeId,
           signature: signatureData,
         });
-
         toast.success("Signature saved successfully!");
-        queryClient.invalidateQueries(["procurement", "budget"]); // Refresh cache for both types
-        handleCloseModal(); // Close the modal
+        queryClient.invalidateQueries(["procurement", "budget"]);
+        handleCloseModal();
       } catch (error) {
         console.error("Error saving signature:", error);
         const serverMessage =
@@ -225,13 +211,12 @@ const Navbar = () => {
     return sorted.find((signer) => signer.order === item.currentSignerIndex);
   }
 
-  // Functions to handle notifications
+  // Notifications handling
   const [showNotifications, setShowNotifications] = useState(false);
 
   const handleNotificationsClick = () => {
     setShowNotifications((prev) => !prev);
-    setShowPopup(false); // סגירת פופאפ חתימות כאשר נפתח פופאפ התראות
-    // Refetch to ensure updated notifications
+    setShowPopup(false);
     refetchAdminNotifications();
   };
 
@@ -241,7 +226,7 @@ const Navbar = () => {
         data: { notificationId },
       });
       toast.success("Notification deleted successfully!");
-      refetchAdminNotifications(); // Refresh notification list
+      refetchAdminNotifications();
     } catch (error) {
       console.error("Error deleting notification:", error);
       const serverMessage =
@@ -257,46 +242,52 @@ const Navbar = () => {
         notificationId,
       });
       toast.success("Notification marked as read!");
-      refetchAdminNotifications(); // Refresh notification list
+      refetchAdminNotifications();
     } catch (error) {
       console.error("Error marking notification as read:", error);
       toast.error("Failed to mark notification as read.");
     }
   };
 
-  // ניקוי timeout בעת unmount
+  const markNotificationAsReadAll = async () => {
+    try {
+      await axiosInstance.post(`/notifications/mark-as-read-all`, {});
+      refetchAdminNotifications();
+      toast.success("All notifications marked as read!");
+    } catch (error) {
+      console.error("Error marking notifications as read:", error);
+      toast.error("Failed to mark notifications as read.");
+    }
+  };
+
   useEffect(() => {
     return () => {
       clearTimeout(hoverTimeout);
     };
   }, []);
 
-  // אין החזרות מוקדמות, כל ה-hooks נקראים תמיד
-
   return (
-    <nav className="bg-gray-800 text-white px-8 py-4 shadow-md sticky top-0 z-50">
+    <nav className="bg-primary text-white px-8 py-4 shadow-md sticky top-0 z-50">
       <div className="flex items-center justify-between">
         {/* Logo */}
         <Link
           to="/"
-          className="text-3xl font-extrabold tracking-wide text-blue-400 hover:text-blue-500 transition duration-300"
+          className="text-3xl font-extrabold tracking-wide text-secondary hover:text-secondary transition duration-300"
         >
           Nexora
         </Link>
 
-        {/* Navigation Links */}
+        {/* Navigation Links (Admin Only) */}
         {isLoggedIn && authUser?.role === "Admin" && (
           <ul className="hidden md:flex items-center space-x-6 text-lg">
             <li>
               <Link
                 to="/dashboard"
-                className="hover:text-blue-400 ml-2 transition duration-300"
+                className="hover:text-secondary ml-2 transition duration-300"
               >
                 {t("navbar.dashboard")}
               </Link>
             </li>
-
-            {/* Dropdowns */}
             {[
               {
                 label: t("navbar.products"),
@@ -358,6 +349,20 @@ const Navbar = () => {
                     to: "/dashboard/add-procurement-record",
                     text: t("navbar.create_procurement_record"),
                   },
+                  {
+                    to: "/dashboard/procurement/approveProcurment",
+                    text: "Receipt Purchase",
+                  },
+                ],
+              },
+              {
+                label: "Projects",
+                links: [
+                  { to: "/dashboard/projects", text: "Projects List" },
+                  {
+                    to: "/dashboard/projects/add-project",
+                    text: "Add Project",
+                  },
                 ],
               },
               {
@@ -384,7 +389,7 @@ const Navbar = () => {
                 ],
               },
               {
-                label: "department",
+                label: "Department",
                 links: [
                   {
                     to: "/dashboard/department/Add-Department",
@@ -395,24 +400,13 @@ const Navbar = () => {
               {
                 label: "Tasks",
                 links: [
-                  {
-                    to: "/dashboard/tasks",
-                    text: "tasks",
-                  },
-                  {
-                    to: "/dashboard/tasks/Add-Tasks",
-                    text: "Add-Tasks",
-                  },
+                  { to: "/dashboard/tasks", text: "Tasks" },
+                  { to: "/dashboard/tasks/Add-Tasks", text: "Add Tasks" },
                 ],
               },
               {
-                label: "calender",
-                links: [
-                  {
-                    to: "/dashboard/Events",
-                    text: "Events",
-                  },
-                ],
+                label: "Calender",
+                links: [{ to: "/dashboard/Events", text: "Events" }],
               },
             ].map((dropdown, index) => (
               <li
@@ -421,7 +415,7 @@ const Navbar = () => {
                 onMouseEnter={() => handleMouseEnter(dropdown.label)}
                 onMouseLeave={handleMouseLeave}
               >
-                <div className="cursor-pointer flex items-center hover:text-blue-400 transition duration-300">
+                <div className="cursor-pointer flex items-center hover:text-secondary transition duration-300">
                   {dropdown.label}
                   <span className="ml-1 text-sm">▼</span>
                 </div>
@@ -452,7 +446,7 @@ const Navbar = () => {
         <div className="flex items-center space-x-4">
           {isLoggedIn ? (
             <>
-              {/* כפתור חתימות: מציג כמות מסמכים שדורשים חתימה */}
+              {/* כפתור חתימות */}
               {(itemsRequiringSignature.length > 0 ||
                 (budgetRequiringSignature &&
                   budgetRequiringSignature.length > 0)) && (
@@ -463,9 +457,9 @@ const Navbar = () => {
                   </span>
                   <button
                     onClick={handleSignature}
-                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition duration-300"
+                    className="px-4 py-2 bg-accent text-white rounded hover:bg-green-600 transition duration-300"
                   >
-                    Sign Now
+                    {t("navbar.Signatures.sign_now")}
                   </button>
 
                   {showPopup && (
@@ -622,7 +616,6 @@ const Navbar = () => {
                 </div>
               )}
 
-              {/* כפתור התראות (Notifications) */}
               {authUser?.role === "Admin" && (
                 <div className="relative">
                   <button
@@ -630,7 +623,6 @@ const Navbar = () => {
                     className="relative mr-4"
                   >
                     <FaBell size={24} />
-                    {/* Badge לכמות התראות לא נקראו (אם יש) */}
                     {unreadCount > 0 && (
                       <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
                         {unreadCount}
@@ -647,8 +639,16 @@ const Navbar = () => {
                       } mt-2 bg-white p-3 rounded shadow-md w-[500px] z-50 text-gray-800`}
                       style={{ maxHeight: "500px", overflowY: "auto" }}
                     >
-                      <h3 className="font-bold mb-2 text-lg border-b pb-2">
+                      <h3 className="font-bold mb-2 text-lg border-b pb-2 flex justify-between items-center">
                         {t("notifications.title")}
+                        <span className="text-sm text-gray-500">
+                          <button
+                            className="hover:underline"
+                            onClick={markNotificationAsReadAll}
+                          >
+                            READ ALL
+                          </button>
+                        </span>
                       </h3>
                       {isLoadingNotifications ? (
                         <p>{t("notifications.loading")}</p>
@@ -697,7 +697,7 @@ const Navbar = () => {
                 </div>
               )}
 
-              <div className="w-10 h-10 rounded-full border-2 border-blue-400 overflow-hidden">
+              <div className="w-10 h-10 rounded-full border-2 border-secondary overflow-hidden">
                 <img
                   src={profileImage}
                   alt="Profile"
@@ -705,7 +705,7 @@ const Navbar = () => {
                 />
               </div>
               <span className="hidden md:block font-medium">
-                {t("navbar.profile.hello", { firstName, lastName })}{" "}
+                {t("navbar.profile.hello", { firstName, lastName })}
               </span>
               <button
                 onClick={() => logout()}
@@ -737,7 +737,7 @@ const Navbar = () => {
               Digital Signature
             </h2>
 
-            {/* Budget details when selected */}
+            {/* פרטי תקציב (Budget) אם קיימים */}
             {selectedDocumentType === "budget" && selectedBudget && (
               <div className="mb-6 p-5 border border-gray-300 rounded-lg bg-gray-50 shadow-sm">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">
@@ -758,7 +758,7 @@ const Navbar = () => {
               </div>
             )}
 
-            {/* Display the procurement or budget PDF */}
+            {/* תצוגת PDF */}
             {selectedPDF && (
               <iframe
                 src={selectedPDF}

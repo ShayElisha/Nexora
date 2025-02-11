@@ -1,49 +1,76 @@
+// src/pages/procurement/CreateTask.jsx
 import React, { useState, useEffect } from "react";
-import axiosInstance from "../../../lib/axios"; // עדכן לפי הנתיב הנכון
+import axiosInstance from "../../../lib/axios"; // עדכן את הנתיב לפי המבנה שלך
 import toast from "react-hot-toast";
 
 const CreateTask = () => {
-  // מצב הטופס כולל תקציב (budget), כותרת, תיאור, סטטוס, עדיפות, תאריך יעד ומשתתפים
+  // אתחול מצב הטופס
   const [formData, setFormData] = useState({
-    department: "", // _id של התקציב (מחלקה/פרוייקט)
+    departmentId: "",
+    projectId: "",
     title: "",
     description: "",
     status: "pending",
     priority: "medium",
     dueDate: "",
-    assignedTo: [], // מערך של מזהי עובדים
+    assignedTo: [],
+    isApproved: false,
   });
 
-  // מצב עבור אפשרויות התקציבים (מחלקות/פרוייקטים)
-  const [budgetOptions, setBudgetOptions] = useState([]);
-  // התקציב של המחלקה/פרוייקט הנבחר (אם קיים)
-  const [budget, setBudget] = useState(null);
-  // רשימת העובדים (למשימה)
-  const [employees, setEmployees] = useState([]);
-  // רשימת העובדים המיועדים לפי המחלקה – ניתן להרחיב במידת הצורך
-  const [filteredEmployees, setFilteredEmployees] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  // טעינת תקציבים (מחלקות/פרוייקטים) מה-API
-  useEffect(() => {
-    const fetchBudgetOptions = async () => {
-      try {
-        const res = await axiosInstance.get(`/budget`);
-        // הנחה: res.data.data הוא מערך של תקציבים, וכל תקציב כולל את השדה departmentOrProjectName
-        const options = res.data.data.map((budget) => ({
-          id: budget._id,
-          name: budget.departmentOrProjectName,
-        }));
-        setBudgetOptions(options);
-      } catch (error) {
-        console.error("Error fetching budget options:", error);
-        toast.error("Error loading budget options");
-      }
-    };
-    fetchBudgetOptions();
-  }, []);
+  // רשימות אפשרויות לבחירת מחלקה ופרוייקט
+  const [departmentOptions, setDepartmentOptions] = useState([]);
+  const [projectOptions, setProjectOptions] = useState([]);
 
   // טעינת רשימת העובדים מהשרת
+  const [employees, setEmployees] = useState([]);
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+
+  // טעינת מחלקות
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const res = await axiosInstance.get("/departments");
+        const options = res.data.data.map((dept) => ({
+          id: dept._id,
+          name: dept.name,
+        }));
+        setDepartmentOptions(options);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+        toast.error("Error loading departments");
+      }
+    };
+    fetchDepartments();
+  }, []);
+
+  // טעינת פרוייקטים כאשר בוחרים מחלקה
+  useEffect(() => {
+    if (formData.departmentId) {
+      const fetchProjects = async () => {
+        try {
+          const res = await axiosInstance.get(
+            `/departments/projectName/${formData.departmentId}`
+          );
+          const options = res.data.data.map((project) => ({
+            id: project.id,
+            name: project.name,
+            endDate: project.endDate,
+          }));
+          setProjectOptions(options);
+        } catch (error) {
+          console.error("Error fetching projects:", error);
+          toast.error("Error loading projects for selected department");
+        }
+      };
+      fetchProjects();
+    } else {
+      setProjectOptions([]);
+    }
+  }, [formData.departmentId]);
+
+  // טעינת עובדים
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -57,54 +84,32 @@ const CreateTask = () => {
     fetchEmployees();
   }, []);
 
-  // כאשר התקציב (department) הנבחר משתנה, נטען את התקציב המלא מהשרת
+  // סינון עובדים לפי המחלקה
   useEffect(() => {
-    if (formData.department) {
-      const fetchBudget = async () => {
-        try {
-          if (!formData.department) {
-            toast.error("Missing department " + formData.department);
-            return;
-          }
-          const res = await axiosInstance.get(
-            `/budget/by-department/${formData.department}`
-          );
-          console.log("Budget:", res.data.data);
-          setBudget(res.data.data);
-        } catch (error) {
-          console.error("Error fetching budget:", error);
-          toast.error(
-            "Error loading department budget+" +
-              formData.department +
-              " " +
-              error
-          );
-        }
-      };
-      fetchBudget();
-
+    if (formData.departmentId) {
       const filtered = employees.filter(
-        (emp) =>
-          String(emp.department) === formData.department ||
-          emp.department === budget?.departmentOrProjectName
+        (emp) => String(emp.department) === formData.departmentId
       );
       setFilteredEmployees(filtered);
     } else {
-      setBudget(null);
       setFilteredEmployees([]);
     }
-  }, [formData.department, employees]);
+  }, [formData.departmentId, employees]);
 
-  // טיפול בשינויי שדות הטופס
+  // טיפול בשינוי שדות הטופס
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
+    // בעת שינוי המחלקה, נאפס את בחירת הפרוייקט
+    if (name === "departmentId") {
+      setFormData((prev) => ({ ...prev, projectId: "" }));
+    }
   };
 
-  // טיפול בשינוי שדה ה-multi-select עבור assignedTo
+  // טיפול בבחירת עובדים (multiple select)
   const handleAssignedChange = (e) => {
     const selectedOptions = Array.from(
       e.target.selectedOptions,
@@ -120,20 +125,32 @@ const CreateTask = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    if (!formData.departmentId) {
+      toast.error("Department is required");
+      setLoading(false);
+      return;
+    }
+    if (!formData.projectId) {
+      toast.error("Project is required");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const res = await axiosInstance.post("/tasks", formData);
+      await axiosInstance.post("/tasks", formData);
       toast.success("Task created successfully!");
-      // איפוס הטופס לאחר יצירה
       setFormData({
-        department: "",
+        departmentId: "",
+        projectId: "",
         title: "",
         description: "",
         status: "pending",
         priority: "medium",
         dueDate: "",
         assignedTo: [],
+        isApproved: false,
       });
-      setBudget(null);
     } catch (error) {
       console.error("Error creating task:", error);
       toast.error("Error creating task");
@@ -142,44 +159,62 @@ const CreateTask = () => {
     }
   };
 
+  // מציאת הפרוייקט הנבחר לצורך תצוגת תאריך הסיום
+  const selectedProject = projectOptions.find(
+    (project) => project.id === formData.projectId
+  );
+
   return (
-    <div className="max-w-3xl mx-auto p-4">
-      <h2 className="text-3xl font-bold mb-6">Create New Task</h2>
-
-      {/* בחירת תקציב (מחלקה/פרוייקט) */}
-      <div className="mb-4">
-        <label htmlFor="department" className="block font-medium mb-1">
-          Department/Project:
-        </label>
-        <select
-          id="department"
-          name="department"
-          value={formData.department}
-          onChange={handleChange}
-          className="w-full border border-gray-300 p-2 rounded"
-          required
-        >
-          <option value="">Select Department/Project</option>
-          {budgetOptions.map((option) => (
-            <option key={option.id} value={option.id}>
-              {option.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* הצגת תקציב המחלקה אם קיים */}
-      {budget && (
-        <div className="mb-4 p-4 border border-green-300 bg-green-50 rounded">
-          <h3 className="font-bold mb-2">Department Budget</h3>
-          <p>Allocated Amount: {budget.amount}</p>
-          <p>Spent Amount: {budget.spentAmount}</p>
-          <p>Remaining: {budget.amount - budget.spentAmount}</p>
-        </div>
-      )}
-
+    <div className="max-w-3xl mx-auto p-4 bg-bg text-text border border-border-color rounded-lg shadow-md">
+      <h2 className="text-3xl font-bold mb-6 text-primary">Create New Task</h2>
       <form onSubmit={handleSubmit}>
-        {/* Title */}
+        {/* בחירת מחלקה */}
+        <div className="mb-4">
+          <label htmlFor="departmentId" className="block font-medium mb-1">
+            Department:
+          </label>
+          <select
+            id="departmentId"
+            name="departmentId"
+            value={formData.departmentId}
+            onChange={handleChange}
+            className="w-full border border-border-color p-2 rounded bg-bg text-text"
+            required
+          >
+            <option value="">Select Department</option>
+            {departmentOptions.map((dept) => (
+              <option key={dept.id} value={dept.id}>
+                {dept.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* בחירת פרוייקט – מוצג רק אם מחלקה נבחרה */}
+        {formData.departmentId && (
+          <div className="mb-4">
+            <label htmlFor="projectId" className="block font-medium mb-1">
+              Project:
+            </label>
+            <select
+              id="projectId"
+              name="projectId"
+              value={formData.projectId}
+              onChange={handleChange}
+              className="w-full border border-border-color p-2 rounded bg-bg text-text"
+              required
+            >
+              <option value="">Select Project</option>
+              {projectOptions.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* שדה כותרת */}
         <div className="mb-4">
           <label htmlFor="title" className="block font-medium mb-1">
             Title:
@@ -190,12 +225,12 @@ const CreateTask = () => {
             name="title"
             value={formData.title}
             onChange={handleChange}
-            className="w-full border border-gray-300 p-2 rounded"
+            className="w-full border border-border-color p-2 rounded bg-bg text-text"
             required
           />
         </div>
 
-        {/* Description */}
+        {/* שדה תיאור */}
         <div className="mb-4">
           <label htmlFor="description" className="block font-medium mb-1">
             Description:
@@ -206,11 +241,11 @@ const CreateTask = () => {
             value={formData.description}
             onChange={handleChange}
             rows="4"
-            className="w-full border border-gray-300 p-2 rounded"
+            className="w-full border border-border-color p-2 rounded bg-bg text-text"
           ></textarea>
         </div>
 
-        {/* Status */}
+        {/* בחירת סטטוס */}
         <div className="mb-4">
           <label htmlFor="status" className="block font-medium mb-1">
             Status:
@@ -220,7 +255,7 @@ const CreateTask = () => {
             name="status"
             value={formData.status}
             onChange={handleChange}
-            className="w-full border border-gray-300 p-2 rounded"
+            className="w-full border border-border-color p-2 rounded bg-bg text-text"
           >
             <option value="pending">Pending</option>
             <option value="in progress">In Progress</option>
@@ -229,7 +264,7 @@ const CreateTask = () => {
           </select>
         </div>
 
-        {/* Priority */}
+        {/* בחירת עדיפות */}
         <div className="mb-4">
           <label htmlFor="priority" className="block font-medium mb-1">
             Priority:
@@ -239,7 +274,7 @@ const CreateTask = () => {
             name="priority"
             value={formData.priority}
             onChange={handleChange}
-            className="w-full border border-gray-300 p-2 rounded"
+            className="w-full border border-border-color p-2 rounded bg-bg text-text"
           >
             <option value="low">Low</option>
             <option value="medium">Medium</option>
@@ -247,7 +282,7 @@ const CreateTask = () => {
           </select>
         </div>
 
-        {/* Due Date */}
+        {/* בחירת תאריך יעד */}
         <div className="mb-4">
           <label htmlFor="dueDate" className="block font-medium mb-1">
             Due Date:
@@ -258,11 +293,23 @@ const CreateTask = () => {
             name="dueDate"
             value={formData.dueDate}
             onChange={handleChange}
-            className="w-full border border-gray-300 p-2 rounded"
+            className="w-full border border-border-color p-2 rounded bg-bg text-text"
           />
         </div>
 
-        {/* Assigned To (עובדים מהתקציב או לפי המחלקה) */}
+        {/* תצוגת תאריך סיום פרוייקט */}
+        {formData.projectId && (
+          <div className="mb-4">
+            <label className="block font-medium mb-1">Project End Date:</label>
+            <p className="p-2 border border-border-color rounded bg-bg text-text">
+              {selectedProject && selectedProject.endDate
+                ? new Date(selectedProject.endDate).toLocaleDateString()
+                : "Not available"}
+            </p>
+          </div>
+        )}
+
+        {/* בחירת עובדים (אם קיימים עובדים מסוננים) */}
         {filteredEmployees.length > 0 && (
           <div className="mb-4">
             <label htmlFor="assignedTo" className="block font-medium mb-1">
@@ -274,7 +321,7 @@ const CreateTask = () => {
               multiple
               value={formData.assignedTo}
               onChange={handleAssignedChange}
-              className="w-full border border-gray-300 p-2 rounded"
+              className="w-full border border-border-color p-2 rounded bg-bg text-text"
             >
               {filteredEmployees.map((emp) => (
                 <option key={emp._id} value={emp._id}>
@@ -282,16 +329,31 @@ const CreateTask = () => {
                 </option>
               ))}
             </select>
-            <small className="text-gray-600">
-              Select one or more employees
+            <small className="text-sm text-gray-600">
+              Select one or more employees (optional)
             </small>
           </div>
         )}
 
+        {/* Checkbox לאישור ביצוע המשימה */}
+        <div className="mb-4">
+          <label htmlFor="isApproved" className="inline-flex items-center">
+            <input
+              type="checkbox"
+              id="isApproved"
+              name="isApproved"
+              checked={formData.isApproved}
+              onChange={handleChange}
+              className="mr-2"
+            />
+            Approved
+          </label>
+        </div>
+
         <button
           type="submit"
           disabled={loading}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="bg-button-bg text-button-text px-4 py-2 rounded"
         >
           {loading ? "Creating..." : "Create Task"}
         </button>

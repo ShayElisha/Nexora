@@ -10,6 +10,7 @@ import {
 
 import jwt from "jsonwebtoken";
 import cloudinary, {
+  extractPublicId,
   uploadToCloudinaryFile,
 } from "../config/lib/cloudinary.js";
 
@@ -452,6 +453,18 @@ export const updateProcurementRecord = async (req, res) => {
     "currentSignerIndex",
     "statusUpdate",
   ];
+
+  const pro = await Procurement.findById(procurementId);
+  if (pro.summeryProcurement) {
+    const publicId = extractPublicId(pro.summeryProcurement);
+    if (publicId) {
+      // חשוב לא להשתמש שוב בשם "res", מכיוון שזה קונפליקט עם response
+      const deletionResult = await cloudinary.uploader.destroy(publicId);
+      console.log("Deletion result:", deletionResult);
+    } else {
+      console.log("Could not extract public_id from URL");
+    }
+  }
 
   let summeryProcurementUrl = "";
 

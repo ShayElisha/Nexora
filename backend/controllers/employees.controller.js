@@ -12,9 +12,12 @@ export const getAllEmployees = async (req, res) => {
     if (!decodedToken) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
-    
+
     const companyId = decodedToken?.companyId;
-    const employees = await Employee.find({ companyId });
+    const employees = await Employee.find({ companyId }).populate(
+      "projects.projectId",
+      "name"
+    );
     res.status(200).json({ success: true, data: employees });
   } catch (error) {
     res.status(500).json({

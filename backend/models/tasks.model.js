@@ -7,6 +7,16 @@ const taskSchema = new mongoose.Schema(
       ref: "Company",
       required: true,
     },
+    projectId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
+      required: true,
+    },
+    departmentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Department",
+      required: false,
+    },
     title: {
       type: String,
       required: [true, "Task title is required"],
@@ -53,6 +63,11 @@ const taskSchema = new mongoose.Schema(
         },
       },
     ],
+    // שדה בוליאני לאישור ביצוע המשימה
+    isApproved: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     // יצירת שדות timestamps (createdAt, updatedAt) אוטומטית

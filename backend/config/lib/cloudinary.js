@@ -74,4 +74,21 @@ export const uploadToCloudinaryFile = async (file) => {
   }
 };
 
+export const extractPublicId = (url) => {
+
+  const parts = url.split('/upload/');
+  if (parts.length < 2) return null;
+
+  const pathPart = parts[1];
+
+  const pathParts = pathPart.split('/');
+  const publicIdWithExtension = pathParts.slice(1).join('/'); // "products/iakkypbyrssngeqq5r02.png"
+
+  const publicId = publicIdWithExtension.replace(/\.[^/.]+$/, "");
+
+  return publicId;
+};
+
+
+
 export default cloudinary;

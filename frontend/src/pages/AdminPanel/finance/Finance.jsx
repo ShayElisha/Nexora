@@ -1,5 +1,6 @@
+// src/pages/procurement/Finance.jsx
 import { useEffect, useState } from "react";
-import axiosInstance from "../../../lib/axios";
+import { axiosInstance } from "../../../lib/axios";
 import Sidebar from "../layouts/Sidebar";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
@@ -43,7 +44,7 @@ const Finance = () => {
 
   if (!isLoggedIn) {
     return (
-      <div className="flex items-center justify-center min-h-screen text-white">
+      <div className="flex items-center justify-center min-h-screen text-text">
         {t("auth.please_login")}
       </div>
     );
@@ -54,10 +55,9 @@ const Finance = () => {
   );
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-r from-gray-900 via-gray-800 to-black">
-      <Sidebar />
-      <div className="flex-1 container mx-auto max-w-5xl p-8">
-        <h1 className="text-3xl font-bold text-blue-400 mb-6 text-center">
+    <div className="flex min-h-screen bg-bg">
+      <div className="flex-1 container mx-auto max-w-full p-8">
+        <h1 className="text-3xl font-bold text-primary mb-6 text-center">
           {t("finance.title")}
         </h1>
 
@@ -65,11 +65,11 @@ const Finance = () => {
           <input
             type="text"
             placeholder={t("finance.search_placeholder")}
-            className="p-2 rounded bg-gray-700 text-white w-full"
+            className="p-2 rounded bg-secondary text-text w-full focus:outline-none focus:ring-2 focus:ring-primary"
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <button
-            className="ml-4 bg-blue-500 text-white px-4 py-2 rounded"
+            className="ml-4 bg-primary text-button-text px-4 py-2 rounded hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary"
             onClick={() => getFinanceData()}
           >
             {t("buttons.refresh")}
@@ -77,7 +77,7 @@ const Finance = () => {
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center text-white">
+          <div className="flex items-center justify-center text-text">
             {t("loading")}
           </div>
         ) : isError ? (
@@ -85,11 +85,11 @@ const Finance = () => {
             {t("errors.loading_error")} {error.message}
           </div>
         ) : (
-          <div className="bg-gray-800 rounded-lg shadow-xl p-6">
+          <div className="bg-secondary rounded-lg shadow-xl p-6">
             <div className="overflow-x-auto">
-              <table className="min-w-full bg-gray-900 text-white rounded-lg overflow-hidden">
+              <table className="min-w-full bg-bg text-text rounded-lg overflow-hidden">
                 <thead>
-                  <tr className="bg-gray-700">
+                  <tr className="bg-border-color">
                     <th className="py-2 px-4">{t("finance.transaction_id")}</th>
                     <th className="py-2 px-4">
                       {t("finance.transaction_date")}
@@ -111,7 +111,7 @@ const Finance = () => {
                 </thead>
                 <tbody>
                   {filteredData.map((doc) => (
-                    <tr key={doc._id} className="border-b border-gray-700">
+                    <tr key={doc._id} className="border-b border-border-color">
                       <td className="py-2 px-4">{doc._id}</td>
                       <td className="py-2 px-4">
                         {new Date(doc.transactionDate).toLocaleDateString()}
@@ -119,11 +119,9 @@ const Finance = () => {
                       <td className="py-2 px-4">
                         {t(
                           `finance.transaction_types.${doc.transactionType.toLowerCase()}`,
-                          {
-                            defaultValue: doc.transactionType,
-                          }
+                          { defaultValue: doc.transactionType }
                         )}
-                      </td>{" "}
+                      </td>
                       <td className="py-2 px-4">{doc.transactionAmount}</td>
                       <td className="py-2 px-4">{doc.transactionCurrency}</td>
                       <td
@@ -143,7 +141,7 @@ const Finance = () => {
                 </tbody>
               </table>
               {filteredData.length === 0 && (
-                <div className="text-center text-white mt-4">
+                <div className="text-center text-text mt-4">
                   {t("finance.no_data_found")}
                 </div>
               )}

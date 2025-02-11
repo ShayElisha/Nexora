@@ -2,13 +2,14 @@
 import Department from "../models/department.model.js";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
+import Project from "../models/project.model.js";
 
 /**
  * Create a new Department
  */
 export const createDepartment = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, teamMembers } = req.body;
     const token = req.cookies["auth_token"];
 
     if (!token) {
@@ -23,7 +24,12 @@ export const createDepartment = async (req, res) => {
         .json({ success: false, error: "companyId and name are required." });
     }
 
-    const department = new Department({ companyId, name, description });
+    const department = new Department({
+      companyId,
+      name,
+      description,
+      teamMembers,
+    });
     await department.save();
     res.status(201).json({ success: true, data: department });
   } catch (error) {
@@ -32,12 +38,14 @@ export const createDepartment = async (req, res) => {
   }
 };
 
-
 export const getDepartments = async (req, res) => {
   try {
     const { companyId } = req.query;
     const query = companyId ? { companyId } : {};
-    const departments = await Department.find(query);
+    const departments = await Department.find(query).populate(
+      "teamMembers.employeeId",
+      "name lastName"
+    );
     res.status(200).json({ success: true, data: departments });
   } catch (error) {
     console.error("Error fetching departments:", error);
@@ -120,5 +128,49 @@ export const deleteDepartment = async (req, res) => {
   } catch (error) {
     console.error("Error deleting department:", error);
     res.status(500).json({ success: false, error: error.message });
+  }
+};
+export const projectNameByDepartment = async (req, res) => {
+  const departmentId = req.params.id;
+
+  // בדיקת תקינות המזהה
+  if (!mongoose.Types.ObjectId.isValid(departmentId)) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Invalid department id" });
+  }
+
+  try {
+    // מציאת המחלקה כולל populate של מערך הפרוייקטים (מביאים את השדות name ו-endDate)
+    const department = await Department.findById(departmentId).populate(
+      "projects.projectId",
+      "name endDate"
+    );
+    if (!department) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Department not found" });
+    }
+
+    // חילוץ שמות הפרוייקטים יחד עם המזהה ותאריך הסיום שלהם
+    const projectNames = department.projects
+      .map((proj) => {
+        if (proj.projectId && proj.projectId.name) {
+          return {
+            id: proj.projectId._id,
+            name: proj.projectId.name,
+            endDate: proj.projectId.endDate, // כולל גם את תאריך הסיום
+          };
+        }
+        return null;
+      })
+      .filter((item) => item !== null);
+
+    res.status(200).json({ success: true, data: projectNames });
+  } catch (error) {
+    console.error("Error fetching project by department id:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 };

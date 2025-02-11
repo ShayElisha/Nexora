@@ -47,9 +47,9 @@ export const useSignatureStore = create((set) => ({
         signers,
         employeeId,
       });
-      // Append new list
+      // Append new list – השתמש ב־response.data במקום response.data.data
       set((state) => ({
-        signatureLists: [...state.signatureLists, response.data.data],
+        signatureLists: [...state.signatureLists, response.data],
         isLoading: false,
       }));
     } catch (error) {

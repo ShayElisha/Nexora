@@ -1,77 +1,79 @@
 // src/components/events/Events.jsx
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import Calendar from "react-calendar";
 import Modal from "react-modal";
 import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 
 const Events = () => {
-  // State לניהול בחירת תאריך, מודלים, האירועים ועובדים פנימיים
+  const queryClient = useQueryClient();
+
+  // State לניהול בחירת תאריך, מודלים, האירוע הנבחר ומצב עדכון
   const [selectedDate, setSelectedDate] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [detailModalIsOpen, setDetailModalIsOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [events, setEvents] = useState([]);
-  // תאריך הפעיל בלוח (לבדיקה אם התא שייך לחודש הנוכחי)
   const [activeStartDate, setActiveStartDate] = useState(new Date());
-  // מצב עדכון – אם true, הטופס במודל ישמש לעדכון אירוע קיים
   const [isUpdateMode, setIsUpdateMode] = useState(false);
-  // רשימת עובדים פנימיים (לטובת בחירת עובדים)
-  const [employeeOptions, setEmployeeOptions] = useState([]);
 
-  // טופס יצירת/עריכת אירוע – כולל שדה participantType (external, internal, other)
+  // טופס יצירת/עריכת אירוע
   const [formData, setFormData] = useState({
-    companyId: "", // managed externally (e.g. from the logged in user)
-    _id: "", // במצב עדכון – מזהה האירוע
+    companyId: "",
+    _id: "",
     title: "",
     description: "",
     startDate: "",
     endDate: "",
-    startTime: "", // שעת התחלה
-    endTime: "", // שעת סיום
+    startTime: "",
+    endTime: "",
     allDay: true,
     location: "",
     meetingUrl: "",
-    eventType: "other", // options: meeting, holiday, reminder, other
-    participantType: "external", // "external", "internal", or "other"
-    participants: [], // עבור Internal – יכיל מזהי עובדים (ריק כברירת מחדל)
+    eventType: "other",
+    participantType: "external",
+    participants: [],
     externalParticipants: [{ name: "", email: "", phone: "" }],
     recurrence: "",
     reminder: 15,
     attachments: [{ fileName: "", fileUrl: "" }],
-    createdBy: "", // managed externally
+    createdBy: "",
     notes: "",
   });
 
-  // טעינת האירועים מהשרת
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const response = await axiosInstance.get("/events");
-        setEvents(response.data);
-      } catch (error) {
-        console.error("Error fetching events:", error);
-        toast.error("Failed to fetch events");
-      }
-    };
-    fetchEvents();
-  }, []);
+  // שימוש ב-React Query לטעינת האירועים
+  const {
+    data: eventsData,
+    isLoading: isEventsLoading,
+    error: eventsError,
+  } = useQuery({
+    queryKey: ["events"],
+    queryFn: async () => {
+      const response = await axiosInstance.get("/events");
+      return response.data;
+    },
+  });
 
-  // טעינת רשימת העובדים (למשתתפים פנימיים)
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await axiosInstance.get("/employees");
-        // הנחה: הנתונים מגיעים במבנה { data: [...] }
-        setEmployeeOptions(response.data.data);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-      }
-    };
-    fetchEmployees();
-  }, []);
+  // במידה והנתונים עדיין לא נטענו, נשתמש במערך ריק
+  const events = eventsData || [];
 
-  // Open modal for creating an event on a specific day
+  // שימוש ב-React Query לטעינת רשימת העובדים עבור משתתפים פנימיים
+  const {
+    data: employeesData,
+    isLoading: isEmployeesLoading,
+    error: employeesError,
+  } = useQuery({
+    queryKey: ["employees"],
+    queryFn: async () => {
+      const response = await axiosInstance.get("/employees");
+      // נניח שהנתונים מגיעים במבנה { data: [...] }
+      return response.data.data;
+    },
+  });
+
+  const employeeOptions = employeesData || [];
+
+  // פתיחת מודל ליצירת אירוע בתאריך מסוים
   const openModalForDate = (date) => {
     setSelectedDate(date);
     setModalIsOpen(true);
@@ -83,7 +85,7 @@ const Events = () => {
     }));
   };
 
-  // Close create/update event modal and reset form
+  // סגירת מודל יצירה/עדכון ואיפוס הטופס
   const closeModal = () => {
     setModalIsOpen(false);
     setSelectedDate(null);
@@ -112,19 +114,19 @@ const Events = () => {
     });
   };
 
-  // Open event details modal
+  // פתיחת פרטי אירוע במודל
   const openEventDetails = (event) => {
     setSelectedEvent(event);
     setDetailModalIsOpen(true);
   };
 
-  // Close event details modal
+  // סגירת מודל פרטי אירוע
   const closeDetailModal = () => {
     setDetailModalIsOpen(false);
     setSelectedEvent(null);
   };
 
-  // Handler for form field changes
+  // Handlers לשינויי טופס
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -135,7 +137,6 @@ const Events = () => {
     setFormData((prev) => ({ ...prev, [name]: checked }));
   };
 
-  // Handler for multi-select internal participants
   const handleMultiSelectChange = (e) => {
     const options = e.target.options;
     const selectedValues = [];
@@ -147,7 +148,6 @@ const Events = () => {
     setFormData((prev) => ({ ...prev, participants: selectedValues }));
   };
 
-  // Handler for הסרת עובד פנימי (Internal) מהכיפים
   const handleRemoveInternalParticipant = (empId) => {
     setFormData((prev) => ({
       ...prev,
@@ -155,7 +155,6 @@ const Events = () => {
     }));
   };
 
-  // Handler for external participant fields
   const handleExternalParticipantChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => {
@@ -165,7 +164,6 @@ const Events = () => {
     });
   };
 
-  // Handler for attachment fields
   const handleAttachmentChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => {
@@ -175,45 +173,77 @@ const Events = () => {
     });
   };
 
-  // Submit create/update event form
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const dataToSend = { ...formData };
-
-    if (dataToSend.participantType === "internal") {
-      // שומרים רק IDs של העובדים שנבחרו
-      dataToSend.externalParticipants = [];
-    } else if (dataToSend.participantType === "external") {
-      // שומרים רק גורם חיצוני
-      dataToSend.participants = [];
-    } else {
-      // participantType === "other"
-      dataToSend.participants = [];
-      dataToSend.externalParticipants = [];
-    }
-
-    try {
+  // Mutation ליצירה או עדכון אירוע
+  const mutation = useMutation({
+    mutationFn: async (dataToSend) => {
       if (isUpdateMode) {
-        // עדכון אירוע קיים
         const response = await axiosInstance.put(
           `/events/${dataToSend._id}`,
           dataToSend
         );
-        // עדכון סטייט מקומי...
-        toast.success("Event updated successfully");
+        return response.data;
       } else {
-        // יצירת אירוע חדש
         const response = await axiosInstance.post("/events", dataToSend);
-        // עדכון סטייט מקומי...
-        toast.success("Event created successfully");
+        return response.data;
       }
+    },
+    onSuccess: () => {
+      // עדכון נתונים בזמן אמת באמצעות invalidateQueries
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      toast.success(
+        isUpdateMode
+          ? "Event updated successfully"
+          : "Event created successfully"
+      );
       closeModal();
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error("Error creating/updating event:", error);
       toast.error("Failed to create/update event");
+    },
+  });
+
+  // Handler לשליחת טופס יצירה/עדכון אירוע
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const dataToSend = { ...formData };
+
+    if (dataToSend.participantType === "internal") {
+      dataToSend.externalParticipants = [];
+    } else if (dataToSend.participantType === "external") {
+      dataToSend.participants = [];
+    } else {
+      dataToSend.participants = [];
+      dataToSend.externalParticipants = [];
     }
+
+    mutation.mutate(dataToSend);
   };
-  // Get events for a specific day (including events spanning multiple days)
+
+  // Mutation למחיקת אירוע
+  const deleteMutation = useMutation({
+    mutationFn: async (eventId) => {
+      const response = await axiosInstance.delete(`/events/${eventId}`);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+      toast.success("Event deleted successfully");
+      closeDetailModal();
+    },
+    onError: (error) => {
+      console.error("Error deleting event:", error);
+      toast.error("Failed to delete event");
+    },
+  });
+
+  // Handler למחיקת אירוע
+  const handleDeleteEvent = () => {
+    if (!selectedEvent || !selectedEvent._id) return;
+    deleteMutation.mutate(selectedEvent._id);
+  };
+
+  // הפונקציה מחזירה את רשימת האירועים לתאריך מסוים
   const getEventsForDate = (date) => {
     return events.filter((event) => {
       const start = new Date(event.startDate);
@@ -229,7 +259,7 @@ const Events = () => {
     });
   };
 
-  // Helper function to conditionally render a field only if its value is not empty
+  // Helper להצגת שדה אם יש לו ערך
   const renderField = (label, value) => {
     if (!value) return null;
     return (
@@ -239,7 +269,7 @@ const Events = () => {
     );
   };
 
-  // Define tile class for each day cell – background white for current month, gray for others
+  // הגדרת מחלקת CSS עבור כל תא בלוח
   const tileClassName = ({ date, view }) => {
     if (view === "month") {
       return `relative min-h-[150px] flex flex-col justify-center items-center border border-gray-300 transition-colors duration-200 hover:bg-gray-100 ${
@@ -251,7 +281,7 @@ const Events = () => {
     return "";
   };
 
-  // Define tile content: display day number at top-right and event titles below
+  // תוכן התא בלוח: מציג את מספר היום ושמות האירועים
   const tileContent = ({ date, view }) => {
     if (view === "month") {
       const dayEvents = getEventsForDate(date);
@@ -280,7 +310,7 @@ const Events = () => {
     return null;
   };
 
-  // Function to trigger update mode – prefill form data with selected event details
+  // מצב עדכון – ממלא את הטופס בפרטי האירוע הנבחר
   const handleUpdateEvent = () => {
     if (!selectedEvent) return;
     setIsUpdateMode(true);
@@ -293,20 +323,6 @@ const Events = () => {
     });
     setDetailModalIsOpen(false);
     setModalIsOpen(true);
-  };
-
-  // Function to delete an event
-  const handleDeleteEvent = async () => {
-    if (!selectedEvent || !selectedEvent._id) return;
-    try {
-      await axiosInstance.delete(`/events/${selectedEvent._id}`);
-      setEvents((prev) => prev.filter((ev) => ev._id !== selectedEvent._id));
-      toast.success("Event deleted successfully");
-      closeDetailModal();
-    } catch (error) {
-      console.error("Error deleting event:", error);
-      toast.error("Failed to delete event");
-    }
   };
 
   return (
@@ -335,7 +351,7 @@ const Events = () => {
         />
       </div>
 
-      {/* Modal for creating/updating event */}
+      {/* Modal ליצירה/עדכון אירוע */}
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
@@ -514,7 +530,6 @@ const Events = () => {
                   </option>
                 ))}
               </select>
-              {/* Display selected internal participants as chips */}
               {formData.participants.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {formData.participants.map((empId) => {
@@ -542,8 +557,7 @@ const Events = () => {
               )}
             </div>
           )}
-          {/* For participantType "other" - no additional fields */}
-          {/* Recurrence */}
+          {/* עבור participantType "other" - אין שדות נוספים */}
           <div>
             <label className="block text-lg font-medium mb-1">
               Recurrence:
@@ -557,7 +571,6 @@ const Events = () => {
               className="w-full border border-gray-300 rounded p-3 focus:ring-blue-500 focus:outline-none transition-colors"
             />
           </div>
-          {/* Reminder */}
           <div>
             <label className="block text-lg font-medium mb-1">
               Reminder (minutes):
@@ -570,7 +583,6 @@ const Events = () => {
               className="w-full border border-gray-300 rounded p-3 focus:ring-blue-500 focus:outline-none transition-colors"
             />
           </div>
-          {/* Attachments */}
           <div>
             <label className="block text-lg font-medium mb-1">
               Attachment (File Name & File URL):
@@ -594,7 +606,6 @@ const Events = () => {
               />
             </div>
           </div>
-          {/* Notes */}
           <div>
             <label className="block text-lg font-medium mb-1">Notes:</label>
             <textarea
@@ -605,7 +616,6 @@ const Events = () => {
               rows="3"
             />
           </div>
-          {/* Action Buttons */}
           <div className="flex space-x-6">
             <button
               type="submit"
@@ -624,7 +634,7 @@ const Events = () => {
         </form>
       </Modal>
 
-      {/* Modal for displaying event details */}
+      {/* Modal להצגת פרטי אירוע */}
       {selectedEvent && (
         <Modal
           isOpen={detailModalIsOpen}
@@ -655,7 +665,6 @@ const Events = () => {
             {renderField("Meeting URL", selectedEvent.meetingUrl)}
             {renderField("Event Type", selectedEvent.eventType)}
 
-            {/* כאן שדות externals */}
             {selectedEvent.externalParticipants &&
               selectedEvent.externalParticipants.length > 0 &&
               selectedEvent.externalParticipants[0].name !== "" &&
@@ -672,7 +681,6 @@ const Events = () => {
                 }`
               )}
 
-            {/* כאן נוסיף את הצגת העובדים הפנימיים (participants) */}
             {selectedEvent.participants &&
               selectedEvent.participants.length > 0 && (
                 <div>
@@ -680,7 +688,6 @@ const Events = () => {
                   <ul className="ml-4 list-disc">
                     {selectedEvent.participants.map((emp) => (
                       <li key={emp._id}>
-                        {/* בהנחה שבמודל של Employee יש name, phone, tz, role, וכו' */}
                         {emp.name}
                         {emp.phone && ` (Phone: ${emp.phone})`}
                         {emp.email && ` (Email: ${emp.email})`}
@@ -724,16 +731,6 @@ const Events = () => {
         </Modal>
       )}
     </div>
-  );
-};
-
-// Helper function to render a field only if its value is not empty
-const renderField = (label, value) => {
-  if (!value) return null;
-  return (
-    <p>
-      <span className="font-bold">{label}:</span> {value}
-    </p>
   );
 };
 

@@ -1,6 +1,7 @@
 import Budget from "../models/Budget.model.js";
 import Product from "../models/product.model.js";
 import Notification from "../models/notification.model.js";
+import Department from "../models/department.model.js";
 import jwt from "jsonwebtoken";
 import cloudinary, {
   uploadToCloudinaryFile,
@@ -100,6 +101,29 @@ export const createBudget = async (req, res) => {
             error: "Each category must have a valid allocatedAmount.",
           });
         }
+      }
+    }
+
+    // *** בדיקה: האם קיים תקציב פעיל למחלקה זו ***
+    // נניח שתקציב "פעיל" הוא כזה שעדיין לא הסתיים (endDate > היום)
+    const activeBudget = await Budget.findOne({
+      companyId,
+      departmentOrProjectName: budgetData.departmentOrProjectName,
+      endDate: { $gt: new Date() },
+    });
+
+    if (activeBudget) {
+      const now = new Date();
+      const activeEndDate = new Date(activeBudget.endDate);
+      const diffMs = activeEndDate - now;
+      const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+      // אם יש תקציב קיים והפרש הסיום גדול מ-3 ימים, לא ניתן ליצור תקציב חדש
+      if (diffDays > 3) {
+        return res.status(400).json({
+          error:
+            "תקציב קיים למחלקה זו עדיין לא הסתיים. ניתן ליצור תקציב חדש רק כשנשארו 3 ימים או פחות לסיום התקציב הקיים.",
+        });
       }
     }
 
@@ -531,6 +555,9 @@ export const signBudget = async (req, res) => {
     // If all required signatures are collected, update budget status
     if (budget.currentSignatures === budget.signers.length) {
       budget.status = "Approved";
+      const department = await Department.findById(budget.departmentId);
+      department.budgets.push(budget._id);
+      await department.save();
     }
 
     // Save the updated budget document

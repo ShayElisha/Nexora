@@ -7,6 +7,7 @@ import Event from "../models/events.model.js";
 import Company from "../models/companies.model.js"; // ייבוא מודל העובד
 import jwt from "jsonwebtoken";
 import cron from "node-cron";
+import Project from "../models/project.model.js";
 
 // פונקציה נפרדת ללוגיקה עסקית
 const checkPendingSignaturesLogic = async (companyId) => {
@@ -203,17 +204,9 @@ cron.schedule("0 * * * *", async () => {
         const procurementNotifications = await checkPendingSignaturesLogic(
           companyId
         );
-        console.log(
-          `Procurement notifications created for company ${companyId}:`,
-          procurementNotifications
-        );
 
         const budgetNotifications = await checkPendingBudgetSignaturesLogic(
           companyId
-        );
-        console.log(
-          `Budget notifications created for company ${companyId}:`,
-          budgetNotifications
         );
       } catch (error) {
         console.error(`Error in company ${companyId} cron job:`, error);
@@ -307,15 +300,45 @@ export const markNotificationAsRead = async (req, res) => {
     });
   }
 };
+export const markNotificationAsReadAll = async (req, res) => {
+  try {
+    const token = req.cookies["auth_token"];
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decodedToken) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const companyId = decodedToken.companyId;
+
+    // ✅ עדכון כל ההתראות של החברה לסימון כנקראו
+    const result = await Notification.updateMany(
+      { companyId: companyId, isRead: false }, // רק ההתראות שלא נקראו
+      { $set: { isRead: true } }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `${result.modifiedCount} notifications marked as read successfully`,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error marking notifications as read",
+      error: error.message,
+    });
+  }
+};
 
 cron.schedule("0 0 * * *", async () => {
-  console.log("Running cron job to clean up expired notifications...");
   try {
     const now = new Date();
     const result = await Notification.deleteMany({
       expirationDate: { $lt: now },
     });
-    console.log(`Deleted ${result.deletedCount} expired notifications.`);
   } catch (error) {
     console.error("Error cleaning up expired notifications:", error);
   }
@@ -428,7 +451,6 @@ export const reminderEventsController = async (req, res) => {
 };
 
 cron.schedule("*/1 * * * *", async () => {
-  console.log("Running cron job for event reminders...");
   try {
     const companies = await Company.find();
 
@@ -445,5 +467,58 @@ cron.schedule("*/1 * * * *", async () => {
     }
   } catch (error) {
     console.error("Error in event reminders cron job:", error);
+  }
+});
+
+export const checkDateProjectForCompany = async (companyId) => {
+  try {
+    // Set the boundaries for today's date (from 00:00 to 23:59:59)
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const endOfToday = new Date();
+    endOfToday.setHours(23, 59, 59, 999);
+
+    // Find projects that have a startDate within today
+    const projects = await Project.find({
+      companyId,
+      startDate: { $gte: startOfToday, $lte: endOfToday },
+    });
+
+    if (projects.length === 0) {
+      return;
+    }
+
+    // Iterate over projects and update status if needed
+    for (const project of projects) {
+      if (project.status !== "Active") {
+        project.status = "Active";
+        await project.save();
+
+        // Create a Notification for the project start
+        const notificationMessage = `Project "${project.name}" has started.`;
+        const notification = new Notification({
+          companyId,
+          content: notificationMessage,
+          type: "Project Started",
+          projectId: project._id,
+        });
+        await notification.save();
+      }
+    }
+  } catch (error) {
+    console.error("Error in checkDateProjectForCompany:", error);
+  }
+};
+
+// Cron job scheduled to run every minute
+cron.schedule("*/1 * * * *", async () => {
+  try {
+    const companies = await Company.find();
+    for (const company of companies) {
+      await checkDateProjectForCompany(company._id);
+    }
+  } catch (error) {
+    console.error("Error in cron job:", error);
   }
 });

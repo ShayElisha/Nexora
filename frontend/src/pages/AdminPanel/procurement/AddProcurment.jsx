@@ -13,7 +13,6 @@ import { useEmployeeStore } from "../../../stores/useEmployeeStore";
 import { useProductStore } from "../../../stores/useProductStore";
 
 // Components
-import Sidebar from "../layouts/Sidebar";
 import SupplierSelect from "./components/SupplierSelect";
 import PaymentAndShipping from "./components/PaymentAndShipping";
 import SignaturesModal from "./components/SignaturesModal";
@@ -33,6 +32,7 @@ const AddProcurement = () => {
   const { data: authData } = useQuery({ queryKey: ["authUser"] });
   const authUser = authData?.user;
 
+  console.log(authUser);
   // ----------------- Form Data ----------------- //
   const [formData, setFormData] = useState({
     companyId: authUser?.company || "",
@@ -99,7 +99,6 @@ const AddProcurement = () => {
   } = useSignatureStore((state) => state);
 
   const {
-    productsBySupplier,
     fetchProductsBySupplier, // => טעינת מוצרים לפי ספק
   } = useProductStore((state) => state);
 
@@ -373,8 +372,10 @@ const AddProcurement = () => {
       sku: prod.SKU,
       category: prod.category,
       quantity: prod.quantity,
-      unitPrice: `${prod.unitPrice} ${currencySymbol}`,
-      total: `${prod.unitPrice * prod.quantity} ${currencySymbol}`,
+      unitPrice: `${prod.unitPrice} ${getCurrencySymbol(formData.currency)}`,
+      total: `${prod.unitPrice * prod.quantity} ${getCurrencySymbol(
+        formData.currency
+      )}`,
     }));
 
     pdf.autoTable({
@@ -396,7 +397,7 @@ const AddProcurement = () => {
     pdf.text(
       `${t("procurement.total_cost", {
         lng: "en",
-      })}: ${totalCost} ${currencySymbol}`,
+      })}: ${totalCost} ${getCurrencySymbol(formData.currency)}`,
       10,
       pdf.autoTable.previous.finalY + 10
     );
@@ -458,6 +459,7 @@ const AddProcurement = () => {
       );
     }
   };
+
   const handleAddProduct = () => {
     const {
       productId,
@@ -618,16 +620,15 @@ const AddProcurement = () => {
 
   // ----------------- Render ----------------- //
   return (
-    <div className="flex min-h-screen bg-gradient-to-r from-gray-900 via-gray-800 to-black">
-      <Sidebar />
-      <div className="flex-1 p-6 bg-gray-800 text-gray-300">
-        <h1 className="text-2xl font-bold text-blue-300 mb-6">
+    <div className="flex min-h-screen bg-gradient-to-r from-bg to-bg">
+      <div className="flex-1 p-6 bg-bg text-text">
+        <h1 className="text-2xl font-bold text-primary mb-6">
           {t("procurement.add_procurement")}
         </h1>
 
         {/* ספקים */}
         <div className="mb-6">
-          <h2 className="text-lg font-bold text-blue-400 mb-4">
+          <h2 className="text-lg font-bold text-secondary mb-4">
             {t("procurement.supplier_details")}
           </h2>
           <SupplierSelect
@@ -636,7 +637,7 @@ const AddProcurement = () => {
           />
 
           {selectedSupplier && (
-            <div className="p-4 bg-gray-700 rounded-md mt-2">
+            <div className="p-4 bg-secondary rounded-md mt-2">
               <p>
                 <strong>{t("procurement.phone")}:</strong>{" "}
                 {selectedSupplier.Phone || "N/A"}
@@ -663,20 +664,19 @@ const AddProcurement = () => {
 
         <button
           onClick={() => setShowSignatureModal(true)}
-          className="bg-purple-600 py-2 px-4 text-white rounded mt-4"
+          className="bg-button-bg py-2 px-4 text-button-text rounded mt-4"
         >
           {t("procurement.select_signature_requirements")}
         </button>
 
         {newSigners.length > 0 && (
-          <div className="p-4 mt-4 bg-gray-700 rounded-md">
-            <h4 className="text-blue-400 font-bold mb-2">
-              {" "}
-              {t("procurement.current_signers")}: :
+          <div className="p-4 mt-4 bg-secondary rounded-md">
+            <h4 className="text-secondary font-bold mb-2">
+              {t("procurement.current_signers")}:
             </h4>
             <ul className="list-disc list-inside">
               {newSigners.map((signer, index) => (
-                <li key={index} className="text-gray-200">
+                <li key={index} className="text-text">
                   {signer.name} - {signer.role}
                 </li>
               ))}
@@ -704,8 +704,7 @@ const AddProcurement = () => {
 
         {/* מוצרים */}
         <div className="mt-4">
-          <h2 className="text-lg font-bold text-blue-400 mb-4">
-            {" "}
+          <h2 className="text-lg font-bold text-secondary mb-4">
             {t("procurement.products")}
           </h2>
         </div>
@@ -726,28 +725,28 @@ const AddProcurement = () => {
         {/* טבלת מוצרים שהתווספו */}
         {products.length > 0 && (
           <div className="mb-6">
-            <h2 className="text-lg font-bold text-blue-400 mb-4">
+            <h2 className="text-lg font-bold text-secondary mb-4">
               {t("procurement.products_list")}
             </h2>
             <table className="w-full border-collapse">
               <thead>
                 <tr>
-                  <th className="border border-gray-700 p-2">
+                  <th className="border border-border-color p-2">
                     {t("procurement.name")}
                   </th>
-                  <th className="border border-gray-700 p-2">
+                  <th className="border border-border-color p-2">
                     {t("procurement.sku")}
                   </th>
-                  <th className="border border-gray-700 p-2">
+                  <th className="border border-border-color p-2">
                     {t("procurement.category")}
                   </th>
-                  <th className="border border-gray-700 p-2">
+                  <th className="border border-border-color p-2">
                     {t("procurement.quantity")}
                   </th>
-                  <th className="border border-gray-700 p-2">
+                  <th className="border border-border-color p-2">
                     {t("procurement.unit_price")}
                   </th>
-                  <th className="border border-gray-700 p-2">
+                  <th className="border border-border-color p-2">
                     {t("procurement.total")}
                   </th>
                 </tr>
@@ -755,16 +754,20 @@ const AddProcurement = () => {
               <tbody>
                 {products.map((p, index) => (
                   <tr key={index}>
-                    <td className="border border-gray-700 p-2">
+                    <td className="border border-border-color p-2">
                       {p.productName}
                     </td>
-                    <td className="border border-gray-700 p-2">{p.SKU}</td>
-                    <td className="border border-gray-700 p-2">{p.category}</td>
-                    <td className="border border-gray-700 p-2">{p.quantity}</td>
-                    <td className="border border-gray-700 p-2">
+                    <td className="border border-border-color p-2">{p.SKU}</td>
+                    <td className="border border-border-color p-2">
+                      {p.category}
+                    </td>
+                    <td className="border border-border-color p-2">
+                      {p.quantity}
+                    </td>
+                    <td className="border border-border-color p-2">
                       {p.unitPrice} {getCurrencySymbol(formData.currency)}
                     </td>
-                    <td className="border border-gray-700 p-2">
+                    <td className="border border-border-color p-2">
                       {p.total} {getCurrencySymbol(formData.currency)}
                     </td>
                   </tr>
@@ -782,7 +785,7 @@ const AddProcurement = () => {
         <button
           type="button"
           onClick={handlePreview}
-          className="bg-blue-600 py-2 px-4 text-white rounded mt-4"
+          className="bg-button-bg py-2 px-4 text-button-text rounded mt-4"
         >
           {t("procurement.preview_procurement")}
         </button>

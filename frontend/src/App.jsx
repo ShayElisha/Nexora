@@ -36,6 +36,9 @@ import Events from "./pages/AdminPanel/events/Events.jsx";
 import CreateTask from "./pages/AdminPanel/Tasks/CreateTask.jsx";
 import Add_Department from "./pages/AdminPanel/departments/Add_Department.jsx";
 import TasksList from "./pages/AdminPanel/Tasks/TasksList.jsx";
+import EmployeeDashboard from "./pages/employeePages/EmployeeDashboard.jsx";
+import AddProject from "./pages/AdminPanel/projects/AddProjact.jsx";
+import ProjectsList from "./pages/AdminPanel/projects/projectsList.jsx";
 
 const App = () => {
   const { data: authUser, isLoading } = useQuery({
@@ -94,6 +97,7 @@ const App = () => {
         <Route path="/nexora" element={<NexoraAdmin />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/products/manage" element={<Products />} />
+        <Route path="/EmployeeDashboard" element={<EmployeeDashboard />} />
         <Route
           path="/login"
           element={!authUser ? <LoginPage /> : <Navigate to="/" />}
@@ -110,6 +114,8 @@ const App = () => {
           <Route path="finance" element={<Finance />} />
           <Route path="finance/Budgets" element={<Budgets />} />
           <Route path="finance/add-budget" element={<AddOrEditBudget />} />
+          <Route path="projects/add-project" element={<AddProject />} />
+          <Route path="projects" element={<ProjectsList />} />
           <Route
             path="finance/budget-details/:id"
             element={<BudgetDetails />}

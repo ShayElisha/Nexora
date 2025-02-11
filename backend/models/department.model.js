@@ -17,6 +17,27 @@ const DepartmentSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    teamMembers: [
+      {
+        employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
+      },
+    ],
+    projects: [
+      {
+        projectId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Project",
+        },
+      },
+    ],
+    budgets: [
+      {
+        budgetId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Budget",
+        },
+      },
+    ],
   },
   {
     timestamps: true,

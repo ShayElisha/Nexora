@@ -14,7 +14,7 @@ const SignatureSchema = new mongoose.Schema(
 
     signers: [
       {
-        employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "employees" ,required: true },
+        employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" ,required: true },
         name: { type: String, required: true }, // שם החותם
         role: { type: String, required: true }, // תפקיד
         order: { type: Number, required: true }, // סדר החתימה

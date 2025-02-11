@@ -1,34 +1,157 @@
+// src/pages/procurement/AddProduct.jsx
 import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import Sidebar from "../layouts/Sidebar";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useProductAdminStore } from "../../../stores/useProductAdminStore";
 import { useSupplierStore } from "../../../stores/useSupplierStore";
 import axiosInstance from "../../../lib/axios";
 import ProductForm from "../components/ProductForm";
 import { useTranslation } from "react-i18next";
+import Add_Department from "../departments/Add_Department"; // ודא שהנתיב נכון
 
+// ---------------------------------------------------------------------------
+// רכיב משנה לבניית ה-BOM
+// ---------------------------------------------------------------------------
+const BOMBuilder = ({
+  bomComponents,
+  setBomComponents,
+  productsList,
+  isLoadingProducts,
+}) => {
+  const { t } = useTranslation();
+
+  // הוספת שורה חדשה ל-BOM
+  const handleAddComponent = () => {
+    setBomComponents((prev) => [
+      ...prev,
+      {
+        quantity: 1,
+        unitCost: 0,
+      },
+    ]);
+  };
+
+  // עדכון ערך בשורה ספציפית
+  const handleComponentChange = (index, field, value) => {
+    setBomComponents((prev) =>
+      prev.map((comp, i) => (i === index ? { ...comp, [field]: value } : comp))
+    );
+  };
+
+  // מחיקת שורה
+  const handleRemoveComponent = (index) => {
+    setBomComponents((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div className="col-span-full mt-8 bg-gray-700 p-4 rounded">
+      <h2 className="text-xl font-semibold text-blue-300 mb-2">
+        {t("product.bom.title")}
+      </h2>
+      <button
+        type="button"
+        onClick={handleAddComponent}
+        className="mb-4 px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+      >
+        {t("product.bom.add_component")}
+      </button>
+      {bomComponents.map((component, index) => (
+        <div
+          key={index}
+          className="grid grid-cols-1 md:grid-cols-5 gap-2 mb-2 bg-gray-800 p-2 rounded"
+        >
+          <div className="md:col-span-2">
+            <label className="block text-gray-400 text-sm mb-1">
+              {t("product.bom.component")}
+            </label>
+            <select
+              value={component.componentId}
+              onChange={(e) =>
+                handleComponentChange(index, "componentId", e.target.value)
+              }
+              className="w-full border border-gray-600 rounded p-2"
+              disabled={isLoadingProducts}
+            >
+              <option value="">{t("product.bom.select_product")}</option>
+              {productsList?.map((p) => (
+                <option key={p._id} value={p._id}>
+                  {p.productName}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-gray-400 text-sm mb-1">
+              {t("product.bom.quantity")}
+            </label>
+            <input
+              type="number"
+              value={component.quantity}
+              onChange={(e) =>
+                handleComponentChange(
+                  index,
+                  "quantity",
+                  parseFloat(e.target.value)
+                )
+              }
+              className="w-full border border-gray-600 rounded p-2"
+              min={1}
+            />
+          </div>
+          <div>
+            <label className="block text-gray-400 text-sm mb-1">
+              {t("product.bom.unit_cost")}
+            </label>
+            <input
+              type="number"
+              value={component.unitCost}
+              onChange={(e) =>
+                handleComponentChange(
+                  index,
+                  "unitCost",
+                  parseFloat(e.target.value)
+                )
+              }
+              className="w-full border border-gray-600 rounded p-2"
+            />
+          </div>
+          <div className="flex items-end">
+            <button
+              type="button"
+              onClick={() => handleRemoveComponent(index)}
+              className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >
+              {t("product.bom.remove")}
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// רכיב ההוספה המרכזי
+// ---------------------------------------------------------------------------
 const AddProduct = () => {
   const { t } = useTranslation();
 
-  // Zustand for products
+  // Zustand for products (יצירת מוצר)
   const { createProduct, isLoading: productIsLoading } = useProductAdminStore();
-
-  // Zustand for suppliers
+  // Zustand for suppliers (רשימת ספקים)
   const {
     suppliers,
     isLoading: suppliersIsLoading,
     error: suppliersError,
     fetchSuppliers,
   } = useSupplierStore();
-
   // React Query for user auth
   const { data: authData } = useQuery({
     queryKey: ["authUser"],
   });
   const authUser = authData?.user;
 
-  // Local form state for product
+  // 1) מצב מקומי למוצר (formData)
   const [formData, setFormData] = useState({
     companyId: authUser?.company,
     sku: "",
@@ -43,26 +166,53 @@ const AddProduct = () => {
     length: "",
     width: "",
     height: "",
+    productType: "purchase", // ערך ברירת מחדל
   });
-
   const [errors, setErrors] = useState({});
 
+  // 2) מצב מקומי ל-BOM (עץ מוצר) - יוצג רק אם סוג המוצר הוא "sale"
+  const [bomComponents, setBomComponents] = useState([]);
+
+  // טעינת ספקים
   useEffect(() => {
     fetchSuppliers();
   }, [fetchSuppliers]);
 
+  // טעינת רשימת מוצרים (ל-BOM)
+  const {
+    data: productsData,
+    isLoading: isLoadingProducts,
+    error: productsError,
+  } = useQuery({
+    queryKey: ["productsList"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/product");
+      return res.data; // הנחה: res.data מחזיר מערך מוצרים
+    },
+  });
+  const productsList = productsData?.data || [];
+
+  // עדכון companyId לפי המשתמש
+  useEffect(() => {
+    if (authUser?.company) {
+      setFormData((prev) => ({
+        ...prev,
+        companyId: authUser.company,
+      }));
+    }
+  }, [authUser]);
+
   const queryClient = useQueryClient();
 
+  // Mutation ליצירת מוצר
   const { mutate: createNewProduct } = useMutation({
     mutationFn: async (productData) => {
       const response = await axiosInstance.post("/product", productData);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries(["products"]);
       toast.success(t("product.success_message"));
-
-      // איפוס הטופס
       setFormData({
         companyId: authUser?.company,
         sku: "",
@@ -71,14 +221,14 @@ const AddProduct = () => {
         productDescription: "",
         unitPrice: "",
         category: "",
-        supplierId: "",
+        supplierId: null,
         supplierName: "",
         productImage: "",
         length: "",
         width: "",
         height: "",
+        productType: "purchase",
       });
-
       const product = data.data;
       const defaultInventory = {
         companyId: product.companyId,
@@ -87,15 +237,27 @@ const AddProduct = () => {
         minStockLevel: 10,
         reorderQuantity: 20,
       };
-
       axiosInstance
         .post("/inventory", defaultInventory)
-        .then(() => {
-          console.log("Default inventory created.");
-        })
-        .catch((error) => {
-          console.error("Error creating default inventory:", error);
-        });
+        .then(() => console.log("Default inventory created."))
+        .catch((error) =>
+          console.error("Error creating default inventory:", error)
+        );
+      if (formData.productType === "sale" && bomComponents.length > 0) {
+        const bomPayload = {
+          productId: product._id,
+          components: bomComponents,
+          notes: "",
+        };
+        try {
+          const bomRes = await axiosInstance.post("/product-trees", bomPayload);
+          toast.success(t("product.bom.creation_success"));
+        } catch (err) {
+          console.error("Error creating BOM:", err);
+          toast.error(t("product.bom.creation_error"));
+        }
+      }
+      setBomComponents([]);
     },
     onError: (error) => {
       toast.error(
@@ -106,7 +268,7 @@ const AddProduct = () => {
     },
   });
 
-  // Handle input changes
+  // Handler לשינוי שדות הטופס
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files) {
@@ -117,23 +279,21 @@ const AddProduct = () => {
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  // Handle form submission
+  // Handler לשליחת הטופס
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const newErrors = {};
-    if (!formData.supplierId)
+    if (formData.productType !== "sale" && !formData.supplierId) {
       newErrors.supplierId = t("product.errors.supplier_required");
+    }
     if (!formData.productName)
       newErrors.productName = t("product.errors.name_required");
     if (!formData.unitPrice)
       newErrors.unitPrice = t("product.errors.price_required");
-
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
     const payload = {
       companyId: formData.companyId,
       sku: formData.sku,
@@ -142,16 +302,15 @@ const AddProduct = () => {
       productDescription: formData.productDescription,
       unitPrice: formData.unitPrice,
       category: formData.category,
-      supplierId: formData.supplierId,
+      supplierId: formData.supplierId || null,
       supplierName:
         suppliers.find((s) => s._id === formData.supplierId)?.SupplierName ||
         "",
       length: formData.length,
       width: formData.width,
       height: formData.height,
+      productType: formData.productType,
     };
-
-    console.log("payload: " + JSON.stringify(payload, null, 2));
     if (formData.productImage) {
       const reader = new FileReader();
       reader.readAsDataURL(formData.productImage);
@@ -167,15 +326,7 @@ const AddProduct = () => {
     }
   };
 
-  useEffect(() => {
-    if (authUser?.company) {
-      setFormData((prev) => ({
-        ...prev,
-        companyId: authUser.company,
-      }));
-    }
-  }, [authUser]);
-
+  // חישוב נפח
   const calculateVolume = () => {
     const length = parseFloat(formData.length) || 0;
     const width = parseFloat(formData.width) || 0;
@@ -183,6 +334,7 @@ const AddProduct = () => {
     return length * width * height;
   };
 
+  // הגדרת שדות הטופס
   const fieldDefinitions = [
     { name: "sku", type: "text", label: t("product.fields.sku") },
     { name: "barcode", type: "text", label: t("product.fields.barcode") },
@@ -194,21 +346,26 @@ const AddProduct = () => {
       type: "textarea",
       label: t("product.fields.description"),
     },
+    { name: "productImage", type: "file", label: t("product.fields.image") },
+    { name: "length", type: "number", label: t("product.fields.length") },
+    { name: "width", type: "number", label: t("product.fields.width") },
+    { name: "height", type: "number", label: t("product.fields.height") },
     {
-      name: "productImage",
-      type: "file",
-      label: t("product.fields.image"),
+      name: "productType",
+      type: "select",
+      label: t("product.fields.productType"),
+      options: [
+        { value: "purchase", label: "purchase" },
+        { value: "sale", label: "sale" },
+        { value: "both", label: "both" },
+      ],
     },
-    { name: "length", type: "number", label: t("product.fields.length") }, // Added field
-    { name: "width", type: "number", label: t("product.fields.width") }, // Added field
-    { name: "height", type: "number", label: t("product.fields.height") }, // Added field
   ];
 
   return (
     <div className="flex min-h-screen bg-gradient-to-r from-gray-900 via-gray-800 to-black">
-      <Sidebar />
-      <div className="container mx-auto max-w-4xl p-8 bg-gray-800 rounded-lg shadow-xl">
-        <h1 className="text-3xl font-bold text-blue-400 mb-6 text-center">
+      <div className="container mx-auto max-w-full p-8 bg-bg rounded-lg shadow-xl text-text">
+        <h1 className="text-3xl font-bold text-primary mb-6 text-center">
           {t("product.add_new_product")}
         </h1>
 
@@ -227,11 +384,21 @@ const AddProduct = () => {
           suppliersIsLoading={suppliersIsLoading}
           handleChange={handleChange}
           handleSubmit={handleSubmit}
+          isSale={formData.productType === "sale"}
         />
 
         <div className="mt-6 text-center text-blue-300">
           {t("product.fields.volume")}: {calculateVolume().toFixed(3)} m³
         </div>
+
+        {formData.productType === "sale" && (
+          <BOMBuilder
+            bomComponents={bomComponents}
+            setBomComponents={setBomComponents}
+            productsList={productsList}
+            isLoadingProducts={isLoadingProducts}
+          />
+        )}
       </div>
     </div>
   );

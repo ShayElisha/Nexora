@@ -16,8 +16,8 @@ export const signUp = async (req, res) => {
       gender,
       identity,
       phone,
+      department,
       address,
-      profileImage,
     } = req.body;
     const profileImageFile = req.file; // Multer stores the file in memory as buffer\
 
@@ -123,6 +123,7 @@ export const signUp = async (req, res) => {
       gender,
       identity,
       password: hashedPassword,
+      department,
       role,
       phone,
       address,

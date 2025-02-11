@@ -1,16 +1,11 @@
-import React, { useState } from "react";
+// src/components/procurement/TasksList.jsx
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axiosInstance from "../../../lib/axios"; // ודא שהנתיב נכון
+import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
-import {
-  FaTrash,
-  FaUser,
-  FaClock,
-  FaExclamationTriangle,
-} from "react-icons/fa";
+import { FaTrash, FaUser, FaClock } from "react-icons/fa";
 
-// פונקציה למיפוי צבעים לסטטוסים
+// פונקציה למיפוי צבעים לסטטוסים (ניתן להתאים גם כאן, במידת הצורך, לערכי הפלטה)
 const getStatusColor = (status) => {
   switch (status) {
     case "pending":
@@ -26,7 +21,7 @@ const getStatusColor = (status) => {
   }
 };
 
-// פונקציה למיפוי צבעים לעדיפות
+// פונקציה למיפוי צבעים לעדיפות (ניתן לשנות בהתאם לרצונכם)
 const getPriorityColor = (priority) => {
   switch (priority) {
     case "high":
@@ -40,9 +35,10 @@ const getPriorityColor = (priority) => {
   }
 };
 
-// קומפוננטת רשימת המשימות
 const TasksList = () => {
   const queryClient = useQueryClient();
+
+  // שליפת המשימות
   const {
     data: tasks = [],
     isLoading,
@@ -72,32 +68,35 @@ const TasksList = () => {
     },
   });
 
-  if (isLoading) return <div className="text-center p-6">Loading tasks...</div>;
-  if (isError)
+  if (isLoading) {
+    return <div className="text-center p-6 text-text">Loading tasks...</div>;
+  }
+  if (isError) {
     return (
-      <div className="text-center p-6 text-red-500">Error loading tasks.</div>
+      <div className="text-center p-6 text-red-500">אין נתונים זמינים</div>
     );
+  }
 
-  // סידור המשימות לפי דדליין ואח"כ לפי עדיפות
+  // מיון המשימות לפי תאריך יעד (dueDate)
   const sortedTasks = [...tasks].sort(
     (a, b) => new Date(a.dueDate) - new Date(b.dueDate)
   );
 
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Task List</h1>
+    <div className="max-w-5xl mx-auto p-6 bg-bg shadow-md rounded-lg border border-border-color">
+      <h1 className="text-3xl font-bold mb-6 text-primary">Task List</h1>
 
       {sortedTasks.length === 0 ? (
-        <p className="text-gray-500 text-center">No tasks available.</p>
+        <p className="text-center text-text">אין משימות זמינות.</p>
       ) : (
         <div className="grid gap-6">
           {sortedTasks.map((task) => (
             <div
               key={task._id}
-              className="p-5 border rounded-lg shadow hover:shadow-lg transition bg-gray-50"
+              className="p-5 border rounded-lg shadow hover:shadow-lg transition bg-bg border border-border-color"
             >
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-800">
+                <h2 className="text-xl font-semibold text-primary">
                   {task.title}
                 </h2>
                 <button
@@ -108,7 +107,7 @@ const TasksList = () => {
                 </button>
               </div>
 
-              <p className="text-gray-600">{task.description}</p>
+              <p className="text-text mt-2">{task.description}</p>
 
               {/* סטטוס */}
               <div
@@ -120,8 +119,8 @@ const TasksList = () => {
               </div>
 
               {/* דדליין */}
-              <div className="flex items-center text-sm text-gray-600 mt-2">
-                <FaClock className="mr-2 text-blue-500" />
+              <div className="flex items-center text-sm text-text mt-2">
+                <FaClock className="mr-2 text-accent" />
                 <span>
                   Due:{" "}
                   {task.dueDate
@@ -138,15 +137,14 @@ const TasksList = () => {
               {/* משתתפים */}
               {task.assignedTo.length > 0 && (
                 <div className="mt-3">
-                  <strong className="text-gray-700">Assigned To:</strong>
+                  <strong className="text-text">Assigned To:</strong>
                   <div className="flex flex-wrap mt-1">
                     {task.assignedTo.map((emp) => (
                       <div
                         key={emp._id}
-                        className="flex items-center bg-gray-200 px-3 py-1 rounded-full text-sm mr-2 mt-2"
+                        className="flex items-center bg-secondary px-3 py-1 rounded-full text-sm mr-2 mt-2"
                       >
-                        <FaUser className="mr-1 text-gray-600" /> {emp.name} (
-                        {emp.role})
+                        <FaUser className="mr-1" /> {emp.name} ({emp.role})
                       </div>
                     ))}
                   </div>

@@ -36,7 +36,6 @@ const productSchema = new mongoose.Schema(
     supplierId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Supplier",
-      required: [true, "Supplier ID is required"],
     },
     length: {
       type: Number,

@@ -1,6 +1,6 @@
-import { useState } from "react";
+// src/components/procurement/AddSupplier.jsx
+import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Sidebar from "../layouts/Sidebar";
 import toast from "react-hot-toast";
 import axiosInstance from "../../../lib/axios";
 import currencyList from "../finance/currency.json";
@@ -23,15 +23,16 @@ const AddSupplier = ({ authUser }) => {
     IsActive: true,
   });
 
-  // Handle input change
+  // Handler לשינוי שדות הטופס
   const handleInputChange = (e) => {
-    const { name, value, type } = e.target;
-    setSupplierData({
-      ...supplierData,
-      [name]: type === "checkbox" ? e.target.checked : value,
-    });
+    const { name, value, type, checked } = e.target;
+    setSupplierData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
+  // Mutation להוספת ספק
   const addSupplierMutation = useMutation({
     mutationFn: async (newSupplier) => {
       const response = await axiosInstance.post("/suppliers", newSupplier);
@@ -39,7 +40,8 @@ const AddSupplier = ({ authUser }) => {
     },
     onSuccess: () => {
       toast.success("Supplier added successfully!");
-      queryClient.invalidateQueries(["suppliers"]); // Refresh suppliers list
+      queryClient.invalidateQueries(["suppliers"]); // רענון רשימת הספקים
+      // איפוס הטופס
       setSupplierData({
         companyId: authUser?.user?.companyId || "",
         SupplierName: "",
@@ -67,16 +69,16 @@ const AddSupplier = ({ authUser }) => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black">
-      <Sidebar />
+    <div className="flex min-h-screen bg-bg text-text">
       <div className="flex-1 flex justify-center items-center">
-        <div className="bg-gray-800 rounded-lg shadow-xl p-8 max-w-lg w-full">
-          <h2 className="text-2xl font-bold text-center text-blue-400 mb-6">
+        <div className="bg-white rounded-lg shadow-xl p-8 max-w-lg w-full">
+          <h2 className="text-2xl font-bold text-center text-primary mb-6">
             {t("supplier.add_new_supplier")}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* שם הספק */}
             <div>
-              <label className="block text-gray-300 font-medium">
+              <label className="block text-text font-medium">
                 {t("supplier.name")}
               </label>
               <input
@@ -85,13 +87,14 @@ const AddSupplier = ({ authUser }) => {
                 value={supplierData.SupplierName}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border rounded-lg bg-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-border-color rounded-lg bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Enter Supplier Name"
               />
             </div>
 
+            {/* איש קשר */}
             <div>
-              <label className="block text-gray-300 font-medium">
+              <label className="block text-text font-medium">
                 {t("supplier.contact")}
               </label>
               <input
@@ -99,13 +102,14 @@ const AddSupplier = ({ authUser }) => {
                 name="Contact"
                 value={supplierData.Contact}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg bg-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-border-color rounded-lg bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Enter Contact Name"
               />
             </div>
 
+            {/* טלפון */}
             <div>
-              <label className="block text-gray-300 font-medium">
+              <label className="block text-text font-medium">
                 {t("supplier.phone")}
               </label>
               <input
@@ -113,13 +117,14 @@ const AddSupplier = ({ authUser }) => {
                 name="Phone"
                 value={supplierData.Phone}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg bg-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-border-color rounded-lg bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Enter Phone Number"
               />
             </div>
 
+            {/* אימייל */}
             <div>
-              <label className="block text-gray-300 font-medium">
+              <label className="block text-text font-medium">
                 {t("supplier.email")}
               </label>
               <input
@@ -127,13 +132,14 @@ const AddSupplier = ({ authUser }) => {
                 name="Email"
                 value={supplierData.Email}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg bg-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-border-color rounded-lg bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Enter Email"
               />
             </div>
 
+            {/* כתובת */}
             <div>
-              <label className="block text-gray-300 font-medium">
+              <label className="block text-text font-medium">
                 {t("supplier.address")}
               </label>
               <input
@@ -141,13 +147,14 @@ const AddSupplier = ({ authUser }) => {
                 name="Address"
                 value={supplierData.Address}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg bg-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-border-color rounded-lg bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Enter Address"
               />
             </div>
 
+            {/* חשבון בנק */}
             <div>
-              <label className="block text-gray-300 font-medium">
+              <label className="block text-text font-medium">
                 {t("supplier.bank_account")}
               </label>
               <input
@@ -155,13 +162,14 @@ const AddSupplier = ({ authUser }) => {
                 name="BankAccount"
                 value={supplierData.BankAccount}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg bg-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-border-color rounded-lg bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Enter Bank Account"
               />
             </div>
 
+            {/* דירוג */}
             <div>
-              <label className="block text-gray-300 font-medium">
+              <label className="block text-text font-medium">
                 {t("supplier.rating")}
               </label>
               <input
@@ -171,18 +179,20 @@ const AddSupplier = ({ authUser }) => {
                 min="1"
                 max="5"
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border rounded-lg bg-gray-700 text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-border-color rounded-lg bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
+
+            {/* בחירת מטבע בסיס */}
             <div>
-              <label className="block text-gray-400 font-medium mb-1">
+              <label className="block text-text font-medium mb-1">
                 {t("supplier.currency")}
               </label>
               <select
-                name="transactionCurrency"
+                name="baseCurrency"
                 value={supplierData.baseCurrency}
-                onChange={supplierData}
-                className="w-full px-2 py-1 border border-gray-700 bg-gray-700 rounded-md text-gray-300"
+                onChange={handleInputChange}
+                className="w-full px-2 py-1 border border-border-color bg-white rounded-md text-text"
                 required
               >
                 {currencyList.map((currency) => (
@@ -196,8 +206,9 @@ const AddSupplier = ({ authUser }) => {
               </select>
             </div>
 
+            {/* סטטוס פעילות */}
             <div>
-              <label className="flex items-center text-gray-300 font-medium">
+              <label className="flex items-center text-text font-medium">
                 <input
                   type="checkbox"
                   name="IsActive"
@@ -211,7 +222,7 @@ const AddSupplier = ({ authUser }) => {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+              className="w-full bg-button-bg text-button-text py-2 px-4 rounded-lg hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary font-medium"
               disabled={addSupplierMutation.isLoading}
             >
               {addSupplierMutation.isLoading

@@ -1,4 +1,3 @@
-// src/components/procurement/PaymentAndShipping.jsx
 import currency from "../../finance/currency.json";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -12,19 +11,19 @@ const PaymentAndShipping = ({
 
   return (
     <div>
-      <h2 className="text-lg font-bold text-blue-400 mb-4">
+      <h2 className="text-lg font-bold text-primary mb-4">
         {t("procurement.payment_shipping")}
       </h2>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-gray-300 mb-2">
+          <label className="block text-text mb-2">
             {t("procurement.payment_method")}:
           </label>
           <select
             name="PaymentMethod"
             value={formData.PaymentMethod}
             onChange={handleFormChange}
-            className="w-full p-2 rounded bg-gray-700"
+            className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="">{t("procurement.select_payment_method")}</option>
             <option value="Cash">{t("procurement.cash")}</option>
@@ -35,14 +34,14 @@ const PaymentAndShipping = ({
           </select>
         </div>
         <div>
-          <label className="block text-gray-300 mb-2">
+          <label className="block text-text mb-2">
             {t("procurement.payment_terms")}:
           </label>
           <select
             name="PaymentTerms"
             value={formData.PaymentTerms}
             onChange={handleFormChange}
-            className="w-full p-2 rounded bg-gray-700"
+            className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="">{t("procurement.select_payment_terms")}</option>
             <option value="Due on receipt">
@@ -54,7 +53,7 @@ const PaymentAndShipping = ({
           </select>
         </div>
         <div>
-          <label className="block text-gray-300 mb-2">
+          <label className="block text-text mb-2">
             {t("procurement.delivery_address")}:
           </label>
           <input
@@ -62,18 +61,18 @@ const PaymentAndShipping = ({
             name="DeliveryAddress"
             value={formData.DeliveryAddress || ""}
             onChange={handleFormChange}
-            className="w-full p-2 rounded bg-gray-700"
+            className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         <div>
-          <label className="block text-gray-300 mb-2">
+          <label className="block text-text mb-2">
             {t("procurement.shipping_method")}:
           </label>
           <select
             name="ShippingMethod"
             value={formData.ShippingMethod}
             onChange={handleFormChange}
-            className="w-full p-2 rounded bg-gray-700"
+            className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="">{t("procurement.select_shipping_method")}</option>
             <option value="Air Freight">{t("procurement.air_freight")}</option>
@@ -84,7 +83,7 @@ const PaymentAndShipping = ({
           </select>
         </div>
         <div>
-          <label className="block text-gray-300 mb-2">
+          <label className="block text-text mb-2">
             {t("procurement.shipping_cost")}:
           </label>
           <input
@@ -92,13 +91,13 @@ const PaymentAndShipping = ({
             name="shippingCost"
             value={formData.shippingCost}
             onChange={handleFormChange}
-            className="w-full p-2 rounded bg-gray-700"
+            className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         <div className="mb-4">
           <label
             htmlFor="currency"
-            className="block text-gray-300 font-medium mb-2"
+            className="block text-text font-medium mb-2"
           >
             {t("procurement.currency")}:
           </label>
@@ -113,7 +112,7 @@ const PaymentAndShipping = ({
               }
               handleCurrencyChange(e);
             }}
-            className="w-full p-2 rounded bg-gray-700 text-gray-300"
+            className="w-full p-2 rounded bg-bg text-text border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="">{t("procurement.select_currency")}</option>
             {currency.map((cur) => (

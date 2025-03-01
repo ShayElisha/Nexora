@@ -3,14 +3,12 @@ import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import Task from "../models/tasks.model.js";
 import Project from "../models/project.model.js";
+import CustomerOrder from "../models/CustomerOrder.model.js";
+import Employee from "../models/employees.model.js";
 
-/**
- * Create Task
- * יוצר משימה חדשה עבור החברה של המשתמש.
- */
 export const createTask = async (req, res) => {
   try {
-    // אימות טוקן וקבלת companyId
+    // אימות משתמש
     const token = req.cookies["auth_token"];
     if (!token) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
@@ -18,42 +16,50 @@ export const createTask = async (req, res) => {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const companyId = decodedToken.companyId;
 
-    // חילוץ השדות מהבקשה
+    // חילוץ שדות מהבקשה
     const {
-      projectId, // שדה חובה
-      departmentId, // שדה אופציונלי
+      projectId,
+      departmentId,
       title,
       description,
-      status,
-      priority,
+      status = "pending",
+      priority = "medium",
       dueDate,
-      assignedTo,
+      assignedTo = [],
+      orderId,
+      orderItems = [],
     } = req.body;
 
-    if (!projectId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Project id is required" });
-    }
-    const project = await Project.findById(projectId);
-    if (!project) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Project not found" });
-    }
-    const dueDateObj = new Date(dueDate);
-    if (project.endDate < dueDateObj) {
-      console.log("Due date must be before project end date");
-      return res.status(400).json({
-        success: false,
-        message: "Due date must be before project end date",
-      });
+    console.log(req.body.projectId);
+    // בדיקת פרויקט
+    if (projectId) {
+      if (projectId && !mongoose.Types.ObjectId.isValid(projectId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid project ID format",
+        });
+      }
+      const selectedProject = await Project.findById(projectId);
+      if (!selectedProject) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Project not found" });
+      }
+      if (dueDate) {
+        const dueDateObj = new Date(dueDate);
+        if (selectedProject.endDate < dueDateObj) {
+          return res.status(400).json({
+            success: false,
+            message: "Due date must be before project end date",
+          });
+        }
+      }
     }
 
-    // יצירת המשימה במסד הנתונים
-    const task = await Task.create({
+    // אובייקט המשימה
+    const newTaskData = {
       companyId,
-      projectId,
+
       departmentId,
       title,
       description,
@@ -61,7 +67,40 @@ export const createTask = async (req, res) => {
       priority,
       dueDate,
       assignedTo,
-    });
+      orderId,
+      orderItems, // [{itemId, productId, productName, quantity}, ...]
+      ...(projectId && { projectId }),
+    };
+
+    // יצירת משימה חדשה
+    const task = await Task.create(newTaskData);
+
+    // לאחר יצירת המשימה, עדכן isAllocated = true בהזמנה עבור הפריטים הנבחרים
+    if (orderId && orderItems.length > 0) {
+      const customerOrder = await CustomerOrder.findById(orderId);
+      if (customerOrder) {
+        // שלוף את מזהי הפריטים שבחרנו
+        const itemIdsSelected = orderItems.map((item) => item.itemId);
+        // עבור על הפריטים בהזמנה וסמן את הדרושים כ־true
+        customerOrder.items.forEach((orderItem) => {
+          const orderItemIdStr = orderItem._id.toString();
+          if (itemIdsSelected.includes(orderItemIdStr)) {
+            orderItem.isAllocated = true;
+          }
+        });
+
+        // שמור את ההזמנה
+        await customerOrder.save();
+      }
+      const OrderItemsCheck = await CustomerOrder.findById(orderId);
+      const allAllocated = OrderItemsCheck.items.every(
+        (item) => item.isAllocated === true
+      );
+      if (allAllocated) {
+        OrderItemsCheck.status = "Confirmed";
+        await OrderItemsCheck.save();
+      }
+    }
 
     return res.status(201).json({ success: true, data: task });
   } catch (error) {
@@ -73,7 +112,6 @@ export const createTask = async (req, res) => {
     });
   }
 };
-
 /**
  * Get Tasks
  * מחזיר את כל המשימות של החברה.
@@ -94,7 +132,6 @@ export const getTasks = async (req, res) => {
       .populate("projectId", "name") // מילוי שם הפרויקט
       .populate("departmentId", "name") // מילוי שם המחלקה
       .populate("assignedTo", "name email role") // מילוי פרטי העובדים שהוקצו
-      .populate("comments.commentedBy", "name email") // מילוי פרטי הכותבים של התגובות
       .sort({ dueDate: 1, priority: 1 });
 
     if (!tasks || tasks.length === 0) {
@@ -136,8 +173,7 @@ export const getTaskById = async (req, res) => {
       .populate("companyId", "name")
       .populate("projectId", "name")
       .populate("departmentId", "name")
-      .populate("assignedTo", "name email role")
-      .populate("comments.commentedBy", "name email");
+      .populate("assignedTo", "name email role");
 
     if (!task) {
       return res
@@ -228,23 +264,112 @@ export const deleteTask = async (req, res) => {
         .json({ success: false, message: "Invalid task id" });
     }
 
-    const deletedTask = await Task.findOneAndDelete({ _id: id, companyId });
-    if (!deletedTask) {
-      return res.status(404).json({
-        success: false,
-        message: "Task not found or not authorized",
-      });
+    // מוצאים את המשימה לפני המחיקה כדי שנוכל לגשת ל-orderId והפריטים
+    const task = await Task.findOne({ _id: id, companyId });
+    if (!task) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Task not found or not authorized" });
     }
+
+    // אם למשימה יש orderId, נטפל בהחזרת isAllocated = false לפריטים
+    if (task.orderId) {
+      // מוצאים את ההזמנה
+      const order = await CustomerOrder.findById(task.orderId);
+      if (order) {
+        // נעבור על הפריטים של המשימה, ונבטל את ה- isAllocated
+        task.orderItems.forEach((taskItem) => {
+          // מנסים למצוא את הפריט המתאים בהזמנה לפי product
+          // (ב-schema של orderItem מוגדר product: {...})
+          const foundItem = order.items.find(
+            (orderItem) =>
+              orderItem.product.toString() === taskItem.productId.toString()
+          );
+
+          // אם מצאנו פריט מתאים - נשנה לו isAllocated ל-false
+          if (foundItem) {
+            foundItem.isAllocated = false;
+          }
+
+          // נשנה את הסטטוס של ההזמנה ל-pending
+          if (order.status != "Pending") order.status = "Pending";
+        });
+
+        // שומרים את ההזמנה המעודכנת
+        await order.save();
+      }
+    }
+
+    // כעת נוכל למחוק את המשימה
+    await Task.findOneAndDelete({ _id: id, companyId });
 
     return res.status(200).json({
       success: true,
-      message: "Task deleted successfully",
+      message: "Task deleted successfully, products are now unallocated",
     });
   } catch (error) {
     console.error("Error deleting task:", error);
     return res.status(500).json({
       success: false,
       message: "Error deleting task",
+      error: error.message,
+    });
+  }
+};
+
+export const getDepartmentTasksWithoutProject = async (req, res) => {
+  try {
+    const token = req.cookies["auth_token"];
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const companyId = decodedToken.companyId;
+    const employeeId = decodedToken.employeeId;
+
+    console.log("Company ID:", companyId);
+    console.log("Employee ID:", employeeId);
+
+    // מציאת המשתמש לפי מזהה העובד
+    const user = await Employee.findOne({ _id: employeeId });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // בדיקה אם המשתמש נמצא במחלקה
+    const department = user.department;
+    if (!department) {
+      return res.status(400).json({
+        success: false,
+        message: "User department information is missing",
+      });
+    }
+    console.log("User department:", department);
+
+    // שליפת כל המשימות של המחלקה
+    const tasks = await Task.find({
+      companyId,
+      departmentId: department,
+    })
+      .populate("departmentId", "name")
+      .populate("assignedTo", "name email")
+      .sort({ dueDate: 1 });
+
+    if (!tasks || tasks.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No tasks found" });
+    }
+    console.log("Tasks:", tasks);
+
+    return res.status(200).json({ success: true, data: tasks });
+  } catch (error) {
+    console.error("Error fetching department tasks:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching tasks",
       error: error.message,
     });
   }

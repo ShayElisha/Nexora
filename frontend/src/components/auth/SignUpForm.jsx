@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../lib/axios";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
@@ -20,12 +20,15 @@ import {
   Plus,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import AddDepartmentModal from "../../pages/AdminPanel/departments/Add_Department.jsx"; // רכיב מודאל ליצירת מחלקה
+import AddDepartmentModal from "../../pages/AdminPanel/departments/Add_Department.jsx";
 
 const SignUpForm = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation(); // שימוש במילון 'signUpForm'
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const companyIdFromQuery = queryParams.get("companyId");
 
   // Fetch authenticated user data
   const { data: authData } = useQuery({ queryKey: ["authUser"] });
@@ -124,6 +127,9 @@ const SignUpForm = () => {
       formData.append("phone", values.phone);
       formData.append("gender", values.gender);
       formData.append("identity", values.identity || "");
+      if (!authUser && companyIdFromQuery) {
+        formData.append("companyId", companyIdFromQuery);
+      }
 
       // Only if user is logged in (authUser), set department & role
       if (authUser) {
@@ -137,7 +143,7 @@ const SignUpForm = () => {
       formData.append("address[country]", values.address.country);
       formData.append("address[postalCode]", values.address.postalCode);
 
-      // Profile Image
+      // Profile Image (optional)
       if (profileImageFile) {
         formData.append("profileImage", profileImageFile);
       } else if (profileImageUrl) {
@@ -163,6 +169,7 @@ const SignUpForm = () => {
     },
   });
 
+  // Function to remove profile image
   const removeProfileImage = () => {
     setProfileImageFile(null);
     setProfileImageUrl("");
@@ -337,7 +344,6 @@ const SignUpForm = () => {
                     )}
                   </select>
                 </div>
-
                 {/* כפתור "+" לפתיחת מודאל */}
                 <button
                   type="button"
@@ -383,10 +389,10 @@ const SignUpForm = () => {
           />
         </div>
 
-        {/* Profile Image */}
+        {/* Profile Image (Optional) */}
         <div className="flex-1">
           <label className="block text-sm font-medium mb-1">
-            {t("signUpForm.form.profile_image")}
+            {t("signUpForm.form.profile_image")} ({t("optional")})
           </label>
           <div className="relative flex items-center gap-2">
             <button
@@ -424,10 +430,7 @@ const SignUpForm = () => {
               />
               <button
                 type="button"
-                onClick={() => {
-                  setProfileImageFile(null);
-                  setProfileImageUrl("");
-                }}
+                onClick={removeProfileImage}
                 className="absolute -top-2 -right-2 bg-white text-gray-500 hover:text-gray-700 rounded-full p-1 shadow"
               >
                 <X className="w-4 h-4" />

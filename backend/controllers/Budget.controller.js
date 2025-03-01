@@ -28,7 +28,10 @@ export const getBudgets = async (req, res) => {
 
     const companyId = decodedToken.companyId;
 
-    const budgets = await Budget.find({ companyId });
+    const budgets = await Budget.find({ companyId }).populate(
+      "departmentId",
+      "name"
+    );
 
     return res.status(200).json({
       success: true,
@@ -60,6 +63,8 @@ export const createBudget = async (req, res) => {
     const createdBy = decodedToken.employeeId;
     const companyId = decodedToken.companyId;
 
+    console.log(budgetData);
+    console.log(companyId);
     if (!companyId)
       return res.status(400).json({ error: "companyId is required." });
     if (
@@ -129,7 +134,7 @@ export const createBudget = async (req, res) => {
 
     const newBudgetData = {
       ...budgetData,
-      companyId,
+      companyId: companyId,
       createdBy,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -149,7 +154,10 @@ export const createBudget = async (req, res) => {
  */
 export const getBudgetById = async (req, res) => {
   try {
-    const budget = await Budget.findById(req.params.id);
+    const budget = await Budget.findById(req.params.id).populate(
+      "departmentId",
+      "name"
+    );
     if (!budget) {
       return res
         .status(404)

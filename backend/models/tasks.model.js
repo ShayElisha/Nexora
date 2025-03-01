@@ -10,71 +10,51 @@ const taskSchema = new mongoose.Schema(
     projectId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Project",
-      required: true,
+      required: false,
     },
     departmentId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Department",
       required: false,
     },
-    title: {
-      type: String,
-      required: [true, "Task title is required"],
-    },
-    description: {
-      type: String,
-      required: false,
-    },
+    title: { type: String, required: true },
+    description: { type: String, default: "" },
     status: {
       type: String,
       enum: ["pending", "in progress", "completed", "cancelled"],
       default: "pending",
-      required: true,
     },
     priority: {
       type: String,
       enum: ["low", "medium", "high"],
       default: "medium",
     },
-    dueDate: {
-      type: Date,
-      required: false,
-    },
+    dueDate: { type: Date, required: true },
     assignedTo: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Employee",
       },
     ],
-    comments: [
+
+    // מזהה ההזמנה
+    orderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order",
+      required: false,
+    },
+
+    // מערך של פריטים שנבחרו מתוך ההזמנה
+    orderItems: [
       {
-        text: {
-          type: String,
-          required: [true, "Comment text is required"],
-        },
-        commentedBy: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Employee",
-          required: true,
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now,
-        },
+        productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        productName: { type: String },
+        quantity: { type: Number },
       },
     ],
-    // שדה בוליאני לאישור ביצוע המשימה
-    isApproved: {
-      type: Boolean,
-      default: false,
-    },
   },
-  {
-    // יצירת שדות timestamps (createdAt, updatedAt) אוטומטית
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-const Task = mongoose.model("Task", taskSchema);
-
-export default Task;
+const TaskModel = mongoose.model("Task", taskSchema);
+export default TaskModel;

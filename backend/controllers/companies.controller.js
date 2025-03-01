@@ -117,8 +117,7 @@ export const sendSignUpLink = async (req, res) => {
     }
 
     const companyName = company.name;
-    const signUpUrl = "http://localhost:5173/signup";
-
+    const signUpUrl = `http://localhost:5173/signup?companyId=${companyId}`;
     await SendRegistrationEmployee(email, companyName, signUpUrl);
 
     return res

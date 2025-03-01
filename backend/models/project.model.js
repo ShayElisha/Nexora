@@ -13,6 +13,11 @@ const ProjectSchema = new mongoose.Schema(
       ref: "Company",
       required: true,
     },
+    projectManager: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Employee",
+      required: [true, "Project manager is required"],
+    },
     // שם הפרויקט
     name: {
       type: String,

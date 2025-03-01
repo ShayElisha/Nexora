@@ -6,6 +6,7 @@ import {
   getTaskById,
   updateTask,
   deleteTask,
+  getDepartmentTasksWithoutProject,
 } from "../controllers/tasks.controller.js";
 
 const router = express.Router();
@@ -24,5 +25,10 @@ router.put("/:id", updateTask);
 
 // מחיקת משימה לפי מזהה
 router.delete("/:id", deleteTask);
+
+router.get(
+  "/department-tasks-without-project",
+  getDepartmentTasksWithoutProject
+);
 
 export default router;

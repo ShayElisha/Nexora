@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import axiosInstance from "../../../lib/axios";
 import { toast } from "react-hot-toast";
-// נוספה יבוא של useQueryClient
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 
@@ -11,7 +10,6 @@ const Products = () => {
   const [error, setError] = useState(null);
   const [cart, setCart] = useState({});
   const [updating, setUpdating] = useState(false);
-  const [updateError, setUpdateError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [budgets, setBudgets] = useState([]);
   const [selectedBudget, setSelectedBudget] = useState("");

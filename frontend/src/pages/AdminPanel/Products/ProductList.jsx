@@ -210,6 +210,14 @@ const ProductList = () => {
   const [bomData, setBomData] = useState({}); // { productId: [BOM-Array], ... }
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+
+  // --- מצבי חיפוש, פילטר ומיון ---
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterProductType, setFilterProductType] = useState("all");
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [filterSupplier, setFilterSupplier] = useState("all");
+  const [sortOption, setSortOption] = useState("");
+
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
@@ -322,11 +330,154 @@ const ProductList = () => {
     setExpandedSaleRows([...expandedSaleRows, productId]);
   };
 
-  // חלוקה למוצרים למכירה ורכישה
-  const saleProducts = allProducts.filter(
+  // סינון מוצרים לפי שורת החיפוש והפילטרים
+  const filteredProducts = allProducts.filter((prod) => {
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+    // בדיקת חיפוש (אם שורת החיפוש ריקה, מתקבל true)
+    const matchesSearch =
+      !searchTerm ||
+      (prod.sku && prod.sku.toLowerCase().includes(lowerCaseSearchTerm)) ||
+      (prod.barcode &&
+        prod.barcode.toLowerCase().includes(lowerCaseSearchTerm)) ||
+      (prod.productName &&
+        prod.productName.toLowerCase().includes(lowerCaseSearchTerm)) ||
+      (prod.unitPrice &&
+        prod.unitPrice
+          .toString()
+          .toLowerCase()
+          .includes(lowerCaseSearchTerm)) ||
+      (prod.category &&
+        prod.category.toLowerCase().includes(lowerCaseSearchTerm)) ||
+      (prod.supplierName &&
+        prod.supplierName.toLowerCase().includes(lowerCaseSearchTerm)) ||
+      (prod.inventory?.quantity &&
+        prod.inventory.quantity
+          .toString()
+          .toLowerCase()
+          .includes(lowerCaseSearchTerm)) ||
+      (prod.inventory?.minStockLevel &&
+        prod.inventory.minStockLevel
+          .toString()
+          .toLowerCase()
+          .includes(lowerCaseSearchTerm)) ||
+      (prod.inventory?.reorderQuantity &&
+        prod.inventory.reorderQuantity
+          .toString()
+          .toLowerCase()
+          .includes(lowerCaseSearchTerm)) ||
+      (prod.height &&
+        prod.width &&
+        prod.length &&
+        (prod.volume
+          ? prod.volume.toString()
+          : (prod.height * prod.width * prod.length).toString()
+        )
+          .toLowerCase()
+          .includes(lowerCaseSearchTerm));
+
+    // בדיקת פילטרים – במידה ונבחרו ערכים שונים מ-"all"
+    const matchesType =
+      filterProductType === "all" || prod.productType === filterProductType;
+    const matchesCategory =
+      filterCategory === "all" ||
+      (prod.category && prod.category === filterCategory);
+    const matchesSupplier =
+      filterSupplier === "all" ||
+      (prod.supplierName && prod.supplierName === filterSupplier);
+
+    return matchesSearch && matchesType && matchesCategory && matchesSupplier;
+  });
+
+  // מיון המוצרים לפי אפשרות המיון שנבחרה
+  if (sortOption) {
+    filteredProducts.sort((a, b) => {
+      switch (sortOption) {
+        case "productName_asc":
+          return (a.productName || "").localeCompare(b.productName || "");
+        case "productName_desc":
+          return (b.productName || "").localeCompare(a.productName || "");
+        case "sku_asc":
+          return (a.sku || "").localeCompare(b.sku || "");
+        case "sku_desc":
+          return (b.sku || "").localeCompare(a.sku || "");
+        case "barcode_asc":
+          return (a.barcode || "").localeCompare(b.barcode || "");
+        case "barcode_desc":
+          return (b.barcode || "").localeCompare(a.barcode || "");
+        case "unitPrice_asc":
+          return a.unitPrice - b.unitPrice;
+        case "unitPrice_desc":
+          return b.unitPrice - a.unitPrice;
+        case "category_asc":
+          return (a.category || "").localeCompare(b.category || "");
+        case "category_desc":
+          return (b.category || "").localeCompare(a.category || "");
+        case "supplierName_asc":
+          return (a.supplierName || "").localeCompare(b.supplierName || "");
+        case "supplierName_desc":
+          return (b.supplierName || "").localeCompare(a.supplierName || "");
+        case "quantity_asc":
+          return (a.inventory?.quantity || 0) - (b.inventory?.quantity || 0);
+        case "quantity_desc":
+          return (b.inventory?.quantity || 0) - (a.inventory?.quantity || 0);
+        case "minStockLevel_asc":
+          return (
+            (a.inventory?.minStockLevel || 0) -
+            (b.inventory?.minStockLevel || 0)
+          );
+        case "minStockLevel_desc":
+          return (
+            (b.inventory?.minStockLevel || 0) -
+            (a.inventory?.minStockLevel || 0)
+          );
+        case "reorderQuantity_asc":
+          return (
+            (a.inventory?.reorderQuantity || 0) -
+            (b.inventory?.reorderQuantity || 0)
+          );
+        case "reorderQuantity_desc":
+          return (
+            (b.inventory?.reorderQuantity || 0) -
+            (a.inventory?.reorderQuantity || 0)
+          );
+        case "volume_asc": {
+          const aVol =
+            a.volume ||
+            (a.height && a.width && a.length
+              ? a.height * a.width * a.length
+              : 0);
+          const bVol =
+            b.volume ||
+            (b.height && b.width && b.length
+              ? b.height * b.width * b.length
+              : 0);
+          return aVol - bVol;
+        }
+        case "volume_desc": {
+          const aVol =
+            a.volume ||
+            (a.height && a.width && a.length
+              ? a.height * a.width * a.length
+              : 0);
+          const bVol =
+            b.volume ||
+            (b.height && b.width && b.length
+              ? b.height * b.width * b.length
+              : 0);
+          return bVol - aVol;
+        }
+        default:
+          return 0;
+      }
+    });
+  }
+
+  // חלוקה למוצרים למכירה ורכישה מתוך המוצרים המסוננים
+  const saleProducts = filteredProducts.filter(
     (prod) => prod.productType === "sale"
   );
-  const purchaseProducts = allProducts.filter(
+  const purchaseProducts = filteredProducts.filter(
     (prod) => prod.productType === "purchase"
   );
 
@@ -635,6 +786,155 @@ const ProductList = () => {
         <h1 className="text-3xl font-bold text-primary mb-8 text-center">
           {t("inventory.Product_Inventory_List")}
         </h1>
+
+        {/* תפריטי פילטר ומיון מעל שורת החיפוש */}
+        <div className="mb-4 flex flex-wrap gap-4">
+          {/* פילטר לפי סוג מוצר */}
+          <select
+            value={filterProductType}
+            onChange={(e) => setFilterProductType(e.target.value)}
+            className="p-2 border border-border-color rounded"
+          >
+            <option value="all">
+              {t("inventory.filter_all_product_types", "All Product Types")}
+            </option>
+            <option value="sale">{t("inventory.sale_products", "Sale")}</option>
+            <option value="purchase">
+              {t("inventory.purchase_products", "Purchase")}
+            </option>
+          </select>
+
+          {/* פילטר לפי קטגוריה – אפשרויות מבוססות על כל המוצרים */}
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            className="p-2 border border-border-color rounded"
+          >
+            <option value="all">
+              {t("inventory.filter_all_categories", "All Categories")}
+            </option>
+            {Array.from(
+              new Set(allProducts.map((prod) => prod.category).filter(Boolean))
+            ).map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+
+          {/* פילטר לפי ספק */}
+          <select
+            value={filterSupplier}
+            onChange={(e) => setFilterSupplier(e.target.value)}
+            className="p-2 border border-border-color rounded"
+          >
+            <option value="all">
+              {t("inventory.filter_all_suppliers", "All Suppliers")}
+            </option>
+            {Array.from(
+              new Set(
+                allProducts.map((prod) => prod.supplierName).filter(Boolean)
+              )
+            ).map((supplier) => (
+              <option key={supplier} value={supplier}>
+                {supplier}
+              </option>
+            ))}
+          </select>
+
+          {/* תפריט מיון */}
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
+            className="p-2 border border-border-color rounded"
+          >
+            <option value="">{t("inventory.sort_by", "Sort By")}</option>
+            <option value="productName_asc">
+              {t("inventory.sort_productName_asc", "Product Name (A-Z)")}
+            </option>
+            <option value="productName_desc">
+              {t("inventory.sort_productName_desc", "Product Name (Z-A)")}
+            </option>
+            <option value="sku_asc">
+              {t("inventory.sort_sku_asc", "SKU (A-Z)")}
+            </option>
+            <option value="sku_desc">
+              {t("inventory.sort_sku_desc", "SKU (Z-A)")}
+            </option>
+            <option value="barcode_asc">
+              {t("inventory.sort_barcode_asc", "Barcode (A-Z)")}
+            </option>
+            <option value="barcode_desc">
+              {t("inventory.sort_barcode_desc", "Barcode (Z-A)")}
+            </option>
+            <option value="unitPrice_asc">
+              {t("inventory.sort_unitPrice_asc", "Unit Price (Low-High)")}
+            </option>
+            <option value="unitPrice_desc">
+              {t("inventory.sort_unitPrice_desc", "Unit Price (High-Low)")}
+            </option>
+            <option value="category_asc">
+              {t("inventory.sort_category_asc", "Category (A-Z)")}
+            </option>
+            <option value="category_desc">
+              {t("inventory.sort_category_desc", "Category (Z-A)")}
+            </option>
+            <option value="supplierName_asc">
+              {t("inventory.sort_supplierName_asc", "Supplier (A-Z)")}
+            </option>
+            <option value="supplierName_desc">
+              {t("inventory.sort_supplierName_desc", "Supplier (Z-A)")}
+            </option>
+            <option value="quantity_asc">
+              {t("inventory.sort_quantity_asc", "Quantity (Low-High)")}
+            </option>
+            <option value="quantity_desc">
+              {t("inventory.sort_quantity_desc", "Quantity (High-Low)")}
+            </option>
+            <option value="minStockLevel_asc">
+              {t(
+                "inventory.sort_minStockLevel_asc",
+                "Min Stock Level (Low-High)"
+              )}
+            </option>
+            <option value="minStockLevel_desc">
+              {t(
+                "inventory.sort_minStockLevel_desc",
+                "Min Stock Level (High-Low)"
+              )}
+            </option>
+            <option value="reorderQuantity_asc">
+              {t(
+                "inventory.sort_reorderQuantity_asc",
+                "Reorder Quantity (Low-High)"
+              )}
+            </option>
+            <option value="reorderQuantity_desc">
+              {t(
+                "inventory.sort_reorderQuantity_desc",
+                "Reorder Quantity (High-Low)"
+              )}
+            </option>
+            <option value="volume_asc">
+              {t("inventory.sort_volume_asc", "Volume (Low-High)")}
+            </option>
+            <option value="volume_desc">
+              {t("inventory.sort_volume_desc", "Volume (High-Low)")}
+            </option>
+          </select>
+        </div>
+
+        {/* שורת חיפוש */}
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder={t("inventory.search_placeholder", "חפש מוצרים")}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full p-2 border border-border-color rounded"
+          />
+        </div>
+
         {loading ? (
           <div className="text-center text-gray-400">Loading products...</div>
         ) : (

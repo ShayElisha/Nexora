@@ -13,7 +13,7 @@ const SupplierSelect = ({ supplierId, onChange }) => {
       name="supplierId"
       value={supplierId}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full p-2 rounded bg-bg text-text border border-border-color"
+      className="max-w-md mx-auto p-2 rounded bg-bg text-text border border-border-color"
     >
       <option value="">Select Supplier</option>
       {suppliers.map((supplier) => (

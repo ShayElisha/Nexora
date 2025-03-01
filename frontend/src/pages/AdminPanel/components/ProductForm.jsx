@@ -19,19 +19,17 @@ const ProductForm = ({
       onSubmit={handleSubmit}
       className="grid grid-cols-1 md:grid-cols-2 gap-4"
     >
-      {/* 1) Render dynamic input fields based on fieldDefinitions */}
-      {fieldDefinitions.map(({ name, type, label, options }) => (
+      {fieldDefinitions.map(({ name, type, label, options, multiple }) => (
         <div key={name}>
           <label className="block text-text font-medium mb-1">
             {t(`product.fields.${name}`)}
           </label>
-
           {type === "select" ? (
             <select
               name={name}
               value={formData[name] || ""}
               onChange={handleChange}
-              className={`w-full p-3 border border-border-color rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+              className="w-full p-3 border border-border-color rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             >
               {options.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -44,25 +42,23 @@ const ProductForm = ({
               name={name}
               value={formData[name] || ""}
               onChange={handleChange}
-              className={`w-full p-3 border border-border-color rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+              className="w-full p-3 border border-border-color rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             />
           ) : (
             <input
               type={type}
               name={name}
-              value={type === "file" ? undefined : formData[name] || ""}
               onChange={handleChange}
-              className={`w-full p-3 border border-border-color rounded-lg focus:outline-none focus:ring-2 focus:ring-primary`}
+              className="w-full p-3 border border-border-color rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              {...(multiple ? { multiple: true } : {})}
             />
           )}
-
           {errors[name] && (
             <p className="mt-1 text-sm text-red-500">{t(errors[name])}</p>
           )}
         </div>
       ))}
 
-      {/* 2) Supplier dropdown */}
       <div>
         <label className="block text-text font-medium mb-1">
           {t("product.fields.supplier")}
@@ -92,7 +88,6 @@ const ProductForm = ({
         )}
       </div>
 
-      {/* 4) Submit button */}
       <div className="col-span-full">
         <button
           type="submit"

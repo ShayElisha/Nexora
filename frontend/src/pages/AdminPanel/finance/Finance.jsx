@@ -9,6 +9,8 @@ const Finance = () => {
   const { t } = useTranslation();
   const [financeData, setFinanceData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortOption, setSortOption] = useState("");
+  const [filterOption, setFilterOption] = useState("all");
 
   const queryClient = useQueryClient();
 
@@ -50,9 +52,50 @@ const Finance = () => {
     );
   }
 
-  const filteredData = financeData.filter((doc) =>
-    doc._id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // סינון ראשוני לפי מחרוזת החיפוש בכל השדות הרלוונטיים
+  let filteredData = financeData.filter((doc) => {
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    const formattedDate = new Date(doc.transactionDate)
+      .toLocaleDateString()
+      .toLowerCase();
+
+    return (
+      doc._id.toLowerCase().includes(lowerCaseSearchTerm) ||
+      formattedDate.includes(lowerCaseSearchTerm) ||
+      doc.transactionStatus.toLowerCase().includes(lowerCaseSearchTerm) ||
+      doc.category.toLowerCase().includes(lowerCaseSearchTerm) ||
+      doc.transactionType.toLowerCase().includes(lowerCaseSearchTerm)
+    );
+  });
+
+  // פילטר נוסף לפי סטטוס העסקה (ניתן לשנות את השדה לפילטר לפי צורך)
+  if (filterOption && filterOption !== "all") {
+    filteredData = filteredData.filter(
+      (doc) => doc.transactionStatus.toLowerCase() === filterOption
+    );
+  }
+
+  // מיון הנתונים לפי האפשרות שנבחרה
+  if (sortOption) {
+    filteredData.sort((a, b) => {
+      switch (sortOption) {
+        case "transactionDate_asc":
+          return new Date(a.transactionDate) - new Date(b.transactionDate);
+        case "transactionDate_desc":
+          return new Date(b.transactionDate) - new Date(a.transactionDate);
+        case "transactionAmount_asc":
+          return a.transactionAmount - b.transactionAmount;
+        case "transactionAmount_desc":
+          return b.transactionAmount - a.transactionAmount;
+        case "transactionType_asc":
+          return a.transactionType.localeCompare(b.transactionType);
+        case "transactionType_desc":
+          return b.transactionType.localeCompare(a.transactionType);
+        default:
+          return 0;
+      }
+    });
+  }
 
   return (
     <div className="flex min-h-screen bg-bg">
@@ -61,6 +104,7 @@ const Finance = () => {
           {t("finance.title")}
         </h1>
 
+        {/* שורת חיפוש וכניסת רענון */}
         <div className="mb-4 flex justify-between">
           <input
             type="text"
@@ -74,6 +118,45 @@ const Finance = () => {
           >
             {t("buttons.refresh")}
           </button>
+        </div>
+
+        {/* תפריטי גלילה למיון ולפילטר */}
+        <div className="mb-4 flex space-x-4">
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
+            className="p-2 rounded bg-secondary text-text focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="">{t("finance.sort_by")}</option>
+            <option value="transactionDate_asc">
+              {t("finance.sort_date_asc")}
+            </option>
+            <option value="transactionDate_desc">
+              {t("finance.sort_date_desc")}
+            </option>
+            <option value="transactionAmount_asc">
+              {t("finance.sort_amount_asc")}
+            </option>
+            <option value="transactionAmount_desc">
+              {t("finance.sort_amount_desc")}
+            </option>
+            <option value="transactionType_asc">
+              {t("finance.sort_type_asc")}
+            </option>
+            <option value="transactionType_desc">
+              {t("finance.sort_type_desc")}
+            </option>
+          </select>
+
+          <select
+            value={filterOption}
+            onChange={(e) => setFilterOption(e.target.value)}
+            className="p-2 rounded bg-secondary text-text focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="all">{t("finance.filter_status_all")}</option>
+            <option value="completed">{t("finance.completed")}</option>
+            <option value="pending">{t("finance.pending")}</option>
+          </select>
         </div>
 
         {isLoading ? (

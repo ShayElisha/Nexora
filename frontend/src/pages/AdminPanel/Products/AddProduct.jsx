@@ -1,4 +1,3 @@
-// src/pages/procurement/AddProduct.jsx
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -9,9 +8,7 @@ import ProductForm from "../components/ProductForm";
 import { useTranslation } from "react-i18next";
 import Add_Department from "../departments/Add_Department"; // ודא שהנתיב נכון
 
-// ---------------------------------------------------------------------------
-// רכיב משנה לבניית ה-BOM
-// ---------------------------------------------------------------------------
+// רכיב משנה ל-BOM
 const BOMBuilder = ({
   bomComponents,
   setBomComponents,
@@ -20,7 +17,6 @@ const BOMBuilder = ({
 }) => {
   const { t } = useTranslation();
 
-  // הוספת שורה חדשה ל-BOM
   const handleAddComponent = () => {
     setBomComponents((prev) => [
       ...prev,
@@ -31,14 +27,12 @@ const BOMBuilder = ({
     ]);
   };
 
-  // עדכון ערך בשורה ספציפית
   const handleComponentChange = (index, field, value) => {
     setBomComponents((prev) =>
       prev.map((comp, i) => (i === index ? { ...comp, [field]: value } : comp))
     );
   };
 
-  // מחיקת שורה
   const handleRemoveComponent = (index) => {
     setBomComponents((prev) => prev.filter((_, i) => i !== index));
   };
@@ -130,28 +124,21 @@ const BOMBuilder = ({
   );
 };
 
-// ---------------------------------------------------------------------------
-// רכיב ההוספה המרכזי
-// ---------------------------------------------------------------------------
 const AddProduct = () => {
   const { t } = useTranslation();
-
-  // Zustand for products (יצירת מוצר)
   const { createProduct, isLoading: productIsLoading } = useProductAdminStore();
-  // Zustand for suppliers (רשימת ספקים)
   const {
     suppliers,
     isLoading: suppliersIsLoading,
     error: suppliersError,
     fetchSuppliers,
   } = useSupplierStore();
-  // React Query for user auth
   const { data: authData } = useQuery({
     queryKey: ["authUser"],
   });
   const authUser = authData?.user;
 
-  // 1) מצב מקומי למוצר (formData)
+  // עדכון מצב המוצר – הוספנו גם attachments
   const [formData, setFormData] = useState({
     companyId: authUser?.company,
     sku: "",
@@ -163,22 +150,19 @@ const AddProduct = () => {
     supplierId: "",
     supplierName: "",
     productImage: "",
+    attachments: [],
     length: "",
     width: "",
     height: "",
-    productType: "purchase", // ערך ברירת מחדל
+    productType: "purchase",
   });
   const [errors, setErrors] = useState({});
-
-  // 2) מצב מקומי ל-BOM (עץ מוצר) - יוצג רק אם סוג המוצר הוא "sale"
   const [bomComponents, setBomComponents] = useState([]);
 
-  // טעינת ספקים
   useEffect(() => {
     fetchSuppliers();
   }, [fetchSuppliers]);
 
-  // טעינת רשימת מוצרים (ל-BOM)
   const {
     data: productsData,
     isLoading: isLoadingProducts,
@@ -187,12 +171,11 @@ const AddProduct = () => {
     queryKey: ["productsList"],
     queryFn: async () => {
       const res = await axiosInstance.get("/product");
-      return res.data; // הנחה: res.data מחזיר מערך מוצרים
+      return res.data;
     },
   });
   const productsList = productsData?.data || [];
 
-  // עדכון companyId לפי המשתמש
   useEffect(() => {
     if (authUser?.company) {
       setFormData((prev) => ({
@@ -204,10 +187,11 @@ const AddProduct = () => {
 
   const queryClient = useQueryClient();
 
-  // Mutation ליצירת מוצר
   const { mutate: createNewProduct } = useMutation({
-    mutationFn: async (productData) => {
-      const response = await axiosInstance.post("/product", productData);
+    mutationFn: async (payload) => {
+      const response = await axiosInstance.post("/product", payload, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       return response.data;
     },
     onSuccess: async (data) => {
@@ -221,9 +205,10 @@ const AddProduct = () => {
         productDescription: "",
         unitPrice: "",
         category: "",
-        supplierId: null,
+        supplierId: "",
         supplierName: "",
         productImage: "",
+        attachments: [],
         length: "",
         width: "",
         height: "",
@@ -268,18 +253,20 @@ const AddProduct = () => {
     },
   });
 
-  // Handler לשינוי שדות הטופס
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files) {
-      setFormData((prev) => ({ ...prev, [name]: files[0] }));
+      if (name === "attachments") {
+        setFormData((prev) => ({ ...prev, [name]: Array.from(files) }));
+      } else {
+        setFormData((prev) => ({ ...prev, [name]: files[0] }));
+      }
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  // Handler לשליחת הטופס
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
@@ -294,36 +281,33 @@ const AddProduct = () => {
       setErrors(newErrors);
       return;
     }
-    const payload = {
-      companyId: formData.companyId,
-      sku: formData.sku,
-      barcode: formData.barcode,
-      productName: formData.productName,
-      productDescription: formData.productDescription,
-      unitPrice: formData.unitPrice,
-      category: formData.category,
-      supplierId: formData.supplierId || null,
-      supplierName:
-        suppliers.find((s) => s._id === formData.supplierId)?.SupplierName ||
-        "",
-      length: formData.length,
-      width: formData.width,
-      height: formData.height,
-      productType: formData.productType,
-    };
+
+    const payload = new FormData();
+    payload.append("companyId", formData.companyId);
+    payload.append("sku", formData.sku);
+    payload.append("barcode", formData.barcode);
+    payload.append("productName", formData.productName);
+    payload.append("productDescription", formData.productDescription);
+    payload.append("unitPrice", formData.unitPrice);
+    payload.append("category", formData.category);
+    payload.append("supplierId", formData.supplierId || "");
+    payload.append(
+      "supplierName",
+      suppliers.find((s) => s._id === formData.supplierId)?.SupplierName || ""
+    );
+    payload.append("length", formData.length);
+    payload.append("width", formData.width);
+    payload.append("height", formData.height);
+    payload.append("productType", formData.productType);
     if (formData.productImage) {
-      const reader = new FileReader();
-      reader.readAsDataURL(formData.productImage);
-      reader.onloadend = () => {
-        payload.productImage = reader.result;
-        createNewProduct(payload);
-      };
-      reader.onerror = () => {
-        toast.error(t("product.errors.image_upload_failed"));
-      };
-    } else {
-      createNewProduct(payload);
+      payload.append("productImage", formData.productImage);
     }
+    if (formData.attachments && formData.attachments.length > 0) {
+      formData.attachments.forEach((file) => {
+        payload.append("attachments", file);
+      });
+    }
+    createNewProduct(payload);
   };
 
   // חישוב נפח
@@ -334,7 +318,6 @@ const AddProduct = () => {
     return length * width * height;
   };
 
-  // הגדרת שדות הטופס
   const fieldDefinitions = [
     { name: "sku", type: "text", label: t("product.fields.sku") },
     { name: "barcode", type: "text", label: t("product.fields.barcode") },
@@ -347,6 +330,12 @@ const AddProduct = () => {
       label: t("product.fields.description"),
     },
     { name: "productImage", type: "file", label: t("product.fields.image") },
+    {
+      name: "attachments",
+      type: "file",
+      label: t("product.fields.attachments"),
+      multiple: true,
+    },
     { name: "length", type: "number", label: t("product.fields.length") },
     { name: "width", type: "number", label: t("product.fields.width") },
     { name: "height", type: "number", label: t("product.fields.height") },

@@ -1,17 +1,18 @@
 import Product from "../models/product.model.js";
-import cloudinary, {extractPublicId, uploadToCloudinary } from "../config/lib/cloudinary.js";
+import cloudinary, {
+  extractPublicId,
+  uploadToCloudinary,
+} from "../config/lib/cloudinary.js";
 import jwt from "jsonwebtoken";
 import Inventory from "../models/inventory.model.js";
 
 export const getProducts = async (req, res) => {
   try {
     const token = req.cookies["auth_token"];
-
     if (!token) {
       console.error("Token is missing in request headers.");
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
-
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     if (!decodedToken) {
       console.error("Invalid token: Missing companyId");
@@ -41,7 +42,6 @@ export const getProductById = async (req, res) => {
     res.status(500).json({ success: false, error: "Invalid product ID" });
   }
 };
-
 export const createProduct = async (req, res) => {
   try {
     const {
@@ -49,12 +49,11 @@ export const createProduct = async (req, res) => {
       sku,
       barcode,
       productName,
+      productDescription,
       unitPrice,
       category,
       supplierId,
       supplierName,
-      productDescription,
-      productImage,
       length,
       width,
       height,
@@ -62,7 +61,6 @@ export const createProduct = async (req, res) => {
       productType,
     } = req.body;
 
-    console.log(req.body);
     // בדיקת שדות חובה
     if (
       !companyId ||
@@ -79,13 +77,46 @@ export const createProduct = async (req, res) => {
     }
 
     let productImageURL = "";
-    if (productImage) {
-      const uploadResponse = await cloudinary.uploader.upload(productImage, {
+    // טיפול בהעלאת תמונת המוצר
+    if (
+      req.files &&
+      req.files.productImage &&
+      req.files.productImage.length > 0
+    ) {
+      const file = req.files.productImage[0];
+      const uploadResponse = await uploadToCloudinary(file.buffer, {
         folder: "products",
         use_filename: true,
         unique_filename: false,
       });
       productImageURL = uploadResponse.secure_url;
+    } else if (req.body.productImage) {
+      // מקרה של base64
+      const uploadResponse = await cloudinary.uploader.upload(
+        req.body.productImage,
+        {
+          folder: "products",
+          use_filename: true,
+          unique_filename: false,
+        }
+      );
+      productImageURL = uploadResponse.secure_url;
+    }
+
+    // טיפול בהעלאת קבצים מצורפים (attachments)
+    let attachmentsArray = [];
+    if (req.files && req.files.attachments) {
+      for (const file of req.files.attachments) {
+        const result = await uploadToCloudinary(file.buffer, {
+          folder: "products/attachments",
+          use_filename: true,
+          unique_filename: false,
+        });
+        attachmentsArray.push({
+          fileName: file.originalname,
+          fileUrl: result.secure_url,
+        });
+      }
     }
 
     const newProduct = new Product({
@@ -104,6 +135,7 @@ export const createProduct = async (req, res) => {
       height,
       volume,
       productType,
+      attachments: attachmentsArray,
     });
 
     await newProduct.save();
@@ -137,7 +169,7 @@ export const updateProduct = async (req, res) => {
         .json({ success: false, error: "Product not found" });
     }
 
-    // Update product fields
+    // עדכון השדות
     product.productName = productName || product.productName;
     product.productDescription =
       productDescription || product.productDescription;
@@ -147,9 +179,9 @@ export const updateProduct = async (req, res) => {
     product.supplierName = supplierName || product.supplierName;
     product.productImage = productImage || product.productImage;
     product.length = length || product.length;
-    (product.width = width || product.width),
-      (product.height = height || product.height),
-      (product.productType = productType || product.productType);
+    product.width = width || product.width;
+    product.height = height || product.height;
+    product.productType = productType || product.productType;
     await product.save();
     res.status(200).json({ success: true, data: product });
   } catch (err) {
@@ -161,7 +193,6 @@ export const updateProduct = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
   try {
-    // נניח שה-token נמצא בעוגייה בשם "auth_token"
     const token = req.cookies["auth_token"];
     if (!token) {
       return res.status(401).json({ success: false, error: "Unauthorized" });
@@ -178,11 +209,9 @@ export const deleteProduct = async (req, res) => {
     }
 
     console.log("Product image URL:", pro.productImage);
-    // מחיקת התמונה ב־Cloudinary (אם קיימת)
     if (pro.productImage) {
       const publicId = extractPublicId(pro.productImage);
       if (publicId) {
-        // חשוב לא להשתמש שוב בשם "res", מכיוון שזה קונפליקט עם response
         const deletionResult = await cloudinary.uploader.destroy(publicId);
         console.log("Deletion result:", deletionResult);
       } else {
@@ -190,7 +219,6 @@ export const deleteProduct = async (req, res) => {
       }
     }
 
-    // מחיקת המוצר ממסד הנתונים
     const product = await Product.findOneAndDelete({
       _id: req.params.id,
       companyId,
@@ -212,4 +240,3 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ success: false, error: "Invalid product ID" });
   }
 };
-

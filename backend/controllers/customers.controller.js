@@ -1,179 +1,173 @@
 import Customer from "../models/customers.model.js";
+import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 
 // Create a new customer
 export const createCustomer = async (req, res) => {
-  const {
-    CustomerName,
-    ContactPerson,
-    Email,
-    Phone,
-    Address,
-    City,
-    Country,
-    CustomerType,
-    Industry,
-    JoinDate,
-    LastContactDate,
-    Status,
-    Notes,
-  } = req.body;
-
-  // Validation of required fields
-  if (
-    !CustomerName ||
-    !Email ||
-    !Phone ||
-    !Address ||
-    !City ||
-    !Country ||
-    !CustomerType
-  ) {
-    return res.status(400).json({
-      success: false,
-      message: "All required fields must be provided.",
-    });
-  }
-
   try {
-    // Validation of unique email
-    const existingCustomer = await Customer.findOne({ Email });
-    if (existingCustomer) {
-      return res.status(400).json({
-        success: false,
-        message: "Customer with this email already exists.",
-      });
+    const token = req.cookies["auth_token"];
+
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decodedToken) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    const employeeId = decodedToken?.employeeId;
+    const companyId = decodedToken?.companyId;
+    const {
+      name,
+      email,
+      phone,
+      address,
+      company,
+      website,
+      industry,
+      status,
+      customerType,
+      dateOfBirth,
+      gender,
+      preferredContactMethod,
+      lastContacted,
+      customerSince,
+      contacts,
+      notes,
+    } = req.body;
+
+    // בדיקת שדות חובה – במקרה זה name ו-email
+    if (!name || !email) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Name and email are required" });
     }
 
+    // יצירת לקוח חדש
     const newCustomer = new Customer({
-      CustomerName,
-      ContactPerson,
-      Email,
-      Phone,
-      Address,
-      City,
-      Country,
-      CustomerType,
-      Industry,
-      JoinDate,
-      LastContactDate,
-      Status,
-      Notes,
+      companyId: companyId,
+      name,
+      email,
+      phone,
+      address,
+      company,
+      website,
+      industry,
+      status,
+      customerType,
+      dateOfBirth,
+      gender,
+      preferredContactMethod,
+      lastContacted,
+      customerSince,
+      contacts, // מערך אנשי קשר
+      notes,
+      createdBy: employeeId,
     });
 
-    const savedCustomer = await newCustomer.save();
-    res.status(201).json({ success: true, data: savedCustomer });
+    await newCustomer.save();
+    return res.status(201).json({ success: true, data: newCustomer });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error creating customer",
-      error: error.message,
-    });
+    console.error("Error creating customer:", error);
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// Pull all customers
+// Get all customers
 export const getAllCustomers = async (req, res) => {
   try {
-    const customers = await Customer.find();
-    res.status(200).json({ success: true, data: customers });
+    const token = req.cookies["auth_token"];
+
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decodedToken) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const companyId = decodedToken?.companyId;
+    const customers = await Customer.find({ companyId }).populate("companyId");
+    return res.status(200).json({ success: true, data: customers });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error retrieving customers",
-      error: error.message,
-    });
+    console.error("Error fetching customers:", error);
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// Pull customer by id
+// Get customer by ID
 export const getCustomerById = async (req, res) => {
   try {
-    const customer = await Customer.findById(req.params.id);
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid customer id" });
+    }
+    const customer = await Customer.findById(id);
     if (!customer) {
       return res
         .status(404)
         .json({ success: false, message: "Customer not found" });
     }
-    res.status(200).json({ success: true, data: customer });
+    return res.status(200).json({ success: true, data: customer });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error retrieving customer",
-      error: error.message,
-    });
+    console.error("Error fetching customer:", error);
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// Update customer by allowed fields
+// Update customer by ID
 export const updateCustomer = async (req, res) => {
-  const updates = req.body;
-  const allowedUpdates = [
-    "CustomerName",
-    "ContactPerson",
-    "Email",
-    "Phone",
-    "Address",
-    "City",
-    "Country",
-    "CustomerType",
-    "Industry",
-    "JoinDate",
-    "LastContactDate",
-    "Status",
-    "Notes",
-  ];
-
-  // validation of allowed fields
-  const isValidUpdate = Object.keys(updates).every((key) =>
-    allowedUpdates.includes(key)
-  );
-  if (!isValidUpdate) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid update fields." });
-  }
-
   try {
-    const updatedCustomer = await Customer.findByIdAndUpdate(
-      req.params.id,
-      updates,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid customer id" });
+    }
+    const updatedCustomer = await Customer.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
     if (!updatedCustomer) {
       return res
         .status(404)
         .json({ success: false, message: "Customer not found" });
     }
-    res.status(200).json({ success: true, data: updatedCustomer });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error updating customer",
-      error: error.message,
+    return res.status(200).json({
+      success: true,
+      data: updatedCustomer,
+      message: "Customer updated successfully",
     });
+  } catch (error) {
+    console.error("Error updating customer:", error);
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// Delete customer by id
+// Delete customer by ID
 export const deleteCustomer = async (req, res) => {
   try {
-    const deletedCustomer = await Customer.findByIdAndDelete(req.params.id);
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid customer id" });
+    }
+    const deletedCustomer = await Customer.findByIdAndDelete(id);
     if (!deletedCustomer) {
       return res
         .status(404)
         .json({ success: false, message: "Customer not found" });
     }
-    res
-      .status(200)
-      .json({ success: true, message: "Customer deleted successfully" });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error deleting customer",
-      error: error.message,
+    return res.status(200).json({
+      success: true,
+      message: "Customer deleted successfully",
+      data: deletedCustomer,
     });
+  } catch (error) {
+    console.error("Error deleting customer:", error);
+    return res.status(500).json({ success: false, message: error.message });
   }
 };

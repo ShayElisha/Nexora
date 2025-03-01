@@ -1,11 +1,13 @@
-// src/pages/procurement/ProjectsList.jsx
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 const ProjectsList = () => {
+  const { t } = useTranslation();
+
   // שליפת רשימת הפרויקטים מה-API
   const {
     data: projects = [],
@@ -18,26 +20,30 @@ const ProjectsList = () => {
       return res.data.data;
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Error fetching projects.");
+      toast.error(error.response?.data?.message || t("projects.error_fetch"));
     },
   });
 
   if (isLoading)
-    return <div className="text-center p-4 text-text">Loading projects...</div>;
+    return (
+      <div className="text-center p-4 text-text">{t("projects.loading")}</div>
+    );
   if (isError)
     return (
       <div className="text-center p-4 text-red-500">
-        Error loading projects.
+        {t("projects.error_loading")}
       </div>
     );
 
   return (
     <div className="max-w-7xl mx-auto p-4 bg-bg text-text">
       <h1 className="text-3xl font-bold mb-6 text-center text-primary">
-        Projects List
+        {t("projects.title")}
       </h1>
       {projects.length === 0 ? (
-        <p className="text-center text-secondary">No projects available.</p>
+        <p className="text-center text-secondary">
+          {t("projects.no_projects")}
+        </p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
@@ -55,61 +61,63 @@ const ProjectsList = () => {
               {/* גוף הכרטיס – פרטים עיקריים */}
               <div className="p-4 flex-grow">
                 <p className="mb-2 text-secondary">
-                  {project.description || "No description provided."}
+                  {project.description || t("projects.no_description")}
                 </p>
 
                 <div className="grid grid-cols-2 gap-4 text-sm text-text">
                   <div>
                     <p>
-                      <strong>Company:</strong> {project.companyId}
+                      <strong>{t("projects.company")}:</strong>{" "}
+                      {project.companyId}
                     </p>
                     <p>
-                      <strong>Department:</strong>{" "}
-                      {project.department && project.department.name
-                        ? project.department.name
-                        : "N/A"}
+                      <strong>{t("projects.department")}:</strong>{" "}
+                      {project.department?.name || t("projects.not_available")}
                     </p>
                     <p>
-                      <strong>Start:</strong>{" "}
+                      <strong>{t("projects.start")}:</strong>{" "}
                       {project.startDate
                         ? format(new Date(project.startDate), "MMM d, yyyy")
-                        : "N/A"}
+                        : t("projects.not_available")}
                     </p>
                     <p>
-                      <strong>End:</strong>{" "}
+                      <strong>{t("projects.end")}:</strong>{" "}
                       {project.endDate
                         ? format(new Date(project.endDate), "MMM d, yyyy")
-                        : "N/A"}
+                        : t("projects.not_available")}
                     </p>
                   </div>
                   <div>
                     <p>
-                      <strong>Status:</strong> {project.status}
+                      <strong>{t("projects.status")}:</strong> {project.status}
                     </p>
                     <p>
-                      <strong>Budget:</strong> ${project.budget}
+                      <strong>{t("projects.budget")}:</strong> ${project.budget}
                     </p>
                     <p>
-                      <strong>Priority:</strong> {project.priority}
+                      <strong>{t("projects.priority")}:</strong>{" "}
+                      {project.priority}
                     </p>
                     <p>
-                      <strong>Progress:</strong> {project.progress}%
+                      <strong>{t("projects.progress")}:</strong>{" "}
+                      {project.progress}%
                     </p>
                   </div>
                 </div>
 
-                {project.tags && project.tags.length > 0 && (
+                {project.tags?.length > 0 && (
                   <div className="mt-2">
                     <p className="text-sm">
-                      <strong>Tags:</strong> {project.tags.join(", ")}
+                      <strong>{t("projects.tags")}:</strong>{" "}
+                      {project.tags.join(", ")}
                     </p>
                   </div>
                 )}
 
-                {project.teamMembers && project.teamMembers.length > 0 && (
+                {project.teamMembers?.length > 0 && (
                   <div className="mt-3">
                     <p className="text-sm font-semibold text-primary">
-                      Team Members:
+                      {t("projects.team_members")}:
                     </p>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {project.teamMembers.map((member, idx) => (
@@ -125,78 +133,77 @@ const ProjectsList = () => {
                 )}
               </div>
 
-              {/* תחתית הכרטיס – תאריכים ונתונים נוספים */}
+              {/* תחתית הכרטיס */}
               <div className="p-4 border-t border-border-color bg-bg text-xs">
                 <p>
-                  <strong>Created:</strong>{" "}
+                  <strong>{t("projects.created")}:</strong>{" "}
                   {project.createdAt
                     ? format(new Date(project.createdAt), "MMM d, yyyy h:mm a")
-                    : "N/A"}
+                    : t("projects.not_available")}
                 </p>
                 <p>
-                  <strong>Updated:</strong>{" "}
+                  <strong>{t("projects.updated")}:</strong>{" "}
                   {project.updatedAt
                     ? format(new Date(project.updatedAt), "MMM d, yyyy h:mm a")
-                    : "N/A"}
+                    : t("projects.not_available")}
                 </p>
               </div>
 
-              {/* מידע נוסף: משימות, מסמכים, הערות */}
+              {/* מידע נוסף */}
               {(project.tasks?.length > 0 ||
                 project.documents?.length > 0 ||
-                (project.comments && project.comments.length > 0)) && (
+                project.comments?.length > 0) && (
                 <div className="p-4 border-t border-border-color">
-                  {project.tasks && project.tasks.length > 0 && (
+                  {project.tasks?.length > 0 && (
                     <div className="mb-2">
                       <p className="text-sm font-semibold text-primary">
-                        Tasks:
+                        {t("projects.tasks")}:
                       </p>
                       <ul className="list-disc ml-5 text-sm text-text">
                         {project.tasks.map((task, idx) => (
-                          <li key={idx}>{task.title ? task.title : task}</li>
+                          <li key={idx}>{task.title || task}</li>
                         ))}
                       </ul>
                     </div>
                   )}
 
-                  {project.documents && project.documents.length > 0 && (
+                  {project.documents?.length > 0 && (
                     <div className="mb-2">
                       <p className="text-sm font-semibold text-primary">
-                        Documents:
+                        {t("projects.documents")}:
                       </p>
                       <ul className="list-disc ml-5 text-sm text-text">
                         {project.documents.map((doc, idx) => (
-                          <li key={idx}>{doc.name ? doc.name : doc}</li>
+                          <li key={idx}>{doc.name || doc}</li>
                         ))}
                       </ul>
                     </div>
                   )}
 
-                  {project.comments && project.comments.length > 0 && (
+                  {project.comments?.length > 0 && (
                     <div>
                       <p className="text-sm font-semibold text-primary">
-                        Comments:
+                        {t("projects.comments")}:
                       </p>
                       <ul className="list-disc ml-5 text-xs text-text">
                         {project.comments.map((comment, idx) => (
                           <li key={idx} className="mb-2">
                             <p>
-                              <strong>User:</strong>{" "}
-                              {comment.user && comment.user.name
-                                ? comment.user.name
-                                : comment.user}
+                              <strong>{t("projects.comment_user")}:</strong>{" "}
+                              {comment.user?.name || comment.user}
                             </p>
                             <p>
-                              <strong>Text:</strong> {comment.text}
+                              <strong>{t("projects.comment_text")}:</strong>{" "}
+                              {comment.text}
                             </p>
                             <p>
-                              <strong>Created:</strong>{" "}
+                              <strong>{t("projects.comment_created")}:</strong>{" "}
                               {comment.createdAt
                                 ? format(
                                     new Date(comment.createdAt),
                                     "MMM d, yyyy h:mm a"
                                   )
-                                : "N/A"}
+                                : t("projects.not_available")}
                             </p>
                           </li>
                         ))}

@@ -20,6 +20,7 @@ export const createProject = async (req, res) => {
     // קבלת הנתונים מה-req.body
     const {
       name,
+      projectManager,
       description,
       startDate,
       endDate,
@@ -40,6 +41,7 @@ export const createProject = async (req, res) => {
       !name ||
       !startDate ||
       !endDate ||
+      !projectManager ||
       !teamMembers ||
       (Array.isArray(teamMembers) && teamMembers.length === 0) ||
       budget === undefined ||
@@ -73,6 +75,7 @@ export const createProject = async (req, res) => {
     // הכנת נתוני הפרויקט
     const projectData = {
       companyId,
+      projectManager,
       name,
       description,
       startDate,

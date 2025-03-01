@@ -9,7 +9,7 @@ import Project from "../models/project.model.js";
  */
 export const createDepartment = async (req, res) => {
   try {
-    const { name, description, teamMembers } = req.body;
+    const { name, description, departmentManager, teamMembers } = req.body;
     const token = req.cookies["auth_token"];
 
     if (!token) {
@@ -26,6 +26,7 @@ export const createDepartment = async (req, res) => {
 
     const department = new Department({
       companyId,
+      departmentManager,
       name,
       description,
       teamMembers,

@@ -1,9 +1,7 @@
-// src/pages/procurement/Dashboard.jsx
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
 import { useTranslation } from "react-i18next";
-
-// ייבוא רכיבי Chart.js וגרפים מ־react-chartjs-2
+import { motion } from "framer-motion";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -30,10 +28,71 @@ ChartJS.register(
   LineElement
 );
 
+// רכיב חדש ליצירת צורות זזות ברקע
+const AnimatedShapes = () => {
+  const shapes = [
+    {
+      style: {
+        width: "100px",
+        height: "100px",
+        borderRadius: "50%",
+        background: "rgba(29, 78, 216, 0.2)",
+      },
+      initial: { x: 0, y: 0 },
+      animate: { x: [0, 50, 0], y: [0, -50, 0] },
+      transition: { duration: 20, repeat: Infinity, ease: "easeInOut" },
+      pos: { top: "10%", left: "5%" },
+    },
+    {
+      style: {
+        width: "150px",
+        height: "150px",
+        borderRadius: "50%",
+        background: "rgba(16, 185, 129, 0.2)",
+      },
+      initial: { x: 0, y: 0 },
+      animate: { x: [0, -50, 0], y: [0, 50, 0] },
+      transition: { duration: 25, repeat: Infinity, ease: "easeInOut" },
+      pos: { bottom: "15%", right: "10%" },
+    },
+    {
+      style: {
+        width: "80px",
+        height: "80px",
+        borderRadius: "50%",
+        background: "rgba(99, 102, 241, 0.2)",
+      },
+      initial: { x: 0, y: 0 },
+      animate: { x: [0, 30, 0], y: [0, -30, 0] },
+      transition: { duration: 18, repeat: Infinity, ease: "easeInOut" },
+      pos: { top: "50%", left: "80%" },
+    },
+    // ניתן להוסיף עוד צורות לפי הצורך
+  ];
+
+  return (
+    <>
+      {shapes.map((shape, idx) => (
+        <motion.div
+          key={idx}
+          style={{
+            position: "absolute",
+            ...shape.style,
+            ...shape.pos,
+          }}
+          initial={shape.initial}
+          animate={shape.animate}
+          transition={shape.transition}
+        />
+      ))}
+    </>
+  );
+};
+
 const Dashboard = () => {
   const { t } = useTranslation();
 
-  // אתחול State עבור דוחות בסיסיים
+  // State לדוחות בסיסיים
   const [budgetSummary, setBudgetSummary] = useState({});
   const [financeSummary, setFinanceSummary] = useState([]);
   const [taskSummary, setTaskSummary] = useState([]);
@@ -44,7 +103,7 @@ const Dashboard = () => {
   const [signatureReport, setSignatureReport] = useState([]);
   const [dashboardReport, setDashboardReport] = useState({});
 
-  // אתחול State עבור דוחות מפורטים
+  // State לדוחות מפורטים
   const [detailedBudgetByProject, setDetailedBudgetByProject] = useState({});
   const [detailedFinance, setDetailedFinance] = useState([]);
   const [detailedTask, setDetailedTask] = useState([]);
@@ -57,7 +116,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ערכי ברירת מחדל עבור דוחות מפורטים
+  // מזהים ברירת מחדל
   const defaultProjectId = "000000000000000000000001";
   const defaultSupplierId = "000000000000000000000002";
   const defaultEmployeeId = "000000000000000000000003";
@@ -162,22 +221,32 @@ const Dashboard = () => {
     fetchReports();
   }, []);
 
-  if (loading) return <div className="p-4">{t("loading")}</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-bg">
+        <motion.div
+          className="w-16 h-16 border-4 border-t-4 border-border-color rounded-full"
+          animate={{ rotate: 360 }}
+          transition={{ loop: Infinity, duration: 1 }}
+        />
+      </div>
+    );
+  }
+
   if (error) return <div className="p-4 text-red-600">{error}</div>;
 
-  // עיבוד נתוני דוחות בסיסיים
+  // עיבוד נתונים לדוגמה (תקציב)
   const totalBudget = Number(budgetSummary.totalBudget) || 0;
   const totalSpent = Number(budgetSummary.totalSpent) || 0;
   const remainingBudget = totalBudget - totalSpent;
 
-  // הגדרת גרפים עבור הדוחות הבסיסיים
+  // הגדרות נתוני גרפים
   const budgetDoughnutData = {
     labels: [t("dashboard.spent"), t("dashboard.remaining")],
     datasets: [
       {
         data: [totalSpent, remainingBudget],
-        backgroundColor: ["#4CAF50", "#FF9800"],
-        hoverBackgroundColor: ["#66BB6A", "#FFB74D"],
+        backgroundColor: ["var(--color-primary)", "var(--color-secondary)"],
       },
     ],
   };
@@ -242,7 +311,6 @@ const Dashboard = () => {
     ],
   };
 
-  // עיבוד נתוני דוח ספקים – הפקת התפלגות
   const activeSuppliersCount = supplierReport.filter((s) => s.IsActive).length;
   const inactiveSuppliersCount = supplierReport.filter(
     (s) => !s.IsActive
@@ -252,13 +320,11 @@ const Dashboard = () => {
     datasets: [
       {
         data: [activeSuppliersCount, inactiveSuppliersCount],
-        backgroundColor: ["#4CAF50", "#F44336"],
-        hoverBackgroundColor: ["#66BB6A", "#E57373"],
+        backgroundColor: ["var(--color-primary)", "var(--color-secondary)"],
       },
     ],
   };
 
-  // עיבוד דוח חתימות – הפקת התפלגות סטטוס
   const signatureStatusCounts = signatureReport.reduce((acc, sig) => {
     const status = sig.status || "N/A";
     acc[status] = (acc[status] || 0) + 1;
@@ -271,630 +337,738 @@ const Dashboard = () => {
     datasets: [
       {
         data: signatureData,
-        backgroundColor: ["#4CAF50", "#FF9800", "#9E9E9E"],
-        hoverBackgroundColor: ["#66BB6A", "#FFB74D", "#BDBDBD"],
+        backgroundColor: [
+          "var(--color-primary)",
+          "var(--color-secondary)",
+          "var(--color-accent)",
+        ],
       },
     ],
   };
 
+  // אנימציות לכרטיסי סיכום
+  const cardVariant = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   return (
-    <div className="flex h-full w-full">
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col bg-bg text-text p-6">
-        <h1 className="text-2xl font-bold mb-4 text-primary">
+    <div className="relative min-h-screen bg-bg text-text overflow-hidden">
+      {/* הוספת הרכיב עם הצורות הזזות */}
+      <AnimatedShapes />
+
+      {/* צורות רקע נוספות עם אנימציות */}
+      <div className="absolute inset-0 z-0">
+        <motion.div
+          className="absolute bg-primary opacity-30 rounded-full"
+          style={{
+            width: "300px",
+            height: "300px",
+            top: "-50px",
+            left: "-100px",
+          }}
+          animate={{ x: [0, 100, 0], y: [0, 50, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.div
+          className="absolute bg-secondary opacity-30 rounded-full"
+          style={{
+            width: "400px",
+            height: "400px",
+            bottom: "-100px",
+            right: "-150px",
+          }}
+          animate={{ x: [0, -1000, 0], y: [0, -500, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.div
+          className="absolute bg-accent opacity-30 rounded-full"
+          style={{
+            width: "250px",
+            height: "250px",
+            bottom: "100px",
+            left: "-80px",
+          }}
+          animate={{ x: [0, 500, 0], y: [0, -300, 0] }}
+          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+        />
+      </div>
+
+      <div className="relative z-10 p-8">
+        <motion.h1
+          className="text-4xl font-extrabold mb-6 text-center text-primary"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+        >
           {t("dashboard.title")}
-        </h1>
+        </motion.h1>
 
-        {/* דוחות בסיסיים */}
-        <section className="mb-8">
-          <h2 className="text-xl font-bold mb-2 text-primary">
-            {t("dashboard.budget_summary")}
-          </h2>
-          <div className="flex flex-wrap gap-4">
-            <div className="p-4 bg-bg shadow-md rounded-lg w-40 border border-border-color">
-              <p className="font-bold">{t("dashboard.total_budgets")}</p>
-              <p>{budgetSummary.count || 0}</p>
-            </div>
-            <div className="p-4 bg-bg shadow-md rounded-lg w-40 border border-border-color">
-              <p className="font-bold">{t("dashboard.total_budget")}</p>
-              <p>{totalBudget}</p>
-            </div>
-            <div className="p-4 bg-bg shadow-md rounded-lg w-40 border border-border-color">
-              <p className="font-bold">{t("dashboard.total_spent")}</p>
-              <p>{totalSpent}</p>
-            </div>
-            <div className="p-4 bg-bg shadow-md rounded-lg w-40 border border-border-color">
-              <p className="font-bold">{t("dashboard.remaining")}</p>
-              <p>{remainingBudget}</p>
-            </div>
-          </div>
-        </section>
-
-        <section className="mb-8">
-          <h2 className="text-xl font-bold mb-2 text-secondary">
-            {t("dashboard.budget_distribution")}
-          </h2>
-          <div
-            className="p-4 bg-bg shadow-md rounded-lg"
-            style={{ maxWidth: "400px", margin: "0 auto" }}
+        {/* כרטיסי סיכום */}
+        <motion.section
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          initial="hidden"
+          animate="visible"
+          variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
+        >
+          <motion.div
+            variants={cardVariant}
+            whileHover={{ scale: 1.05 }}
+            className="p-6 bg-bg bg-opacity-75 rounded-xl shadow-xl border border-border-color"
           >
+            <p className="text-lg font-semibold">
+              {t("dashboard.total_budgets")}
+            </p>
+            <p className="mt-2 text-2xl font-bold">
+              {budgetSummary.count || 0}
+            </p>
+          </motion.div>
+          <motion.div
+            variants={cardVariant}
+            whileHover={{ scale: 1.05 }}
+            className="p-6 bg-bg bg-opacity-75 rounded-xl shadow-xl border border-border-color"
+          >
+            <p className="text-lg font-semibold">
+              {t("dashboard.total_budget")}
+            </p>
+            <p className="mt-2 text-2xl font-bold">{totalBudget}</p>
+          </motion.div>
+          <motion.div
+            variants={cardVariant}
+            whileHover={{ scale: 1.05 }}
+            className="p-6 bg-bg bg-opacity-75 rounded-xl shadow-xl border border-border-color"
+          >
+            <p className="text-lg font-semibold">
+              {t("dashboard.total_spent")}
+            </p>
+            <p className="mt-2 text-2xl font-bold">{totalSpent}</p>
+          </motion.div>
+          <motion.div
+            variants={cardVariant}
+            whileHover={{ scale: 1.05 }}
+            className="p-6 bg-bg bg-opacity-75 rounded-xl shadow-xl border border-border-color"
+          >
+            <p className="text-lg font-semibold">{t("dashboard.remaining")}</p>
+            <p className="mt-2 text-2xl font-bold text-secondary">
+              {remainingBudget}
+            </p>
+          </motion.div>
+        </motion.section>
+
+        {/* גרפים */}
+        <motion.section
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8"
+          initial="hidden"
+          animate="visible"
+          variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
+        >
+          <motion.div
+            variants={cardVariant}
+            whileHover={{ scale: 1.05 }}
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-6"
+          >
+            <h2 className="text-xl font-bold mb-4 text-secondary">
+              {t("dashboard.budget_distribution")}
+            </h2>
             <Doughnut data={budgetDoughnutData} />
-          </div>
-        </section>
-
-        <section className="mb-8">
-          <h2 className="text-xl font-bold mb-2 text-secondary">
-            {t("dashboard.finance_summary")}
-          </h2>
-          <div
-            className="p-4 bg-bg shadow-md rounded-lg"
-            style={{ maxWidth: "600px", margin: "0 auto" }}
+          </motion.div>
+          <motion.div
+            variants={cardVariant}
+            whileHover={{ scale: 1.05 }}
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-6"
           >
+            <h2 className="text-xl font-bold mb-4 text-secondary">
+              {t("dashboard.finance_summary")}
+            </h2>
             <Bar data={financeBarData} />
-          </div>
-        </section>
-
-        <section className="mb-8">
-          <h2 className="text-xl font-bold mb-2 text-secondary">
-            {t("dashboard.task_summary")}
-          </h2>
-          <div
-            className="p-4 bg-bg shadow-md rounded-lg"
-            style={{ maxWidth: "400px", margin: "0 auto" }}
+          </motion.div>
+          <motion.div
+            variants={cardVariant}
+            whileHover={{ scale: 1.05 }}
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-6"
           >
+            <h2 className="text-xl font-bold mb-4 text-secondary">
+              {t("dashboard.task_summary")}
+            </h2>
             <Pie data={taskPieData} />
-          </div>
-        </section>
-
-        <section className="mb-8">
-          <h2 className="text-xl font-bold mb-2 text-secondary">
-            {t("dashboard.procurement_summary")}
-          </h2>
-          <div
-            className="p-4 bg-bg shadow-md rounded-lg"
-            style={{ maxWidth: "600px", margin: "0 auto" }}
+          </motion.div>
+          <motion.div
+            variants={cardVariant}
+            whileHover={{ scale: 1.05 }}
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-6"
           >
+            <h2 className="text-xl font-bold mb-4 text-secondary">
+              {t("dashboard.procurement_summary")}
+            </h2>
             <Line data={procurementLineData} />
-          </div>
-        </section>
-
-        <section className="mb-8">
-          <h2 className="text-xl font-bold mb-2 text-secondary">
-            {t("dashboard.low_stock_items")}
-          </h2>
-          {lowStockItems.length > 0 ? (
-            <div
-              className="p-4 bg-bg shadow-md rounded-lg"
-              style={{ maxWidth: "600px", margin: "0 auto" }}
-            >
+          </motion.div>
+          <motion.div
+            variants={cardVariant}
+            whileHover={{ scale: 1.05 }}
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-6"
+          >
+            <h2 className="text-xl font-bold mb-4 text-secondary">
+              {t("dashboard.low_stock_items")}
+            </h2>
+            {lowStockItems.length > 0 ? (
               <Radar data={lowStockRadarData} />
-            </div>
-          ) : (
-            <p>{t("dashboard.no_data")}</p>
-          )}
-        </section>
-
-        <section className="mb-8">
-          <h2 className="text-xl font-bold mb-2 text-secondary">
-            {t("dashboard.supplier_report")}
-          </h2>
-          {supplierReport.length > 0 ? (
-            <div
-              className="p-4 bg-bg shadow-md rounded-lg"
-              style={{ maxWidth: "400px", margin: "0 auto" }}
-            >
+            ) : (
+              <p>{t("dashboard.no_data")}</p>
+            )}
+          </motion.div>
+          <motion.div
+            variants={cardVariant}
+            whileHover={{ scale: 1.05 }}
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-6"
+          >
+            <h2 className="text-xl font-bold mb-4 text-secondary">
+              {t("dashboard.supplier_report")}
+            </h2>
+            {supplierReport.length > 0 ? (
               <Doughnut data={supplierPieData} />
-            </div>
-          ) : (
-            <p>{t("dashboard.no_data")}</p>
-          )}
-        </section>
-
-        <section className="mb-8">
-          <h2 className="text-xl font-bold mb-2 text-secondary">
-            {t("dashboard.signature_report")}
-          </h2>
-          {signatureReport.length > 0 ? (
-            <div
-              className="p-4 bg-bg shadow-md rounded-lg"
-              style={{ maxWidth: "400px", margin: "0 auto" }}
-            >
+            ) : (
+              <p>{t("dashboard.no_data")}</p>
+            )}
+          </motion.div>
+          <motion.div
+            variants={cardVariant}
+            whileHover={{ scale: 1.05 }}
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-6 md:col-span-2"
+          >
+            <h2 className="text-xl font-bold mb-4 text-secondary">
+              {t("dashboard.signature_report")}
+            </h2>
+            {signatureReport.length > 0 ? (
               <Doughnut data={signatureDoughnutData} />
-            </div>
-          ) : (
-            <p>{t("dashboard.no_data")}</p>
-          )}
-        </section>
+            ) : (
+              <p>{t("dashboard.no_data")}</p>
+            )}
+          </motion.div>
+        </motion.section>
 
-        {/* טבלאות עבור דוחות בסיסיים */}
-        <section className="mb-8">
-          <h2 className="text-xl font-bold mb-2 text-secondary">
-            {t("dashboard.upcoming_events")}
-          </h2>
-          {upcomingEvents.length > 0 ? (
-            <table className="min-w-full bg-bg border border-border-color rounded-lg">
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 border border-border-color">
-                    {t("dashboard.title")}
-                  </th>
-                  <th className="py-2 px-4 border border-border-color">
-                    {t("dashboard.start_date")}
-                  </th>
-                  <th className="py-2 px-4 border border-border-color">
-                    {t("dashboard.event_type")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {upcomingEvents.map((event) => (
-                  <tr key={event._id}>
-                    <td className="py-2 px-4 border border-border-color">
-                      {event.title}
-                    </td>
-                    <td className="py-2 px-4 border border-border-color">
-                      {new Date(event.startDate).toLocaleString()}
-                    </td>
-                    <td className="py-2 px-4 border border-border-color">
-                      {event.eventType}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p>{t("dashboard.no_data")}</p>
-          )}
-        </section>
-
-        <section className="mb-8">
-          <h2 className="text-xl font-bold mb-2">
-            {t("dashboard.supplier_report")}
-          </h2>
-          {supplierReport.length > 0 ? (
-            <table className="min-w-full bg-bg border border-border-color rounded-lg">
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 border border-border-color">
-                    {t("dashboard.supplier_name")}
-                  </th>
-                  <th className="py-2 px-4 border border-border-color">
-                    {t("dashboard.email")}
-                  </th>
-                  <th className="py-2 px-4 border border-border-color">
-                    {t("dashboard.phone")}
-                  </th>
-                  <th className="py-2 px-4 border border-border-color">
-                    {t("dashboard.status")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {supplierReport.map((supplier) => (
-                  <tr key={supplier._id}>
-                    <td className="py-2 px-4 border border-border-color">
-                      {supplier.SupplierName}
-                    </td>
-                    <td className="py-2 px-4 border border-border-color">
-                      {supplier.Email}
-                    </td>
-                    <td className="py-2 px-4 border border-border-color">
-                      {supplier.Phone}
-                    </td>
-                    <td className="py-2 px-4 border border-border-color">
-                      {supplier.IsActive
-                        ? t("dashboard.active")
-                        : t("dashboard.inactive")}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p>{t("dashboard.no_data")}</p>
-          )}
-        </section>
-
-        <section className="mb-8">
-          <h2 className="text-xl font-bold mb-2">
-            {t("dashboard.signature_report")}
-          </h2>
-          {signatureReport.length > 0 ? (
-            <table className="min-w-full bg-bg border border-border-color rounded-lg">
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 border border-border-color">
-                    {t("dashboard.signature_name")}
-                  </th>
-                  <th className="py-2 px-4 border border-border-color">
-                    {t("dashboard.status")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {signatureReport.map((sig) => (
-                  <tr key={sig._id}>
-                    <td className="py-2 px-4 border border-border-color">
-                      {sig.name}
-                    </td>
-                    <td className="py-2 px-4 border border-border-color">
-                      {sig.status || "N/A"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p>{t("dashboard.no_data")}</p>
-          )}
-        </section>
-
-        {/* Detailed Reports */}
-        <section className="mb-8">
-          <h2 className="text-xl font-bold mb-2">
-            {t("dashboard.detailed_reports")}
-          </h2>
-          <div className="space-y-8">
-            {/* Detailed Budget by Project */}
-            <div>
-              <h3 className="text-lg font-bold mb-2 text-primary">
-                {t("dashboard.budget_by_project")}
-              </h3>
-              {detailedBudgetByProject &&
-              detailedBudgetByProject.count !== undefined ? (
-                <table className="min-w-full bg-bg border border-border-color rounded-lg">
+        {/* טבלאות */}
+        <motion.section
+          className="space-y-8"
+          initial="hidden"
+          animate="visible"
+          variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
+        >
+          {/* טבלת אירועים קרובים */}
+          <motion.div variants={cardVariant}>
+            <h2 className="text-2xl font-bold mb-4 text-secondary">
+              {t("dashboard.upcoming_events")}
+            </h2>
+            {upcomingEvents.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
                   <thead>
                     <tr>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.project_id")}
+                      <th className="py-3 px-4 border-b border-border-color">
+                        {t("dashboard.title")}
                       </th>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.total_budget")}
-                      </th>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.total_spent")}
-                      </th>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.count")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="py-2 px-4 border border-border-color">
-                        {detailedBudgetByProject._id || "-"}
-                      </td>
-                      <td className="py-2 px-4 border border-border-color">
-                        {detailedBudgetByProject.totalBudget || 0}
-                      </td>
-                      <td className="py-2 px-4 border border-border-color">
-                        {detailedBudgetByProject.totalSpent || 0}
-                      </td>
-                      <td className="py-2 px-4 border border-border-color">
-                        {detailedBudgetByProject.count || 0}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              ) : (
-                <p>{t("dashboard.no_data")}</p>
-              )}
-            </div>
-            {/* Detailed Finance */}
-            <div>
-              <h3 className="text-lg font-bold mb-2 text-primary">
-                {t("dashboard.detailed_finance")}
-              </h3>
-              {detailedFinance.length > 0 ? (
-                <table className="min-w-full bg-bg border border-border-color rounded-lg">
-                  <thead>
-                    <tr>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.transaction_type")}
-                      </th>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.total_amount")}
-                      </th>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.transaction_count")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {detailedFinance.map((tx, idx) => (
-                      <tr key={idx}>
-                        <td className="py-2 px-4 border border-border-color">
-                          {tx.transactionType}
-                        </td>
-                        <td className="py-2 px-4 border border-border-color">
-                          {tx.transactionAmount}
-                        </td>
-                        <td className="py-2 px-4 border border-border-color">
-                          {tx.count}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p>{t("dashboard.no_data")}</p>
-              )}
-            </div>
-            {/* Detailed Task */}
-            <div>
-              <h3 className="text-lg font-bold mb-2 text-primary">
-                {t("dashboard.detailed_task")}
-              </h3>
-              {detailedTask.length > 0 ? (
-                <table className="min-w-full bg-bg border border-border-color rounded-lg">
-                  <thead>
-                    <tr>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.status")}
-                      </th>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.count")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {detailedTask.map((item, idx) => (
-                      <tr key={idx}>
-                        <td className="py-2 px-4 border border-border-color">
-                          {item._id}
-                        </td>
-                        <td className="py-2 px-4 border border-border-color">
-                          {item.count}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p>{t("dashboard.no_data")}</p>
-              )}
-            </div>
-            {/* Detailed Procurement by Supplier */}
-            <div>
-              <h3 className="text-lg font-bold mb-2">
-                {t("dashboard.procurement_by_supplier")}
-              </h3>
-              {procurementBySupplier.length > 0 ? (
-                <table className="min-w-full bg-bg border border-border-color rounded-lg">
-                  <thead>
-                    <tr>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.supplier_id")}
-                      </th>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.total_cost")}
-                      </th>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.order_count")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {procurementBySupplier.map((item, idx) => (
-                      <tr key={idx}>
-                        <td className="py-2 px-4 border border-border-color">
-                          {item._id}
-                        </td>
-                        <td className="py-2 px-4 border border-border-color">
-                          {item.totalCost}
-                        </td>
-                        <td className="py-2 px-4 border border-border-color">
-                          {item.count}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p>{t("dashboard.no_data")}</p>
-              )}
-            </div>
-            {/* Detailed Event by Type */}
-            <div>
-              <h3 className="text-lg font-bold mb-2">
-                {t("dashboard.event_by_type")}
-              </h3>
-              {eventByType.length > 0 ? (
-                <table className="min-w-full bg-bg border border-border-color rounded-lg">
-                  <thead>
-                    <tr>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.event_title")}
-                      </th>
-                      <th className="py-2 px-4 border border-border-color">
+                      <th className="py-3 px-4 border-b border-border-color">
                         {t("dashboard.start_date")}
                       </th>
-                      <th className="py-2 px-4 border border-border-color">
+                      <th className="py-3 px-4 border-b border-border-color">
                         {t("dashboard.event_type")}
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {eventByType.map((event, idx) => (
-                      <tr key={idx}>
-                        <td className="py-2 px-4 border border-border-color">
+                    {upcomingEvents.map((event) => (
+                      <tr key={event._id}>
+                        <td className="py-3 px-4 border-b border-border-color">
                           {event.title}
                         </td>
-                        <td className="py-2 px-4 border border-border-color">
+                        <td className="py-3 px-4 border-b border-border-color">
                           {new Date(event.startDate).toLocaleString()}
                         </td>
-                        <td className="py-2 px-4 border border-border-color">
+                        <td className="py-3 px-4 border-b border-border-color">
                           {event.eventType}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-              ) : (
-                <p>{t("dashboard.no_data")}</p>
-              )}
-            </div>
-            {/* Detailed Inventory Reorder */}
-            <div>
-              <h3 className="text-lg font-bold mb-2">
-                {t("dashboard.inventory_reorder")}
-              </h3>
-              {inventoryReorder.length > 0 ? (
-                <table className="min-w-full bg-bg border border-border-color rounded-lg">
+              </div>
+            ) : (
+              <p>{t("dashboard.no_data")}</p>
+            )}
+          </motion.div>
+
+          {/* טבלת ספקים */}
+          <motion.div variants={cardVariant}>
+            <h2 className="text-2xl font-bold mb-4 text-secondary">
+              {t("dashboard.supplier_report")}
+            </h2>
+            {supplierReport.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
                   <thead>
                     <tr>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.product_name")}
-                      </th>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.quantity")}
-                      </th>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.min_stock")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {inventoryReorder.map((item, idx) => (
-                      <tr key={idx}>
-                        <td className="py-2 px-4 border border-border-color">
-                          {item.productId?.productName ||
-                            t("dashboard.no_product_name")}
-                        </td>
-                        <td className="py-2 px-4 border border-border-color">
-                          {item.quantity}
-                        </td>
-                        <td className="py-2 px-4 border border-border-color">
-                          {item.minStockLevel}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p>{t("dashboard.no_data")}</p>
-              )}
-            </div>
-            {/* Detailed Employee Performance */}
-            <div>
-              <h3 className="text-lg font-bold mb-2">
-                {t("dashboard.employee_performance")}
-              </h3>
-              {employeePerformance.tasks &&
-              employeePerformance.tasks.length > 0 ? (
-                <div>
-                  <h4 className="font-bold mb-1">{t("dashboard.tasks")}</h4>
-                  <table className="min-w-full bg-bg mb-4 border border-border-color rounded-lg">
-                    <thead>
-                      <tr>
-                        <th className="py-2 px-4 border border-border-color">
-                          {t("dashboard.task_status")}
-                        </th>
-                        <th className="py-2 px-4 border border-border-color">
-                          {t("dashboard.count")}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {employeePerformance.tasks.map((item, idx) => (
-                        <tr key={idx}>
-                          <td className="py-2 px-4 border border-border-color">
-                            {item._id}
-                          </td>
-                          <td className="py-2 px-4 border border-border-color">
-                            {item.count}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p>{t("dashboard.no_data")}</p>
-              )}
-              {employeePerformance.procurements &&
-              employeePerformance.procurements.length > 0 ? (
-                <div>
-                  <h4 className="font-bold mb-1">
-                    {t("dashboard.procurements")}
-                  </h4>
-                  <table className="min-w-full bg-bg border border-border-color rounded-lg">
-                    <thead>
-                      <tr>
-                        <th className="py-2 px-4 border border-border-color">
-                          {t("dashboard.order_status")}
-                        </th>
-                        <th className="py-2 px-4 border border-border-color">
-                          {t("dashboard.count")}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {employeePerformance.procurements.map((item, idx) => (
-                        <tr key={idx}>
-                          <td className="py-2 px-4 border border-border-color">
-                            {item._id}
-                          </td>
-                          <td className="py-2 px-4 border border-border-color">
-                            {item.count}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p>{t("dashboard.no_data")}</p>
-              )}
-            </div>
-            {/* Detailed Supplier Performance */}
-            <div>
-              <h3 className="text-lg font-bold mb-2">
-                {t("dashboard.supplier_performance")}
-              </h3>
-              {supplierPerformance.length > 0 ? (
-                <table className="min-w-full bg-bg border border-border-color rounded-lg">
-                  <thead>
-                    <tr>
-                      <th className="py-2 px-4 border border-border-color">
+                      <th className="py-3 px-4 border-b border-border-color">
                         {t("dashboard.supplier_name")}
                       </th>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.order_count")}
-                      </th>
-                      <th className="py-2 px-4 border border-border-color">
-                        {t("dashboard.total_cost")}
-                      </th>
-                      <th className="py-2 px-4 border border-border-color">
+                      <th className="py-3 px-4 border-b border-border-color">
                         {t("dashboard.email")}
+                      </th>
+                      <th className="py-3 px-4 border-b border-border-color">
+                        {t("dashboard.phone")}
+                      </th>
+                      <th className="py-3 px-4 border-b border-border-color">
+                        {t("dashboard.status")}
                       </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {supplierPerformance.map((item, idx) => (
-                      <tr key={idx}>
-                        <td className="py-2 px-4 border border-border-color">
-                          {item.supplierName}
+                    {supplierReport.map((supplier) => (
+                      <tr key={supplier._id}>
+                        <td className="py-3 px-4 border-b border-border-color">
+                          {supplier.SupplierName}
                         </td>
-                        <td className="py-2 px-4 border border-border-color">
-                          {item.orderCount}
+                        <td className="py-3 px-4 border-b border-border-color">
+                          {supplier.Email}
                         </td>
-                        <td className="py-2 px-4 border border-border-color">
-                          {item.totalCost}
+                        <td className="py-3 px-4 border-b border-border-color">
+                          {supplier.Phone}
                         </td>
-                        <td className="py-2 px-4 border border-border-color">
-                          {item.Email}
+                        <td className="py-3 px-4 border-b border-border-color">
+                          {supplier.IsActive
+                            ? t("dashboard.active")
+                            : t("dashboard.inactive")}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
-              ) : (
-                <p>{t("dashboard.no_data")}</p>
-              )}
+              </div>
+            ) : (
+              <p>{t("dashboard.no_data")}</p>
+            )}
+          </motion.div>
+
+          {/* טבלת דוח חתימות */}
+          <motion.div variants={cardVariant}>
+            <h2 className="text-2xl font-bold mb-4 text-secondary">
+              {t("dashboard.signature_report")}
+            </h2>
+            {signatureReport.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                  <thead>
+                    <tr>
+                      <th className="py-3 px-4 border-b border-border-color">
+                        {t("dashboard.signature_name")}
+                      </th>
+                      <th className="py-3 px-4 border-b border-border-color">
+                        {t("dashboard.status")}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {signatureReport.map((sig) => (
+                      <tr key={sig._id}>
+                        <td className="py-3 px-4 border-b border-border-color">
+                          {sig.name}
+                        </td>
+                        <td className="py-3 px-4 border-b border-border-color">
+                          {sig.status || "N/A"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p>{t("dashboard.no_data")}</p>
+            )}
+          </motion.div>
+
+          {/* דוחות מפורטים */}
+          <motion.div variants={cardVariant}>
+            <h2 className="text-2xl font-bold mb-4 text-secondary">
+              {t("dashboard.detailed_reports")}
+            </h2>
+            <div className="space-y-8">
+              {/* Detailed Budget by Project */}
+              <div>
+                <h3 className="text-xl font-semibold mb-2">
+                  {t("dashboard.budget_by_project")}
+                </h3>
+                {detailedBudgetByProject &&
+                detailedBudgetByProject.count !== undefined ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                      <thead>
+                        <tr>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.project_id")}
+                          </th>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.total_budget")}
+                          </th>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.total_spent")}
+                          </th>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.count")}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="py-3 px-4 border-b border-border-color">
+                            {detailedBudgetByProject._id || "-"}
+                          </td>
+                          <td className="py-3 px-4 border-b border-border-color">
+                            {detailedBudgetByProject.totalBudget || 0}
+                          </td>
+                          <td className="py-3 px-4 border-b border-border-color">
+                            {detailedBudgetByProject.totalSpent || 0}
+                          </td>
+                          <td className="py-3 px-4 border-b border-border-color">
+                            {detailedBudgetByProject.count || 0}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p>{t("dashboard.no_data")}</p>
+                )}
+              </div>
+              {/* Detailed Finance */}
+              <div>
+                <h3 className="text-xl font-semibold mb-2">
+                  {t("dashboard.detailed_finance")}
+                </h3>
+                {detailedFinance.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                      <thead>
+                        <tr>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.transaction_type")}
+                          </th>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.total_amount")}
+                          </th>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.transaction_count")}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {detailedFinance.map((tx, idx) => (
+                          <tr key={idx}>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {tx.transactionType}
+                            </td>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {tx.transactionAmount}
+                            </td>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {tx.count}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p>{t("dashboard.no_data")}</p>
+                )}
+              </div>
+              {/* Detailed Task */}
+              <div>
+                <h3 className="text-xl font-semibold mb-2">
+                  {t("dashboard.detailed_task")}
+                </h3>
+                {detailedTask.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                      <thead>
+                        <tr>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.status")}
+                          </th>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.count")}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {detailedTask.map((item, idx) => (
+                          <tr key={idx}>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {item._id}
+                            </td>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {item.count}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p>{t("dashboard.no_data")}</p>
+                )}
+              </div>
+              {/* Detailed Procurement by Supplier */}
+              <div>
+                <h3 className="text-xl font-semibold mb-2">
+                  {t("dashboard.procurement_by_supplier")}
+                </h3>
+                {procurementBySupplier.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                      <thead>
+                        <tr>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.supplier_id")}
+                          </th>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.total_cost")}
+                          </th>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.order_count")}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {procurementBySupplier.map((item, idx) => (
+                          <tr key={idx}>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {item._id}
+                            </td>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {item.totalCost}
+                            </td>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {item.count}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p>{t("dashboard.no_data")}</p>
+                )}
+              </div>
+              {/* Detailed Event by Type */}
+              <div>
+                <h3 className="text-xl font-semibold mb-2">
+                  {t("dashboard.event_by_type")}
+                </h3>
+                {eventByType.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                      <thead>
+                        <tr>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.event_title")}
+                          </th>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.start_date")}
+                          </th>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.event_type")}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {eventByType.map((event, idx) => (
+                          <tr key={idx}>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {event.title}
+                            </td>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {new Date(event.startDate).toLocaleString()}
+                            </td>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {event.eventType}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p>{t("dashboard.no_data")}</p>
+                )}
+              </div>
+              {/* Detailed Inventory Reorder */}
+              <div>
+                <h3 className="text-xl font-semibold mb-2">
+                  {t("dashboard.inventory_reorder")}
+                </h3>
+                {inventoryReorder.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                      <thead>
+                        <tr>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.product_name")}
+                          </th>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.quantity")}
+                          </th>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.min_stock")}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {inventoryReorder.map((item, idx) => (
+                          <tr key={idx}>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {item.productId?.productName ||
+                                t("dashboard.no_product_name")}
+                            </td>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {item.quantity}
+                            </td>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {item.minStockLevel}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p>{t("dashboard.no_data")}</p>
+                )}
+              </div>
+              {/* Detailed Employee Performance */}
+              <div>
+                <h3 className="text-xl font-semibold mb-2">
+                  {t("dashboard.employee_performance")}
+                </h3>
+                {employeePerformance.tasks &&
+                employeePerformance.tasks.length > 0 ? (
+                  <div>
+                    <h4 className="font-bold mb-2">{t("dashboard.tasks")}</h4>
+                    <div className="overflow-x-auto mb-4">
+                      <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                        <thead>
+                          <tr>
+                            <th className="py-3 px-4 border-b border-border-color">
+                              {t("dashboard.task_status")}
+                            </th>
+                            <th className="py-3 px-4 border-b border-border-color">
+                              {t("dashboard.count")}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {employeePerformance.tasks.map((item, idx) => (
+                            <tr key={idx}>
+                              <td className="py-3 px-4 border-b border-border-color">
+                                {item._id}
+                              </td>
+                              <td className="py-3 px-4 border-b border-border-color">
+                                {item.count}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    {employeePerformance.procurements &&
+                      employeePerformance.procurements.length > 0 && (
+                        <div>
+                          <h4 className="font-bold mb-2">
+                            {t("dashboard.procurements")}
+                          </h4>
+                          <div className="overflow-x-auto">
+                            <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                              <thead>
+                                <tr>
+                                  <th className="py-3 px-4 border-b border-border-color">
+                                    {t("dashboard.order_status")}
+                                  </th>
+                                  <th className="py-3 px-4 border-b border-border-color">
+                                    {t("dashboard.count")}
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {employeePerformance.procurements.map(
+                                  (item, idx) => (
+                                    <tr key={idx}>
+                                      <td className="py-3 px-4 border-b border-border-color">
+                                        {item._id}
+                                      </td>
+                                      <td className="py-3 px-4 border-b border-border-color">
+                                        {item.count}
+                                      </td>
+                                    </tr>
+                                  )
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                ) : (
+                  <p>{t("dashboard.no_data")}</p>
+                )}
+              </div>
+              {/* Detailed Supplier Performance */}
+              <div>
+                <h3 className="text-xl font-semibold mb-2">
+                  {t("dashboard.supplier_performance")}
+                </h3>
+                {supplierPerformance.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                      <thead>
+                        <tr>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.supplier_name")}
+                          </th>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.order_count")}
+                          </th>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.total_cost")}
+                          </th>
+                          <th className="py-3 px-4 border-b border-border-color">
+                            {t("dashboard.email")}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {supplierPerformance.map((item, idx) => (
+                          <tr key={idx}>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {item.supplierName}
+                            </td>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {item.orderCount}
+                            </td>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {item.totalCost}
+                            </td>
+                            <td className="py-3 px-4 border-b border-border-color">
+                              {item.Email}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p>{t("dashboard.no_data")}</p>
+                )}
+              </div>
             </div>
-          </div>
-        </section>
+          </motion.div>
+        </motion.section>
       </div>
     </div>
   );

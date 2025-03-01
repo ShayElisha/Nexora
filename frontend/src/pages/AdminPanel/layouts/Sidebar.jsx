@@ -56,7 +56,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="w-64 bg-primary text-white h-screen shadow-lg flex flex-col">
+    <div className="w-64 bg-primary text-white h-full-screen shadow-lg flex flex-col">
       {/* כותרת עליונה */}
       <div className="p-4 text-2xl font-bold border-b border-secondary">
         {t("sidebar.adminPanel")}

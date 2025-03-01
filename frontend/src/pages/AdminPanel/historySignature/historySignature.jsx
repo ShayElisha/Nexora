@@ -1,4 +1,3 @@
-// src/components/procurement/HistorySignature.jsx
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../../lib/axios";
 import { useTranslation } from "react-i18next";
@@ -127,7 +126,7 @@ const HistorySignature = () => {
                   </td>
                   <td className="border border-border-color px-4 py-2">
                     <ul className="max-h-20 overflow-y-scroll space-y-4">
-                      {signature.signers.map((signer, i) => (
+                      {(signature.signers || []).map((signer, i) => (
                         <li
                           key={i}
                           className="flex items-center space-x-4 bg-bg p-3 rounded-lg shadow border border-border-color"

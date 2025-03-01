@@ -304,7 +304,7 @@ const AddBudget = () => {
       setSelectedSignatureList(null);
     } catch (error) {
       console.error("Error creating budget:", error);
-      toast.error("Error creating budget");
+      toast.error("Error creating budget" + error);
     } finally {
       setLoading(false);
     }

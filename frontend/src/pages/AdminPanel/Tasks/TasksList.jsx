@@ -1,11 +1,12 @@
-// src/components/procurement/TasksList.jsx
+import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { FaTrash, FaUser, FaClock } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
-// פונקציה למיפוי צבעים לסטטוסים (ניתן להתאים גם כאן, במידת הצורך, לערכי הפלטה)
+// פונקציה למיפוי צבעים לסטטוסים
 const getStatusColor = (status) => {
   switch (status) {
     case "pending":
@@ -21,7 +22,7 @@ const getStatusColor = (status) => {
   }
 };
 
-// פונקציה למיפוי צבעים לעדיפות (ניתן לשנות בהתאם לרצונכם)
+// פונקציה למיפוי צבעים לעדיפות
 const getPriorityColor = (priority) => {
   switch (priority) {
     case "high":
@@ -36,6 +37,7 @@ const getPriorityColor = (priority) => {
 };
 
 const TasksList = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   // שליפת המשימות
@@ -50,7 +52,7 @@ const TasksList = () => {
       return res.data.data;
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Error fetching tasks.");
+      toast.error(error.response?.data?.message || t("tasks.error_fetch"));
     },
   });
 
@@ -61,19 +63,21 @@ const TasksList = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["tasks"]);
-      toast.success("Task deleted successfully");
+      toast.success(t("tasks.deleted_success"));
     },
     onError: () => {
-      toast.error("Failed to delete task");
+      toast.error(t("tasks.deleted_error"));
     },
   });
 
   if (isLoading) {
-    return <div className="text-center p-6 text-text">Loading tasks...</div>;
+    return (
+      <div className="text-center p-6 text-text">{t("tasks.loading")}</div>
+    );
   }
   if (isError) {
     return (
-      <div className="text-center p-6 text-red-500">אין נתונים זמינים</div>
+      <div className="text-center p-6 text-red-500">{t("tasks.no_data")}</div>
     );
   }
 
@@ -84,10 +88,12 @@ const TasksList = () => {
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-bg shadow-md rounded-lg border border-border-color">
-      <h1 className="text-3xl font-bold mb-6 text-primary">Task List</h1>
+      <h1 className="text-3xl font-bold mb-6 text-primary">
+        {t("tasks.list_title")}
+      </h1>
 
       {sortedTasks.length === 0 ? (
-        <p className="text-center text-text">אין משימות זמינות.</p>
+        <p className="text-center text-text">{t("tasks.no_tasks")}</p>
       ) : (
         <div className="grid gap-6">
           {sortedTasks.map((task) => (
@@ -122,22 +128,24 @@ const TasksList = () => {
               <div className="flex items-center text-sm text-text mt-2">
                 <FaClock className="mr-2 text-accent" />
                 <span>
-                  Due:{" "}
+                  {t("tasks.due")}{" "}
                   {task.dueDate
                     ? format(new Date(task.dueDate), "MMM d, yyyy")
-                    : "N/A"}
+                    : t("tasks.not_available")}
                 </span>
               </div>
 
               {/* עדיפות */}
               <p className={`mt-2 ${getPriorityColor(task.priority)}`}>
-                Priority: {task.priority}
+                {t("tasks.priority")}: {task.priority}
               </p>
 
               {/* משתתפים */}
               {task.assignedTo.length > 0 && (
                 <div className="mt-3">
-                  <strong className="text-text">Assigned To:</strong>
+                  <strong className="text-text">
+                    {t("tasks.assigned_to")}:
+                  </strong>
                   <div className="flex flex-wrap mt-1">
                     {task.assignedTo.map((emp) => (
                       <div

@@ -2,7 +2,6 @@
 import Inventory from "../models/inventory.model.js";
 import Product from "../models/product.model.js";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
 
 /**
  * Create a new inventory item
@@ -232,6 +231,48 @@ export const getProductsBySupplier = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to fetch products.",
+      error: error.message,
+    });
+  }
+};
+
+export const getInventoryandItem = async (req, res) => {
+  try {
+    const token = req.cookies["auth_token"];
+
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const companyId = decodedToken?.companyId;
+
+    // Fetch inventory items for the company
+    const inventoryItem = await Inventory.find({ companyId });
+    if (!inventoryItem || inventoryItem.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Inventory item not found",
+      });
+    }
+
+    // Fetch products where productType is either "sale" or "both"
+    const products = await Product.find({
+      companyId,
+      $or: [{ productType: "sale" }, { productType: "both" }],
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        inventory: inventoryItem,
+        products: products,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching inventory item",
       error: error.message,
     });
   }

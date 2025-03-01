@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 const Sidebar = () => {
-  const { t } = useTranslation(); // הגדרת namespace 'sidebar'
+  const { t } = useTranslation(); // שימוש ב-namespace של "sidebar"
 
   const menuItems = [
     { nameKey: "dashboard", icon: <FiHome />, path: "/Dashboard" },
@@ -56,9 +56,9 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="w-64 bg-gray-900 text-gray-200 h-screen shadow-lg flex flex-col">
+    <div className="w-64 bg-primary text-white h-full-screen shadow-lg flex flex-col">
       {/* כותרת עליונה */}
-      <div className="p-4 text-2xl font-bold border-b border-gray-700">
+      <div className="p-4 text-2xl font-bold border-b border-secondary">
         {t("sidebar.adminPanel")}
       </div>
 
@@ -68,7 +68,7 @@ const Sidebar = () => {
           <li key={index} className="rounded-md">
             <Link
               to={item.path}
-              className="flex items-center gap-4 p-4 cursor-pointer rounded-md transition-all duration-300 hover:bg-gray-800 hover:text-blue-400"
+              className="flex items-center gap-4 p-4 cursor-pointer rounded-md transition-all duration-300 hover:bg-secondary hover:text-accent"
             >
               <span className="text-xl">{item.icon}</span>
               <span>{t(`sidebar.menu.${item.nameKey}`)}</span>

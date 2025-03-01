@@ -36,7 +36,6 @@ const productSchema = new mongoose.Schema(
     supplierId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Supplier",
-      required: [true, "Supplier ID is required"],
     },
     length: {
       type: Number,
@@ -61,6 +60,13 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    attachments: [
+      {
+        fileName: { type: String },
+        fileUrl: { type: String },
+        uploadedAt: { type: Date, default: Date.now },
+      },
+    ],
     productType: {
       type: String,
       enum: ["purchase", "sale", "both"],
@@ -73,6 +79,8 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-const Product = mongoose.model("Product", productSchema);
+// אם המודל כבר קיים, נשתמש בו; אם לא, ניצור אותו.
+const Product =
+  mongoose.models.Product || mongoose.model("Product", productSchema);
 
 export default Product;

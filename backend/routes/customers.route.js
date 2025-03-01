@@ -1,17 +1,27 @@
 import express from "express";
 import {
   createCustomer,
+  getAllCustomers,
   getCustomerById,
   updateCustomer,
   deleteCustomer,
 } from "../controllers/customers.controller.js";
-// import { restrictToCompany } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
-router.post("/", /*restrictToCompany,*/ createCustomer);
-router.get("/:id", /*restrictToCompany,*/ getCustomerById);
-router.put("/:id", /*restrictToCompany,*/ updateCustomer);
-router.delete("/:id", /*restrictToCompany,*/ deleteCustomer);
+// יצירת לקוח חדש
+router.post("/", createCustomer);
+
+// שליפת כל הלקוחות
+router.get("/", getAllCustomers);
+
+// שליפת לקוח לפי מזהה
+router.get("/:id", getCustomerById);
+
+// עדכון לקוח לפי מזהה
+router.put("/:id", updateCustomer);
+
+// מחיקת לקוח לפי מזהה
+router.delete("/:id", deleteCustomer);
 
 export default router;

@@ -6,10 +6,18 @@ import {
   updateProduct,
   deleteProduct,
 } from "../controllers/product.controller.js";
+import upload from "../middleware/multer.middleware.js";
 
 const router = express.Router();
 
-router.post("/", createProduct);
+router.post(
+  "/",
+  upload.fields([
+    { name: "productImage", maxCount: 1 },
+    { name: "attachments", maxCount: 10 },
+  ]),
+  createProduct
+);
 router.get("/", getProducts);
 router.get("/:id", getProductById);
 router.put("/:id", updateProduct);

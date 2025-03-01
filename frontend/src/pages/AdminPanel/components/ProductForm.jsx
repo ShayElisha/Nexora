@@ -10,6 +10,7 @@ const ProductForm = ({
   suppliersIsLoading,
   handleChange,
   handleSubmit,
+  isSale,
 }) => {
   const { t } = useTranslation();
 
@@ -18,30 +19,38 @@ const ProductForm = ({
       onSubmit={handleSubmit}
       className="grid grid-cols-1 md:grid-cols-2 gap-4"
     >
-      {/* 1) Render dynamic input fields based on fieldDefinitions */}
-      {fieldDefinitions.map(({ name, type, label }) => (
+      {fieldDefinitions.map(({ name, type, label, options, multiple }) => (
         <div key={name}>
-          <label className="block text-gray-400 font-medium mb-1">
+          <label className="block text-text font-medium mb-1">
             {t(`product.fields.${name}`)}
           </label>
-          {type !== "textarea" ? (
-            <input
-              type={type}
+          {type === "select" ? (
+            <select
               name={name}
-              value={type === "file" ? undefined : formData[name] || ""}
+              value={formData[name] || ""}
               onChange={handleChange}
-              className={`w-full p-3 border ${
-                errors[name] ? "border-red-500" : "border-gray-300"
-              } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600`}
-            />
-          ) : (
+              className="w-full p-3 border border-border-color rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              {options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          ) : type === "textarea" ? (
             <textarea
               name={name}
               value={formData[name] || ""}
               onChange={handleChange}
-              className={`w-full p-3 border ${
-                errors[name] ? "border-red-500" : "border-gray-300"
-              } rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600`}
+              className="w-full p-3 border border-border-color rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          ) : (
+            <input
+              type={type}
+              name={name}
+              onChange={handleChange}
+              className="w-full p-3 border border-border-color rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              {...(multiple ? { multiple: true } : {})}
             />
           )}
           {errors[name] && (
@@ -50,17 +59,16 @@ const ProductForm = ({
         </div>
       ))}
 
-      {/* 2) Supplier dropdown */}
       <div>
-        <label className="block text-gray-400 font-medium mb-1">
+        <label className="block text-text font-medium mb-1">
           {t("product.fields.supplier")}
         </label>
         <select
           name="supplierId"
           value={formData.supplierId || ""}
           onChange={handleChange}
-          className="w-full px-2 py-1 border border-gray-700 bg-gray-700 rounded-md text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
-          disabled={suppliersIsLoading}
+          className="w-full px-2 py-1 border border-border-color bg-base-100 rounded-md text-text focus:outline-none focus:ring-1 focus:ring-primary"
+          disabled={suppliersIsLoading || isSale}
         >
           {suppliersIsLoading ? (
             <option>{t("product.loading_suppliers")}</option>
@@ -80,15 +88,14 @@ const ProductForm = ({
         )}
       </div>
 
-      {/* 4) Submit button */}
       <div className="col-span-full">
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full bg-primary text-button-text font-bold py-2 px-4 rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary"
           disabled={isLoading}
         >
           {isLoading ? (
-            <Loader className="size-6 animate-spin" />
+            <Loader className="w-6 h-6 animate-spin" />
           ) : (
             t("product.add_product_button")
           )}

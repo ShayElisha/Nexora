@@ -5,11 +5,11 @@ const Footer = () => {
   const { t } = useTranslation();
 
   return (
-    <footer className="bg-gray-900 text-gray-300 py-6">
+    <footer className="bg-primary text-text py-6">
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
         {/* Section 1: Logo and Description */}
         <div className="mb-4 md:mb-0">
-          <h1 className="text-blue-400 text-xl font-bold">
+          <h1 className="text-primary text-xl font-bold">
             {t("footer.company_name")}
           </h1>
           <p className="text-sm mt-2">{t("footer.description")}</p>
@@ -17,16 +17,16 @@ const Footer = () => {
 
         {/* Section 2: Links */}
         <div className="mb-4 md:mb-0 flex flex-col md:flex-row gap-4">
-          <a href="/about" className="hover:text-blue-400">
+          <a href="/about" className="hover:text-primary">
             {t("footer.about_us")}
           </a>
-          <a href="/services" className="hover:text-blue-400">
+          <a href="/services" className="hover:text-primary">
             {t("footer.services")}
           </a>
-          <a href="/contact" className="hover:text-blue-400">
+          <a href="/contact" className="hover:text-primary">
             {t("footer.contact")}
           </a>
-          <a href="/privacy" className="hover:text-blue-400">
+          <a href="/privacy" className="hover:text-primary">
             {t("footer.privacy_policy")}
           </a>
         </div>
@@ -37,7 +37,7 @@ const Footer = () => {
             href="https://facebook.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-blue-400"
+            className="hover:text-primary"
           >
             <i className="fab fa-facebook-f"></i>
           </a>
@@ -45,7 +45,7 @@ const Footer = () => {
             href="https://twitter.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-blue-400"
+            className="hover:text-primary"
           >
             <i className="fab fa-twitter"></i>
           </a>
@@ -53,7 +53,7 @@ const Footer = () => {
             href="https://linkedin.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-blue-400"
+            className="hover:text-primary"
           >
             <i className="fab fa-linkedin-in"></i>
           </a>
@@ -61,7 +61,7 @@ const Footer = () => {
             href="https://instagram.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-blue-400"
+            className="hover:text-primary"
           >
             <i className="fab fa-instagram"></i>
           </a>
@@ -69,7 +69,7 @@ const Footer = () => {
       </div>
 
       {/* Bottom Section */}
-      <div className="mt-6 border-t border-gray-700 pt-4 text-center text-sm">
+      <div className="mt-6 border-t border-border-color pt-4 text-center text-sm">
         <p>
           &copy; {t("footer.current_year", { year: new Date().getFullYear() })}{" "}
           {t("footer.company_name")}. {t("footer.all_rights_reserved")}

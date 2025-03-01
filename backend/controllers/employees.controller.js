@@ -1,6 +1,7 @@
 import Employee from "../models/employees.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import cloudinary, { uploadToCloudinary } from "../config/lib/cloudinary.js";
 // Pull all employees
 export const getAllEmployees = async (req, res) => {
   try {
@@ -12,9 +13,12 @@ export const getAllEmployees = async (req, res) => {
     if (!decodedToken) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
-    
+
     const companyId = decodedToken?.companyId;
-    const employees = await Employee.find({ companyId });
+    const employees = await Employee.find({ companyId }).populate(
+      "projects.projectId",
+      "name"
+    );
     res.status(200).json({ success: true, data: employees });
   } catch (error) {
     res.status(500).json({
@@ -28,9 +32,20 @@ export const getAllEmployees = async (req, res) => {
 // Pull employee by id
 export const getEmployeeById = async (req, res) => {
   try {
-    const employee = await Employee.findById(req.params.id)
-      .populate("companyId", "CompanyName")
-      .populate("projectsList.projectId", "projectName");
+    const token = req.cookies["auth_token"];
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decodedToken) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    const employeeId = decodedToken.employeeId; // לקבלת מזהה העובד מתוך הטוקן
+    const employee = await Employee.findById({ _id: employeeId })
+      .populate("companyId", "name")
+      .populate("projects.projectId", "name")
+      .populate("projects.projectId", "name");
+
     if (!employee) {
       return res
         .status(404)
@@ -45,24 +60,53 @@ export const getEmployeeById = async (req, res) => {
     });
   }
 };
-
-// Update employee by allowed fields
+export const extractPublicId = (url) => {
+  // מוצאים את החלק לאחר "/upload/"
+  const start = url.indexOf("/upload/") + 8;
+  let publicIdWithExtension = url.substring(start);
+  const versionRegex = /^v\d+\//;
+  if (versionRegex.test(publicIdWithExtension)) {
+    publicIdWithExtension = publicIdWithExtension.replace(versionRegex, "");
+  }
+  // מסירים את הסיומת
+  return publicIdWithExtension.replace(/\.[^/.]+$/, "");
+};
 export const updateEmployee = async (req, res) => {
   const updates = req.body;
+  console.log("req file" + req.file.path);
+  console.log(updates);
+
+  // רשימת השדות המותרים לעדכון (עבור כתובת – תתי שדות)
   const allowedUpdates = [
-    "fullName",
+    "name",
+    "lastName",
     "email",
     "password",
-    "address",
-    "city",
+    "address.city",
+    "address.street",
+    "address.country",
+    "address.postalCode",
     "phone",
     "role",
-    "profileImageURL",
-    "projectsList",
+    "profileImage", // הקישור לתמונה החדשה
+    // אם אין אפשרות לשמור את public_id בנפרד, נשתמש בחילוץ מה־URL
+    "projects",
   ];
 
-  // בדיקת ולידציה לשדות מותרים לעדכון
-  const isValidUpdate = Object.keys(updates).every((key) =>
+  // "מפלסים" את האובייקט כדי לאפשר עדכונים חלקיים עבור שדות מקוננים כמו address
+  let flattenedUpdates = {};
+  for (let key in updates) {
+    if (key === "address" && typeof updates[key] === "object") {
+      Object.keys(updates.address).forEach((subKey) => {
+        flattenedUpdates[`address.${subKey}`] = updates.address[subKey];
+      });
+    } else {
+      flattenedUpdates[key] = updates[key];
+    }
+  }
+
+  // בדיקה שכל השדות בעדכון הם מאושרים
+  const isValidUpdate = Object.keys(flattenedUpdates).every((key) =>
     allowedUpdates.includes(key)
   );
   if (!isValidUpdate) {
@@ -72,21 +116,48 @@ export const updateEmployee = async (req, res) => {
   }
 
   try {
-    // הצפנת סיסמה במקרה שהיא מעודכנת
-    if (updates.password) {
-      updates.password = await bcrypt.hash(updates.password, 10);
+    // מציאת העובד הקיים
+    const employee = await Employee.findById(req.params.id);
+    if (!employee) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Employee not found" });
     }
 
+    // טיפול בשינוי סיסמה
+    if (flattenedUpdates.password) {
+      flattenedUpdates.password = await bcrypt.hash(
+        flattenedUpdates.password,
+        10
+      );
+    }
+
+    // טיפול בעדכון תמונת הפרופיל
+    if (req.file) {
+      // אם קיימת תמונה ישנה, ננסה לחלץ את ה־public id מתוך ה־URL שלה
+      if (employee.profileImage) {
+        const publicId = extractPublicId(employee.profileImage);
+        console.log("publicId", publicId);
+        if (publicId) {
+          await cloudinary.uploader.destroy(publicId);
+        }
+      }
+
+      // העלאת התמונה החדשה
+      const result = await uploadToCloudinary(req.file);
+
+      // שמירת הקישור לתמונה החדשה
+      flattenedUpdates.profileImage = result.secure_url;
+    }
+
+    // עדכון העובד בבסיס הנתונים
     const updatedEmployee = await Employee.findByIdAndUpdate(
       req.params.id,
-      updates,
-      {
-        new: true,
-        runValidators: true,
-      }
+      { $set: flattenedUpdates },
+      { new: true, runValidators: true }
     )
-      .populate("companyId", "CompanyName")
-      .populate("projectsList.projectId", "projectName");
+      .populate("companyId", "name")
+      .populate("projects.projectId", "name");
 
     if (!updatedEmployee) {
       return res

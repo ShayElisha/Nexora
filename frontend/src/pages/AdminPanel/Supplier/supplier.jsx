@@ -1,7 +1,7 @@
+// src/components/procurement/SupplierList.jsx
 import { useEffect, useState } from "react";
-import axiosInstance from "../../../lib/axios";
-import Sidebar from "../layouts/Sidebar";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import axiosInstance from "../../../lib/axios"; // ודא שהנתיב נכון
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
@@ -14,7 +14,6 @@ const SupplierList = () => {
   const { data: authData } = useQuery({
     queryKey: ["authUser"],
   });
-
   const authUser = authData?.user;
   const isLoggedIn = !!authUser;
 
@@ -29,8 +28,13 @@ const SupplierList = () => {
       setError(null);
     },
     onError: (err) => {
-      toast.error(err.response?.data?.message || t("supplier.fetch_failed"));
-      setError(err.message);
+      if (err.response && err.response.status === 404) {
+        setSuppliers([]); // אין ספקים
+        setError(null);
+      } else {
+        toast.error(err.response?.data?.message || t("supplier.fetch_failed"));
+        setError(err.message);
+      }
     },
   });
 
@@ -43,7 +47,7 @@ const SupplierList = () => {
   if (suppliersLoading) {
     return (
       <div className="flex justify-center items-center h-96">
-        <div className="animate-spin rounded-full h-24 w-24 border-t-4 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-24 w-24 border-t-4 border-primary"></div>
       </div>
     );
   }
@@ -57,22 +61,22 @@ const SupplierList = () => {
   }
 
   return (
-    <div className="flex w-full min-h-screen bg-gray-900 text-gray-200">
-      <Sidebar className="w-1/5 bg-gray-800 p-4" />
+    <div className="flex w-full min-h-screen bg-bg text-text">
       <div className="flex-1 py-12 px-6">
-        <h2 className="text-3xl font-bold text-blue-400 mb-6 text-center">
+        <h2 className="text-3xl font-bold text-primary mb-6 text-center">
           {t("supplier.list_title")}
         </h2>
-        {error ? (
-          <p className="text-red-500 text-center">{error}</p>
-        ) : suppliers.length > 0 ? (
+
+        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
+        {suppliers.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {suppliers.map((supplier) => (
               <div
                 key={supplier._id}
-                className="bg-gray-800 rounded-lg p-4 shadow-lg hover:scale-105 transition-transform duration-300"
+                className="bg-bg rounded-lg p-4 shadow-lg hover:scale-105 transition-transform duration-300 border border-border-color"
               >
-                <h3 className="text-blue-400 font-semibold mb-2">
+                <h3 className="text-primary font-semibold mb-2">
                   {supplier.SupplierName}
                 </h3>
                 <p>

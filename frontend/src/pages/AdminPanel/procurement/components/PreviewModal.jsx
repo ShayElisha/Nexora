@@ -11,8 +11,8 @@ const PreviewModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-gray-900 p-6 rounded shadow-lg w-2/4">
-        <h2 className="text-lg font-bold text-blue-300 mb-4">
+      <div className="bg-bg p-6 rounded shadow-lg w-2/4">
+        <h2 className="text-lg font-bold text-primary mb-4">
           Procurement Summary
         </h2>
         <div>
@@ -23,7 +23,7 @@ const PreviewModal = ({
             <strong>Total Cost:</strong> {totalCost} ₪
           </p>
         </div>
-        <div className="mt-4 border-2 border-gray-600 rounded">
+        <div className="mt-4 border-2 border-border-color rounded">
           <iframe
             id="pdfPreview"
             title="Procurement PDF"
@@ -34,13 +34,13 @@ const PreviewModal = ({
 
         <button
           onClick={onSubmit}
-          className="bg-blue-600 py-2 px-4 text-white rounded mt-4"
+          className="bg-button-bg py-2 px-4 text-button-text rounded mt-4"
         >
           Confirm and Submit
         </button>
         <button
           onClick={onClose}
-          className="bg-gray-600 py-2 px-4 text-white rounded mt-4"
+          className="bg-secondary py-2 px-4 text-text rounded mt-4"
         >
           Cancel
         </button>

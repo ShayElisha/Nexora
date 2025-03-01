@@ -16,19 +16,19 @@ export const signUp = async (req, res) => {
       gender,
       identity,
       phone,
+      department,
       address,
-      profileImage,
     } = req.body;
-    const profileImageFile = req.file; // Multer stores the file in memory as buffer\
 
-    // Validate required fields
+    const profileImageFile = req.file;
+
+    // בדיקה בסיסית שכל השדות ההכרחיים מולאו
     if (
       !name ||
       !lastName ||
       !email ||
       !gender ||
       !identity ||
-      !role ||
       !password ||
       !phone ||
       !address
@@ -51,11 +51,11 @@ export const signUp = async (req, res) => {
       });
     }
 
-    // Upload image to Cloudinary
+    // העלאת התמונה לענן (Cloudinary למשל) אם נשלחה
     let profileImageURL = "";
     if (profileImageFile) {
       try {
-        const imageResult = await uploadToCloudinary(profileImageFile); // Passing file object with buffer
+        const imageResult = await uploadToCloudinary(profileImageFile);
         profileImageURL = imageResult.url;
       } catch (error) {
         console.error("Error uploading image to Cloudinary:", error);
@@ -66,19 +66,48 @@ export const signUp = async (req, res) => {
       }
     }
 
-    // Extract company ID from the cookie
-    const token =
-      req.cookies["email_approved_jwt"] || req.cookies["auth_token"];
-    if (!token) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Unauthorized - No token provided" });
+    // ========================
+    // שליפת מזהה החברה (companyId)
+    // ========================
+    let companyId;
+
+    // 1) קודם כל בודקים אם הוא מגיע דרך ה־Query Param / Param
+    //    למשל /sign-up/:companyId או /sign-up?companyId=xxx
+    companyId =
+      req.params.companyId || req.query.companyId || req.body.companyId;
+    console.log("companyId:", companyId);
+
+    // 2) אם לא הגיע companyId בפרמטרים, נבדוק אם יש Token עם companyId
+    if (!companyId) {
+      const token =
+        req.cookies["email_approved_jwt"] || req.cookies["auth_token"];
+
+      // אם אין טוקן – לא נוכל לשלוף מזהה חברה ונחזיר שגיאה
+      if (!token) {
+        return res.status(401).json({
+          success: false,
+          message: "Unauthorized - No token or companyId provided",
+        });
+      }
+
+      try {
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        companyId = decodedToken.companyId;
+      } catch (error) {
+        return res
+          .status(401)
+          .json({ success: false, message: "Invalid token" });
+      }
     }
 
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    const companyId = decodedToken.companyId;
+    // עכשיו companyId אמור להיות מוגדר אם הגיע מטוקן או מהלינק
+    if (!companyId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No company ID provided" });
+    }
 
-    // Verify company status
+    // שליפת החברה מה־DB לבדיקה
     const company = await Company.findById(companyId);
     if (!company) {
       return res
@@ -86,13 +115,14 @@ export const signUp = async (req, res) => {
         .json({ success: false, message: "Company not found" });
     }
 
+    // בדיקת סטטוס חברה, במידה ורלוונטי
     if (company.status !== "Active") {
       return res
         .status(403)
         .json({ success: false, message: "Company is not approved yet" });
     }
 
-    // Check if an admin already exists for this company
+    // בדיקה אם כבר קיים מנהל (Admin) תחת החברה הזו
     const existingAdmin = await Employee.findOne({ companyId, role: "Admin" });
     if (existingAdmin && role === "Admin") {
       return res.status(403).json({
@@ -101,7 +131,7 @@ export const signUp = async (req, res) => {
       });
     }
 
-    // Check if the email already exists within this company
+    // בדיקה האם המייל הזה כבר תפוס תחת אותה חברה
     const existingUser = await Employee.findOne({ companyId, email, identity });
     if (existingUser) {
       return res.status(400).json({
@@ -110,11 +140,11 @@ export const signUp = async (req, res) => {
       });
     }
 
-    // Hash the password
+    // Hashing לסיסמה
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new admin user
+    // יצירת עובד חדש
     const newEmployee = new Employee({
       companyId,
       name,
@@ -123,6 +153,7 @@ export const signUp = async (req, res) => {
       gender,
       identity,
       password: hashedPassword,
+      department,
       role,
       phone,
       address,
@@ -131,10 +162,11 @@ export const signUp = async (req, res) => {
 
     await newEmployee.save();
 
-    // Clear the approval token
+    // ניקוי הטוקן (אם קיים) של אימות המייל
     if (req.cookies["email_approved_jwt"]) {
       res.clearCookie("email_approved_jwt");
     }
+
     res.status(201).json({
       success: true,
       message: "Employee created successfully",

@@ -1,64 +1,117 @@
 import mongoose from "mongoose";
 
-const customerSchema = new mongoose.Schema(
+const CustomerSchema = new mongoose.Schema(
   {
-    customerName: {
-      type: String,
+    companyId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
       required: true,
     },
-    contactPerson: {
+    name: {
       type: String,
-      required: false,
+      required: true,
+      trim: true,
     },
     email: {
       type: String,
       required: true,
       unique: true,
+      trim: true,
+      lowercase: true,
     },
     phone: {
       type: String,
-      required: true,
+      trim: true,
     },
     address: {
       type: String,
-      required: true,
+      trim: true,
     },
-    city: {
+    company: {
       type: String,
-      required: true,
+      trim: true,
     },
-    customerType: {
+    website: {
       type: String,
-      enum: ["Business", "Private", "Public"],
-      required: true,
+      trim: true,
     },
     industry: {
       type: String,
-      required: false,
+      trim: true,
     },
-    joinDate: {
+    // סיווג הלקוח
+    status: {
+      type: String,
+      enum: ["Active", "Inactive", "Prospect"],
+      default: "Prospect",
+    },
+    customerType: {
+      type: String,
+      enum: ["Individual", "Corporate"],
+      default: "Corporate",
+    },
+    // פרטים אישיים (רלוונטיים לעסקים פרטיים)
+    dateOfBirth: {
+      type: Date,
+    },
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Other"],
+    },
+    // פרטי קשר נוספים
+    preferredContactMethod: {
+      type: String,
+      enum: ["Email", "Phone", "Mail"],
+    },
+    lastContacted: {
+      type: Date,
+    },
+    customerSince: {
       type: Date,
       default: Date.now,
     },
-    LastContactDate: {
-      type: Date,
-      required: false,
-    },
-    Status: {
+    // אנשי קשר – אם הלקוח כולל מספר אנשי קשר (לדוגמה, בחברות)
+    contacts: [
+      {
+        name: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        position: {
+          type: String,
+          trim: true,
+        },
+        email: {
+          type: String,
+          trim: true,
+          lowercase: true,
+        },
+        phone: {
+          type: String,
+          trim: true,
+        },
+      },
+    ],
+    // הערות נוספות
+    notes: {
       type: String,
-      enum: ["Active", "Inactive", "Pending"],
-      default: "Active",
+      trim: true,
     },
-    Notes: {
-      type: String,
-      required: false,
+    // פרטים על מי יצר/עדכן את הרישום (ניתן להרחיב לפי הצורך)
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    updatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   {
-    timestamps: true,
+    timestamps: true, // מוסיף createdAt ו-updatedAt
   }
 );
 
-const Customer = mongoose.model("Customer", customerSchema);
-
+const Customer = mongoose.model("Customer", CustomerSchema);
 export default Customer;

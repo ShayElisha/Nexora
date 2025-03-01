@@ -36,6 +36,20 @@ import Events from "./pages/AdminPanel/events/Events.jsx";
 import CreateTask from "./pages/AdminPanel/Tasks/CreateTask.jsx";
 import Add_Department from "./pages/AdminPanel/departments/Add_Department.jsx";
 import TasksList from "./pages/AdminPanel/Tasks/TasksList.jsx";
+import EmployeeDashboard from "./pages/employeePages/EmployeeDashboard.jsx";
+import AddProject from "./pages/AdminPanel/projects/AddProjact.jsx";
+import ProjectsList from "./pages/AdminPanel/projects/projectsList.jsx";
+import AddCustomers from "./pages/AdminPanel/customers/AddCusomers.jsx";
+import CustomersList from "./pages/AdminPanel/customers/CusomersList.jsx";
+import AddOrders from "./pages/AdminPanel/customers/AddOrders.jsx";
+import OrdersList from "./pages/AdminPanel/customers/OrdersList.jsx";
+import PrivacyPolicy from "./pages/private.jsx";
+import Services from "./pages/Services.jsx";
+import Contact from "./pages/Contact.jsx";
+import FinanceList from "./pages/employeePages/financePages/financeList.jsx";
+import FinanceAdd from "./pages/employeePages/financePages/AddFinance.jsx";
+import ProcurementProposals from "./pages/employeePages/manageProducts/ProcurementProposals.jsx";
+import ProcurementProposalsList from "./pages/AdminPanel/procurement/ProcurementProposals.jsx";
 
 const App = () => {
   const { data: authUser, isLoading } = useQuery({
@@ -58,7 +72,20 @@ const App = () => {
 
   // Protect Admin Routes
   const AdminRoute = ({ authUser }) => {
-    return authUser?.user?.role === "Admin" ? <Outlet /> : <Navigate to="/" />;
+    return authUser?.user?.role === "Admin" ? (
+      <Outlet />
+    ) : (
+      <Navigate to="/" replace />
+    );
+  };
+
+  const EmployeeRoute = ({ authUser }) => {
+    return authUser?.user?.role === "Employee" ||
+      authUser?.user?.role === "Manager" ? (
+      <Outlet />
+    ) : (
+      <Navigate to="/" replace />
+    );
   };
 
   if (isLoading) {
@@ -77,6 +104,9 @@ const App = () => {
           element={
             authUser?.user?.role === "Admin" ? (
               <Navigate to="/dashboard" replace />
+            ) : authUser?.user?.role === "Employee" ||
+              authUser?.user?.role === "Manager" ? (
+              <Navigate to="/employee" replace />
             ) : (
               <HomePage />
             )
@@ -89,11 +119,25 @@ const App = () => {
         />
 
         <Route path="/pricing-plans" element={<PricingPlans />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/payment/completed" element={<Success />} />
         <Route path="/payment/cancelled" element={<Fail />} />
         <Route path="/nexora" element={<NexoraAdmin />} />
         <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/products/manage" element={<Products />} />
+
+        <Route path="/employee" element={<EmployeeRoute authUser={authUser} />}>
+          <Route index element={<EmployeeDashboard />} />
+          <Route path="finance" element={<FinanceList />} />
+          <Route path="AddFinance" element={<FinanceAdd />} />
+          <Route
+            path="ProcurementProposals"
+            element={<ProcurementProposals />}
+          />
+          <Route path="products" element={<Products />} />
+        </Route>
+
         <Route
           path="/login"
           element={!authUser ? <LoginPage /> : <Navigate to="/" />}
@@ -110,6 +154,12 @@ const App = () => {
           <Route path="finance" element={<Finance />} />
           <Route path="finance/Budgets" element={<Budgets />} />
           <Route path="finance/add-budget" element={<AddOrEditBudget />} />
+          <Route path="projects/add-project" element={<AddProject />} />
+          <Route path="projects" element={<ProjectsList />} />
+          <Route
+            path="ProcurementProposalsList"
+            element={<ProcurementProposalsList />}
+          />
           <Route
             path="finance/budget-details/:id"
             element={<BudgetDetails />}
@@ -131,6 +181,10 @@ const App = () => {
             path="department/Add-Department"
             element={<Add_Department />}
           />
+          <Route path="Customers/Add-Customer" element={<AddCustomers />} />
+          <Route path="Customers" element={<CustomersList />} />
+          <Route path="Customers/Orders" element={<OrdersList />} />
+          <Route path="Customers/AddOrder" element={<AddOrders />} />
         </Route>
       </Routes>
       <Toaster />

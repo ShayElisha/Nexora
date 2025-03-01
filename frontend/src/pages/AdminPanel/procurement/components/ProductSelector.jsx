@@ -1,4 +1,3 @@
-// src/components/procurement/ProductSelector.jsx
 import { useEffect, useState } from "react";
 import { useProductStore } from "../../../../stores/useProductStore.js";
 import toast from "react-hot-toast";
@@ -102,8 +101,8 @@ const ProductSelector = ({
   ]);
 
   return (
-    <div className="bg-gray-800 p-4 rounded">
-      <label className="block text-gray-300 mb-2">
+    <div className="bg-bg p-4 rounded">
+      <label className="block text-text mb-2">
         {t("procurement.select_product")}
       </label>
       <select
@@ -164,7 +163,7 @@ const ProductSelector = ({
             setAvailableStock(null);
           }
         }}
-        className="w-full p-2 rounded bg-gray-700"
+        className="w-full p-2 rounded bg-secondary"
       >
         <option value="">{`-- ${t(
           "procurement.select_product_placeholder"
@@ -177,26 +176,24 @@ const ProductSelector = ({
       </select>
 
       {availableStock !== null && (
-        <p className="text-gray-300 mt-2">
+        <p className="text-text mt-2">
           {t("procurement.available_stock")}: {availableStock}
         </p>
       )}
 
       <div className="mt-4 grid grid-cols-2 gap-4">
         <div>
-          <label className="text-gray-300 text-sm">
-            {t("procurement.sku")}
-          </label>
+          <label className="text-text text-sm">{t("procurement.sku")}</label>
           <input
             type="text"
             value={productData.sku}
             readOnly
             placeholder={t("procurement.sku_placeholder")}
-            className="w-full p-2 rounded bg-gray-700"
+            className="w-full p-2 rounded bg-secondary"
           />
         </div>
         <div>
-          <label className="text-gray-300 text-sm">
+          <label className="text-text text-sm">
             {t("procurement.category")}
           </label>
           <input
@@ -204,11 +201,11 @@ const ProductSelector = ({
             value={productData.category}
             readOnly
             placeholder={t("procurement.category_placeholder")}
-            className="w-full p-2 rounded bg-gray-700"
+            className="w-full p-2 rounded bg-secondary"
           />
         </div>
         <div>
-          <label className="text-gray-300 text-sm">
+          <label className="text-text text-sm">
             {t("procurement.unit_price")}
           </label>
           <input
@@ -216,11 +213,11 @@ const ProductSelector = ({
             value={productData.unitPrice}
             readOnly
             placeholder={t("procurement.unit_price_placeholder")}
-            className="w-full p-2 rounded bg-gray-700"
+            className="w-full p-2 rounded bg-secondary"
           />
         </div>
         <div>
-          <label className="text-gray-300 text-sm">
+          <label className="text-text text-sm">
             {t("procurement.quantity")}
           </label>
           <input
@@ -233,7 +230,7 @@ const ProductSelector = ({
               }))
             }
             placeholder={t("procurement.quantity_placeholder")}
-            className="w-full p-2 rounded bg-gray-700"
+            className="w-full p-2 rounded bg-secondary"
             disabled={!supplierId}
           />
         </div>
@@ -241,7 +238,7 @@ const ProductSelector = ({
 
       <button
         onClick={onAddProduct}
-        className="bg-green-600 py-2 px-4 text-white rounded mt-4 hover:bg-green-700"
+        className="bg-primary py-2 px-4 text-white rounded mt-4 hover:bg-primary transition-colors"
         disabled={!supplierId}
       >
         {t("procurement.add_product")}

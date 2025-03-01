@@ -1,6 +1,7 @@
 import Budget from "../models/Budget.model.js";
 import Product from "../models/product.model.js";
 import Notification from "../models/notification.model.js";
+import Department from "../models/department.model.js";
 import jwt from "jsonwebtoken";
 import cloudinary, {
   uploadToCloudinaryFile,
@@ -27,7 +28,10 @@ export const getBudgets = async (req, res) => {
 
     const companyId = decodedToken.companyId;
 
-    const budgets = await Budget.find({ companyId });
+    const budgets = await Budget.find({ companyId }).populate(
+      "departmentId",
+      "name"
+    );
 
     return res.status(200).json({
       success: true,
@@ -59,6 +63,8 @@ export const createBudget = async (req, res) => {
     const createdBy = decodedToken.employeeId;
     const companyId = decodedToken.companyId;
 
+    console.log(budgetData);
+    console.log(companyId);
     if (!companyId)
       return res.status(400).json({ error: "companyId is required." });
     if (
@@ -103,9 +109,32 @@ export const createBudget = async (req, res) => {
       }
     }
 
+    // *** בדיקה: האם קיים תקציב פעיל למחלקה זו ***
+    // נניח שתקציב "פעיל" הוא כזה שעדיין לא הסתיים (endDate > היום)
+    const activeBudget = await Budget.findOne({
+      companyId,
+      departmentOrProjectName: budgetData.departmentOrProjectName,
+      endDate: { $gt: new Date() },
+    });
+
+    if (activeBudget) {
+      const now = new Date();
+      const activeEndDate = new Date(activeBudget.endDate);
+      const diffMs = activeEndDate - now;
+      const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+      // אם יש תקציב קיים והפרש הסיום גדול מ-3 ימים, לא ניתן ליצור תקציב חדש
+      if (diffDays > 3) {
+        return res.status(400).json({
+          error:
+            "תקציב קיים למחלקה זו עדיין לא הסתיים. ניתן ליצור תקציב חדש רק כשנשארו 3 ימים או פחות לסיום התקציב הקיים.",
+        });
+      }
+    }
+
     const newBudgetData = {
       ...budgetData,
-      companyId,
+      companyId: companyId,
       createdBy,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -125,7 +154,10 @@ export const createBudget = async (req, res) => {
  */
 export const getBudgetById = async (req, res) => {
   try {
-    const budget = await Budget.findById(req.params.id);
+    const budget = await Budget.findById(req.params.id).populate(
+      "departmentId",
+      "name"
+    );
     if (!budget) {
       return res
         .status(404)
@@ -531,6 +563,9 @@ export const signBudget = async (req, res) => {
     // If all required signatures are collected, update budget status
     if (budget.currentSignatures === budget.signers.length) {
       budget.status = "Approved";
+      const department = await Department.findById(budget.departmentId);
+      department.budgets.push(budget._id);
+      await department.save();
     }
 
     // Save the updated budget document

@@ -1,16 +1,25 @@
 import { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import SideBar from "../../pages/AdminPanel/layouts/Sidebar";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { FaGlobe } from "react-icons/fa";
-
-// אם אתה משתמש בדגלים חיצוניים כמו react-world-flags
 import Flag from "react-world-flags";
+import DesignBox from "./DesignBox";
 
 const Layout = ({ children }) => {
+  // שליפת נתוני המשתמש (לצורך הצגת Sidebar לדוגמא)
+  const { data: authData } = useQuery({
+    queryKey: ["authUser"],
+  });
+  const authUser = authData?.user;
+  const isAdmin = authUser?.role === "Admin"; // בדיקה אם המשתמש אדמין
+
   const { t, i18n } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  // שינוי שפה (לדוגמא)
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
     setIsDropdownOpen(false);
@@ -27,13 +36,13 @@ const Layout = ({ children }) => {
   };
 
   const flagMap = {
-    en: "us", // United States
-    he: "il", // Israel
-    ru: "ru", // Russia
-    es: "es", // Spain
-    fr: "fr", // France
-    ar: "sa", // Saudi Arabia
-    ja: "jp", // Japan
+    en: "us",
+    he: "il",
+    ru: "ru",
+    es: "es",
+    fr: "fr",
+    ar: "sa",
+    ja: "jp",
   };
 
   useEffect(() => {
@@ -47,6 +56,8 @@ const Layout = ({ children }) => {
       <Navbar />
       <div className="flex justify-end p-4">
         <div className="relative">
+          {/* תיבת עיצובים – המשתמש יכול לשנות את הצבעים והרקע */}
+          <DesignBox />
           <button
             type="button"
             className="inline-flex items-center px-4 py-2 border rounded-md z-20 bg-white text-gray-700 shadow-md"
@@ -70,7 +81,13 @@ const Layout = ({ children }) => {
           )}
         </div>
       </div>
-      <main className="flex-grow">{children}</main>
+
+      {/* במידה והמשתמש הוא אדמין, נציג את Sidebar */}
+      <div className="flex flex-grow">
+        {isAdmin && <SideBar />}
+        <main className="flex-grow">{children}</main>
+      </div>
+
       <Footer />
     </div>
   );

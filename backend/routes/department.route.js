@@ -6,6 +6,7 @@ import {
   getDepartmentById,
   updateDepartment,
   deleteDepartment,
+  projectNameByDepartment,
 } from "../controllers/department.controller.js";
 
 const router = express.Router();
@@ -24,5 +25,6 @@ router.put("/:id", updateDepartment);
 
 // מחיקת מחלקה לפי מזהה
 router.delete("/:id", deleteDepartment);
+router.get("/projectName/:id", projectNameByDepartment);
 
 export default router;

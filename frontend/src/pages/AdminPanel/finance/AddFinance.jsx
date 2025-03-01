@@ -1,7 +1,7 @@
+// src/pages/procurement/AddFinance.jsx
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../../../lib/axios";
-import Sidebar from "../layouts/Sidebar";
 import toast from "react-hot-toast";
 import currencyList from "./currency.json";
 import { useTranslation } from "react-i18next";
@@ -79,10 +79,9 @@ const AddFinance = () => {
     return <div>...Loading</div>;
   }
   return (
-    <div className="flex min-h-screen bg-gradient-to-r from-gray-900 via-gray-800 to-black">
-      <Sidebar />
-      <div className="container mx-auto max-w-4xl p-8 bg-gray-800 rounded-lg shadow-xl">
-        <h1 className="text-3xl font-bold text-blue-400 mb-6 text-center">
+    <div className="flex min-h-screen bg-bg">
+      <div className="container mx-auto max-w-4xl p-8 bg-bg rounded-lg shadow-xl">
+        <h1 className="text-3xl font-bold text-primary mb-6 text-center">
           {t("finance.add_record")}
         </h1>
         <form
@@ -91,7 +90,7 @@ const AddFinance = () => {
         >
           {/* Transaction Date */}
           <div>
-            <label className="block text-gray-400 font-medium mb-1">
+            <label className="block text-secondary font-medium mb-1">
               {t("finance.transaction_date")}:
             </label>
             <input
@@ -99,21 +98,21 @@ const AddFinance = () => {
               name="transactionDate"
               value={formData.transactionDate}
               onChange={handleChange}
-              className="w-full px-2 py-1 border border-gray-700 bg-gray-700 rounded-md text-gray-300"
+              className="w-full px-2 py-1 border border-border-color bg-secondary rounded-md text-text"
               required
             />
           </div>
 
           {/* Transaction Type */}
           <div>
-            <label className="block text-gray-400 font-medium mb-1">
+            <label className="block text-secondary font-medium mb-1">
               {t("finance.transaction_type")}:
             </label>
             <select
               name="transactionType"
               value={formData.transactionType}
               onChange={handleChange}
-              className="w-full px-2 py-1 border border-gray-700 bg-gray-700 rounded-md text-gray-300"
+              className="w-full px-2 py-1 border border-border-color bg-secondary rounded-md text-text"
               required
             >
               <option value="Income">{t("finance.income")}</option>
@@ -124,7 +123,7 @@ const AddFinance = () => {
 
           {/* Transaction Amount */}
           <div>
-            <label className="block text-gray-400 font-medium mb-1">
+            <label className="block text-secondary font-medium mb-1">
               {t("finance.amount")}:
             </label>
             <input
@@ -132,21 +131,21 @@ const AddFinance = () => {
               name="transactionAmount"
               value={formData.transactionAmount}
               onChange={handleChange}
-              className="w-full px-2 py-1 border border-gray-700 bg-gray-700 rounded-md text-gray-300"
+              className="w-full px-2 py-1 border border-border-color bg-secondary rounded-md text-text"
               required
             />
           </div>
 
           {/* Currency */}
           <div>
-            <label className="block text-gray-400 font-medium mb-1">
+            <label className="block text-secondary font-medium mb-1">
               {t("budget.currency")}:
             </label>
             <select
               name="transactionCurrency"
               value={formData.transactionCurrency}
               onChange={handleChange}
-              className="w-full px-2 py-1 border border-gray-700 bg-gray-700 rounded-md text-gray-300"
+              className="w-full px-2 py-1 border border-border-color bg-secondary rounded-md text-text"
               required
             >
               {currencyList.map((currency) => (
@@ -162,7 +161,7 @@ const AddFinance = () => {
 
           {/* Category */}
           <div>
-            <label className="block text-gray-400 font-medium mb-1">
+            <label className="block text-secondary font-medium mb-1">
               {t("finance.Category")}:
             </label>
             <input
@@ -170,14 +169,14 @@ const AddFinance = () => {
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="w-full px-2 py-1 border border-gray-700 bg-gray-700 rounded-md text-gray-300"
+              className="w-full px-2 py-1 border border-border-color bg-secondary rounded-md text-text"
               required
             />
           </div>
 
           {/* Bank Account */}
           <div>
-            <label className="block text-gray-400 font-medium mb-1">
+            <label className="block text-secondary font-medium mb-1">
               {t("finance.Bank_Account")}:
             </label>
             <input
@@ -185,21 +184,21 @@ const AddFinance = () => {
               name="bankAccount"
               value={formData.bankAccount}
               onChange={handleChange}
-              className="w-full px-2 py-1 border border-gray-700 bg-gray-700 rounded-md text-gray-300"
+              className="w-full px-2 py-1 border border-border-color bg-secondary rounded-md text-text"
               required
             />
           </div>
 
           {/* Transaction Status */}
           <div>
-            <label className="block text-gray-400 font-medium mb-1">
+            <label className="block text-secondary font-medium mb-1">
               {t("finance.Transaction_Status")}:
             </label>
             <select
               name="transactionStatus"
               value={formData.transactionStatus}
               onChange={handleChange}
-              className="w-full px-2 py-1 border border-gray-700 bg-gray-700 rounded-md text-gray-300"
+              className="w-full px-2 py-1 border border-border-color bg-secondary rounded-md text-text"
               required
             >
               <option value="Pending">Pending</option>
@@ -210,14 +209,14 @@ const AddFinance = () => {
 
           {/* Supplier */}
           <div>
-            <label className="block text-gray-400 font-medium mb-1">
+            <label className="block text-secondary font-medium mb-1">
               {t("finance.supplier")}:
             </label>
             <select
               name="supplierId"
               value={formData.supplierId}
               onChange={handleChange}
-              className="w-full px-2 py-1 border border-gray-700 bg-gray-700 rounded-md text-gray-300"
+              className="w-full px-2 py-1 border border-border-color bg-secondary rounded-md text-text"
             >
               <option value="">{t("finance.select_supplier")}</option>
               {suppliersData?.map((supplier) => (
@@ -230,7 +229,7 @@ const AddFinance = () => {
 
           {/* Attachment URL */}
           <div>
-            <label className="block text-gray-400 font-medium mb-1">
+            <label className="block text-secondary font-medium mb-1">
               {t("finance.Attachment_URL")}:
             </label>
             <input
@@ -238,13 +237,13 @@ const AddFinance = () => {
               name="attachmentURL"
               value={formData.attachmentURL}
               onChange={handleChange}
-              className="w-full px-2 py-1 border border-gray-700 bg-gray-700 rounded-md text-gray-300"
+              className="w-full px-2 py-1 border border-border-color bg-secondary rounded-md text-text"
             />
           </div>
 
           {/* Invoice Number */}
           <div>
-            <label className="block text-gray-400 font-medium mb-1">
+            <label className="block text-secondary font-medium mb-1">
               {t("finance.Invoice_Number")}:
             </label>
             <input
@@ -252,20 +251,20 @@ const AddFinance = () => {
               name="invoiceNumber"
               value={formData.invoiceNumber}
               onChange={handleChange}
-              className="w-full px-2 py-1 border border-gray-700 bg-gray-700 rounded-md text-gray-300"
+              className="w-full px-2 py-1 border border-border-color bg-secondary rounded-md text-text"
             />
           </div>
 
           {/* Transaction Description */}
           <div className="col-span-full">
-            <label className="block text-gray-400 font-medium mb-1">
+            <label className="block text-secondary font-medium mb-1">
               {t("finance.Transaction_Description")}:
             </label>
             <textarea
               name="transactionDescription"
               value={formData.transactionDescription}
               onChange={handleChange}
-              className="w-full px-2 py-1 border border-gray-700 bg-gray-700 rounded-md text-gray-300"
+              className="w-full px-2 py-1 border border-border-color bg-secondary rounded-md text-text"
               rows="3"
             />
           </div>
@@ -273,7 +272,7 @@ const AddFinance = () => {
           <div className="col-span-full">
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700"
+              className="w-full bg-primary text-button-text font-bold py-2 px-4 rounded-md hover:bg-primary/90"
               disabled={createFinanceMutation.isLoading}
             >
               {createFinanceMutation.isLoading

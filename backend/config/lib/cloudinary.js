@@ -8,42 +8,31 @@ cloudinary.config({
 });
 
 // פורמטים תקפים
-const validImageFormats = ["jpg", "jpeg", "png", "gif"];
+const validImageFormats = ["jpg", "jpeg", "png", "gif", "webp"];
 const validDocumentFormats = ["pdf", "docx", "txt"];
-export const uploadToCloudinary = async (file) => {
+export const uploadToCloudinary = async (file, options = {}) => {
   try {
-    // If file is a buffer (from multer or similar middleware)
-    if (file.buffer) {
-      return new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          { folder: "profile_images" },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        );
-        uploadStream.end(file.buffer);
-      });
-    }
+    // המרת ה-buffer ל-Buffer תקין אם הוא ArrayBuffer
+    const fileBuffer = Buffer.isBuffer(file)
+      ? file
+      : Buffer.from(new Uint8Array(file));
 
-    // If file is a path
-    if (file.path) {
-      const result = await cloudinary.uploader.upload(file.path, {
-        folder: "profile_images",
-      });
-
-      // Optionally remove local file after upload
-      fs.unlinkSync(file.path);
-
-      return result;
-    }
-
-    throw new Error("Invalid file format");
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { ...options, resource_type: "auto" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      uploadStream.end(fileBuffer);
+    });
   } catch (error) {
     console.error("Cloudinary upload error:", error);
     throw error;
   }
 };
+
 
 const getFileExtension = (filename) => filename.split(".").pop().toLowerCase();
 
@@ -72,6 +61,20 @@ export const uploadToCloudinaryFile = async (file) => {
     console.error("Cloudinary upload error:", error.message);
     throw error;
   }
+};
+
+export const extractPublicId = (url) => {
+  const parts = url.split("/upload/");
+  if (parts.length < 2) return null;
+
+  const pathPart = parts[1];
+
+  const pathParts = pathPart.split("/");
+  const publicIdWithExtension = pathParts.slice(1).join("/"); // "products/iakkypbyrssngeqq5r02.png"
+
+  const publicId = publicIdWithExtension.replace(/\.[^/.]+$/, "");
+
+  return publicId;
 };
 
 export default cloudinary;

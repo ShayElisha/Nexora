@@ -28,10 +28,9 @@ export const getBudgets = async (req, res) => {
 
     const companyId = decodedToken.companyId;
 
-    const budgets = await Budget.find({ companyId }).populate(
-      "departmentId",
-      "name"
-    );
+    const budgets = await Budget.find({ companyId })
+      .populate("departmentId", "name")
+      .populate("items.productId", "productName");
 
     return res.status(200).json({
       success: true,
@@ -65,8 +64,10 @@ export const createBudget = async (req, res) => {
 
     console.log(budgetData);
     console.log(companyId);
+
     if (!companyId)
       return res.status(400).json({ error: "companyId is required." });
+
     if (
       !budgetData.departmentOrProjectName ||
       typeof budgetData.departmentOrProjectName !== "string"
@@ -75,10 +76,13 @@ export const createBudget = async (req, res) => {
         error: "Department or Project Name is required and must be a string.",
       });
     }
+
+    // המרת סכום למספר ועדכון הנתון
     const amount = parseFloat(budgetData.amount);
     if (isNaN(amount)) {
       return res.status(400).json({ error: "Amount must be a valid number." });
     }
+    budgetData.amount = amount;
 
     if (budgetData.startDate && isNaN(Date.parse(budgetData.startDate))) {
       return res
@@ -88,6 +92,7 @@ export const createBudget = async (req, res) => {
     if (budgetData.endDate && isNaN(Date.parse(budgetData.endDate))) {
       return res.status(400).json({ error: "End Date must be a valid date." });
     }
+
     if (budgetData.categories) {
       if (!Array.isArray(budgetData.categories)) {
         return res.status(400).json({ error: "Categories must be an array." });
@@ -109,8 +114,7 @@ export const createBudget = async (req, res) => {
       }
     }
 
-    // *** בדיקה: האם קיים תקציב פעיל למחלקה זו ***
-    // נניח שתקציב "פעיל" הוא כזה שעדיין לא הסתיים (endDate > היום)
+    // בדיקה: האם קיים תקציב פעיל למחלקה זו
     const activeBudget = await Budget.findOne({
       companyId,
       departmentOrProjectName: budgetData.departmentOrProjectName,
@@ -169,7 +173,6 @@ export const getBudgetById = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-// Budget.controller.js
 export const updateBudget = async (req, res) => {
   try {
     const token = req.cookies["auth_token"];
@@ -188,7 +191,6 @@ export const updateBudget = async (req, res) => {
 
     const employeeId = decodedToken.employeeId;
     const budgetId = req.params.id;
-    const itemsToAdd = req.body.items;
 
     // בדיקת תקינות מזהה התקציב
     if (!mongoose.Types.ObjectId.isValid(budgetId)) {
@@ -197,7 +199,7 @@ export const updateBudget = async (req, res) => {
         .json({ success: false, message: "Invalid budget ID format." });
     }
 
-    // מציאת התקציב במסד הנתונים
+    // שליפת התקציב
     const budget = await Budget.findById(budgetId);
     if (!budget) {
       return res
@@ -205,49 +207,93 @@ export const updateBudget = async (req, res) => {
         .json({ success: false, message: `Budget not found: ${budgetId}` });
     }
 
-    // הוספת employeeId לכל פריט חדש
-    if (itemsToAdd && Array.isArray(itemsToAdd)) {
-      itemsToAdd.forEach((item) => {
+    // חילוץ השדות מה-body
+    const {
+      departmentOrProjectName,
+      amount,
+      currency,
+      startDate,
+      endDate,
+      notes,
+      items, // מערך פריטים להוספה
+      resetSigners, // בוליאני לאיפוס חתימות
+    } = req.body;
+
+    // ===== 1) עדכון שדות התקציב הכלליים =====
+    if (departmentOrProjectName !== undefined) {
+      budget.departmentOrProjectName = departmentOrProjectName;
+    }
+    if (amount !== undefined) {
+      budget.amount = amount;
+    }
+    if (currency !== undefined) {
+      budget.currency = currency;
+    }
+    if (startDate !== undefined) {
+      budget.startDate = startDate;
+    }
+    if (endDate !== undefined) {
+      budget.endDate = endDate;
+    }
+    if (notes !== undefined) {
+      budget.notes = notes;
+    }
+
+    // ===== 2) איפוס חתימות (אופציונלי) =====
+    // אם רוצים שאם עדכנו משהו מהותי - נמחק/נאפסת מערך signers:
+    if (resetSigners) {
+      budget.signers.forEach((signer) => {
+        signer.hasSigned = false;
+        signer.signatureUrl = null;
+        signer.timeStamp = null;
+      });
+      budget.currentSignatures = 0;
+      budget.currentSignerIndex = 0;
+      budget.status = "Draft";
+    }
+
+    // ===== 3) הוספת items חדשים (אם יש) =====
+    let totalSpentFromNewItems = 0;
+    if (items && Array.isArray(items) && items.length > 0) {
+      // הוספת employeeId לכל פריט חדש
+      items.forEach((item) => {
         item.employeeId = employeeId;
       });
+
+      // חישוב סך ההוצאה החדשה
+      totalSpentFromNewItems = items.reduce(
+        (sum, item) => sum + item.unitPrice * item.quantity,
+        0
+      );
+
+      // הוספת הפריטים למערך
+      budget.items.push(...items);
+
+      // עדכון הסכום שנוצל
+      budget.spentAmount += totalSpentFromNewItems;
     }
 
-    // חישוב סכום ההוצאה
-    const totalSpent = (itemsToAdd || []).reduce(
-      (sum, item) => sum + item.unitPrice * item.quantity,
-      0
-    );
-
-    // הוספת הפריטים למערך items
-    budget.items.push(...itemsToAdd);
-
-    // עדכון הסכום שנוצל
-    budget.spentAmount += totalSpent;
+    // עדכון זמן העדכון
     budget.updatedAt = new Date();
-
     await budget.save();
 
-    if (!employeeId) {
-      console.error(
-        "Error: employeeId is missing, notification will not be sent."
-      );
-    }
-
-    // בדיקת חציית התקציב ושליחת התראה אם נדרש
+    // ===== 4) התראות במקרה של חריגה מהתקציב =====
     if (budget.spentAmount > budget.amount) {
       console.log(
         `Budget exceeded for: ${budget.departmentOrProjectName}, sending notification...`
       );
-
-      const notification = new Notification({
-        companyId: budget.companyId,
-        content: `The budget ${budget.departmentOrProjectName} has been exceeded.`,
-        type: "Error",
-        employeeId: employeeId,
-      });
-
-      await notification.save();
-      console.log("Notification saved successfully.");
+      if (employeeId) {
+        const notification = new Notification({
+          companyId: budget.companyId,
+          content: `The budget ${budget.departmentOrProjectName} has been exceeded.`,
+          type: "Error",
+          employeeId: employeeId,
+        });
+        await notification.save();
+        console.log("Notification saved successfully.");
+      } else {
+        console.error("employeeId is missing, no notification will be sent.");
+      }
     }
 
     return res.status(200).json({
@@ -650,7 +696,7 @@ export const assignToBudget = async (req, res) => {
 export const getBudgetByDepartments = async (req, res) => {
   try {
     const token = req.cookies["auth_token"];
-    const { departmentId } = req.query; // שינוי מ-req.params ל-req.query
+    const { departmentId } = req.params; // שינוי כאן מ-query ל-params
 
     // בדיקת אימות
     if (!token) {

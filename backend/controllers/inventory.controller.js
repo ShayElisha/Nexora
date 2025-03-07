@@ -117,39 +117,66 @@ export const getAllInventoryItems = async (req, res) => {
  */
 export const updateInventoryItem = async (req, res) => {
   try {
-    const { id } = req.params; // productId מגיע מה-URL
-    const { quantity } = req.body; // השינוי בכמות (חיובי או שלילי)
+    // בדיקת טוקן
+    const token = req.cookies["auth_token"];
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const companyId = decodedToken?.companyId;
+    if (!companyId) {
+      return res.status(400).json({ success: false, message: "Invalid token" });
+    }
 
-    const inventoryItem = await Inventory.findOne({ productId: id });
+    // כאן req.params.id הוא מזהה המוצר (productId)
+    const productId = req.params.id;
+
+    // חילוץ שדות לעדכון מהבקשה
+    const {
+      quantity,
+      minStockLevel,
+      reorderQuantity,
+      batchNumber,
+      expirationDate,
+      shelfLocation,
+      lastOrderDate,
+    } = req.body;
+
+    // מציאת רשומת מלאי לפי productId ו-companyId
+    const inventoryItem = await Inventory.findOne({ productId, companyId });
     if (!inventoryItem) {
-      return res.status(404).json({
-        success: false,
-        message: `Inventory item not found for product ID: ${id}`,
-      });
-    }
-
-    // עדכון כמות המלאי
-    inventoryItem.quantity += quantity;
-
-    if (inventoryItem.quantity < 0) {
-      // במקרה שכמות המלאי יוצאת שלילית
       return res
-        .status(400)
-        .json({ success: false, message: "Insufficient stock." });
+        .status(404)
+        .json({ success: false, message: "Inventory item not found." });
     }
 
-    await inventoryItem.save();
+    // עדכון השדות – מעדכנים רק אם נשלח ערך
+    if (quantity !== undefined) inventoryItem.quantity = quantity;
+    if (minStockLevel !== undefined)
+      inventoryItem.minStockLevel = minStockLevel;
+    if (reorderQuantity !== undefined)
+      inventoryItem.reorderQuantity = reorderQuantity;
+    if (batchNumber !== undefined) inventoryItem.batchNumber = batchNumber;
+    if (expirationDate !== undefined)
+      inventoryItem.expirationDate = expirationDate
+        ? new Date(expirationDate)
+        : null;
+    if (shelfLocation !== undefined)
+      inventoryItem.shelfLocation = shelfLocation;
+    if (lastOrderDate !== undefined)
+      inventoryItem.lastOrderDate = lastOrderDate
+        ? new Date(lastOrderDate)
+        : null;
 
-    return res.status(200).json({
-      success: true,
-      message: "Inventory updated successfully",
-      data: inventoryItem,
-    });
+    const updatedInventory = await inventoryItem.save();
+
+    return res.status(200).json({ success: true, data: updatedInventory });
   } catch (error) {
-    console.error("Error updating inventory:", error.message);
+    console.error("Error updating inventory item:", error.message);
     return res.status(500).json({
       success: false,
-      message: error.message || "Error updating inventory",
+      message: "Failed to update inventory item.",
+      error: error.message,
     });
   }
 };

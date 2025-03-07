@@ -73,10 +73,12 @@ export const extractPublicId = (url) => {
 };
 export const updateEmployee = async (req, res) => {
   const updates = req.body;
-  console.log("req file" + req.file.path);
-  console.log(updates);
 
-  // רשימת השדות המותרים לעדכון (עבור כתובת – תתי שדות)
+  // Log req.file safely
+  console.log("req file:", req.file ? req.file.path : "No file uploaded");
+  console.log("Updates:", updates);
+
+  // List of allowed fields for updates
   const allowedUpdates = [
     "name",
     "lastName",
@@ -88,12 +90,12 @@ export const updateEmployee = async (req, res) => {
     "address.postalCode",
     "phone",
     "role",
-    "profileImage", // הקישור לתמונה החדשה
-    // אם אין אפשרות לשמור את public_id בנפרד, נשתמש בחילוץ מה־URL
+    "profileImage",
     "projects",
+    "status", // Added to allow status updates
   ];
 
-  // "מפלסים" את האובייקט כדי לאפשר עדכונים חלקיים עבור שדות מקוננים כמו address
+  // Flatten the updates object to handle nested fields like address
   let flattenedUpdates = {};
   for (let key in updates) {
     if (key === "address" && typeof updates[key] === "object") {
@@ -105,7 +107,7 @@ export const updateEmployee = async (req, res) => {
     }
   }
 
-  // בדיקה שכל השדות בעדכון הם מאושרים
+  // Validate that all update fields are allowed
   const isValidUpdate = Object.keys(flattenedUpdates).every((key) =>
     allowedUpdates.includes(key)
   );
@@ -116,7 +118,7 @@ export const updateEmployee = async (req, res) => {
   }
 
   try {
-    // מציאת העובד הקיים
+    // Find the existing employee
     const employee = await Employee.findById(req.params.id);
     if (!employee) {
       return res
@@ -124,7 +126,7 @@ export const updateEmployee = async (req, res) => {
         .json({ success: false, message: "Employee not found" });
     }
 
-    // טיפול בשינוי סיסמה
+    // Handle password update
     if (flattenedUpdates.password) {
       flattenedUpdates.password = await bcrypt.hash(
         flattenedUpdates.password,
@@ -132,25 +134,23 @@ export const updateEmployee = async (req, res) => {
       );
     }
 
-    // טיפול בעדכון תמונת הפרופיל
+    // Handle profile image update only if a file is provided
     if (req.file) {
-      // אם קיימת תמונה ישנה, ננסה לחלץ את ה־public id מתוך ה־URL שלה
+      // Delete the old image from Cloudinary if it exists
       if (employee.profileImage) {
         const publicId = extractPublicId(employee.profileImage);
-        console.log("publicId", publicId);
+        console.log("publicId:", publicId);
         if (publicId) {
           await cloudinary.uploader.destroy(publicId);
         }
       }
 
-      // העלאת התמונה החדשה
+      // Upload the new image to Cloudinary
       const result = await uploadToCloudinary(req.file);
-
-      // שמירת הקישור לתמונה החדשה
       flattenedUpdates.profileImage = result.secure_url;
     }
 
-    // עדכון העובד בבסיס הנתונים
+    // Update the employee in the database
     const updatedEmployee = await Employee.findByIdAndUpdate(
       req.params.id,
       { $set: flattenedUpdates },

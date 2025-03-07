@@ -5,6 +5,7 @@ import cloudinary, {
 } from "../config/lib/cloudinary.js";
 import jwt from "jsonwebtoken";
 import Inventory from "../models/inventory.model.js";
+import ProductTree from "../models/productTree.model.js";
 
 export const getProducts = async (req, res) => {
   try {
@@ -148,20 +149,6 @@ export const createProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   try {
-    const {
-      productName,
-      productDescription,
-      unitPrice,
-      category,
-      supplierId,
-      supplierName,
-      productImage,
-      length,
-      width,
-      height,
-      productType,
-    } = req.body;
-
     const product = await Product.findById(req.params.id);
     if (!product) {
       return res
@@ -169,7 +156,22 @@ export const updateProduct = async (req, res) => {
         .json({ success: false, error: "Product not found" });
     }
 
-    // עדכון השדות
+    // Extract fields from req.body
+    const {
+      productName,
+      productDescription,
+      unitPrice,
+      category,
+      supplierId,
+      supplierName,
+      length,
+      width,
+      height,
+      productType,
+      attachedFiles: existingFilesFromBody, // Renamed for clarity
+    } = req.body;
+
+    // Update basic fields if provided
     product.productName = productName || product.productName;
     product.productDescription =
       productDescription || product.productDescription;
@@ -177,17 +179,107 @@ export const updateProduct = async (req, res) => {
     product.category = category || product.category;
     product.supplierId = supplierId || product.supplierId;
     product.supplierName = supplierName || product.supplierName;
-    product.productImage = productImage || product.productImage;
     product.length = length || product.length;
     product.width = width || product.width;
     product.height = height || product.height;
     product.productType = productType || product.productType;
+
+    // Handle product image update
+    if (
+      req.files &&
+      req.files.productImage &&
+      req.files.productImage.length > 0
+    ) {
+      if (product.productImage) {
+        const publicId = extractPublicId(product.productImage);
+        if (publicId) {
+          await cloudinary.uploader.destroy(publicId);
+        }
+      }
+      const file = req.files.productImage[0];
+      const uploadResponse = await uploadToCloudinary(file.buffer, {
+        folder: "products",
+        use_filename: true,
+        unique_filename: false,
+      });
+      product.productImage = uploadResponse.secure_url;
+    } else if (req.body.productImage === "") {
+      if (product.productImage) {
+        const publicId = extractPublicId(product.productImage);
+        if (publicId) {
+          await cloudinary.uploader.destroy(publicId);
+        }
+        product.productImage = "";
+      }
+    }
+
+    // Handle attached files
+    if (req.files && req.files.attachments) {
+      const newAttachments = [];
+      for (const file of req.files.attachments) {
+        const result = await uploadToCloudinary(file.buffer, {
+          folder: "products/attachments",
+          use_filename: true,
+          unique_filename: false,
+        });
+        newAttachments.push({
+          fileName: file.originalname,
+          fileUrl: result.secure_url,
+        });
+      }
+
+      const existingFiles = product.attachments || [];
+      const updatedFiles = existingFilesFromBody
+        ? JSON.parse(existingFilesFromBody).map((file) => ({
+            fileName: file.name,
+            fileUrl:
+              file.fileUrl ||
+              existingFiles.find((ef) => ef.fileName === file.name)?.fileUrl,
+          }))
+        : existingFiles;
+
+      const filesToKeep = updatedFiles.map((f) => f.fileUrl);
+      const filesToDelete = existingFiles.filter(
+        (file) => !filesToKeep.includes(file.fileUrl)
+      );
+      for (const file of filesToDelete) {
+        const publicId = extractPublicId(file.fileUrl);
+        if (publicId) {
+          await cloudinary.uploader.destroy(publicId);
+        }
+      }
+
+      product.attachments = [...updatedFiles, ...newAttachments];
+    } else if (existingFilesFromBody) {
+      const updatedFiles = JSON.parse(existingFilesFromBody).map((file) => ({
+        fileName: file.name,
+        fileUrl:
+          file.fileUrl ||
+          product.attachments.find((ef) => ef.fileName === file.name)?.fileUrl,
+      }));
+
+      const filesToKeep = updatedFiles.map((f) => f.fileUrl);
+      const filesToDelete = product.attachments.filter(
+        (file) => !filesToKeep.includes(file.fileUrl)
+      );
+      for (const file of filesToDelete) {
+        const publicId = extractPublicId(file.fileUrl);
+        if (publicId) {
+          await cloudinary.uploader.destroy(publicId);
+        }
+      }
+
+      product.attachments = updatedFiles;
+    }
+
     await product.save();
     res.status(200).json({ success: true, data: product });
   } catch (err) {
-    res
-      .status(500)
-      .json({ success: false, error: "Invalid product ID or request data" });
+    console.error("Error updating product:", err);
+    res.status(500).json({
+      success: false,
+      error: "Error updating product: " + err.message,
+    });
   }
 };
 
@@ -231,6 +323,11 @@ export const deleteProduct = async (req, res) => {
     const inventory = await Inventory.findOne({ productId: req.params.id });
     if (inventory) {
       await inventory.deleteOne();
+    }
+
+    const productTree = await ProductTree.findOne({ productId: req.params.id });
+    if (productTree) {
+      await productTree.deleteOne();
     }
 
     res

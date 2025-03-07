@@ -170,10 +170,11 @@ export const getAllProjects = async (req, res) => {
     }
     const companyId = decodedToken.companyId;
     // אפשר להוסיף populate אם אתה רוצה להרחיב מידע מ- department / teamMembers וכו'
-    const projects = await Project.find({ companyId }).populate(
-      "teamMembers.employeeId",
-      "name lastName"
-    );
+    const projects = await Project.find({ companyId })
+      .populate("teamMembers.employeeId", "name lastName")
+      .populate("departmentId", "name")
+      .populate("projectManager", "name lastName")
+      .populate("companyId", "name");
 
     return res.status(200).json({
       success: true,

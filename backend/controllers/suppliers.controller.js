@@ -6,20 +6,25 @@ import Company from "../models/companies.model.js";
 import UpdateProcurement from "../models/UpdateProcurement.model.js";
 import jwt from "jsonwebtoken";
 // Create a new supplier
+import {
+  uploadToCloudinary,
+  extractPublicId,
+} from "../config/lib/cloudinary.js";
+
 export const createSupplier = async (req, res) => {
   try {
+    // בדיקת טוקן ואימות
     const token = req.cookies["auth_token"];
     if (!token) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
-
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     if (!decodedToken || !decodedToken.companyId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
-
     const companyId = decodedToken.companyId;
 
+    // קריאת שדות מהגוף
     const {
       SupplierName,
       Contact,
@@ -31,7 +36,10 @@ export const createSupplier = async (req, res) => {
       baseCurrency,
       IsActive,
       ProductsSupplied,
+      ConfirmationAccount, // אפשר לקבל גם ערך מטופס (אם לא הועלה קובץ)
     } = req.body;
+    console.log(req.body);
+    console.log(req.files);
 
     // בדיקת ולידציה לשדות נדרשים
     if (!SupplierName) {
@@ -41,7 +49,41 @@ export const createSupplier = async (req, res) => {
       });
     }
 
-    // שלב 4: יצירת ספק חדש
+    // טיפול בהעלאת קבצים - attachments
+    let attachmentsArray = [];
+    if (req.files && req.files.attachments) {
+      for (const file of req.files.attachments) {
+        // uploadToCloudinary תקבל את ה-buffer (המגיע מ־multer memoryStorage)
+        const uploadResult = await uploadToCloudinary(file.buffer, {
+          folder: "suppliers/attachments",
+          use_filename: true,
+          unique_filename: false,
+        });
+        attachmentsArray.push({
+          fileName: file.originalname,
+          fileUrl: uploadResult.secure_url,
+          // uploadedAt יוגדר כברירת מחדל במודל
+        });
+      }
+    }
+
+    // טיפול בהעלאת קובץ עבור ConfirmationAccount (אם קיים)
+    let confirmationAccountURL = "";
+    if (
+      req.files &&
+      req.files.confirmationAccount &&
+      req.files.confirmationAccount.length > 0
+    ) {
+      const file = req.files.confirmationAccount[0];
+      const uploadResult = await uploadToCloudinary(file.buffer, {
+        folder: "suppliers/confirmationAccounts",
+        use_filename: true,
+        unique_filename: false,
+      });
+      confirmationAccountURL = uploadResult.secure_url;
+    }
+
+    // יצירת ספק חדש עם כל השדות, כולל קבצים שהועלו
     const newSupplier = new Suppliers({
       companyId,
       SupplierName,
@@ -50,10 +92,13 @@ export const createSupplier = async (req, res) => {
       Email,
       Address,
       BankAccount,
-      baseCurrency,
       Rating,
+      baseCurrency,
       IsActive,
+      // אם הועלה קובץ עבור ConfirmationAccount, נעדכן אותו; אחרת, נשתמש בערך מהגוף
+      ConfirmationAccount: confirmationAccountURL || ConfirmationAccount,
       ProductsSupplied,
+      attachments: attachmentsArray,
     });
 
     const savedSupplier = await newSupplier.save();
@@ -79,12 +124,10 @@ export const getAllSuppliers = async (req, res) => {
   try {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const companyId = decodedToken?.companyId;
-    console.log("Company ID:", companyId);
     if (!companyId) {
       return res.status(400).json({ success: false, message: "Invalid token" });
     }
     const suppliers = await Suppliers.find({ companyId });
-    console.log("Suppliers:", suppliers);
 
     if (suppliers.length > 0) {
       return res.status(200).json({ success: true, data: suppliers });
@@ -151,7 +194,13 @@ export const getSupplierById = async (req, res) => {
 
 // Update supplier by allowed fields
 export const updateSupplier = async (req, res) => {
-  const updates = req.body;
+  // סינון השדות מהגוף (body)
+  const updates = Object.fromEntries(
+    Object.entries(req.body).filter(
+      ([key, value]) => value !== "" && value !== undefined
+    )
+  );
+
   const allowedUpdates = [
     "SupplierName",
     "Contact",
@@ -164,7 +213,7 @@ export const updateSupplier = async (req, res) => {
     "ProductsSupplied",
   ];
 
-  // בדיקת ולידציה לשדות המותרים לעדכון
+  // בדיקה שכל המפתחות שמתקבלים הם מותרת
   const isValidUpdate = Object.keys(updates).every((key) =>
     allowedUpdates.includes(key)
   );
@@ -175,16 +224,31 @@ export const updateSupplier = async (req, res) => {
   }
 
   try {
+    // טיפול בהעלאת קבצים, אם קיימים
+    if (req.files && req.files.attachments && req.files.attachments.length > 0) {
+      let newAttachments = [];
+      for (const file of req.files.attachments) {
+        const uploadResult = await uploadToCloudinary(file.buffer, {
+          folder: "suppliers/attachments",
+          use_filename: true,
+          unique_filename: false,
+        });
+        newAttachments.push({
+          fileName: file.originalname,
+          fileUrl: uploadResult.secure_url,
+          uploadedAt: new Date(),
+        });
+      }
+      // אם רוצים למזג את הקבצים החדשים עם הקיימים, אפשר לשלוף את המסמך הקיים ולהוסיף אליו.
+      // כאן אנו פשוט מעדכנים את השדה attachments עם הקבצים החדשים:
+      updates.attachments = newAttachments;
+    }
+
     const updatedSupplier = await Suppliers.findByIdAndUpdate(
       req.params.id,
       updates,
-      {
-        new: true,
-        runValidators: true,
-      }
-    )
-      .populate("companyId", "CompanyName")
-      .populate("ProductsSupplied.productId", "productName");
+      { new: true, runValidators: true }
+    );
 
     if (!updatedSupplier) {
       return res
@@ -194,6 +258,7 @@ export const updateSupplier = async (req, res) => {
 
     res.status(200).json({ success: true, data: updatedSupplier });
   } catch (error) {
+    console.error("Update error:", error);
     res.status(500).json({
       success: false,
       message: "Error updating supplier",
@@ -201,7 +266,6 @@ export const updateSupplier = async (req, res) => {
     });
   }
 };
-
 // Delete supplier by id
 export const deleteSupplier = async (req, res) => {
   try {

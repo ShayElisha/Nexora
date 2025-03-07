@@ -6,7 +6,6 @@ import { useSupplierStore } from "../../../stores/useSupplierStore";
 import axiosInstance from "../../../lib/axios";
 import ProductForm from "../components/ProductForm";
 import { useTranslation } from "react-i18next";
-import Add_Department from "../departments/Add_Department"; // ודא שהנתיב נכון
 
 // רכיב משנה ל-BOM
 const BOMBuilder = ({
@@ -138,7 +137,6 @@ const AddProduct = () => {
   });
   const authUser = authData?.user;
 
-  // עדכון מצב המוצר – הוספנו גם attachments
   const [formData, setFormData] = useState({
     companyId: authUser?.company,
     sku: "",
@@ -290,11 +288,13 @@ const AddProduct = () => {
     payload.append("productDescription", formData.productDescription);
     payload.append("unitPrice", formData.unitPrice);
     payload.append("category", formData.category);
-    payload.append("supplierId", formData.supplierId || "");
-    payload.append(
-      "supplierName",
-      suppliers.find((s) => s._id === formData.supplierId)?.SupplierName || ""
-    );
+    if (formData.supplierId) {
+      payload.append("supplierId", formData.supplierId);
+      payload.append(
+        "supplierName",
+        suppliers.find((s) => s._id === formData.supplierId)?.SupplierName || ""
+      );
+    }
     payload.append("length", formData.length);
     payload.append("width", formData.width);
     payload.append("height", formData.height);
@@ -310,7 +310,6 @@ const AddProduct = () => {
     createNewProduct(payload);
   };
 
-  // חישוב נפח
   const calculateVolume = () => {
     const length = parseFloat(formData.length) || 0;
     const width = parseFloat(formData.width) || 0;

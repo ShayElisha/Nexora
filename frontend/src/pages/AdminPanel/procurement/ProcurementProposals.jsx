@@ -596,6 +596,40 @@ const ProcurementProposals = () => {
     setTotalCost(0);
   };
 
+  // Function to open the modal for creating a purchase order
+  const openPurchaseOrderModal = (proposal) => {
+    setSelectedProposal(proposal);
+    const proposalProducts = proposal.items.map((item) => ({
+      productId: item.productId || "",
+      productName: item.productName || "Unknown Product",
+      sku: item.sku || "",
+      category: item.category || "Uncategorized",
+      quantity: item.quantity || 0,
+      unitPrice: item.unitPrice || 0,
+      total: (item.quantity || 0) * (item.unitPrice || 0),
+      baseUnitPrice: item.unitPrice || 0,
+      supplierId: item.supplierId || "",
+    }));
+
+    setFormData((prev) => ({
+      ...prev,
+      companyId: authUser?.company || "",
+      PurchaseOrder: generatePurchaseOrderNumber(),
+      products: proposalProducts,
+      totalCost: proposal.totalEstimatedCost || 0,
+      notes: proposal.notes || "",
+      deliveryDate: proposal.expectedDeliveryDate || "",
+    }));
+    setProducts(proposalProducts);
+    setTotalCost(proposal.totalEstimatedCost || 0);
+
+    setShowModal(true);
+  };
+
+  // Check if the user is an Admin or Manager
+  const canCreatePurchaseOrder =
+    authUser?.role === "Admin" || authUser?.role === "Manager";
+
   if (loading) {
     return <div className="text-center text-gray-500">טוען הצעות...</div>;
   }
@@ -614,9 +648,22 @@ const ProcurementProposals = () => {
                 key={proposal._id || Math.random()}
                 className="p-4 border border-gray-200 rounded-md shadow-sm"
               >
-                <h2 className="text-xl font-medium text-gray-800">
-                  {proposal.title || "ללא כותרת"}
-                </h2>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-medium text-gray-800">
+                    {proposal.title || "ללא כותרת"}
+                  </h2>
+                  {proposal.status === "approved and waiting order" &&
+                    canCreatePurchaseOrder && (
+                      <button
+                        onClick={() => openPurchaseOrderModal(proposal)}
+                        className="text-blue-600 hover:text-blue-800"
+                        title="צור תעודת רכש"
+                      >
+                        📦{" "}
+                        {/* Replace with an icon from a library like react-icons */}
+                      </button>
+                    )}
+                </div>
                 <p className="text-gray-600 mt-1">
                   {proposal.description || "ללא תיאור"}
                 </p>

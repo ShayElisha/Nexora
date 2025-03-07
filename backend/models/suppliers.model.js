@@ -4,7 +4,7 @@ const suppliersSchema = new mongoose.Schema(
   {
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "companies",
+      ref: "Company",
       required: true,
     },
     SupplierName: {
@@ -31,12 +31,12 @@ const suppliersSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    Rating: {
+    Rating: [{
       type: Number,
       min: 1,
       max: 5,
       required: false,
-    },
+    }],
     baseCurrency: {
       type: String,
       required: [true, "BaseCurrency is required"],
@@ -45,6 +45,17 @@ const suppliersSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    ConfirmationAccount: {
+      type: String,
+      required: false,
+    },
+    attachments: [
+      {
+        fileName: { type: String },
+        fileUrl: { type: String },
+        uploadedAt: { type: Date, default: Date.now },
+      },
+    ],
     ProductsSupplied: [
       {
         productId: {

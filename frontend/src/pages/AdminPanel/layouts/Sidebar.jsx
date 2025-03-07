@@ -1,4 +1,3 @@
-// src/components/procurement/layouts/Sidebar.jsx
 import {
   FiHome,
   FiSettings,
@@ -11,7 +10,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 const Sidebar = () => {
-  const { t } = useTranslation(); // שימוש ב-namespace של "sidebar"
+  const { t, i18n } = useTranslation(); // Access i18n for language direction
 
   const menuItems = [
     { nameKey: "dashboard", icon: <FiHome />, path: "/Dashboard" },
@@ -55,23 +54,34 @@ const Sidebar = () => {
     },
   ];
 
+  // Determine if the language is RTL
+  const isRTL = ["he", "ar"].includes(i18n.language);
+
   return (
-    <div className="w-64 bg-primary text-white h-full-screen shadow-lg flex flex-col">
-      {/* כותרת עליונה */}
-      <div className="p-4 text-2xl font-bold border-b border-secondary">
+    <div
+      className={`hidden md:block w-48 md:w-56 lg:w-64 bg-primary text-white h-screen shadow-lg flex flex-col fixed top-16 ${
+        isRTL ? "right-0" : "left-0"
+      }`}
+    >
+      {/* Header */}
+      <div className="p-2 md:p-3 lg:p-4 text-lg md:text-xl lg:text-2xl font-bold border-b border-secondary">
         {t("sidebar.adminPanel")}
       </div>
 
-      {/* רשימת תפריטים */}
-      <ul className="space-y-4 mt-6 flex-grow">
+      {/* Menu List */}
+      <ul className="space-y-1 md:space-y-2 lg:space-y-4 mt-2 md:mt-4 lg:mt-6 flex-grow overflow-y-auto">
         {menuItems.map((item, index) => (
           <li key={index} className="rounded-md">
             <Link
               to={item.path}
-              className="flex items-center gap-4 p-4 cursor-pointer rounded-md transition-all duration-300 hover:bg-secondary hover:text-accent"
+              className="flex items-center gap-2 md:gap-3 lg:gap-4 p-2 md:p-3 lg:p-4 cursor-pointer rounded-md transition-all duration-300 hover:bg-secondary hover:text-accent text-xs md:text-sm lg:text-base"
             >
-              <span className="text-xl">{item.icon}</span>
-              <span>{t(`sidebar.menu.${item.nameKey}`)}</span>
+              <span className="text-base md:text-lg lg:text-xl">
+                {item.icon}
+              </span>
+              <span className="truncate">
+                {t(`sidebar.menu.${item.nameKey}`)}
+              </span>
             </Link>
           </li>
         ))}

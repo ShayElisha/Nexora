@@ -16,27 +16,25 @@ const ReceiptPurchase = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
-  // מצבים למודאל
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const [receivedQuantities, setReceivedQuantities] = useState({});
   const [allowCloseWithDiscrepancy, setAllowCloseWithDiscrepancy] =
     useState(false);
-
-  // **מערך של מזהים מורחבים** - כשיש חץ ▼/▲
   const [expandedRows, setExpandedRows] = useState([]);
+  const [isGoodsChecked, setIsGoodsChecked] = useState(false); // חדש: בדיקת סחורה
+  const [additionalNotes, setAdditionalNotes] = useState(""); // חדש: הערות נוספות
+  const [supplierRating, setSupplierRating] = useState(0); // חדש: דירוג לספק (0-5)
 
-  // שימוש ב-react-query לשאילתת נתונים
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["purchaseReceipts", "all"],
     queryFn: fetchAllReceipts,
   });
 
-  // fetchAllReceipts
   async function fetchAllReceipts() {
     try {
       const response = await axiosInstance.get("/procurement");
-      return response.data.data; // הנחה שהנתונים נמצאים ב-data.data
+      return response.data.data;
     } catch (err) {
       throw new Error(
         err.response?.data?.message || "Failed to fetch purchase receipts"
@@ -44,23 +42,18 @@ const ReceiptPurchase = () => {
     }
   }
 
-  // טיפול בשגיאת fetch
   useEffect(() => {
     if (isError) {
       toast.error(error.message || "Error fetching purchase receipts");
     }
   }, [isError, error]);
 
-  // פתיחת/סגירת שורה (חץ)
   const toggleRow = (id) => {
-    if (expandedRows.includes(id)) {
-      setExpandedRows(expandedRows.filter((rowId) => rowId !== id));
-    } else {
-      setExpandedRows([...expandedRows, id]);
-    }
+    setExpandedRows((prev) =>
+      prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
+    );
   };
 
-  // פונקציית עריכה
   const handleEditClick = (receipt) => {
     setSelectedReceipt(receipt);
     const initialQuantities = {};
@@ -70,10 +63,12 @@ const ReceiptPurchase = () => {
     });
     setReceivedQuantities(initialQuantities);
     setAllowCloseWithDiscrepancy(false);
+    setIsGoodsChecked(false); // איפוס בדיקת סחורה
+    setAdditionalNotes(""); // איפוס הערות
+    setSupplierRating(0); // איפוס דירוג
     setIsModalOpen(true);
   };
 
-  // פונקציית מחיקה
   const handleDeleteClick = async (id) => {
     if (window.confirm(t("receipts.confirm_delete"))) {
       try {
@@ -81,7 +76,6 @@ const ReceiptPurchase = () => {
         toast.success(t("receipts.delete_success"));
         queryClient.invalidateQueries(["purchaseReceipts", "all"]);
       } catch (err) {
-        console.error(err);
         toast.error(
           t("receipts.delete_error") || "Failed to delete procurement"
         );
@@ -89,7 +83,6 @@ const ReceiptPurchase = () => {
     }
   };
 
-  // שינוי בכמות שהתקבלה
   const handleQuantityChange = (productId, value) => {
     setReceivedQuantities((prev) => ({
       ...prev,
@@ -97,11 +90,17 @@ const ReceiptPurchase = () => {
     }));
   };
 
-  // שמירת הכמויות שהתקבלו
   const handleSaveReceived = async () => {
     if (!selectedReceipt) return;
 
-    // בדיקה מקומית
+    // בדיקה אם הסחורה נבדקה
+    if (!isGoodsChecked) {
+      toast.error(
+        "Please confirm that the goods have been checked before saving."
+      );
+      return;
+    }
+
     for (const [productId, qty] of Object.entries(receivedQuantities)) {
       if (isNaN(qty) || qty < 0) {
         toast.error("Please enter valid quantities.");
@@ -119,6 +118,8 @@ const ReceiptPurchase = () => {
           allowCloseWithDiscrepancy: discrepancies
             ? allowCloseWithDiscrepancy
             : true,
+          additionalNotes, // חדש: שליחת הערות נוספות
+          supplierRating, // חדש: שליחת דירוג הספק
         }
       );
 
@@ -132,12 +133,10 @@ const ReceiptPurchase = () => {
         );
       }
     } catch (err) {
-      console.error(err);
       toast.error("Failed to update received quantities.");
     }
   };
 
-  // סינון בצד הלקוח
   const filteredData = data
     ? data.filter(
         (receipt) =>
@@ -146,12 +145,10 @@ const ReceiptPurchase = () => {
       )
     : [];
 
-  // חישוב הבדלים
   const discrepancies = selectedReceipt
     ? hasDiscrepancies(selectedReceipt, receivedQuantities)
     : false;
 
-  // אם אין הבדלים - בטל checkbox
   useEffect(() => {
     if (!discrepancies) {
       setAllowCloseWithDiscrepancy(false);
@@ -172,7 +169,6 @@ const ReceiptPurchase = () => {
             <table className="min-w-full bg-gray-700 rounded-lg overflow-hidden">
               <thead>
                 <tr>
-                  {/* עמודה לחץ ▼ */}
                   <th className="py-2 px-4 bg-gray-800"></th>
                   <th className="py-2 px-4 bg-gray-800">
                     {t("receipts.order_id")}
@@ -200,7 +196,6 @@ const ReceiptPurchase = () => {
                   return (
                     <React.Fragment key={receipt._id}>
                       <tr className="hover:bg-gray-600">
-                        {/* עמודת החץ ▼/▲ */}
                         <td className="border border-gray-700 p-2 text-center">
                           <button
                             onClick={() => toggleRow(receipt._id)}
@@ -239,15 +234,12 @@ const ReceiptPurchase = () => {
                           </button>
                         </td>
                       </tr>
-
-                      {/* שורת הרחבה (אם expandedRows כולל את ה-ID של ה-Receipt) */}
                       {isExpanded && (
                         <tr className="bg-gray-800">
                           <td
                             colSpan={7}
                             className="border border-gray-700 p-3 text-white"
                           >
-                            {/* במידה ויש הערה: */}
                             {receipt.notes ? (
                               <div>
                                 <strong>Note:</strong> {receipt.notes}
@@ -270,7 +262,6 @@ const ReceiptPurchase = () => {
           !isLoading && <p>{t("receipts.no_records")}</p>
         )}
 
-        {/* --- מודאל לעריכת תעודת רכש --- */}
         {isModalOpen && selectedReceipt && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-3/4 max-h-[90vh] overflow-y-auto">
@@ -300,7 +291,6 @@ const ReceiptPurchase = () => {
                 </p>
               </div>
 
-              {/* טבלת המוצרים */}
               <table className="min-w-full bg-gray-700 rounded-lg overflow-hidden mb-4">
                 <thead>
                   <tr>
@@ -328,10 +318,12 @@ const ReceiptPurchase = () => {
                         <input
                           type="number"
                           min="0"
-                          max={product.quantity - product.receivedQuantity}
+                          max={
+                            product.quantity - (product.receivedQuantity || 0)
+                          }
                           value={
                             receivedQuantities[product.productId.toString()] ??
-                            product.quantity - product.receivedQuantity
+                            (product.receivedQuantity || 0)
                           }
                           onChange={(e) =>
                             handleQuantityChange(
@@ -347,7 +339,55 @@ const ReceiptPurchase = () => {
                 </tbody>
               </table>
 
-              {/* Checkbox לאפשר סגירה עם דיסקרפנסי */}
+              {/* Checkbox לבדיקת סחורה */}
+              <div className="mb-4">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={isGoodsChecked}
+                    onChange={(e) => setIsGoodsChecked(e.target.checked)}
+                    className="mr-2"
+                  />
+                  {t("receipts.goods_checked")}
+                </label>
+              </div>
+
+              {/* שדה הערות נוספות */}
+              <div className="mb-4">
+                <label className="block mb-2">
+                  {t("receipts.additional_notes")}
+                </label>
+                <textarea
+                  value={additionalNotes}
+                  onChange={(e) => setAdditionalNotes(e.target.value)}
+                  className="w-full p-2 rounded bg-gray-700 text-gray-300"
+                  rows="3"
+                  placeholder={t("receipts.enter_additional_notes")}
+                />
+              </div>
+
+              {/* שדה דירוג לספק */}
+              <div className="mb-4">
+                <label className="block mb-2">
+                  {t("receipts.supplier_rating")}
+                </label>
+                <select
+                  value={supplierRating}
+                  onChange={(e) => setSupplierRating(Number(e.target.value))}
+                  className="w-full p-2 rounded bg-gray-700 text-gray-300"
+                >
+                  <option value={0} disabled>
+                    Choose a rating (1-5)
+                  </option>{" "}
+                  {/* 0 לא תקף, רק כברירת מחדל */}
+                  <option value={1}>1 - Poor</option>
+                  <option value={2}>2 - Fair</option>
+                  <option value={3}>3 - Good</option>
+                  <option value={4}>4 - Very Good</option>
+                  <option value={5}>5 - Excellent</option>
+                </select>
+              </div>
+
               {discrepancies && (
                 <div className="mb-4">
                   <label className="flex items-center">
@@ -364,7 +404,6 @@ const ReceiptPurchase = () => {
                 </div>
               )}
 
-              {/* כפתורי שמירה וביטול */}
               <div className="flex justify-end">
                 <button
                   className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600 mr-2"

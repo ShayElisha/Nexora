@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import axiosInstance from "../../lib/axios";
 import toast from "react-hot-toast";
 import SignatureCanvas from "react-signature-canvas";
-import { FaBell } from "react-icons/fa";
+import { FaBell, FaBars, FaTimes } from "react-icons/fa";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 
-// ----- מערך צבעים לפונקציית רקע רנדומלית -----
+// Random Background Colors
 const colorArray = [
   "bg-red-500",
   "bg-green-500",
@@ -18,7 +18,6 @@ const colorArray = [
   "bg-indigo-500",
 ];
 
-// פונקציית עזר לקבלת כיתה (className) עם צבע רנדומלי
 const getRandomColorClass = () => {
   const randomIndex = Math.floor(Math.random() * colorArray.length);
   return colorArray[randomIndex];
@@ -29,7 +28,7 @@ const Navbar = () => {
   const queryClient = useQueryClient();
   const signaturePadRef = useRef(null);
 
-  // ======= States =======
+  // States
   const [showPopup, setShowPopup] = useState(false);
   const [selectedPDF, setSelectedPDF] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -39,16 +38,14 @@ const Navbar = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [openSubDropdown, setOpenSubDropdown] = useState(null);
-
-  // State עבור צבע האוואטר במקרה שאין תמונה
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [avatarColorClass, setAvatarColorClass] = useState("");
 
-  // נגריל צבע רקע עבור האוואטר פעם אחת בכל טעינת הקומפוננטה
   useEffect(() => {
     setAvatarColorClass(getRandomColorClass());
   }, []);
 
-  // ======= Query: Authenticated User =======
+  // Query: Authenticated User
   const { data: authData } = useQuery({
     queryKey: ["authUser"],
     queryFn: async () => {
@@ -60,13 +57,10 @@ const Navbar = () => {
   const authUser = authData?.user;
   const firstName = authUser?.name || "Guest";
   const lastName = authUser?.lastName || "";
-
-  // **הסרנו את ה־placeholder** כדי לאפשר הצגת הרקע הרנדומלי באמת
   const profileImage = authUser?.profileImage;
-
   const isLoggedIn = !!authUser;
 
-  // ======= Mutation: Logout =======
+  // Mutation: Logout
   const { mutate: logout, isLoading: isLoggingOut } = useMutation({
     mutationFn: async () => {
       await axiosInstance.post("/auth/logout");
@@ -82,7 +76,7 @@ const Navbar = () => {
     },
   });
 
-  // ======= Queries: Procurement & Budget & Notifications =======
+  // Queries: Procurement, Budget, Notifications
   const { data: procurementData = [] } = useQuery({
     queryKey: ["procurement"],
     queryFn: async () => {
@@ -117,7 +111,7 @@ const Navbar = () => {
   });
   const unreadCount = adminNotifications.filter((n) => !n.isRead).length || 0;
 
-  // ======= Documents needing signature =======
+  // Documents needing signature
   const itemsRequiringSignature = procurementData.filter(
     (item) =>
       item.approvalStatus === "Pending Approval" &&
@@ -136,12 +130,13 @@ const Navbar = () => {
       )
   );
 
-  // ======= Handlers: Signatures Popup =======
+  // Handlers: Signatures Popup
   const togglePopup = () => {
     setShowPopup((prev) => !prev);
     setShowNotifications(false);
     setOpenDropdown(null);
     setOpenSubDropdown(null);
+    setIsMenuOpen(false);
   };
 
   const handleSignature = () => {
@@ -160,6 +155,7 @@ const Navbar = () => {
     setShowModal(true);
     setShowPopup(false);
     setShowNotifications(false);
+    setIsMenuOpen(false);
   };
 
   const handleCloseModal = () => {
@@ -200,12 +196,13 @@ const Navbar = () => {
     }
   };
 
-  // ======= Handlers: Notifications =======
+  // Handlers: Notifications
   const handleNotificationsClick = () => {
     setShowNotifications((prev) => !prev);
     setShowPopup(false);
     setOpenDropdown(null);
     setOpenSubDropdown(null);
+    setIsMenuOpen(false);
     refetchAdminNotifications();
   };
 
@@ -218,10 +215,10 @@ const Navbar = () => {
       refetchAdminNotifications();
     } catch (error) {
       console.error("Error deleting notification:", error);
-      const serverMessage =
+      toast.error(
         error.response?.data?.message ||
-        t("navbar.notifications.notificationDeleteError");
-      toast.error(serverMessage);
+          t("navbar.notifications.notificationDeleteError")
+      );
     }
   };
 
@@ -249,9 +246,16 @@ const Navbar = () => {
     }
   };
 
-  // =============================================
-  //       ROLE-BASED COLOR & MENU DATA
-  // =============================================
+  // Handlers: Hamburger Menu
+  const toggleMenu = () => {
+    setIsMenuOpen((prev) => !prev);
+    setShowPopup(false);
+    setShowNotifications(false);
+    setOpenDropdown(null);
+    setOpenSubDropdown(null);
+  };
+
+  // Role-Based Links & Colors
   const roleLinkColor = (() => {
     switch (authUser?.role) {
       case "Admin":
@@ -316,6 +320,19 @@ const Navbar = () => {
           to: "/dashboard/procurement/approveProcurment",
           text: "Receipt Purchase",
         },
+        {
+          label: t("navbar.ProcurementProposals"),
+          subMenu: [
+            {
+              to: "/dashboard/ProcurementProposals",
+              text: t("navbar.ProcurementProposals"),
+            },
+            {
+              to: "/dashboard/ProcurementProposalsList",
+              text: t("navbar.ProcurementProposalsList"),
+            },
+          ],
+        },
       ],
     },
     {
@@ -352,6 +369,10 @@ const Navbar = () => {
           to: "/dashboard/department/Add-Department",
           text: t("navbar.add_department"),
         },
+        {
+          to: "/dashboard/department/DepartmentList",
+          text: t("navbar.departmentList"),
+        },
       ],
     },
     {
@@ -362,10 +383,10 @@ const Navbar = () => {
       ],
     },
     {
-      label: "Orders",
+      label: t("navbar.Orders"),
       subMenu: [
-        { to: "/dashboard/Customers/Orders", text: "Orders List" },
-        { to: "/dashboard/Customers/AddOrder", text: "Add-Orders" },
+        { to: "/dashboard/Customers/Orders", text: t("navbar.Orders List") },
+        { to: "/dashboard/Customers/AddOrder", text: t("navbar.Add-Orders") },
       ],
     },
     {
@@ -380,18 +401,12 @@ const Navbar = () => {
       label: t("navbar.finance"),
       subMenu: [
         { to: "/employee/finance", text: t("navbar.finance_records") },
-        {
-          to: "/employee/AddFinance",
-          text: t("navbar.create_finance_record"),
-        },
+        { to: "/employee/AddFinance", text: t("navbar.create_finance_record") },
       ],
     },
     {
       label: t("navbar.products"),
-      subMenu: [
-        { to: "/employee/products", text: t("navbar.all_products") },
-        { to: "/employee/add-product", text: t("navbar.add_product") },
-      ],
+      subMenu: [{ to: "/employee/products", text: t("navbar.all_products") }],
     },
     {
       label: t("navbar.procurement"),
@@ -399,6 +414,10 @@ const Navbar = () => {
         {
           to: "/employee/ProcurementProposals",
           text: t("navbar.ProcurementProposals"),
+        },
+        {
+          to: "/employee/ProcurementProposalsList",
+          text: t("navbar.ProcurementProposalsList"),
         },
       ],
     },
@@ -410,18 +429,12 @@ const Navbar = () => {
       label: t("navbar.finance"),
       subMenu: [
         { to: "/employee/finance", text: t("navbar.finance_records") },
-        {
-          to: "/employee/AddFinance",
-          text: t("navbar.create_finance_record"),
-        },
+        { to: "/employee/AddFinance", text: t("navbar.create_finance_record") },
       ],
     },
     {
       label: t("navbar.products"),
-      subMenu: [
-        { to: "/employee/products", text: t("navbar.all_products") },
-        { to: "/employee/add-product", text: t("navbar.add_product") },
-      ],
+      subMenu: [{ to: "/employee/products", text: t("navbar.all_products") }],
     },
     {
       label: t("navbar.procurement"),
@@ -429,6 +442,10 @@ const Navbar = () => {
         {
           to: "/employee/ProcurementProposals",
           text: t("navbar.ProcurementProposals"),
+        },
+        {
+          to: "/employee/ProcurementProposalsList",
+          text: t("navbar.ProcurementProposalsList"),
         },
       ],
     },
@@ -443,12 +460,10 @@ const Navbar = () => {
     navigationLinks = employeeLinks;
   }
 
-  // =============================================
-  //       RENDER FUNCTION FOR DROPDOWNS
-  // =============================================
+  // Render SubMenu
   const renderSubMenu = (subMenu, parentIndex) => {
     return (
-      <ul className="mt-2 space-y-1">
+      <ul className="mt-1 space-y-1 pl-2 sm:pl-4 text-xs sm:text-sm lg:text-base">
         {subMenu.map((item, subIndex) => {
           const uniqueSubIndex = `${parentIndex}-${subIndex}`;
           if (item.subMenu) {
@@ -461,16 +476,15 @@ const Navbar = () => {
                       openSubDropdown === uniqueSubIndex ? null : uniqueSubIndex
                     );
                   }}
-                  className={`flex justify-between items-center w-full px-3 py-2 rounded-md transition-colors
-                              bg-gray-100 hover:bg-gray-200 focus:outline-none ${roleLinkColor}`}
+                  className={`flex justify-between items-center w-full px-1 sm:px-2 py-1 rounded transition-colors ${roleLinkColor}`}
                 >
                   <span>{item.label}</span>
-                  <span className="ml-2 text-xs">
+                  <span className="ml-1 sm:ml-2 text-xs">
                     {openSubDropdown === uniqueSubIndex ? "▲" : "▼"}
                   </span>
                 </button>
                 {openSubDropdown === uniqueSubIndex && (
-                  <div className="ml-4 border-l-2 border-gray-200 pl-2">
+                  <div className="ml-1 sm:ml-2">
                     {renderSubMenu(item.subMenu, uniqueSubIndex)}
                   </div>
                 )}
@@ -486,8 +500,9 @@ const Navbar = () => {
                     setOpenSubDropdown(null);
                     setShowPopup(false);
                     setShowNotifications(false);
+                    setIsMenuOpen(false);
                   }}
-                  className={`block px-3 py-2 rounded-md hover:bg-gray-200 transition-colors ${roleLinkColor}`}
+                  className={`block px-1 sm:px-2 py-1 rounded hover:bg-gray-200 transition-colors ${roleLinkColor}`}
                 >
                   {item.text || item.label}
                 </Link>
@@ -500,19 +515,34 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-blue-900 via-purple-900 to-gray-900 text-white px-6 py-3 shadow-lg sticky top-0 z-50">
-      <div className="flex items-center justify-between">
-        {/* Left Side: Logo */}
+    <nav className="bg-gradient-to-r from-blue-900 via-purple-900 to-gray-900 text-white px-2 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 shadow-lg sticky top-0 z-50 w-full min-w-full">
+      <div className="w-full flex items-center justify-between">
+        {/* Logo */}
         <Link
           to="/"
-          className="text-3xl font-extrabold tracking-wide text-white hover:scale-105 transition-transform"
+          className="text-lg sm:text-xl lg:text-2xl font-extrabold tracking-wide text-white hover:scale-105 transition-transform flex-shrink-0"
         >
           Nexora
         </Link>
 
-        {/* Center: Navigation Links */}
+        {/* Hamburger Menu Button */}
         {isLoggedIn && (
-          <div className="flex-1 flex justify-center items-center space-x-4 hidden md:flex">
+          <button
+            onClick={toggleMenu}
+            className="xl:hidden text-white focus:outline-none flex-shrink-0"
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? (
+              <FaTimes className="w-5 h-5 sm:w-6 sm:h-6 xl:w-7 xl:h-7" />
+            ) : (
+              <FaBars className="w-5 h-5 sm:w-6 sm:h-6 xl:w-7 xl:h-7" />
+            )}
+          </button>
+        )}
+
+        {/* Desktop Navigation Links */}
+        {isLoggedIn && (
+          <div className="hidden xl:flex flex-1 justify-center items-center space-x-1 sm:space-x-2 lg:space-x-3 xl:space-x-4 px-2 sm:px-4 lg:px-6">
             {navigationLinks.map((navItem, index) => {
               if (navItem.subMenu) {
                 return (
@@ -529,7 +559,7 @@ const Navbar = () => {
                         setShowPopup(false);
                         setShowNotifications(false);
                       }}
-                      className={`flex items-center space-x-0.5 px-2 py-2 rounded-md hover:bg-black/10 transition-colors ${roleLinkColor}`}
+                      className={`flex items-center space-x-0.5 px-1 sm:px-2 lg:px-3 py-1 rounded-md hover:bg-black/10 transition-colors text-xs sm:text-sm lg:text-base ${roleLinkColor}`}
                     >
                       <span>{navItem.label}</span>
                       <span className="text-xs">
@@ -537,14 +567,7 @@ const Navbar = () => {
                       </span>
                     </button>
                     {openDropdown === index && (
-                      <div
-                        className="absolute left-0 mt-2 bg-white text-gray-700 rounded-md shadow-lg p-3 w-56 z-50"
-                        onMouseLeave={() => {
-                          // ניתן להסיר את האירוע אם לא רוצים שייסגר אוטומטית
-                          // setOpenDropdown(null);
-                          // setOpenSubDropdown(null);
-                        }}
-                      >
+                      <div className="absolute left-0 mt-2 bg-white text-gray-700 rounded-md shadow-lg p-2 w-40 sm:w-48 lg:w-56 xl:w-64 z-50">
                         {renderSubMenu(navItem.subMenu, index)}
                       </div>
                     )}
@@ -555,7 +578,7 @@ const Navbar = () => {
                   <Link
                     key={index}
                     to={navItem.to}
-                    className={`px-4 py-2 rounded-md hover:bg-black/10 transition-colors ${roleLinkColor}`}
+                    className={`px-1 sm:px-2 lg:px-3 py-1 rounded-md hover:bg-black/10 transition-colors text-xs sm:text-sm lg:text-base ${roleLinkColor}`}
                     onClick={() => {
                       setOpenDropdown(null);
                       setOpenSubDropdown(null);
@@ -571,29 +594,29 @@ const Navbar = () => {
           </div>
         )}
 
-        {/* Right Side: Signatures, Notifications, Profile, Logout/Login */}
-        <div className="flex items-center space-x-4">
+        {/* Right Side: Profile, Signatures, Notifications, Logout */}
+        <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-3 flex-shrink-0">
           {isLoggedIn ? (
             <>
               {(itemsRequiringSignature.length > 0 ||
                 budgetRequiringSignature.length > 0) && (
                 <div className="relative">
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-3 w-3 sm:h-4 sm:w-4 flex items-center justify-center">
                     {itemsRequiringSignature.length +
                       budgetRequiringSignature.length}
                   </span>
                   <button
                     onClick={handleSignature}
-                    className="px-3 py-2 bg-accent text-white rounded hover:bg-green-600 transition duration-300"
+                    className="px-1 sm:px-2 py-1 bg-accent text-white rounded hover:bg-green-600 text-xs sm:text-sm lg:text-base transition duration-300"
                   >
                     {t("navbar.Signatures.sign_now")}
                   </button>
                   {showPopup && (
-                    <div className="absolute right-0 mt-2 bg-white text-gray-800 shadow-lg rounded-md p-4 w-96 z-50">
-                      <h3 className="text-lg font-bold mb-2">
+                    <div className="absolute right-0 mt-2 bg-white text-gray-800 shadow-lg rounded-md p-2 sm:p-3 w-60 sm:w-72 lg:w-96 z-50 max-h-64 overflow-y-auto">
+                      <h3 className="text-xs sm:text-sm lg:text-base font-bold mb-2">
                         {t("navbar.Signatures.documents_requiring_signature")}
                       </h3>
-                      <ul className="max-h-64 overflow-y-auto">
+                      <ul>
                         {itemsRequiringSignature.map((item) => {
                           const nextSigner =
                             item.signers[item.currentSignerIndex];
@@ -604,15 +627,10 @@ const Navbar = () => {
                             (s) => s.hasSigned
                           ).length;
                           const remainingSigners = totalSigners - signedCount;
-                          if (!item.PurchaseOrder) {
-                            console.warn(
-                              `PurchaseOrder missing for procurement ${item._id}`
-                            );
-                            return null;
-                          }
+                          if (!item.PurchaseOrder) return null;
                           return (
-                            <li key={item._id} className="mb-3 border-b pb-2">
-                              <div>
+                            <li key={item._id} className="mb-2 border-b pb-2">
+                              <div className="text-xs sm:text-sm">
                                 <strong>
                                   {t("navbar.Signatures.purchase_order")}:
                                 </strong>{" "}
@@ -627,19 +645,19 @@ const Navbar = () => {
                                       "procurement"
                                     )
                                   }
-                                  className="mt-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300"
+                                  className="mt-1 px-1 sm:px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs sm:text-sm transition duration-300"
                                 >
                                   {t("navbar.Signatures.sign_now")}
                                 </button>
                               ) : (
                                 <>
-                                  <p className="text-sm text-gray-600">
+                                  <p className="text-xs sm:text-sm text-gray-600">
                                     {t("navbar.Signatures.next_signer")}:{" "}
                                     {nextSigner
                                       ? `${nextSigner.name} (${nextSigner.role})`
                                       : t("navbar.Signatures.no_next_signer")}
                                   </p>
-                                  <p className="text-sm text-gray-600">
+                                  <p className="text-xs sm:text-sm text-gray-600">
                                     {t("navbar.Signatures.remaining_signers", {
                                       count: remainingSigners,
                                     })}
@@ -660,24 +678,18 @@ const Navbar = () => {
                           ).length;
                           const remainingSigners = totalSigners - signedCount;
                           return (
-                            <li key={item._id} className="mb-3 border-b pb-2">
-                              <div>
+                            <li key={item._id} className="mb-2 border-b pb-2">
+                              <div className="text-xs sm:text-sm">
                                 <strong>
                                   {t("navbar.Signatures.budget_name")}:
                                 </strong>{" "}
                                 {item.departmentOrProjectName}
                               </div>
-                              <div>
+                              <div className="text-xs sm:text-sm">
                                 <strong>
                                   {t("navbar.Signatures.amount")}:
                                 </strong>{" "}
                                 ${item.amount}
-                              </div>
-                              <div>
-                                <strong>
-                                  {t("navbar.Signatures.department")}:
-                                </strong>{" "}
-                                {item.department}
                               </div>
                               {isMyTurn ? (
                                 <button
@@ -694,19 +706,19 @@ const Navbar = () => {
                                       }
                                     )
                                   }
-                                  className="mt-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition duration-300"
+                                  className="mt-1 px-1 sm:px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs sm:text-sm transition duration-300"
                                 >
                                   {t("navbar.Signatures.sign_now")}
                                 </button>
                               ) : (
                                 <>
-                                  <p className="text-sm text-gray-600">
+                                  <p className="text-xs sm:text-sm text-gray-600">
                                     {t("navbar.Signatures.next_signer")}:{" "}
                                     {nextSigner
                                       ? `${nextSigner.name} (${nextSigner.role})`
                                       : t("navbar.Signatures.no_next_signer")}
                                   </p>
-                                  <p className="text-sm text-gray-600">
+                                  <p className="text-xs sm:text-sm text-gray-600">
                                     {t("navbar.Signatures.remaining_signers", {
                                       count: remainingSigners,
                                     })}
@@ -718,11 +730,8 @@ const Navbar = () => {
                         })}
                       </ul>
                       <button
-                        onClick={() => {
-                          setShowPopup(false);
-                          setShowNotifications(false);
-                        }}
-                        className="mt-3 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                        onClick={() => setShowPopup(false)}
+                        className="mt-2 px-1 sm:px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs sm:text-sm"
                       >
                         {t("buttons.close")}
                       </button>
@@ -735,11 +744,11 @@ const Navbar = () => {
                 <div className="relative">
                   <button
                     onClick={handleNotificationsClick}
-                    className="relative mr-2"
+                    className="relative"
                   >
-                    <FaBell size={24} />
+                    <FaBell className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
                     {unreadCount > 0 && (
-                      <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 sm:px-1.5">
                         {unreadCount}
                       </span>
                     )}
@@ -748,24 +757,23 @@ const Navbar = () => {
                     <div
                       className={`absolute ${
                         i18n.language === "he" || i18n.language === "ar"
-                          ? "-left-7"
+                          ? "left-0"
                           : "right-0"
-                      } mt-2 bg-white p-3 rounded shadow-md w-[500px] z-50 text-gray-800`}
-                      style={{ maxHeight: "500px", overflowY: "auto" }}
+                      } mt-2 bg-white p-2 sm:p-3 rounded shadow-md w-56 sm:w-72 lg:w-96 z-50 text-gray-800 max-h-64 overflow-y-auto`}
                     >
-                      <h3 className="font-bold mb-2 text-lg border-b pb-2 flex justify-between items-center">
+                      <h3 className="font-bold text-xs sm:text-sm lg:text-base mb-2 border-b pb-1 flex justify-between items-center">
                         {t("notifications.title")}
-                        <span className="text-sm text-gray-500">
-                          <button
-                            className="hover:underline"
-                            onClick={markNotificationAsReadAll}
-                          >
-                            {t("notifications.readAll")}
-                          </button>
-                        </span>
+                        <button
+                          className="text-xs sm:text-sm hover:underline"
+                          onClick={markNotificationAsReadAll}
+                        >
+                          {t("notifications.readAll")}
+                        </button>
                       </h3>
                       {isLoadingNotifications ? (
-                        <p>{t("notifications.loading")}</p>
+                        <p className="text-xs sm:text-sm">
+                          {t("notifications.loading")}
+                        </p>
                       ) : adminNotifications.length > 0 ? (
                         adminNotifications.map((notification) => (
                           <div
@@ -774,7 +782,7 @@ const Navbar = () => {
                               !notification.isRead &&
                               markNotificationAsRead(notification._id)
                             }
-                            className={`relative border-b border-gray-200 mb-2 pb-2 pl-3 pr-6 cursor-pointer rounded ${
+                            className={`relative border-b mb-1 pb-1 pl-2 pr-4 cursor-pointer rounded ${
                               notification.isRead
                                 ? "bg-gray-100 opacity-70"
                                 : "bg-white hover:bg-gray-50"
@@ -785,17 +793,14 @@ const Navbar = () => {
                                 e.stopPropagation();
                                 deleteNotification(notification._id);
                               }}
-                              className="absolute top-1 right-1 px-1 py-0.5 bg-red-500 text-white rounded-full hover:bg-red-600 text-xs"
-                              aria-label={t(
-                                "navbar.notifications.notificationDeleted"
-                              )}
+                              className="absolute top-0 right-0 px-1 py-0.5 bg-red-500 text-white rounded-full hover:bg-red-600 text-xs"
                             >
                               ×
                             </button>
-                            <p className="text-sm text-gray-700">
+                            <p className="text-xs sm:text-sm">
                               {notification.content}
                             </p>
-                            <span className="text-xs text-gray-500 block">
+                            <span className="text-xs sm:text-sm text-gray-500 block">
                               {new Date(
                                 notification.createdAt
                               ).toLocaleString()}
@@ -803,15 +808,16 @@ const Navbar = () => {
                           </div>
                         ))
                       ) : (
-                        <p>{t("navbar.notifications.no_notifications")}</p>
+                        <p className="text-xs sm:text-sm">
+                          {t("navbar.notifications.no_notifications")}
+                        </p>
                       )}
                     </div>
                   )}
                 </div>
               )}
 
-              {/* כאן מציגים תמונת פרופיל או אוואטר טקסטואלי */}
-              <div className="w-10 h-10 rounded-full border-2 border-secondary overflow-hidden">
+              <div className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 rounded-full border-2 border-secondary overflow-hidden flex-shrink-0">
                 {profileImage ? (
                   <img
                     src={profileImage}
@@ -822,19 +828,19 @@ const Navbar = () => {
                   <div
                     className={`w-full h-full flex items-center justify-center ${avatarColorClass}`}
                   >
-                    <span className="text-white text-xl font-bold">
+                    <span className="text-white text-sm sm:text-base lg:text-lg font-bold">
                       {authUser?.name?.charAt(0)?.toUpperCase() || "U"}
                     </span>
                   </div>
                 )}
               </div>
 
-              <span className="hidden md:block font-medium">
+              <span className="hidden xl:block text-xs sm:text-sm lg:text-base font-medium truncate max-w-[100px] sm:max-w-[150px]">
                 {t("navbar.profile.hello", { firstName, lastName })}
               </span>
               <button
                 onClick={() => logout()}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition duration-300"
+                className="px-1 sm:px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-xs sm:text-sm lg:text-base transition duration-300"
                 disabled={isLoggingOut}
               >
                 {isLoggingOut
@@ -845,7 +851,7 @@ const Navbar = () => {
           ) : (
             <Link
               to="/login"
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300"
+              className="px-1 sm:px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs sm:text-sm lg:text-base transition duration-300"
             >
               {t("navbar.profile.login")}
             </Link>
@@ -853,39 +859,78 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* ===== Signature Modal ===== */}
+      {/* Hamburger Menu (Mobile - below 1400px) */}
+      {isLoggedIn && isMenuOpen && (
+        <div className="xl:hidden mt-1 sm:mt-2 bg-white text-gray-800 rounded-md shadow-lg p-2 sm:p-3 w-full max-h-[80vh] overflow-y-auto">
+          {navigationLinks.map((navItem, index) => (
+            <div key={index} className="mb-1 sm:mb-2">
+              {navItem.subMenu ? (
+                <div>
+                  <button
+                    onClick={() => {
+                      if (openDropdown === index) {
+                        setOpenDropdown(null);
+                        setOpenSubDropdown(null);
+                      } else {
+                        setOpenDropdown(index);
+                        setOpenSubDropdown(null);
+                      }
+                    }}
+                    className={`flex justify-between items-center w-full px-1 sm:px-2 py-1 rounded text-xs sm:text-sm ${roleLinkColor}`}
+                  >
+                    <span>{navItem.label}</span>
+                    <span className="text-xs">
+                      {openDropdown === index ? "▲" : "▼"}
+                    </span>
+                  </button>
+                  {openDropdown === index &&
+                    renderSubMenu(navItem.subMenu, index)}
+                </div>
+              ) : (
+                <Link
+                  to={navItem.to}
+                  onClick={() => {
+                    setOpenDropdown(null);
+                    setOpenSubDropdown(null);
+                    setIsMenuOpen(false);
+                  }}
+                  className={`block px-1 sm:px-2 py-1 rounded hover:bg-gray-200 text-xs sm:text-sm ${roleLinkColor}`}
+                >
+                  {navItem.label}
+                </Link>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Signature Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-2xl relative">
-            <h2 className="text-2xl font-extrabold text-gray-800 mb-6 text-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-2 sm:px-4">
+          <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 lg:p-6 w-full max-w-xs sm:max-w-md lg:max-w-2xl relative">
+            <h2 className="text-sm sm:text-lg lg:text-xl font-bold text-gray-800 mb-2 sm:mb-4 text-center">
               {selectedDocumentType === "budget"
                 ? t("navbar.Signatures.budgetDocument")
                 : t("navbar.Signatures.procurementDocument")}{" "}
               {t("navbar.Signatures.digitalSignature")}
             </h2>
             {selectedDocumentType === "budget" && selectedBudget && (
-              <div className="mb-6 p-5 border border-gray-300 rounded-lg bg-gray-50 shadow-sm">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
+              <div className="mb-2 sm:mb-4 p-1 sm:p-2 lg:p-3 border rounded bg-gray-50 text-xs sm:text-sm lg:text-base">
+                <h3 className="text-sm sm:text-base lg:text-lg font-bold mb-1 sm:mb-2">
                   {t("navbar.Signatures.budgetSummary")} -{" "}
                   {selectedBudget.budgetName}
                 </h3>
-                <p className="text-lg text-gray-800 mb-2">
-                  <strong className="font-semibold">
-                    {t("navbar.Signatures.amount")}:
-                  </strong>{" "}
-                  ${selectedBudget.amount}
+                <p>
+                  <strong>{t("navbar.Signatures.amount")}:</strong> $
+                  {selectedBudget.amount}
                 </p>
-                <p className="text-lg text-gray-800 mb-2">
-                  <strong className="font-semibold">
-                    {t("navbar.Signatures.department")}:
-                  </strong>{" "}
+                <p>
+                  <strong>{t("navbar.Signatures.department")}:</strong>{" "}
                   {selectedBudget.departmentId?.name ||
                     selectedBudget.departmentId}
                 </p>
-                <p className="text-lg text-gray-800">
-                  <strong className="font-semibold">
-                    {t("navbar.Signatures.description")}:
-                  </strong>{" "}
+                <p>
+                  <strong>{t("navbar.Signatures.description")}:</strong>{" "}
                   {selectedBudget.description}
                 </p>
               </div>
@@ -894,28 +939,38 @@ const Navbar = () => {
               <iframe
                 src={selectedPDF}
                 title="Document PDF"
-                className="w-full h-80 mb-6 border border-gray-400 rounded-lg shadow-sm"
+                className="w-full h-32 sm:h-48 lg:h-64 mb-2 sm:mb-4 border rounded"
               />
             )}
             <SignatureCanvas
               ref={signaturePadRef}
               penColor="black"
               canvasProps={{
-                width: 600,
-                height: 200,
-                className: "border border-gray-400 rounded-lg shadow-sm",
+                width:
+                  window.innerWidth < 640
+                    ? 250
+                    : window.innerWidth < 1024
+                    ? 350
+                    : 500,
+                height:
+                  window.innerWidth < 640
+                    ? 100
+                    : window.innerWidth < 1024
+                    ? 120
+                    : 150,
+                className: "border rounded w-full",
               }}
             />
-            <div className="flex justify-end mt-6">
+            <div className="flex justify-end mt-2 sm:mt-4 space-x-1 sm:space-x-2">
               <button
                 onClick={handleCloseModal}
-                className="px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition duration-300 mr-4 shadow-md"
+                className="px-2 sm:px-3 lg:px-4 py-1 sm:py-1.5 bg-red-600 text-white rounded text-xs sm:text-sm lg:text-base hover:bg-red-700 transition duration-300"
               >
                 {t("events.cancel")}
               </button>
               <button
                 onClick={handleSaveSignature}
-                className="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition duration-300 shadow-md"
+                className="px-2 sm:px-3 lg:px-4 py-1 sm:py-1.5 bg-green-600 text-white rounded text-xs sm:text-sm lg:text-base hover:bg-red-700 transition duration-300"
               >
                 {t("navbar.Signatures.save")}
               </button>

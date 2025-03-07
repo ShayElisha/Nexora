@@ -526,14 +526,11 @@ const checkAndNotifySubscriptionsEndingSoon = async () => {
     const today = new Date();
     const oneWeekLater = new Date(today);
     oneWeekLater.setDate(today.getDate() + 7);
+    const oneWeekInMs = 7 * 24 * 60 * 60 * 1000; // 7 ימים במילישניות
 
     // שליפת כל המנויים הפעילים מ-Stripe
     const subscriptions = await stripe.subscriptions.list({
       status: "active",
-    });
-
-    subscriptions.data.forEach((subscription) => {
-      const endDate = new Date(subscription.current_period_end * 1000);
     });
 
     // סינון מנויים שתאריך הסיום שלהם בטווח 7 ימים מהיום
@@ -545,21 +542,20 @@ const checkAndNotifySubscriptionsEndingSoon = async () => {
     );
 
     if (subscriptionsEndingSoon.length === 0) {
+      console.log("No subscriptions ending soon found.");
       return;
     }
 
-    subscriptionsEndingSoon.forEach((subscription) => {
-      const endDate = new Date(subscription.current_period_end * 1000);
-    });
-
     // שליחת מייל לכל מנוי שסיום המנוי שלו בטווח 7 ימים
     for (const subscription of subscriptionsEndingSoon) {
+      const endDate = new Date(subscription.current_period_end * 1000);
       const customer = await stripe.customers.retrieve(subscription.customer); // שליפת פרטי הלקוח
       const email = customer.email;
       const companyName =
         customer.metadata.companyName ||
         customer.business_name ||
         "Unknown Company";
+      const name = customer.name || "Customer"; // שם הלקוח
 
       // לוג אם שם החברה לא נמצא
       if (companyName === "Unknown Company") {
@@ -568,18 +564,44 @@ const checkAndNotifySubscriptionsEndingSoon = async () => {
         );
       }
 
-      const name = customer.name || "Customer"; // שם הלקוח
-
       console.log(
         `Processing subscription for company: ${companyName}, Customer: ${name}, Email: ${email}`
       );
 
-      try {
-        await sendSubscriptionEndingEmail(email, companyName, name);
-        console.log(`Notification email sent to ${email}`);
-      } catch (emailError) {
-        console.error(
-          `Failed to send notification email to ${email}: ${emailError.message}`
+      // יצירת הודעה ייחודית עבור המנוי
+      const message = `Reminder: Your subscription for ${companyName} is ending soon on ${endDate.toLocaleDateString()}.`;
+
+      // בדיקה אם כבר נשלחה התראה דומה ב-7 הימים האחרונים
+      const existingNotification = await Notification.findOne({
+        companyId: customer.metadata.companyId || "unknown", // הנחה שיש companyId ב-metadata
+        employeeId: customer.id, // משתמש ב-customer ID כתחליף ל-employeeId
+        content: message,
+        type: "SubscriptionReminder",
+        createdAt: { $gte: new Date(today - oneWeekInMs) }, // ב-7 הימים האחרונים
+      });
+
+      if (!existingNotification) {
+        try {
+          // שליחת המייל
+          await sendSubscriptionEndingEmail(email, companyName, name);
+          console.log(`Notification email sent to ${email}`);
+
+          // שמירת ההתראה ב-DB כדי למנוע כפילות
+          const notification = new Notification({
+            companyId: customer.metadata.companyId || "unknown",
+            content: message,
+            type: "SubscriptionReminder",
+            employeeId: customer.id, // שימוש ב-customer ID כמזהה
+          });
+          await notification.save();
+        } catch (emailError) {
+          console.error(
+            `Failed to send notification email to ${email}: ${emailError.message}`
+          );
+        }
+      } else {
+        console.log(
+          `Notification already sent to ${email} within the last 7 days. Skipping.`
         );
       }
     }
@@ -590,6 +612,7 @@ const checkAndNotifySubscriptionsEndingSoon = async () => {
   }
 };
 
+// תזמון הרצה כל שעה
 cron.schedule("0 * * * *", async () => {
   await checkAndNotifySubscriptionsEndingSoon();
 });

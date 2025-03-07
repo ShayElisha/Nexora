@@ -41,20 +41,28 @@ const financeSchema = new mongoose.Schema(
       enum: ["Pending", "Completed", "Cancelled"],
       required: true,
     },
-    supplierId: {
+    // שדה לשמירת סוג הרשומה (ספק, עובד, לקוח, אחר)
+    recordType: {
+      type: String,
+      enum: ["supplier", "employee", "customer", "other"],
+      required: true,
+    },
+    // שדה חדש לאיחוד המזהה של הצד הנבחר (ספק, עובד, לקוח)
+    partyId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Supplier",
       required: false,
     },
-    supplierName: {
-      type: String,
-      required: false,
-    },
-    attachmentURL: {
-      type: String,
-      required: false,
-    },
+    attachmentURL: [
+      {
+        type: String,
+        required: false,
+      },
+    ],
     invoiceNumber: {
+      type: String,
+      required: false,
+    },
+    otherDetails: {
       type: String,
       required: false,
     },

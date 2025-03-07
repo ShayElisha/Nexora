@@ -1,7 +1,6 @@
 import ProductTree from "../models/productTree.model.js";
 import jwt from "jsonwebtoken";
 
-
 export const createProductTree = async (req, res) => {
   try {
     const token = req.cookies["auth_token"];
@@ -47,9 +46,12 @@ export const createProductTree = async (req, res) => {
 
 export const getAllProductTrees = async (req, res) => {
   try {
-    const productTrees = await ProductTree.find().populate(
-      "productId components.componentId"
-    );
+    const { productId } = req.query;
+    const filter = productId ? { productId } : {};
+
+    const productTrees = await ProductTree.find(filter)
+      .populate("components.componentId", "productName unitPrice")
+
     res.status(200).json(productTrees);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -58,9 +60,7 @@ export const getAllProductTrees = async (req, res) => {
 
 export const getProductTreeById = async (req, res) => {
   try {
-    const productTree = await ProductTree.findById(req.params.id).populate(
-      "productId components.componentId"
-    );
+    const productTree = await ProductTree.findById(req.params.id);
     if (!productTree) {
       return res.status(404).json({ message: "Product tree not found" });
     }

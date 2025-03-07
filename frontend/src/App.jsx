@@ -35,6 +35,7 @@ import Products from "./pages/employeePages/manageProducts/Products";
 import Events from "./pages/AdminPanel/events/Events.jsx";
 import CreateTask from "./pages/AdminPanel/Tasks/CreateTask.jsx";
 import Add_Department from "./pages/AdminPanel/departments/Add_Department.jsx";
+import DepartmentList from "./pages/AdminPanel/departments/DepartmentList.jsx";
 import TasksList from "./pages/AdminPanel/Tasks/TasksList.jsx";
 import EmployeeDashboard from "./pages/employeePages/EmployeeDashboard.jsx";
 import AddProject from "./pages/AdminPanel/projects/AddProjact.jsx";
@@ -135,6 +136,10 @@ const App = () => {
             path="ProcurementProposals"
             element={<ProcurementProposals />}
           />
+          <Route
+            path="ProcurementProposalsList"
+            element={<ProcurementProposalsList />}
+          />
           <Route path="products" element={<Products />} />
         </Route>
 
@@ -146,6 +151,14 @@ const App = () => {
         {/* Dashboard and Admin-only Routes */}
         <Route path="/dashboard" element={<AdminRoute authUser={authUser} />}>
           <Route index element={<Dashboard />} />
+          <Route
+            path="ProcurementProposals"
+            element={<ProcurementProposals />}
+          />
+          <Route
+            path="ProcurementProposalsList"
+            element={<ProcurementProposalsList />}
+          />
           <Route path="products" element={<ProductList />} />
           <Route path="Events" element={<Events />} />
           <Route path="add-product" element={<AddProduct />} />
@@ -180,6 +193,10 @@ const App = () => {
           <Route
             path="department/Add-Department"
             element={<Add_Department />}
+          />
+          <Route
+            path="department/DepartmentList"
+            element={<DepartmentList />}
           />
           <Route path="Customers/Add-Customer" element={<AddCustomers />} />
           <Route path="Customers" element={<CustomersList />} />

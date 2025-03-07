@@ -5,13 +5,20 @@ import {
   updateFinanceRecord,
   deleteFinanceRecord,
 } from "../controllers/finance.controller.js";
-//import { restrictToCompany } from "../middlewares/auth.middleware.js";
+import multer from "multer";
 
 const router = express.Router();
 
-router.post("/create-finance", /*restrictToCompany*/ createFinanceRecord);
+const upload = multer({ storage: multer.memoryStorage() }); // או הגדרה אחרת של storage
+
+// שימוש ב-upload.array לקבלת מספר קבצים (למשל עד 5 קבצים)
+router.post(
+  "/create-finance",
+  upload.array("attachment", 5),
+  createFinanceRecord
+);
 router.get("/", getAllFinanceRecords);
-router.put("/:id", /*restrictToCompany*/ updateFinanceRecord);
-router.delete("/:id", /*restrictToCompany*/ deleteFinanceRecord);
+router.put("/:id", updateFinanceRecord);
+router.delete("/:id", deleteFinanceRecord);
 
 export default router;

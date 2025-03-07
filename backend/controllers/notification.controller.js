@@ -32,21 +32,32 @@ const checkPendingSignaturesLogic = async (companyId) => {
 
       const timeSinceLastTurn =
         now - new Date(currentSigner.timeStamp || procurement.createdAt);
+      const oneDayInMs = 60 * 1000 * 60 * 24; // 24 hours in milliseconds
 
-      if (timeSinceLastTurn >= 60 * 1000 * 60 * 24) {
-        // 24 שעות
-        const message = `The signer ${currentSigner.name} has not signed Purchase Order ${PurchaseOrder} after 24 hours.`;
-
-        const notification = new Notification({
-          companyId: companyId, // שמירת מזהה החברה
-          content: message,
-          type: "Reminder",
+      if (timeSinceLastTurn >= oneDayInMs) {
+        // Check if a similar notification was already sent in the last 24 hours
+        const existingNotification = await Notification.findOne({
+          companyId: companyId,
           employeeId: currentSigner.employeeId,
           PurchaseOrder: PurchaseOrder,
+          type: "Reminder",
+          createdAt: { $gte: new Date(now - oneDayInMs) }, // Within last 24 hours
         });
 
-        await notification.save();
-        notifications.push(notification);
+        if (!existingNotification) {
+          const message = `The signer ${currentSigner.name} has not signed Purchase Order ${PurchaseOrder} after 24 hours.`;
+
+          const notification = new Notification({
+            companyId: companyId,
+            content: message,
+            type: "Reminder",
+            employeeId: currentSigner.employeeId,
+            PurchaseOrder: PurchaseOrder,
+          });
+
+          await notification.save();
+          notifications.push(notification);
+        }
       }
     }
 
@@ -57,7 +68,7 @@ const checkPendingSignaturesLogic = async (companyId) => {
   }
 };
 
-// בקר HTTP לבדיקת חתימות בהמתנה
+// HTTP controllers remain the same
 export const checkPendingSignatures = async (req, res) => {
   const token = req.cookies["auth_token"];
 
@@ -87,7 +98,6 @@ export const checkPendingSignatures = async (req, res) => {
   }
 };
 
-// בקר HTTP לקבלת התראות לאדמין
 export const getAdminNotifications = async (req, res) => {
   try {
     const token = req.cookies["auth_token"];
@@ -138,21 +148,32 @@ const checkPendingBudgetSignaturesLogic = async (companyId) => {
 
       const timeSinceLastTurn =
         now - new Date(currentSigner.timeStamp || budget.createdAt);
+      const oneDayInMs = 60 * 1000 * 60 * 24; // 24 hours in milliseconds
 
-      if (timeSinceLastTurn >= 60 * 1000 * 60 * 24) {
-        // 24 שעות
-        const message = `The signer ${currentSigner.name} has not signed the budget for ${departmentOrProjectName} after 24 hours.`;
-
-        const notification = new Notification({
-          companyId: companyId, // שמירת מזהה החברה
-          content: message,
-          type: "Reminder",
+      if (timeSinceLastTurn >= oneDayInMs) {
+        // בדיקת התראה קיימת מ-24 השעות האחרונות
+        const existingNotification = await Notification.findOne({
+          companyId: companyId,
           employeeId: currentSigner.employeeId,
           budgetName: departmentOrProjectName,
+          type: "Reminder",
+          createdAt: { $gte: new Date(now - oneDayInMs) }, // מ-24 השעות האחרונות
         });
 
-        await notification.save();
-        notifications.push(notification);
+        if (!existingNotification) {
+          const message = `The signer ${currentSigner.name} has not signed the budget for ${departmentOrProjectName} after 24 hours.`;
+
+          const notification = new Notification({
+            companyId: companyId,
+            content: message,
+            type: "Reminder",
+            employeeId: currentSigner.employeeId,
+            budgetName: departmentOrProjectName,
+          });
+
+          await notification.save();
+          notifications.push(notification);
+        }
       }
     }
 
@@ -374,41 +395,60 @@ const reminderEventsLogic = async (companyId) => {
       }
 
       let message;
+      let reminderType;
 
       if (event.eventType === "meeting") {
         if (timeUntilStart < twoHours && !event.twoHoursReminderSent) {
           message = `Reminder: There is a meeting in under two hours (Event: "${event.title}").`;
-          event.twoHoursReminderSent = true;
+          reminderType = "twoHours";
         } else if (timeUntilStart < oneDay && !event.dayReminderSent) {
           message = `Reminder: There is a meeting in under one day (Event: "${event.title}").`;
-          event.dayReminderSent = true;
+          reminderType = "oneDay";
         }
       } else if (event.eventType === "holiday") {
         if (timeUntilStart < oneDay && !event.dayReminderSent) {
           message = `Reminder: A holiday starts in under one day (Event: "${event.title}").`;
-          event.dayReminderSent = true;
+          reminderType = "oneDay";
         }
       } else {
         if (timeUntilStart < twoHours && !event.twoHoursReminderSent) {
           message = `Reminder: Your event "${event.title}" starts in under two hours.`;
-          event.twoHoursReminderSent = true;
+          reminderType = "twoHours";
         } else if (timeUntilStart < oneDay && !event.dayReminderSent) {
           message = `Reminder: Your event "${event.title}" starts in under 24 hours.`;
-          event.dayReminderSent = true;
+          reminderType = "oneDay";
         }
       }
 
       if (message) {
-        const notification = new Notification({
+        // בדיקת התראה קיימת עבור אותו אירוע ואותו סוג תזכורת
+        const existingNotification = await Notification.findOne({
           companyId,
-          content: message,
-          type: "Reminder",
           employeeId: event.createdBy,
+          content: message, // בודקים שההודעה זהה
+          type: "Reminder",
+          createdAt: { $gte: new Date(now - oneDay) }, // ב-24 השעות האחרונות
         });
 
-        await notification.save();
-        notifications.push(notification);
-        await event.save();
+        if (!existingNotification) {
+          const notification = new Notification({
+            companyId,
+            content: message,
+            type: "Reminder",
+            employeeId: event.createdBy,
+          });
+
+          await notification.save();
+          notifications.push(notification);
+
+          // עדכון הדגלים של האירוע
+          if (reminderType === "twoHours") {
+            event.twoHoursReminderSent = true;
+          } else if (reminderType === "oneDay") {
+            event.dayReminderSent = true;
+          }
+          await event.save();
+        }
       }
     }
 

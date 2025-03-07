@@ -17,42 +17,68 @@ const AddSupplier = ({ authUser }) => {
     Phone: "",
     Email: "",
     baseCurrency: "USD",
-    Address: "",
-    BankAccount: "",
+    // שדות כתובת נפרדים:
+    City: "",
+    Street: "",
+    Apartment: "",
+    Country: "",
+    // שדות חשבון בנק
+    BankNumber: "",
+    BranchNumber: "",
+    AccountNumber: "",
     Rating: 1,
     IsActive: true,
+    // שדות קבצים
+    confirmationAccount: null, // שימו לב: שם השדה כאן הוא "confirmationAccount"
+    attachments: [],
   });
 
-  // Handler לשינוי שדות הטופס
+  // Handler לשינוי שדות הטופס (תומך גם בקבצים)
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setSupplierData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    const { name, value, type, checked, files } = e.target;
+    if (files) {
+      if (name === "attachments") {
+        setSupplierData((prev) => ({ ...prev, [name]: Array.from(files) }));
+      } else {
+        setSupplierData((prev) => ({ ...prev, [name]: files[0] }));
+      }
+    } else {
+      setSupplierData((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
   };
 
-  // Mutation להוספת ספק
+  // Mutation להוספת ספק – שולח נתונים כ־FormData
   const addSupplierMutation = useMutation({
     mutationFn: async (newSupplier) => {
-      const response = await axiosInstance.post("/suppliers", newSupplier);
+      const response = await axiosInstance.post("/suppliers", newSupplier, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       return response.data;
     },
     onSuccess: () => {
       toast.success("Supplier added successfully!");
-      queryClient.invalidateQueries(["suppliers"]); // רענון רשימת הספקים
-      // איפוס הטופס
+      queryClient.invalidateQueries(["suppliers"]);
       setSupplierData({
         companyId: authUser?.user?.companyId || "",
         SupplierName: "",
         Contact: "",
         Phone: "",
         Email: "",
-        Address: "",
         baseCurrency: "USD",
-        BankAccount: "",
+        City: "",
+        Street: "",
+        Apartment: "",
+        Country: "",
+        BankNumber: "",
+        BranchNumber: "",
+        AccountNumber: "",
         Rating: 1,
         IsActive: true,
+        confirmationAccount: null,
+        attachments: [],
       });
     },
     onError: (error) => {
@@ -65,20 +91,65 @@ const AddSupplier = ({ authUser }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    addSupplierMutation.mutate(supplierData);
+    // ניצור FormData ונאחד את השדות הנלווים
+    const formData = new FormData();
+    const {
+      BankNumber,
+      BranchNumber,
+      AccountNumber,
+      City,
+      Street,
+      Apartment,
+      Country,
+      confirmationAccount,
+      attachments,
+      ...rest
+    } = supplierData;
+
+    // הוספת שדות טקסטיים
+    Object.entries(rest).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    // מחברים את שדות חשבון הבנק
+    const bankAccountStr = `${BankNumber}-${BranchNumber}-${AccountNumber}`;
+    formData.append("BankAccount", bankAccountStr);
+
+    // מאחדים את כתובת – בין עיר לרחוב יש מקף, בין רחוב לדירה יש רווח, ובין דירה למדינה יש מקף
+    const addressStr = `${City}-${Street} ${Apartment}-${Country}`;
+    formData.append("Address", addressStr);
+
+    // הוספת קובץ אישור חשבון אם קיים
+    if (confirmationAccount) {
+      formData.append("confirmationAccount", confirmationAccount);
+    }
+
+    // הוספת קבצים נלווים (מספר קבצים)
+    if (attachments && attachments.length > 0) {
+      attachments.forEach((file) => {
+        formData.append("attachments", file);
+      });
+    }
+
+    addSupplierMutation.mutate(formData);
   };
 
   return (
-    <div className="flex min-h-screen bg-bg text-text">
-      <div className="flex-1 flex justify-center items-center">
-        <div className="bg-white rounded-lg shadow-xl p-8 max-w-lg w-full">
-          <h2 className="text-2xl font-bold text-center text-primary mb-6">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 animate-fadeIn">
+      <div className="max-w-3xl w-full space-y-8">
+        <div>
+          <h2 className="text-center text-3xl font-extrabold text-gray-900 mb-8">
             {t("supplier.add_new_supplier")}
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* שם הספק */}
+        </div>
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white p-8 rounded-lg shadow-lg transform transition-all duration-500 hover:shadow-2xl"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* פרטי ספק */}
             <div>
-              <label className="block text-text font-medium">
+              <label className="block text-sm font-medium text-gray-700">
                 {t("supplier.name")}
               </label>
               <input
@@ -87,14 +158,12 @@ const AddSupplier = ({ authUser }) => {
                 value={supplierData.SupplierName}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-border-color rounded-lg bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary"
+                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
                 placeholder="Enter Supplier Name"
               />
             </div>
-
-            {/* איש קשר */}
             <div>
-              <label className="block text-text font-medium">
+              <label className="block text-sm font-medium text-gray-700">
                 {t("supplier.contact")}
               </label>
               <input
@@ -102,14 +171,12 @@ const AddSupplier = ({ authUser }) => {
                 name="Contact"
                 value={supplierData.Contact}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-border-color rounded-lg bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary"
+                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
                 placeholder="Enter Contact Name"
               />
             </div>
-
-            {/* טלפון */}
             <div>
-              <label className="block text-text font-medium">
+              <label className="block text-sm font-medium text-gray-700">
                 {t("supplier.phone")}
               </label>
               <input
@@ -117,14 +184,12 @@ const AddSupplier = ({ authUser }) => {
                 name="Phone"
                 value={supplierData.Phone}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-border-color rounded-lg bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary"
+                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
                 placeholder="Enter Phone Number"
               />
             </div>
-
-            {/* אימייל */}
             <div>
-              <label className="block text-text font-medium">
+              <label className="block text-sm font-medium text-gray-700">
                 {t("supplier.email")}
               </label>
               <input
@@ -132,67 +197,154 @@ const AddSupplier = ({ authUser }) => {
                 name="Email"
                 value={supplierData.Email}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-border-color rounded-lg bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary"
+                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
                 placeholder="Enter Email"
               />
             </div>
 
-            {/* כתובת */}
-            <div>
-              <label className="block text-text font-medium">
+            {/* שדות כתובת */}
+            <div className="md:col-span-2">
+              <h3 className="text-lg font-medium text-gray-700 mb-2">
                 {t("supplier.address")}
+              </h3>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                {t("supplier.city")}
               </label>
               <input
                 type="text"
-                name="Address"
-                value={supplierData.Address}
+                name="City"
+                value={supplierData.City}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-border-color rounded-lg bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Enter Address"
+                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
+                placeholder="Enter City"
               />
             </div>
-
-            {/* חשבון בנק */}
             <div>
-              <label className="block text-text font-medium">
-                {t("supplier.bank_account")}
+              <label className="block text-sm font-medium text-gray-700">
+                {t("supplier.street")}
               </label>
               <input
                 type="text"
-                name="BankAccount"
-                value={supplierData.BankAccount}
+                name="Street"
+                value={supplierData.Street}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-border-color rounded-lg bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Enter Bank Account"
+                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
+                placeholder="Enter Street"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                {t("supplier.apartment")}
+              </label>
+              <input
+                type="text"
+                name="Apartment"
+                value={supplierData.Apartment}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
+                placeholder="Enter Apartment"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                {t("supplier.country")}
+              </label>
+              <input
+                type="text"
+                name="Country"
+                value={supplierData.Country}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
+                placeholder="Enter Country"
               />
             </div>
 
-            {/* דירוג */}
+            {/* שדות חשבון בנק */}
+            <div className="md:col-span-2">
+              <h3 className="text-lg font-medium text-gray-700 mb-2">
+                Bank Account
+              </h3>
+            </div>
             <div>
-              <label className="block text-text font-medium">
-                {t("supplier.rating")}
+              <label className="block text-sm font-medium text-gray-700">
+                {t("supplier.bank_number")}
               </label>
               <input
-                type="number"
-                name="Rating"
-                value={supplierData.Rating}
-                min="1"
-                max="5"
+                type="text"
+                name="BankNumber"
+                value={supplierData.BankNumber}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-border-color rounded-lg bg-white text-text focus:outline-none focus:ring-2 focus:ring-primary"
+                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
+                placeholder="Enter Bank Number"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                {t("supplier.branch_number")}
+              </label>
+              <input
+                type="text"
+                name="BranchNumber"
+                value={supplierData.BranchNumber}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
+                placeholder="Enter Branch Number"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                {t("supplier.account_number")}
+              </label>
+              <input
+                type="text"
+                name="AccountNumber"
+                value={supplierData.AccountNumber}
+                onChange={handleInputChange}
+                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
+                placeholder="Enter Account Number"
+              />
+            </div>
+
+            {/* שדה אישור חשבון */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">
+                {t("supplier.confirmation_account")}
+              </label>
+              {/* שם השדה נמוך, כך שיתפוס ב־req.files.confirmationAccount */}
+              <input
+                type="file"
+                name="confirmationAccount"
+                onChange={handleInputChange}
+                className="mt-1 block w-full text-gray-700"
+              />
+            </div>
+
+            {/* שדה מסמכים נלווים */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">
+                {t("supplier.attachments")}
+              </label>
+              <input
+                type="file"
+                name="attachments"
+                onChange={handleInputChange}
+                multiple
+                className="mt-1 block w-full text-gray-700"
               />
             </div>
 
             {/* בחירת מטבע בסיס */}
             <div>
-              <label className="block text-text font-medium mb-1">
+              <label className="block text-sm font-medium text-gray-700">
                 {t("supplier.currency")}
               </label>
               <select
                 name="baseCurrency"
                 value={supplierData.baseCurrency}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 border border-border-color bg-white rounded-md text-text"
+                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
                 required
               >
                 {currencyList.map((currency) => (
@@ -206,31 +358,48 @@ const AddSupplier = ({ authUser }) => {
               </select>
             </div>
 
-            {/* סטטוס פעילות */}
+            {/* דירוג */}
             <div>
-              <label className="flex items-center text-text font-medium">
-                <input
-                  type="checkbox"
-                  name="IsActive"
-                  checked={supplierData.IsActive}
-                  onChange={handleInputChange}
-                  className="mr-2"
-                />
+              <label className="block text-sm font-medium text-gray-700">
+                {t("supplier.rating")}
+              </label>
+              <input
+                type="number"
+                name="Rating"
+                value={supplierData.Rating}
+                min="1"
+                max="5"
+                onChange={handleInputChange}
+                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
+              />
+            </div>
+
+            {/* סטטוס פעילות */}
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                name="IsActive"
+                checked={supplierData.IsActive}
+                onChange={handleInputChange}
+                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded transition-transform duration-300"
+              />
+              <label className="ml-2 text-sm text-gray-700">
                 {t("supplier.active")}
               </label>
             </div>
-
+          </div>
+          <div>
             <button
               type="submit"
-              className="w-full bg-button-bg text-button-text py-2 px-4 rounded-lg hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary font-medium"
               disabled={addSupplierMutation.isLoading}
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-300 hover:scale-105"
             >
               {addSupplierMutation.isLoading
                 ? t("supplier.adding")
                 : t("supplier.add_button")}
             </button>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
   );

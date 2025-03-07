@@ -83,7 +83,7 @@ const procurementSchema = new mongoose.Schema({
   currentSignerIndex: { type: Number, default: 0 }, // החותם הנוכחי בתור
   signers: [
     {
-      employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "employees" },
+      employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
       name: { type: String, required: true },
       role: { type: String, required: true },
       order: { type: Number, required: true, default: 0 },

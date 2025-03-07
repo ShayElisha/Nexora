@@ -20,7 +20,14 @@ router.post(
 );
 router.get("/", getProducts);
 router.get("/:id", getProductById);
-router.put("/:id", updateProduct);
+router.put(
+  "/:id",
+  upload.fields([
+    { name: "productImage", maxCount: 1 },
+    { name: "attachments", maxCount: 10 },
+  ]),
+  updateProduct
+);
 router.delete("/:id", deleteProduct);
 
 export default router;

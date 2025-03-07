@@ -41,12 +41,17 @@ export const createDepartment = async (req, res) => {
 
 export const getDepartments = async (req, res) => {
   try {
-    const { companyId } = req.query;
-    const query = companyId ? { companyId } : {};
-    const departments = await Department.find(query).populate(
-      "teamMembers.employeeId",
-      "name lastName"
-    );
+    const token = req.cookies["auth_token"];
+
+    if (!token) {
+      return res.status(401).json({ success: false, error: "Unauthorized" });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const companyId = decodedToken.companyId;
+    const departments = await Department.find({ companyId })
+      .populate("teamMembers.employeeId", "name lastName")
+      .populate("departmentManager", "name lastName"); // Add this
     res.status(200).json({ success: true, data: departments });
   } catch (error) {
     console.error("Error fetching departments:", error);
@@ -89,10 +94,22 @@ export const updateDepartment = async (req, res) => {
         .status(400)
         .json({ success: false, error: "Invalid department id." });
     }
-    const updatedDepartment = await Department.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+
+    // Map managerId to departmentManager if it exists
+    const updateData = { ...req.body };
+    if (updateData.managerId) {
+      updateData.departmentManager = updateData.managerId;
+      delete updateData.managerId; // Remove the original key
+    }
+
+    const updatedDepartment = await Department.findByIdAndUpdate(
+      id,
+      updateData,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
     if (!updatedDepartment) {
       return res
         .status(404)

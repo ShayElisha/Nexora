@@ -28,7 +28,7 @@ const BudgetSchema = new mongoose.Schema({
   ],
   items: [
     {
-      product: {
+      productId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
       },

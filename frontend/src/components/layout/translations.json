@@ -47,6 +47,34 @@
         }
       },
       "inventory": {
+        "filter_all_product_types": "Filter all product types",
+        "sale_products": "Products for sale",
+        "purchase_products": "Products for purchase",
+        "filter_all_categories": "Filter all categories",
+        "filter_all_suppliers": "Filter all suppliers",
+        "sort_by": "Sort by",
+        "sort_productName_asc": "Sort by product name (ascending)",
+        "sort_productName_desc": "Sort by product name (descending)",
+        "sort_sku_asc": "Sort by SKU (ascending)",
+        "sort_sku_desc": "Sort by SKU (descending)",
+        "sort_barcode_asc": "Sort by barcode (ascending)",
+        "sort_barcode_desc": "Sort by barcode (descending)",
+        "sort_unitPrice_asc": "Sort by unit price (ascending)",
+        "sort_unitPrice_desc": "Sort by unit price (descending)",
+        "sort_category_asc": "Sort by category (ascending)",
+        "sort_category_desc": "Sort by category (descending)",
+        "sort_supplierName_asc": "Sort by supplier name (ascending)",
+        "sort_supplierName_desc": "Sort by supplier name (descending)",
+        "sort_quantity_asc": "Sort by quantity (ascending)",
+        "sort_quantity_desc": "Sort by quantity (descending)",
+        "sort_minStockLevel_asc": "Sort by min stock level (ascending)",
+        "sort_minStockLevel_desc": "Sort by min stock level (descending)",
+        "sort_reorderQuantity_asc": "Sort by reorder quantity (ascending)",
+        "sort_reorderQuantity_desc": "Sort by reorder quantity (descending)",
+        "sort_volume_asc": "Sort by volume (ascending)",
+        "sort_volume_desc": "Sort by volume (descending)",
+        "no_products_available": "No products available",
+        "search_placeholder": "Search...",
         "volume": "Inventory Volume",
         "title": "Product and Inventory List",
         "image": "Image",
@@ -191,6 +219,12 @@
         "current_year": "{{year}}"
       },
       "navbar": {
+        "ProcurementProposals": "Procurement Proposals",
+        "ProcurementProposalsList": "Procurement Proposals List",
+        "Orders List": "Orders List",
+        "Add-Orders": "Add Orders",
+        "Orders": "Orders",
+        "departmentList": "Department list",
         "Projects": "Projects",
         "Projects_List": "Projects List",
         "Add_Project": "Add Project",
@@ -250,6 +284,8 @@
           "save": "Save"
         },
         "notifications": {
+          "allNotificationsRead": "All notifications read",
+          "notificationMarkedAsRead": "Notification marked as read",
           "notificationDeleted": "Notification deleted",
           "notificationDeleteError": "Error deleting notification",
           "no_notifications": "No notifications"
@@ -265,6 +301,8 @@
         "refresh": "Search"
       },
       "notifications": {
+        "title": "Notifications title",
+        "readAll": "Read all",
         "notifications": "Notifications",
         "loading_notifications": "Loading notifications...",
         "no_notifications_found": "No notifications found.",
@@ -272,6 +310,18 @@
         "delete": "Delete Notification",
         "notification_deleted": "Notification deleted successfully!",
         "notification_marked_as_read": "Notification marked as read!"
+      },
+      "departments": {
+        "name": "Department name",
+        "description": "Department description",
+        "manager": "Department manager",
+        "team_members": "Team members",
+        "actions": "Actions",
+        "no_team_members": "No team members",
+        "projects": "Projects",
+        "edit_department": "Edit department",
+        "cancel": "Cancel",
+        "save": "Save"
       },
       "signature_modal": {
         "title": "Manage Signature Requirements",
@@ -343,6 +393,16 @@
         "submit": "Create Project"
       },
       "projects": {
+        "project_manager": "Project manager",
+        "edit": "Edit",
+        "edit_project": "Edit project",
+        "name": "Project name",
+        "description": "Project description",
+        "tags_hint": "Tags hint",
+        "team_members_hint": "Team members hint",
+        "close": "Close",
+        "save": "Save",
+        "remove": "Remove",
         "title": "Projects List",
         "loading": "Loading projects...",
         "error_fetch": "Error fetching projects.",
@@ -370,6 +430,10 @@
         "comment_created": "Created on"
       },
       "finance": {
+        "documents": "Financial documents",
+        "not_available": "Not available",
+        "record_type": "Record type",
+        "attachment": "Attachment",
         "filter_status_all": "Filter: All statuses",
         "sort_date_asc": "Sort by date (ascending)",
         "sort_by": "Sort by",
@@ -574,6 +638,11 @@
         "error_loading_employees": "Error loading employees"
       },
       "tasks": {
+        "status": "Task status",
+        "pending": "Pending",
+        "in_progress": "In progress",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
         "loading": "Loading tasks...",
         "error_fetch": "Error fetching tasks.",
         "deleted_success": "Task deleted successfully",
@@ -587,6 +656,7 @@
         "assigned_to": "Assignees"
       },
       "historySignature": {
+        "signed": "Signed",
         "status": "Status",
         "approvalStatus": "Approval Status",
         "signers": "Signers",
@@ -759,6 +829,7 @@
         }
       },
       "procurement": {
+        "loading": "Loading...",
         "purchase_order": "Purchase Order",
         "notes": "Notes",
         "delete": "Delete",
@@ -859,6 +930,17 @@
         "close": "Close"
       },
       "budget": {
+        "spent_amount": "Amount spent",
+        "period": "Period",
+        "no_items": "No items",
+        "created_by": "Created by",
+        "items": "Items",
+        "signers": "Signers",
+        "signer_name": "Signer name",
+        "signer_role": "Signer role",
+        "has_signed": "Has signed",
+        "signature_time": "Signature time",
+        "signature": "Signature",
         "select_department_project": "Select department/project",
         "add_department": "Add department",
         "budgets": "Budgets",
@@ -885,10 +967,35 @@
         "signers_list_saved": "Signers list saved successfully",
         "signers_list_deleted": "Signers list deleted successfully"
       },
+      "receipts": {
+        "pending_title": "Pending receipts",
+        "order_id": "Order number",
+        "supplier": "Supplier",
+        "total_cost": "Total cost",
+        "order_date": "Order date",
+        "receivedDate": "Received date",
+        "actions": "Actions",
+        "edit": "Edit",
+        "delete": "Delete",
+        "product_name": "Product name",
+        "quantity_to_receive": "Quantity to receive",
+        "received_quantity": "Quantity received",
+        "goods_checked": "Goods checked",
+        "additional_notes": "Additional notes",
+        "supplier_rating": "Supplier rating",
+        "allow_close_with_discrepancy": "Allow closing with discrepancy",
+        "save": "Save",
+        "cancel": "Cancel",
+        "enter_additional_notes": "Enter additional notes"
+      },
       "user": {
-        "hello": "Hello {{firstName}} {{lastName}}"
+        "hello": "Hello {{firstName}} {{lastName}}",
+        "search_placeholder": "Search for a user...",
+        "delete": "Delete",
+        "inactive": "User inactive"
       },
       "product": {
+        "fields.attachments": "Product attachments",
         "add_new_product": "Add New Product",
         "success_message": "Product added successfully",
         "error_message": "Error adding product",
@@ -921,6 +1028,16 @@
         }
       },
       "supplier": {
+        "inactive": "Supplier inactive",
+        "city": "City",
+        "street": "Street",
+        "apartment": "Apartment",
+        "country": "Country",
+        "bank_number": "Bank number",
+        "branch_number": "Branch number",
+        "account_number": "Account number",
+        "confirmation_account": "Account confirmation",
+        "attachments": "Supplier attachments",
         "list_title": "Suppliers List",
         "add_new_supplier": "Add New Supplier",
         "name": "Supplier Name",
@@ -1021,6 +1138,34 @@
         }
       },
       "inventory": {
+        "filter_all_product_types": "סינון לכל סוגי המוצרים",
+        "sale_products": "מוצרים למכירה",
+        "purchase_products": "מוצרים לרכישה",
+        "filter_all_categories": "סינון לכל הקטגוריות",
+        "filter_all_suppliers": "סינון לכל הספקים",
+        "sort_by": "מיון לפי",
+        "sort_productName_asc": "מיין לפי שם מוצר (עולה)",
+        "sort_productName_desc": "מיין לפי שם מוצר (יורד)",
+        "sort_sku_asc": "מיין לפי SKU (עולה)",
+        "sort_sku_desc": "מיין לפי SKU (יורד)",
+        "sort_barcode_asc": "מיין לפי ברקוד (עולה)",
+        "sort_barcode_desc": "מיין לפי ברקוד (יורד)",
+        "sort_unitPrice_asc": "מיין לפי מחיר יחידה (עולה)",
+        "sort_unitPrice_desc": "מיין לפי מחיר יחידה (יורד)",
+        "sort_category_asc": "מיין לפי קטגוריה (עולה)",
+        "sort_category_desc": "מיין לפי קטגוריה (יורד)",
+        "sort_supplierName_asc": "מיין לפי שם ספק (עולה)",
+        "sort_supplierName_desc": "מיין לפי שם ספק (יורד)",
+        "sort_quantity_asc": "מיין לפי כמות (עולה)",
+        "sort_quantity_desc": "מיין לפי כמות (יורד)",
+        "sort_minStockLevel_asc": "מיין לפי רמת מלאי מינימלית (עולה)",
+        "sort_minStockLevel_desc": "מיין לפי רמת מלאי מינימלית (יורד)",
+        "sort_reorderQuantity_asc": "מיין לפי כמות הזמנה מחדש (עולה)",
+        "sort_reorderQuantity_desc": "מיין לפי כמות הזמנה מחדש (יורד)",
+        "sort_volume_asc": "מיין לפי נפח (עולה)",
+        "sort_volume_desc": "מיין לפי נפח (יורד)",
+        "no_products_available": "אין מוצרים זמינים",
+        "search_placeholder": "חיפוש...",
         "volume": "נפח מלאי",
         "title": "רשימת מוצרים ומלאי",
         "image": "תמונה",
@@ -1166,6 +1311,12 @@
         "current_year": "{{year}}"
       },
       "navbar": {
+        "ProcurementProposals": "הצעות רכש",
+        "ProcurementProposalsList": "רשימת הצעות רכש",
+        "Orders List": "רשימת הזמנות",
+        "Add-Orders": "הוסף הזמנות",
+        "Orders": "הזמנות",
+        "departmentList": "רשימת מחלקות",
         "Projects": "פרויקטים",
         "Projects_List": "רשימת פרויקטים",
         "Add_Project": "הוסף פרויקט",
@@ -1225,6 +1376,8 @@
           "save": "שמור"
         },
         "notifications": {
+          "allNotificationsRead": "כל ההתראות נקראו",
+          "notificationMarkedAsRead": "ההודעה סומנה כנקראה",
           "notificationDeleted": "התראה נמחקה",
           "notificationDeleteError": "שגיאה במחיקת התראה",
           "no_notifications": "אין התראות"
@@ -1240,6 +1393,8 @@
         "refresh": "חיפוש"
       },
       "notifications": {
+        "title": "כותרת התראות",
+        "readAll": "קרא הכל",
         "notifications": "התראות",
         "loading_notifications": "טוען התראות...",
         "no_notifications_found": "לא נמצאו התראות.",
@@ -1318,6 +1473,16 @@
         "submit": "צור פרויקט"
       },
       "projects": {
+        "project_manager": "מנהל הפרויקט",
+        "edit": "ערוך",
+        "edit_project": "ערוך פרויקט",
+        "name": "שם הפרויקט",
+        "description": "תיאור הפרויקט",
+        "tags_hint": "רמז לתגים",
+        "team_members_hint": "רמז לחברי הצוות",
+        "close": "סגור",
+        "save": "שמור",
+        "remove": "הסר",
         "title": "רשימת פרויקטים",
         "loading": "טוען פרויקטים...",
         "error_fetch": "שגיאה בשליפת הפרויקטים.",
@@ -1345,6 +1510,10 @@
         "comment_created": "נוצרה בתאריך"
       },
       "finance": {
+        "documents": "מסמכים פיננסיים",
+        "not_available": "לא זמין",
+        "record_type": "סוג רישום",
+        "attachment": "קובץ מצורף",
         "filter_status_all": "סינון: כל הסטטוסים",
         "sort_date_asc": "מיון לפי תאריך (עולה)",
         "sort_by": "מיין לפי",
@@ -1550,6 +1719,11 @@
         "error_loading_employees": "שגיאה בטעינת העובדים"
       },
       "tasks": {
+        "status": "סטטוס משימה",
+        "pending": "ממתין",
+        "in_progress": "בתהליך",
+        "completed": "הושלם",
+        "cancelled": "בוטל",
         "loading": "טוען משימות...",
         "error_fetch": "שגיאה בשליפת משימות.",
         "deleted_success": "המשימה נמחקה בהצלחה",
@@ -1563,6 +1737,7 @@
         "assigned_to": "משתתפים"
       },
       "historySignature": {
+        "signed": "נחתם",
         "status": "סטטוס",
         "approvalStatus": "סטטוס אישור",
         "signers": "חותמים",
@@ -1735,6 +1910,7 @@
         }
       },
       "procurement": {
+        "loading": "טוען...",
         "purchase_order": "הזמנת רכישה",
         "notes": "הערות",
         "delete": "מחק",
@@ -1834,7 +2010,39 @@
         "edit": "ערוך",
         "close": "סגור"
       },
+      "receipts": {
+        "pending_title": "קבלות בהמתנה",
+        "order_id": "מספר הזמנה",
+        "supplier": "ספק",
+        "total_cost": "עלות כוללת",
+        "order_date": "תאריך הזמנה",
+        "receivedDate": "תאריך קבלה",
+        "actions": "פעולות",
+        "edit": "ערוך",
+        "delete": "מחק",
+        "product_name": "שם מוצר",
+        "quantity_to_receive": "כמות לקבלה",
+        "received_quantity": "כמות שהתקבלה",
+        "goods_checked": "האם הסחורה נבדקה",
+        "additional_notes": "הערות נוספות",
+        "supplier_rating": "דירוג ספק",
+        "allow_close_with_discrepancy": "אפשר לסגור עם אי התאמה",
+        "save": "שמור",
+        "cancel": "בטל",
+        "enter_additional_notes": "הזן הערות נוספות"
+      },
       "budget": {
+        "spent_amount": "סכום שהוצא",
+        "period": "תקופה",
+        "no_items": "אין פריטים",
+        "created_by": "נוצר על ידי",
+        "items": "פריטים",
+        "signers": "חותמים",
+        "signer_name": "שם החותם",
+        "signer_role": "תפקיד החותם",
+        "has_signed": "האם חתם",
+        "signature_time": "זמן החתימה",
+        "signature": "חתימה",
         "select_department_project": "בחר מחלקה/פרויקט",
         "add_department": "הוסף מחלקה",
         "budgets": "תקציבים",
@@ -1863,9 +2071,13 @@
       },
 
       "user": {
+        "search_placeholder": "חפש משתמש...",
+        "delete": "מחק",
+        "inactive": "משתמש לא פעיל",
         "hello": "שלום {{firstName}} {{lastName}}"
       },
       "product": {
+        "fields.attachments": "קבצים מצורפים למוצר",
         "add_new_product": "הוספת מוצר חדש",
         "success_message": "המוצר נוסף בהצלחה",
         "error_message": "שגיאה בהוספת המוצר",
@@ -1898,6 +2110,16 @@
         }
       },
       "supplier": {
+        "inactive": "ספק לא פעיל",
+        "city": "עיר",
+        "street": "רחוב",
+        "apartment": "דירה",
+        "country": "מדינה",
+        "bank_number": "מספר בנק",
+        "branch_number": "מספר סניף",
+        "account_number": "מספר חשבון",
+        "confirmation_account": "אישור חשבון",
+        "attachments": "קבצים מצורפים לספק",
         "list_title": "רשימת ספקים",
         "add_new_supplier": "הוסף ספק חדש",
         "name": "שם ספק",
@@ -1918,6 +2140,18 @@
         "active": "פעיל",
         "add_button": "הוסף ספק",
         "adding": "מוסיף..."
+      },
+      "departments": {
+        "name": "שם המחלקה",
+        "description": "תיאור המחלקה",
+        "manager": "מנהל המחלקה",
+        "team_members": "חברי הצוות",
+        "actions": "פעולות",
+        "no_team_members": "אין חברי צוות",
+        "projects": "פרויקטים",
+        "edit_department": "ערוך מחלקה",
+        "cancel": "בטל",
+        "save": "שמור"
       },
       "errors": {
         "supplier_required": "יש לבחור ספק",
@@ -1998,6 +2232,34 @@
         }
       },
       "inventory": {
+        "filter_all_product_types": "Фильтр для всех типов продуктов",
+        "sale_products": "Товары на продажу",
+        "purchase_products": "Товары для покупки",
+        "filter_all_categories": "Фильтр для всех категорий",
+        "filter_all_suppliers": "Фильтр для всех поставщиков",
+        "sort_by": "Сортировать по",
+        "sort_productName_asc": "Сортировать по названию продукта (по возрастанию)",
+        "sort_productName_desc": "Сортировать по названию продукта (по убыванию)",
+        "sort_sku_asc": "Сортировать по SKU (по возрастанию)",
+        "sort_sku_desc": "Сортировать по SKU (по убыванию)",
+        "sort_barcode_asc": "Сортировать по штрих-коду (по возрастанию)",
+        "sort_barcode_desc": "Сортировать по штрих-коду (по убыванию)",
+        "sort_unitPrice_asc": "Сортировать по цене за единицу (по возрастанию)",
+        "sort_unitPrice_desc": "Сортировать по цене за единицу (по убыванию)",
+        "sort_category_asc": "Сортировать по категории (по возрастанию)",
+        "sort_category_desc": "Сортировать по категории (по убыванию)",
+        "sort_supplierName_asc": "Сортировать по имени поставщика (по возрастанию)",
+        "sort_supplierName_desc": "Сортировать по имени поставщика (по убыванию)",
+        "sort_quantity_asc": "Сортировать по количеству (по возрастанию)",
+        "sort_quantity_desc": "Сортировать по количеству (по убыванию)",
+        "sort_minStockLevel_asc": "Сортировать по мин. уровню запаса (по возрастанию)",
+        "sort_minStockLevel_desc": "Сортировать по мин. уровню запаса (по убыванию)",
+        "sort_reorderQuantity_asc": "Сортировать по количеству дозакупки (по возрастанию)",
+        "sort_reorderQuantity_desc": "Сортировать по количеству дозакупки (по убыванию)",
+        "sort_volume_asc": "Сортировать по объёму (по возрастанию)",
+        "sort_volume_desc": "Сортировать по объёму (по убыванию)",
+        "no_products_available": "Нет доступных товаров",
+        "search_placeholder": "Поиск...",
         "volume": "Объём запасов",
         "title": "Список продуктов и запасов",
         "image": "Изображение",
@@ -2141,7 +2403,22 @@
         "all_rights_reserved": "Все права защищены.",
         "current_year": "{{year}}"
       },
+      "departments": {
+        "name": "Название отдела",
+        "description": "Описание отдела",
+        "manager": "Менеджер отдела",
+        "team_members": "Члены команды",
+        "actions": "Действия",
+        "no_team_members": "Нет членов команды",
+        "projects": "Проекты",
+        "edit_department": "Редактировать отдел",
+        "cancel": "Отменить",
+        "save": "Сохранить"
+      },
       "navbar": {
+        "ProcurementProposals": "Предложения по закупкам",
+        "ProcurementProposalsList": "Список предложений по закупкам",
+        "departmentList": "Список отделов",
         "Projects": "Проекты",
         "Projects_List": "Список проектов",
         "Add_Project": "Добавить проект",
@@ -2172,6 +2449,9 @@
         "add_tasks": "Добавить задачи",
         "calendar": "Календарь",
         "events": "События",
+        "Orders List": "Список заказов",
+        "Add-Orders": "Добавить заказы",
+        "Orders": "Заказы",
         "profile": {
           "hello": "Здравствуйте, {{firstName}} {{lastName}}",
           "logging_out": "Выход из системы...",
@@ -2201,6 +2481,8 @@
           "save": "Сохранить"
         },
         "notifications": {
+          "allNotificationsRead": "Все уведомления прочитаны",
+          "notificationMarkedAsRead": "Уведомление отмечено как прочитанное",
           "notificationDeleted": "Уведомление удалено",
           "notificationDeleteError": "Ошибка при удалении уведомления",
           "no_notifications": "Нет уведомлений"
@@ -2216,6 +2498,8 @@
         "refresh": "Обновить"
       },
       "notifications": {
+        "title": "Заголовок уведомлений",
+        "readAll": "Прочитать все",
         "notifications": "Уведомления",
         "loading_notifications": "Загрузка уведомлений...",
         "no_notifications_found": "Уведомления не найдены.",
@@ -2294,6 +2578,16 @@
         "submit": "Создать проект"
       },
       "projects": {
+        "project_manager": "Менеджер проекта",
+        "edit": "Редактировать",
+        "edit_project": "Редактировать проект",
+        "name": "Название проекта",
+        "description": "Описание проекта",
+        "tags_hint": "Подсказка для тегов",
+        "team_members_hint": "Подсказка для участников команды",
+        "close": "Закрыть",
+        "save": "Сохранить",
+        "remove": "Удалить",
         "title": "Список проектов",
         "loading": "Загрузка проектов...",
         "error_fetch": "Ошибка при получении проектов.",
@@ -2321,6 +2615,10 @@
         "comment_created": "Создано"
       },
       "finance": {
+        "documents": "Финансовые документы",
+        "not_available": "Недоступно",
+        "record_type": "Тип записи",
+        "attachment": "Вложение",
         "filter_status_all": "Фильтр: Все статусы",
         "sort_date_asc": "Сортировать по дате (по возрастанию)",
         "sort_by": "Сортировать по",
@@ -2525,6 +2823,11 @@
         "error_loading_employees": "Ошибка при загрузке сотрудников"
       },
       "tasks": {
+        "status": "Статус задачи",
+        "pending": "В ожидании",
+        "in_progress": "В процессе",
+        "completed": "Завершено",
+        "cancelled": "Отменено",
         "loading": "Загрузка задач...",
         "error_fetch": "Ошибка при получении задач.",
         "deleted_success": "Задача успешно удалена",
@@ -2538,6 +2841,7 @@
         "assigned_to": "Ответственные"
       },
       "historySignature": {
+        "signed": "Подписано",
         "status": "Статус",
         "approvalStatus": "Статус одобрения",
         "signers": "Подписанты",
@@ -2710,6 +3014,7 @@
         }
       },
       "procurement": {
+        "loading": "Загрузка...",
         "purchase_order": "Заказ на покупку",
         "notes": "Заметки",
         "delete": "Удалить",
@@ -2808,7 +3113,39 @@
         "edit": "Редактировать",
         "close": "Закрыть"
       },
+      "receipts": {
+        "pending_title": "Ожидающие квитанции",
+        "order_id": "Номер заказа",
+        "supplier": "Поставщик",
+        "total_cost": "Итоговая стоимость",
+        "order_date": "Дата заказа",
+        "receivedDate": "Дата получения",
+        "actions": "Действия",
+        "edit": "Редактировать",
+        "delete": "Удалить",
+        "product_name": "Название продукта",
+        "quantity_to_receive": "Количество к получению",
+        "received_quantity": "Полученное количество",
+        "goods_checked": "Товар проверен",
+        "additional_notes": "Дополнительные заметки",
+        "supplier_rating": "Рейтинг поставщика",
+        "allow_close_with_discrepancy": "Разрешить закрыть с несоответствием",
+        "save": "Сохранить",
+        "cancel": "Отменить",
+        "enter_additional_notes": "Введите дополнительные заметки"
+      },
       "budget": {
+        "spent_amount": "Израсходованная сумма",
+        "period": "Период",
+        "no_items": "Нет элементов",
+        "created_by": "Создано",
+        "items": "Элементы",
+        "signers": "Подписанты",
+        "signer_name": "Имя подписанта",
+        "signer_role": "Роль подписанта",
+        "has_signed": "Подписано?",
+        "signature_time": "Время подписи",
+        "signature": "Подпись",
         "select_department_project": "Выбрать отдел/проект",
         "add_department": "Добавить отдел",
         "budgets": "Бюджеты",
@@ -2836,9 +3173,13 @@
         "signers_list_deleted": "Список подписантов успешно удалён"
       },
       "user": {
+        "search_placeholder": "Поиск пользователя...",
+        "delete": "Удалить",
+        "inactive": "Пользователь не активен",
         "hello": "Здравствуйте, {{firstName}} {{lastName}}"
       },
       "product": {
+        "fields.attachments": "Вложения к продукту",
         "add_new_product": "Добавить новый продукт",
         "success_message": "Продукт успешно добавлен",
         "error_message": "Ошибка при добавлении продукта",
@@ -2871,6 +3212,16 @@
         }
       },
       "supplier": {
+        "inactive": "Поставщик не активен",
+        "city": "Город",
+        "street": "Улица",
+        "apartment": "Квартира",
+        "country": "Страна",
+        "bank_number": "Номер банка",
+        "branch_number": "Номер отделения",
+        "account_number": "Номер счёта",
+        "confirmation_account": "Подтверждение счёта",
+        "attachments": "Вложения поставщика",
         "list_title": "Список поставщиков",
         "add_new_supplier": "Добавить нового поставщика",
         "name": "Название поставщика",
@@ -2971,6 +3322,34 @@
         }
       },
       "inventory": {
+        "filter_all_product_types": "すべての製品タイプをフィルター",
+        "sale_products": "販売製品",
+        "purchase_products": "購入製品",
+        "filter_all_categories": "すべてのカテゴリをフィルター",
+        "filter_all_suppliers": "すべての仕入先をフィルター",
+        "sort_by": "並び替え",
+        "sort_productName_asc": "商品名で昇順ソート",
+        "sort_productName_desc": "商品名で降順ソート",
+        "sort_sku_asc": "SKUで昇順ソート",
+        "sort_sku_desc": "SKUで降順ソート",
+        "sort_barcode_asc": "バーコードで昇順ソート",
+        "sort_barcode_desc": "バーコードで降順ソート",
+        "sort_unitPrice_asc": "単価で昇順ソート",
+        "sort_unitPrice_desc": "単価で降順ソート",
+        "sort_category_asc": "カテゴリで昇順ソート",
+        "sort_category_desc": "カテゴリで降順ソート",
+        "sort_supplierName_asc": "仕入先名で昇順ソート",
+        "sort_supplierName_desc": "仕入先名で降順ソート",
+        "sort_quantity_asc": "数量で昇順ソート",
+        "sort_quantity_desc": "数量で降順ソート",
+        "sort_minStockLevel_asc": "最小在庫レベルで昇順ソート",
+        "sort_minStockLevel_desc": "最小在庫レベルで降順ソート",
+        "sort_reorderQuantity_asc": "再注文数量で昇順ソート",
+        "sort_reorderQuantity_desc": "再注文数量で降順ソート",
+        "sort_volume_asc": "容量で昇順ソート",
+        "sort_volume_desc": "容量で降順ソート",
+        "no_products_available": "利用可能な製品はありません",
+        "search_placeholder": "検索...",
         "volume": "在庫量",
         "title": "商品の在庫リスト",
         "image": "画像",
@@ -3086,6 +3465,18 @@
         "success_message": "会社が正常に作成されました！",
         "error_message": "問題が発生しました。もう一度お試しください。"
       },
+      "departments": {
+        "name": "部署名",
+        "description": "部署の説明",
+        "manager": "部署の管理者",
+        "team_members": "チームメンバー",
+        "actions": "アクション",
+        "no_team_members": "チームメンバーはいません",
+        "projects": "プロジェクト",
+        "edit_department": "部署を編集",
+        "cancel": "キャンセル",
+        "save": "保存"
+      },
       "auth": {
         "email": "メール",
         "enter_email": "メールアドレスを入力してください",
@@ -3115,6 +3506,9 @@
         "current_year": "{{year}}"
       },
       "navbar": {
+        "ProcurementProposals": "調達提案",
+        "ProcurementProposalsList": "調達提案リスト",
+        "departmentList": "部署リスト",
         "Projects": "プロジェクト",
         "Projects_List": "プロジェクト一覧",
         "Add_Project": "プロジェクトを追加",
@@ -3145,6 +3539,9 @@
         "add_tasks": "タスクを追加",
         "calendar": "カレンダー",
         "events": "イベント",
+        "Orders List": "注文リスト",
+        "Add-Orders": "注文を追加",
+        "Orders": "注文",
         "profile": {
           "hello": "こんにちは、{{firstName}} {{lastName}}",
           "logging_out": "ログアウト中...",
@@ -3174,6 +3571,8 @@
           "save": "保存"
         },
         "notifications": {
+          "allNotificationsRead": "すべての通知が既読になりました",
+          "notificationMarkedAsRead": "通知が既読としてマークされました",
           "notificationDeleted": "通知が削除されました",
           "notificationDeleteError": "通知の削除中にエラーが発生しました",
           "no_notifications": "通知はありません"
@@ -3189,6 +3588,8 @@
         "refresh": "更新"
       },
       "notifications": {
+        "title": "通知のタイトル",
+        "readAll": "すべてを読む",
         "notifications": "通知",
         "loading_notifications": "通知を読み込み中...",
         "no_notifications_found": "通知が見つかりません。",
@@ -3267,6 +3668,16 @@
         "submit": "プロジェクトを作成"
       },
       "projects": {
+        "project_manager": "プロジェクトマネージャー",
+        "edit": "編集",
+        "edit_project": "プロジェクトを編集",
+        "name": "プロジェクト名",
+        "description": "プロジェクトの説明",
+        "tags_hint": "タグのヒント",
+        "team_members_hint": "チームメンバーのヒント",
+        "close": "閉じる",
+        "save": "保存",
+        "remove": "削除",
         "title": "プロジェクト一覧",
         "loading": "プロジェクトを読み込み中...",
         "error_fetch": "プロジェクトの取得中にエラーが発生しました。",
@@ -3294,6 +3705,10 @@
         "comment_created": "作成日"
       },
       "finance": {
+        "documents": "財務書類",
+        "not_available": "利用不可",
+        "record_type": "記録の種類",
+        "attachment": "添付ファイル",
         "filter_status_all": "フィルター：すべてのステータス",
         "sort_date_asc": "日付で昇順に並べ替え",
         "sort_by": "並べ替え",
@@ -3498,6 +3913,11 @@
         "error_loading_employees": "従業員の読み込み中にエラーが発生しました"
       },
       "tasks": {
+        "status": "タスクのステータス",
+        "pending": "保留中",
+        "in_progress": "進行中",
+        "completed": "完了",
+        "cancelled": "キャンセル済み",
         "loading": "タスクを読み込み中...",
         "error_fetch": "タスクの取得中にエラーが発生しました。",
         "deleted_success": "タスクが正常に削除されました",
@@ -3511,6 +3931,7 @@
         "assigned_to": "担当者"
       },
       "historySignature": {
+        "signed": "署名済み",
         "status": "状態",
         "approvalStatus": "承認状況",
         "signers": "署名者",
@@ -3683,6 +4104,7 @@
         }
       },
       "procurement": {
+        "loading": "読み込み中...",
         "purchase_order": "発注書",
         "notes": "備考",
         "delete": "削除",
@@ -3781,7 +4203,39 @@
         "edit": "編集",
         "close": "閉じる"
       },
+      "receipts": {
+        "pending_title": "保留中の入荷",
+        "order_id": "注文番号",
+        "supplier": "仕入先",
+        "total_cost": "合計費用",
+        "order_date": "注文日",
+        "receivedDate": "受領日",
+        "actions": "アクション",
+        "edit": "編集",
+        "delete": "削除",
+        "product_name": "製品名",
+        "quantity_to_receive": "受領予定数量",
+        "received_quantity": "受領数量",
+        "goods_checked": "商品を確認しましたか",
+        "additional_notes": "追加メモ",
+        "supplier_rating": "仕入先の評価",
+        "allow_close_with_discrepancy": "不一致があっても完了を許可",
+        "save": "保存",
+        "cancel": "キャンセル",
+        "enter_additional_notes": "追加メモを入力"
+      },
       "budget": {
+        "spent_amount": "支出金額",
+        "period": "期間",
+        "no_items": "アイテムがありません",
+        "created_by": "作成者",
+        "items": "アイテム",
+        "signers": "署名者",
+        "signer_name": "署名者名",
+        "signer_role": "署名者の役割",
+        "has_signed": "署名済み",
+        "signature_time": "署名時刻",
+        "signature": "署名",
         "select_department_project": "部門/プロジェクトを選択",
         "add_department": "部門を追加",
         "budgets": "予算",
@@ -3809,9 +4263,13 @@
         "signers_list_deleted": "署名者リストが正常に削除されました"
       },
       "user": {
+        "search_placeholder": "ユーザーを検索...",
+        "delete": "削除",
+        "inactive": "ユーザーは無効です",
         "hello": "こんにちは、{{firstName}} {{lastName}}"
       },
       "product": {
+        "fields.attachments": "製品の添付ファイル",
         "add_new_product": "新製品を追加",
         "success_message": "製品が正常に追加されました",
         "error_message": "製品の追加中にエラーが発生しました",
@@ -3844,6 +4302,16 @@
         }
       },
       "supplier": {
+        "inactive": "仕入先は無効です",
+        "city": "市区町村",
+        "street": "住所（番地）",
+        "apartment": "アパート / 部屋番号",
+        "country": "国",
+        "bank_number": "銀行番号",
+        "branch_number": "支店番号",
+        "account_number": "口座番号",
+        "confirmation_account": "口座の確認",
+        "attachments": "仕入先の添付ファイル",
         "list_title": "サプライヤー一覧",
         "add_new_supplier": "新しいサプライヤーを追加",
         "name": "サプライヤー名",
@@ -3944,6 +4412,34 @@
         }
       },
       "inventory": {
+        "filter_all_product_types": "Filtrer tous les types de produits",
+        "sale_products": "Produits à la vente",
+        "purchase_products": "Produits à l'achat",
+        "filter_all_categories": "Filtrer toutes les catégories",
+        "filter_all_suppliers": "Filtrer tous les fournisseurs",
+        "sort_by": "Trier par",
+        "sort_productName_asc": "Trier par nom du produit (croissant)",
+        "sort_productName_desc": "Trier par nom du produit (décroissant)",
+        "sort_sku_asc": "Trier par SKU (croissant)",
+        "sort_sku_desc": "Trier par SKU (décroissant)",
+        "sort_barcode_asc": "Trier par code-barres (croissant)",
+        "sort_barcode_desc": "Trier par code-barres (décroissant)",
+        "sort_unitPrice_asc": "Trier par prix unitaire (croissant)",
+        "sort_unitPrice_desc": "Trier par prix unitaire (décroissant)",
+        "sort_category_asc": "Trier par catégorie (croissant)",
+        "sort_category_desc": "Trier par catégorie (décroissant)",
+        "sort_supplierName_asc": "Trier par nom du fournisseur (croissant)",
+        "sort_supplierName_desc": "Trier par nom du fournisseur (décroissant)",
+        "sort_quantity_asc": "Trier par quantité (croissant)",
+        "sort_quantity_desc": "Trier par quantité (décroissant)",
+        "sort_minStockLevel_asc": "Trier par stock minimum (croissant)",
+        "sort_minStockLevel_desc": "Trier par stock minimum (décroissant)",
+        "sort_reorderQuantity_asc": "Trier par quantité de réapprovisionnement (croissant)",
+        "sort_reorderQuantity_desc": "Trier par quantité de réapprovisionnement (décroissant)",
+        "sort_volume_asc": "Trier par volume (croissant)",
+        "sort_volume_desc": "Trier par volume (décroissant)",
+        "no_products_available": "Aucun produit disponible",
+        "search_placeholder": "Rechercher...",
         "volume": "Volume de l'Inventaire",
         "title": "Liste des Produits et de l'Inventaire",
         "image": "Image",
@@ -4088,6 +4584,9 @@
         "current_year": "{{year}}"
       },
       "navbar": {
+        "ProcurementProposals": "Propositions d'achat",
+        "ProcurementProposalsList": "Liste des propositions d'achat",
+        "departmentList": "Liste des départements",
         "Projects": "Projets",
         "Projects_List": "Liste des Projets",
         "Add_Project": "Ajouter un Projet",
@@ -4118,6 +4617,9 @@
         "add_tasks": "Ajouter des Tâches",
         "calendar": "Calendrier",
         "events": "Événements",
+        "Orders List": "Liste des commandes",
+        "Add-Orders": "Ajouter des commandes",
+        "Orders": "Commandes",
         "profile": {
           "hello": "Bonjour, {{firstName}} {{lastName}}",
           "logging_out": "Déconnexion en cours...",
@@ -4147,10 +4649,24 @@
           "save": "Enregistrer"
         },
         "notifications": {
+          "allNotificationsRead": "Toutes les notifications ont été lues",
+          "notificationMarkedAsRead": "Notification marquée comme lue",
           "notificationDeleted": "Notification supprimée",
           "notificationDeleteError": "Erreur lors de la suppression de la notification",
           "no_notifications": "Aucune notification"
         }
+      },
+      "departments": {
+        "name": "Nom du département",
+        "description": "Description du département",
+        "manager": "Responsable du département",
+        "team_members": "Membres de l'équipe",
+        "actions": "Actions",
+        "no_team_members": "Pas de membres dans l'équipe",
+        "projects": "Projets",
+        "edit_department": "Modifier le département",
+        "cancel": "Annuler",
+        "save": "Enregistrer"
       },
       "buttons": {
         "submit": "Envoyer",
@@ -4162,6 +4678,8 @@
         "refresh": "Rafraîchir"
       },
       "notifications": {
+        "title": "Titre des notifications",
+        "readAll": "Tout lire",
         "notifications": "Notifications",
         "loading_notifications": "Chargement des notifications...",
         "no_notifications_found": "Aucune notification trouvée.",
@@ -4240,6 +4758,16 @@
         "submit": "Créer le Projet"
       },
       "projects": {
+        "project_manager": "Chef de projet",
+        "edit": "Modifier",
+        "edit_project": "Modifier le projet",
+        "name": "Nom du projet",
+        "description": "Description du projet",
+        "tags_hint": "Indice pour les balises",
+        "team_members_hint": "Indice pour les membres de l'équipe",
+        "close": "Fermer",
+        "save": "Enregistrer",
+        "remove": "Supprimer",
         "title": "Liste des Projets",
         "loading": "Chargement des projets...",
         "error_fetch": "Erreur lors de la récupération des projets.",
@@ -4267,6 +4795,10 @@
         "comment_created": "Créé le"
       },
       "finance": {
+        "documents": "Documents financiers",
+        "not_available": "Indisponible",
+        "record_type": "Type d'enregistrement",
+        "attachment": "Pièce jointe",
         "filter_status_all": "Filtrer : Tous les statuts",
         "sort_date_asc": "Trier par date (ascendant)",
         "sort_by": "Trier par",
@@ -4471,6 +5003,11 @@
         "error_loading_employees": "Erreur lors du chargement des employés"
       },
       "tasks": {
+        "status": "Statut de la tâche",
+        "pending": "En attente",
+        "in_progress": "En cours",
+        "completed": "Terminé",
+        "cancelled": "Annulé",
         "loading": "Chargement des tâches...",
         "error_fetch": "Erreur lors de la récupération des tâches.",
         "deleted_success": "Tâche supprimée avec succès",
@@ -4484,6 +5021,7 @@
         "assigned_to": "Assignés"
       },
       "historySignature": {
+        "signed": "Signé",
         "status": "Statut",
         "approvalStatus": "Statut d'Approbation",
         "signers": "Signataires",
@@ -4655,7 +5193,29 @@
           "failed_to_fetch_conversion_rate": "Échec de la récupération du taux de conversion."
         }
       },
+      "receipts": {
+        "pending_title": "Réceptions en attente",
+        "order_id": "Numéro de commande",
+        "supplier": "Fournisseur",
+        "total_cost": "Coût total",
+        "order_date": "Date de commande",
+        "receivedDate": "Date de réception",
+        "actions": "Actions",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "product_name": "Nom du produit",
+        "quantity_to_receive": "Quantité à recevoir",
+        "received_quantity": "Quantité reçue",
+        "goods_checked": "Marchandises vérifiées",
+        "additional_notes": "Notes supplémentaires",
+        "supplier_rating": "Évaluation du fournisseur",
+        "allow_close_with_discrepancy": "Permettre la clôture avec écart",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "enter_additional_notes": "Saisir des notes supplémentaires"
+      },
       "procurement": {
+        "loading": "Chargement...",
         "purchase_order": "Bon de Commande",
         "notes": "Notes",
         "delete": "Supprimer",
@@ -4755,6 +5315,17 @@
         "close": "Fermer"
       },
       "budget": {
+        "spent_amount": "Montant dépensé",
+        "period": "Période",
+        "no_items": "Aucun élément",
+        "created_by": "Créé par",
+        "items": "Éléments",
+        "signers": "Signataires",
+        "signer_name": "Nom du signataire",
+        "signer_role": "Rôle du signataire",
+        "has_signed": "A signé",
+        "signature_time": "Heure de la signature",
+        "signature": "Signature",
         "select_department_project": "Sélectionner département/projet",
         "add_department": "Ajouter un département",
         "budgets": "Budgets",
@@ -4782,9 +5353,13 @@
         "signers_list_deleted": "Liste des signataires supprimée avec succès"
       },
       "user": {
+        "search_placeholder": "Rechercher un utilisateur...",
+        "delete": "Supprimer",
+        "inactive": "Utilisateur inactif",
         "hello": "Bonjour {{firstName}} {{lastName}}"
       },
       "product": {
+        "fields.attachments": "Pièces jointes du produit",
         "add_new_product": "Ajouter un Nouveau Produit",
         "success_message": "Produit ajouté avec succès",
         "error_message": "Erreur lors de l'ajout du produit",
@@ -4817,6 +5392,16 @@
         }
       },
       "supplier": {
+        "inactive": "Fournisseur inactif",
+        "city": "Ville",
+        "street": "Rue",
+        "apartment": "Appartement",
+        "country": "Pays",
+        "bank_number": "Numéro de banque",
+        "branch_number": "Numéro d'agence",
+        "account_number": "Numéro de compte",
+        "confirmation_account": "Confirmation du compte",
+        "attachments": "Pièces jointes du fournisseur",
         "list_title": "Liste des Fournisseurs",
         "add_new_supplier": "Ajouter un Nouveau Fournisseur",
         "name": "Nom du Fournisseur",
@@ -4917,6 +5502,34 @@
         }
       },
       "inventory": {
+        "filter_all_product_types": "Filtrar todos los tipos de productos",
+        "sale_products": "Productos a la venta",
+        "purchase_products": "Productos de compra",
+        "filter_all_categories": "Filtrar todas las categorías",
+        "filter_all_suppliers": "Filtrar todos los proveedores",
+        "sort_by": "Ordenar por",
+        "sort_productName_asc": "Ordenar por nombre de producto (ascendente)",
+        "sort_productName_desc": "Ordenar por nombre de producto (descendente)",
+        "sort_sku_asc": "Ordenar por SKU (ascendente)",
+        "sort_sku_desc": "Ordenar por SKU (descendente)",
+        "sort_barcode_asc": "Ordenar por código de barras (ascendente)",
+        "sort_barcode_desc": "Ordenar por código de barras (descendente)",
+        "sort_unitPrice_asc": "Ordenar por precio unitario (ascendente)",
+        "sort_unitPrice_desc": "Ordenar por precio unitario (descendente)",
+        "sort_category_asc": "Ordenar por categoría (ascendente)",
+        "sort_category_desc": "Ordenar por categoría (descendente)",
+        "sort_supplierName_asc": "Ordenar por nombre del proveedor (ascendente)",
+        "sort_supplierName_desc": "Ordenar por nombre del proveedor (descendente)",
+        "sort_quantity_asc": "Ordenar por cantidad (ascendente)",
+        "sort_quantity_desc": "Ordenar por cantidad (descendente)",
+        "sort_minStockLevel_asc": "Ordenar por nivel mínimo de stock (ascendente)",
+        "sort_minStockLevel_desc": "Ordenar por nivel mínimo de stock (descendente)",
+        "sort_reorderQuantity_asc": "Ordenar por cantidad de reorden (ascendente)",
+        "sort_reorderQuantity_desc": "Ordenar por cantidad de reorden (descendente)",
+        "sort_volume_asc": "Ordenar por volumen (ascendente)",
+        "sort_volume_desc": "Ordenar por volumen (descendente)",
+        "no_products_available": "No hay productos disponibles",
+        "search_placeholder": "Buscar...",
         "volume": "Volumen de Inventario",
         "title": "Lista de Productos e Inventario",
         "image": "Imagen",
@@ -5060,7 +5673,22 @@
         "all_rights_reserved": "Todos los derechos reservados.",
         "current_year": "{{year}}"
       },
+      "departments": {
+        "name": "Nombre del departamento",
+        "description": "Descripción del departamento",
+        "manager": "Gerente del departamento",
+        "team_members": "Miembros del equipo",
+        "actions": "Acciones",
+        "no_team_members": "No hay miembros en el equipo",
+        "projects": "Proyectos",
+        "edit_department": "Editar departamento",
+        "cancel": "Cancelar",
+        "save": "Guardar"
+      },
       "navbar": {
+        "ProcurementProposals": "Propuestas de adquisición",
+        "ProcurementProposalsList": "Lista de propuestas de adquisición",
+        "departmentList": "Lista de departamentos",
         "Projects": "Proyectos",
         "Projects_List": "Lista de Proyectos",
         "Add_Project": "Agregar Proyecto",
@@ -5091,6 +5719,9 @@
         "add_tasks": "Agregar Tareas",
         "calendar": "Calendario",
         "events": "Eventos",
+        "Orders List": "Lista de pedidos",
+        "Add-Orders": "Agregar pedidos",
+        "Orders": "Pedidos",
         "profile": {
           "hello": "Hola, {{firstName}} {{lastName}}",
           "logging_out": "Cerrando sesión...",
@@ -5120,6 +5751,8 @@
           "save": "Guardar"
         },
         "notifications": {
+          "allNotificationsRead": "Todas las notificaciones leídas",
+          "notificationMarkedAsRead": "Notificación marcada como leída",
           "notificationDeleted": "Notificación eliminada",
           "notificationDeleteError": "Error al eliminar la notificación",
           "no_notifications": "No hay notificaciones"
@@ -5135,6 +5768,8 @@
         "refresh": "Refrescar"
       },
       "notifications": {
+        "title": "Título de notificaciones",
+        "readAll": "Leer todo",
         "notifications": "Notificaciones",
         "loading_notifications": "Cargando notificaciones...",
         "no_notifications_found": "No se han encontrado notificaciones.",
@@ -5213,6 +5848,16 @@
         "submit": "Crear Proyecto"
       },
       "projects": {
+        "project_manager": "Gerente de proyecto",
+        "edit": "Editar",
+        "edit_project": "Editar proyecto",
+        "name": "Nombre del proyecto",
+        "description": "Descripción del proyecto",
+        "tags_hint": "Sugerencia de etiquetas",
+        "team_members_hint": "Sugerencia de miembros del equipo",
+        "close": "Cerrar",
+        "save": "Guardar",
+        "remove": "Eliminar",
         "title": "Lista de Proyectos",
         "loading": "Cargando proyectos...",
         "error_fetch": "Error al obtener los proyectos.",
@@ -5240,6 +5885,10 @@
         "comment_created": "Creado el"
       },
       "finance": {
+        "documents": "Documentos financieros",
+        "not_available": "No disponible",
+        "record_type": "Tipo de registro",
+        "attachment": "Archivo adjunto",
         "filter_status_all": "Filtrar: Todos los estados",
         "sort_date_asc": "Ordenar por fecha (ascendente)",
         "sort_by": "Ordenar por",
@@ -5444,6 +6093,11 @@
         "error_loading_employees": "Error al cargar los empleados"
       },
       "tasks": {
+        "status": "Estado de la tarea",
+        "pending": "Pendiente",
+        "in_progress": "En progreso",
+        "completed": "Completada",
+        "cancelled": "Cancelada",
         "loading": "Cargando tareas...",
         "error_fetch": "Error al obtener las tareas.",
         "deleted_success": "¡Tarea eliminada con éxito!",
@@ -5457,6 +6111,7 @@
         "assigned_to": "Asignados"
       },
       "historySignature": {
+        "signed": "Firmado",
         "status": "Estado",
         "approvalStatus": "Estado de Aprobación",
         "signers": "Firmantes",
@@ -5586,6 +6241,27 @@
         },
         "image_preview": "Vista Previa de la Imagen"
       },
+      "receipts": {
+        "pending_title": "Recibos pendientes",
+        "order_id": "Número de pedido",
+        "supplier": "Proveedor",
+        "total_cost": "Costo total",
+        "order_date": "Fecha de pedido",
+        "receivedDate": "Fecha de recepción",
+        "actions": "Acciones",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "product_name": "Nombre del producto",
+        "quantity_to_receive": "Cantidad a recibir",
+        "received_quantity": "Cantidad recibida",
+        "goods_checked": "Mercancía revisada",
+        "additional_notes": "Notas adicionales",
+        "supplier_rating": "Calificación del proveedor",
+        "allow_close_with_discrepancy": "Permitir cerrar con discrepancia",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "enter_additional_notes": "Ingrese notas adicionales"
+      },
       "signupEmployee": {
         "signUpPage": {
           "logo_alt": "Tu Logo",
@@ -5629,6 +6305,7 @@
         }
       },
       "procurement": {
+        "loading": "Cargando...",
         "purchase_order": "Orden de Compra",
         "notes": "Notas",
         "delete": "Eliminar",
@@ -5728,6 +6405,17 @@
         "close": "Cerrar"
       },
       "budget": {
+        "spent_amount": "Cantidad gastada",
+        "period": "Periodo",
+        "no_items": "No hay artículos",
+        "created_by": "Creado por",
+        "items": "Artículos",
+        "signers": "Firmantes",
+        "signer_name": "Nombre del firmante",
+        "signer_role": "Rol del firmante",
+        "has_signed": "Ha firmado",
+        "signature_time": "Hora de la firma",
+        "signature": "Firma",
         "select_department_project": "Seleccionar departamento/proyecto",
         "add_department": "Agregar departamento",
         "budgets": "Presupuestos",
@@ -5755,9 +6443,13 @@
         "signers_list_deleted": "Lista de firmantes eliminada con éxito"
       },
       "user": {
+        "search_placeholder": "Buscar usuario...",
+        "delete": "Eliminar",
+        "inactive": "Usuario inactivo",
         "hello": "Hola {{firstName}} {{lastName}}"
       },
       "product": {
+        "fields.attachments": "Archivos adjuntos del producto",
         "add_new_product": "Agregar Nuevo Producto",
         "success_message": "Producto agregado con éxito",
         "error_message": "Error al agregar el producto",
@@ -5790,6 +6482,16 @@
         }
       },
       "supplier": {
+        "inactive": "Proveedor inactivo",
+        "city": "Ciudad",
+        "street": "Calle",
+        "apartment": "Apartamento",
+        "country": "País",
+        "bank_number": "Número de banco",
+        "branch_number": "Número de sucursal",
+        "account_number": "Número de cuenta",
+        "confirmation_account": "Confirmación de cuenta",
+        "attachments": "Archivos adjuntos del proveedor",
         "list_title": "Lista de Proveedores",
         "add_new_supplier": "Agregar Nuevo Proveedor",
         "name": "Nombre del Proveedor",
@@ -5890,6 +6592,34 @@
         }
       },
       "inventory": {
+        "filter_all_product_types": "تصفية كافة أنواع المنتجات",
+        "sale_products": "منتجات للبيع",
+        "purchase_products": "منتجات للشراء",
+        "filter_all_categories": "تصفية جميع الفئات",
+        "filter_all_suppliers": "تصفية جميع الموردين",
+        "sort_by": "الترتيب حسب",
+        "sort_productName_asc": "ترتيب حسب اسم المنتج (تصاعدي)",
+        "sort_productName_desc": "ترتيب حسب اسم المنتج (تنازلي)",
+        "sort_sku_asc": "ترتيب حسب رقم SKU (تصاعدي)",
+        "sort_sku_desc": "ترتيب حسب رقم SKU (تنازلي)",
+        "sort_barcode_asc": "ترتيب حسب الباركود (تصاعدي)",
+        "sort_barcode_desc": "ترتيب حسب الباركود (تنازلي)",
+        "sort_unitPrice_asc": "ترتيب حسب سعر الوحدة (تصاعدي)",
+        "sort_unitPrice_desc": "ترتيب حسب سعر الوحدة (تنازلي)",
+        "sort_category_asc": "ترتيب حسب التصنيف (تصاعدي)",
+        "sort_category_desc": "ترتيب حسب التصنيف (تنازلي)",
+        "sort_supplierName_asc": "ترتيب حسب اسم المورد (تصاعدي)",
+        "sort_supplierName_desc": "ترتيب حسب اسم المورد (تنازلي)",
+        "sort_quantity_asc": "ترتيب حسب الكمية (تصاعدي)",
+        "sort_quantity_desc": "ترتيب حسب الكمية (تنازلي)",
+        "sort_minStockLevel_asc": "ترتيب حسب الحد الأدنى للمخزون (تصاعدي)",
+        "sort_minStockLevel_desc": "ترتيب حسب الحد الأدنى للمخزون (تنازلي)",
+        "sort_reorderQuantity_asc": "ترتيب حسب كمية إعادة الطلب (تصاعدي)",
+        "sort_reorderQuantity_desc": "ترتيب حسب كمية إعادة الطلب (تنازلي)",
+        "sort_volume_asc": "ترتيب حسب الحجم (تصاعدي)",
+        "sort_volume_desc": "ترتيب حسب الحجم (تنازلي)",
+        "no_products_available": "لا توجد منتجات متاحة",
+        "search_placeholder": "بحث...",
         "volume": "حجم المخزون",
         "title": "قائمة المنتجات والمخزون",
         "image": "الصورة",
@@ -6034,6 +6764,9 @@
         "current_year": "{{year}}"
       },
       "navbar": {
+        "ProcurementProposals": "مقترحات المشتريات",
+        "ProcurementProposalsList": "قائمة مقترحات المشتريات",
+        "departmentList": "قائمة الأقسام",
         "Projects": "المشاريع",
         "Projects_List": "قائمة المشاريع",
         "Add_Project": "إضافة مشروع",
@@ -6064,6 +6797,9 @@
         "add_tasks": "إضافة مهام",
         "calendar": "التقويم",
         "events": "الأحداث",
+        "Orders List": "قائمة الطلبات",
+        "Add-Orders": "إضافة طلبات",
+        "Orders": "الطلبات",
         "profile": {
           "hello": "مرحبًا، {{firstName}} {{lastName}}",
           "logging_out": "جار تسجيل الخروج...",
@@ -6093,10 +6829,24 @@
           "save": "حفظ"
         },
         "notifications": {
+          "allNotificationsRead": "تمت قراءة جميع الإشعارات",
+          "notificationMarkedAsRead": "تم وضع علامة على الإشعار بأنه مقروء",
           "notificationDeleted": "تم حذف الإشعار",
           "notificationDeleteError": "حدث خطأ أثناء حذف الإشعار",
           "no_notifications": "لا توجد إشعارات"
         }
+      },
+      "departments": {
+        "name": "اسم القسم",
+        "description": "وصف القسم",
+        "manager": "مدير القسم",
+        "team_members": "أعضاء الفريق",
+        "actions": "إجراءات",
+        "no_team_members": "لا يوجد أعضاء في الفريق",
+        "projects": "مشاريع",
+        "edit_department": "تحرير القسم",
+        "cancel": "إلغاء",
+        "save": "حفظ"
       },
       "buttons": {
         "submit": "إرسال",
@@ -6108,6 +6858,8 @@
         "refresh": "بحث"
       },
       "notifications": {
+        "title": "عنوان الإشعارات",
+        "readAll": "قراءة الكل",
         "notifications": "الإشعارات",
         "loading_notifications": "جار تحميل الإشعارات...",
         "no_notifications_found": "لم يتم العثور على إشعارات.",
@@ -6186,6 +6938,16 @@
         "submit": "إنشاء المشروع"
       },
       "projects": {
+        "project_manager": "مدير المشروع",
+        "edit": "تحرير",
+        "edit_project": "تحرير المشروع",
+        "name": "اسم المشروع",
+        "description": "وصف المشروع",
+        "tags_hint": "تلميح العلامات",
+        "team_members_hint": "تلميح أعضاء الفريق",
+        "close": "إغلاق",
+        "save": "حفظ",
+        "remove": "إزالة",
         "title": "قائمة المشاريع",
         "loading": "جار تحميل المشاريع...",
         "error_fetch": "حدث خطأ أثناء جلب المشاريع.",
@@ -6213,6 +6975,10 @@
         "comment_created": "تاريخ الإنشاء"
       },
       "finance": {
+        "documents": "مستندات مالية",
+        "not_available": "غير متوفر",
+        "record_type": "نوع السجل",
+        "attachment": "مرفق",
         "filter_status_all": "تصفية: كل الحالات",
         "sort_date_asc": "ترتيب حسب التاريخ (تصاعدي)",
         "sort_by": "ترتيب حسب",
@@ -6417,6 +7183,11 @@
         "error_loading_employees": "حدث خطأ أثناء تحميل الموظفين"
       },
       "tasks": {
+        "status": "حالة المهمة",
+        "pending": "قيد الانتظار",
+        "in_progress": "قيد التنفيذ",
+        "completed": "منجز",
+        "cancelled": "ملغى",
         "loading": "جار تحميل المهام...",
         "error_fetch": "حدث خطأ أثناء جلب المهام.",
         "deleted_success": "تم حذف المهمة بنجاح",
@@ -6430,6 +7201,7 @@
         "assigned_to": "المعينين"
       },
       "historySignature": {
+        "signed": "تم التوقيع",
         "status": "الحالة",
         "approvalStatus": "حالة الموافقة",
         "signers": "الموقعون",
@@ -6559,6 +7331,27 @@
         },
         "image_preview": "معاينة الصورة"
       },
+      "receipts": {
+        "pending_title": "إيصالات قيد الانتظار",
+        "order_id": "رقم الطلب",
+        "supplier": "المورد",
+        "total_cost": "التكلفة الإجمالية",
+        "order_date": "تاريخ الطلب",
+        "receivedDate": "تاريخ الاستلام",
+        "actions": "إجراءات",
+        "edit": "تحرير",
+        "delete": "حذف",
+        "product_name": "اسم المنتج",
+        "quantity_to_receive": "الكمية المطلوب استلامها",
+        "received_quantity": "الكمية التي تم استلامها",
+        "goods_checked": "هل تم فحص البضائع",
+        "additional_notes": "ملاحظات إضافية",
+        "supplier_rating": "تقييم المورد",
+        "allow_close_with_discrepancy": "السماح بالإغلاق مع وجود اختلاف",
+        "save": "حفظ",
+        "cancel": "إلغاء",
+        "enter_additional_notes": "أدخل ملاحظات إضافية"
+      },
       "signupEmployee": {
         "signUpPage": {
           "logo_alt": "شعارك",
@@ -6602,6 +7395,7 @@
         }
       },
       "procurement": {
+        "loading": "جارٍ التحميل...",
         "purchase_order": "أمر الشراء",
         "notes": "الملاحظات",
         "delete": "حذف",
@@ -6702,6 +7496,17 @@
         "close": "إغلاق"
       },
       "budget": {
+        "spent_amount": "المبلغ المُنفق",
+        "period": "الفترة",
+        "no_items": "لا توجد عناصر",
+        "created_by": "تم الإنشاء بواسطة",
+        "items": "العناصر",
+        "signers": "الموقعون",
+        "signer_name": "اسم المُوقّع",
+        "signer_role": "دور المُوقّع",
+        "has_signed": "هل تم التوقيع",
+        "signature_time": "وقت التوقيع",
+        "signature": "توقيع",
         "select_department_project": "اختر القسم/المشروع",
         "add_department": "أضف قسم",
         "budgets": "الميزانيات",
@@ -6729,9 +7534,13 @@
         "signers_list_deleted": "تم حذف قائمة الموقعين بنجاح"
       },
       "user": {
+        "search_placeholder": "ابحث عن مستخدم...",
+        "delete": "حذف",
+        "inactive": "مستخدم غير نشط",
         "hello": "مرحبًا {{firstName}} {{lastName}}"
       },
       "product": {
+        "fields.attachments": "مرفقات المنتج",
         "add_new_product": "إضافة منتج جديد",
         "success_message": "تم إضافة المنتج بنجاح",
         "error_message": "حدث خطأ أثناء إضافة المنتج",
@@ -6764,6 +7573,16 @@
         }
       },
       "supplier": {
+        "inactive": "مورد غير نشط",
+        "city": "مدينة",
+        "street": "شارع",
+        "apartment": "شقة",
+        "country": "دولة",
+        "bank_number": "رقم البنك",
+        "branch_number": "رقم الفرع",
+        "account_number": "رقم الحساب",
+        "confirmation_account": "تأكيد الحساب",
+        "attachments": "مرفقات المورد",
         "list_title": "قائمة الموردين",
         "add_new_supplier": "إضافة مورد جديد",
         "name": "اسم المورد",

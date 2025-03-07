@@ -9,17 +9,15 @@ import Flag from "react-world-flags";
 import DesignBox from "./DesignBox";
 
 const Layout = ({ children }) => {
-  // שליפת נתוני המשתמש (לצורך הצגת Sidebar לדוגמא)
   const { data: authData } = useQuery({
     queryKey: ["authUser"],
   });
   const authUser = authData?.user;
-  const isAdmin = authUser?.role === "Admin"; // בדיקה אם המשתמש אדמין
+  const isAdmin = authUser?.role === "Admin";
 
   const { t, i18n } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // שינוי שפה (לדוגמא)
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
     setIsDropdownOpen(false);
@@ -52,29 +50,32 @@ const Layout = ({ children }) => {
   }, [i18n.language]);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen w-full">
       <Navbar />
-      <div className="flex justify-end p-4">
+      <div className="flex justify-end p-2 sm:p-4 xl:p-6">
         <div className="relative">
-          {/* תיבת עיצובים – המשתמש יכול לשנות את הצבעים והרקע */}
           <DesignBox />
           <button
             type="button"
-            className="inline-flex items-center px-4 py-2 border rounded-md z-20 bg-white text-gray-700 shadow-md"
+            className="inline-flex items-center px-2 py-1 sm:px-3 sm:py-2 xl:px-4 xl:py-2 border rounded-md z-20 bg-white text-gray-700 shadow-md text-sm sm:text-base xl:text-lg"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            <FaGlobe className="mr-2" /> {t("language.change_language")}
+            <FaGlobe className="mr-1 sm:mr-2 w-4 h-4 sm:w-5 sm:h-5 xl:w-6 xl:h-6" />
+            <span className="truncate">{t("language.change_language")}</span>
           </button>
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 bg-white shadow-md rounded-md z-20">
+            <div className="absolute right-0 mt-2 bg-white shadow-md rounded-md z-20 w-40 sm:w-48 xl:w-56 max-h-64 overflow-y-auto">
               {Object.keys(flagMap).map((lng) => (
                 <button
                   key={lng}
                   onClick={() => changeLanguage(lng)}
-                  className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left"
+                  className="flex items-center px-2 py-1 sm:px-3 sm:py-2 xl:px-4 xl:py-2 text-gray-700 hover:bg-gray-100 w-full text-left text-xs sm:text-sm xl:text-base"
                 >
-                  <Flag code={flagMap[lng]} className="w-5 h-5 mr-2 rounded" />
-                  {t(`${lng}`)}
+                  <Flag
+                    code={flagMap[lng]}
+                    className="w-4 h-4 sm:w-5 sm:h-5 xl:w-6 xl:h-6 mr-1 sm:mr-2 rounded"
+                  />
+                  <span className="truncate">{t(`${lng}`)}</span>
                 </button>
               ))}
             </div>
@@ -82,10 +83,16 @@ const Layout = ({ children }) => {
         </div>
       </div>
 
-      {/* במידה והמשתמש הוא אדמין, נציג את Sidebar */}
-      <div className="flex flex-grow">
-        {isAdmin && <SideBar />}
-        <main className="flex-grow">{children}</main>
+      {/* Main content with Sidebar for Admin */}
+      <div className="flex flex-grow w-full">
+        {isAdmin && (
+          <div className="hidden md:block w-48 md:w-56 lg:w-64 flex-shrink-0">
+            <SideBar />
+          </div>
+        )}
+        <main className="flex-grow w-full px-2 sm:px-4 md:px-6">
+          {children}
+        </main>
       </div>
 
       <Footer />

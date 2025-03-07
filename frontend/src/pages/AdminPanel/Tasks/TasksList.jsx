@@ -1,4 +1,3 @@
-import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
@@ -70,6 +69,22 @@ const TasksList = () => {
     },
   });
 
+  // עדכון סטטוס משימה
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ id, status }) => {
+      await axiosInstance.put(`/tasks/${id}`, { status });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["tasks"]);
+      toast.success(t("tasks.status_updated"));
+    },
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.message || t("tasks.status_update_error")
+      );
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="text-center p-6 text-text">{t("tasks.loading")}</div>
@@ -85,6 +100,10 @@ const TasksList = () => {
   const sortedTasks = [...tasks].sort(
     (a, b) => new Date(a.dueDate) - new Date(b.dueDate)
   );
+
+  const handleStatusChange = (taskId, newStatus) => {
+    updateStatusMutation.mutate({ id: taskId, status: newStatus });
+  };
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-bg shadow-md rounded-lg border border-border-color">
@@ -115,13 +134,23 @@ const TasksList = () => {
 
               <p className="text-text mt-2">{task.description}</p>
 
-              {/* סטטוס */}
-              <div
-                className={`inline-block px-3 py-1 text-sm font-semibold rounded-lg mt-2 ${getStatusColor(
-                  task.status
-                )}`}
-              >
-                {task.status}
+              {/* סטטוס עם תפריט גלילה */}
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-sm font-semibold text-text">
+                  {t("tasks.status")}:
+                </span>
+                <select
+                  value={task.status}
+                  onChange={(e) => handleStatusChange(task._id, e.target.value)}
+                  className={`px-3 py-1 text-sm font-semibold rounded-lg ${getStatusColor(
+                    task.status
+                  )} focus:outline-none focus:ring-2 focus:ring-blue-600`}
+                >
+                  <option value="pending">{t("tasks.pending")}</option>
+                  <option value="in progress">{t("tasks.in_progress")}</option>
+                  <option value="completed">{t("tasks.completed")}</option>
+                  <option value="cancelled">{t("tasks.cancelled")}</option>
+                </select>
               </div>
 
               {/* דדליין */}

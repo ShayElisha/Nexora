@@ -1,7 +1,7 @@
 import Finance from "../models/finance.model.js";
 import jwt from "jsonwebtoken";
+import { uploadToCloudinaryFile } from "../config/lib/cloudinary.js";
 
-// Create a new finance record
 export const createFinanceRecord = async (req, res) => {
   const {
     transactionDate,
@@ -12,9 +12,11 @@ export const createFinanceRecord = async (req, res) => {
     category,
     bankAccount,
     transactionStatus,
+    recordType, // supplier, employee, customer, other
     supplierId,
-    supplierName,
-    attachmentURL,
+    employeeId,
+    customerId,
+    otherDetails,
     invoiceNumber,
   } = req.body;
 
@@ -43,10 +45,40 @@ export const createFinanceRecord = async (req, res) => {
     });
   }
 
+  // מיפוי שדות דינמיים לפי סוג הרשומה
+  let partyId = null;
+  if (recordType === "supplier") {
+    partyId = supplierId;
+  } else if (recordType === "employee") {
+    partyId = employeeId;
+  } else if (recordType === "customer") {
+    partyId = customerId;
+  }
+
+  // טיפול במספר קבצים מצורפים – העלאה ל־Cloudinary
+  let attachmentURLs = [];
+  if (req.files && req.files.length > 0) {
+    try {
+      const uploadPromises = req.files.map((file) =>
+        uploadToCloudinaryFile(file.buffer.toString("base64"))
+      );
+      const uploadResults = await Promise.all(uploadPromises);
+      attachmentURLs = uploadResults.map((result) => result.secure_url);
+    } catch (uploadError) {
+      console.error("Error uploading files:", uploadError.message);
+      return res.status(500).json({
+        success: false,
+        message: "Error uploading files",
+        error: uploadError.message,
+      });
+    }
+  } else if (req.body.attachment) {
+    attachmentURLs = [req.body.attachment];
+  }
+
   try {
-    // יצירת רשומת פיננסים חדשה
     const newFinanceRecord = new Finance({
-      companyId, // מועבר מהטוקן
+      companyId,
       transactionDate,
       transactionType,
       transactionAmount,
@@ -55,10 +87,11 @@ export const createFinanceRecord = async (req, res) => {
       category,
       bankAccount,
       transactionStatus,
-      supplierId,
-      supplierName,
-      attachmentURL,
+      recordType,
+      partyId, // שמירת המזהה המאוחד לפי סוג הרשומה
+      attachmentURL: attachmentURLs,
       invoiceNumber,
+      // ניתן לשמור גם otherDetails במקרה הצורך
     });
 
     const savedFinanceRecord = await newFinanceRecord.save();

@@ -1,9 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../../../lib/axios";
-import Sidebar from "../layouts/Sidebar";
+import { useTranslation } from "react-i18next";
 
-// Chart.js imports
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -29,10 +28,6 @@ ChartJS.register(
   Legend
 );
 
-/**
- * פונקציה היוצרת Map: dateKey -> sum of totalPrice באותו יום
- * ממיינת ומאגדת את items לפי `addedAt`.
- */
 function createDateMapFromItems(items) {
   const dateMap = {};
   for (const item of items) {
@@ -43,39 +38,23 @@ function createDateMapFromItems(items) {
   return dateMap;
 }
 
-/**
- * יוצרת מערך תאריכים מ-startDate עד endDate (גם אם אין פריטים באותו יום),
- * ומחזירה מערך של אובייקטים { date, cumulativeTotal }
- * כאשר cumulativeTotal מצטבר מהתחלה עד לאותו יום.
- */
 function computeDailyCumulative(startDate, endDate, items) {
-  // 1. מייצרים טווח ימים
   const allDays = generateDateRange(startDate, endDate);
-  // 2. יוצרים מפת סכומים לפי יום
   const dateMap = createDateMapFromItems(items);
 
-  // 3. מעבר על כל הימים בסדר כרונולוגי, צוברים
   let cumulative = 0;
   const result = [];
-
   for (const day of allDays) {
-    const dayTotal = dateMap[day] || 0; // אם אין פריטים באותו יום - 0
+    const dayTotal = dateMap[day] || 0;
     cumulative += dayTotal;
-    result.push({
-      date: day, // למשל: "2025-01-16"
-      cumulativeTotal: cumulative,
-    });
+    result.push({ date: day, cumulativeTotal: cumulative });
   }
   return result;
 }
 
-/**
- * פונקציית עזר: יוצרת מערך ימים (strings) ממתחם תאריכים start->end.
- */
 function generateDateRange(startDateStr, endDateStr) {
   const start = new Date(startDateStr);
   const end = new Date(endDateStr);
-
   if (start > end) return [];
 
   const dateArray = [];
@@ -86,9 +65,9 @@ function generateDateRange(startDateStr, endDateStr) {
 }
 
 const BudgetDetails = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
 
-  // 1. מושכים את התקציב מכתובת: GET /budget/:id
   const {
     data: apiRes,
     isLoading,
@@ -97,16 +76,39 @@ const BudgetDetails = () => {
     queryKey: ["budget", id],
     queryFn: async () => {
       const res = await axiosInstance.get(`/budget/${id}`);
-      return res.data; // { success, data: { ... } }
+      return res.data;
     },
     onError: (err) => console.error("Error fetching budget:", err),
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading budget details</div>;
-  if (!apiRes || !apiRes.data) return <div>No budget data found.</div>;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-bg flex justify-center items-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-primary"></div>
+      </div>
+    );
+  }
 
-  // 2. שליפת השדות מהאובייקט שהוחזר
+  if (error) {
+    return (
+      <div className="min-h-screen bg-bg flex justify-center items-center">
+        <div className="text-red-500 font-medium text-lg">
+          {t("budget.error_loading_details")}: {error.message}
+        </div>
+      </div>
+    );
+  }
+
+  if (!apiRes || !apiRes.data) {
+    return (
+      <div className="min-h-screen bg-bg flex justify-center items-center">
+        <div className="text-text font-medium text-lg opacity-70">
+          {t("budget.no_data_found")}
+        </div>
+      </div>
+    );
+  }
+
   const budget = apiRes.data;
   const {
     departmentOrProjectName,
@@ -115,26 +117,20 @@ const BudgetDetails = () => {
     endDate,
     items = [],
   } = budget;
-
-  // 3. מחשבים מערך לציר הזמן: קו אדום (cumulative) מתאריך התחלה עד תאריך סוף
   const dailyCumulative = computeDailyCumulative(startDate, endDate, items);
-  // dailyCumulative => [{ date: "2025-01-16", cumulativeTotal: 1332 }, ...]
 
-  // אם אין כלל תאריכים או something, נטפל:
   if (!dailyCumulative.length) {
     return (
-      <div className="flex">
-        <Sidebar />
-        <div className="container mx-auto p-8">
-          <h1 className="text-2xl font-bold mb-4">No Data to Display</h1>
+      <div className="min-h-screen bg-bg flex flex-col items-center py-10">
+        <div className="container mx-auto p-6 sm:p-8">
+          <h1 className="text-3xl font-extrabold text-text mb-6 tracking-tight drop-shadow-md">
+            {t("budget.no_data_to_display")}
+          </h1>
         </div>
       </div>
     );
   }
 
-  // 4. בונים 2 קווים:
-  //   א) "Actual" (אדום) עם cumulativeTotal
-  //   ב) "Budget" (כחול) - ערך קבוע amount לאורך כל הימים
   const actualLine = dailyCumulative.map((row) => ({
     x: row.date,
     y: row.cumulativeTotal,
@@ -142,21 +138,20 @@ const BudgetDetails = () => {
 
   const budgetLine = dailyCumulative.map((row) => ({
     x: row.date,
-    y: amount, // קבוע
+    y: amount,
   }));
 
-  // 5. הגדרת data ו-options ל-Chart.js (ללא נקודות, רק קו)
   const chartData = {
     datasets: [
       {
-        label: "Actual Spend (Cumulative)",
+        label: t("budget.actual_spend_cumulative"),
         data: actualLine,
-        borderColor: "rgba(255, 99, 132, 1)", // צבע אדום חזק
-        backgroundColor: "rgba(255, 99, 132, 0.1)", // רקע אדום עדין
-        borderWidth: 4, // עובי הקו
+        borderColor: "rgba(255, 99, 132, 1)",
+        backgroundColor: "rgba(255, 99, 132, 0.1)",
+        borderWidth: 4,
         pointRadius: actualLine.map((data, index) =>
           index === 0 || data.y !== actualLine[index - 1]?.y ? 5 : 0
-        ), // נקודות רק במקומות שינוי
+        ),
         pointHoverRadius: 8,
         pointBackgroundColor: "white",
         pointBorderWidth: 2,
@@ -166,13 +161,13 @@ const BudgetDetails = () => {
         showLine: true,
       },
       {
-        label: "Budget (constant)",
+        label: t("budget.budget_constant"),
         data: budgetLine,
-        borderColor: "rgba(54, 162, 235, 1)", // צבע כחול לתקציב
-        backgroundColor: "rgba(54, 162, 235, 0.05)", // רקע כחול עדין
+        borderColor: "rgba(54, 162, 235, 1)",
+        backgroundColor: "rgba(54, 162, 235, 0.05)",
         borderWidth: 3,
-        pointRadius: 0, // ללא נקודות כלל בקו התקציב
-        borderDash: [15, 5], // קו מקווקו לתקציב
+        pointRadius: 0,
+        borderDash: [15, 5],
         borderDashOffset: 2,
         tension: 0,
         fill: false,
@@ -183,74 +178,126 @@ const BudgetDetails = () => {
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false, // מאפשר שליטה בגובה
     plugins: {
-      legend: { position: "bottom" },
+      legend: { position: "bottom", labels: { font: { size: 14 } } },
       title: {
         display: true,
-        text: "Daily Budget vs. Cumulative Spend",
+        text: t("budget.daily_budget_vs_spend"),
+        font: { size: 18, weight: "bold" },
+        color: "#374151", // text-color
+        padding: { top: 10, bottom: 20 },
+      },
+      tooltip: {
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        titleFont: { size: 14 },
+        bodyFont: { size: 12 },
       },
     },
     scales: {
       x: {
         type: "time",
-        time: {
-          unit: "day",
-          tooltipFormat: "yyyy-MM-dd",
-        },
+        time: { unit: "day", tooltipFormat: "yyyy-MM-dd" },
+        title: { display: true, text: t("budget.date"), font: { size: 14 } },
+        grid: { color: "#d1d5db" }, // border-color
       },
       y: {
         beginAtZero: true,
+        title: { display: true, text: t("budget.amount"), font: { size: 14 } },
+        grid: { color: "#d1d5db" },
       },
     },
   };
 
-  // 6. רינדור סופי
   return (
-    <div className="flex">
-      <div className="container mx-auto p-8">
-        <h1 className="text-2xl font-bold mb-4">
-          {departmentOrProjectName} - Budget Details
+    <div className="min-h-screen bg-bg flex flex-col items-center py-10 animate-fade-in">
+      <div className="container mx-auto p-6 sm:p-8 w-full max-w-5xl">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-text mb-8 tracking-tight drop-shadow-md text-center">
+          {departmentOrProjectName} - {t("budget.budget_details")}
         </h1>
-        <p>
-          <strong>Allocated Amount:</strong> {amount}
-        </p>
-        <p>
-          <strong>Start Date:</strong> {startDate?.split("T")[0] || "N/A"}
-        </p>
-        <p>
-          <strong>End Date:</strong> {endDate?.split("T")[0] || "N/A"}
-        </p>
 
-        <div className="mt-6">
+        <div className="bg-accent p-6 rounded-xl shadow-md border bg-bg mb-8">
+          <p className="text-sm text-text">
+            <strong className="font-semibold">
+              {t("budget.allocated_amount")}:
+            </strong>{" "}
+            {amount}
+          </p>
+          <p className="text-sm text-text mt-2">
+            <strong className="font-semibold">{t("budget.start_date")}:</strong>{" "}
+            {startDate?.split("T")[0] || "N/A"}
+          </p>
+          <p className="text-sm text-text mt-2">
+            <strong className="font-semibold">{t("budget.end_date")}:</strong>{" "}
+            {endDate?.split("T")[0] || "N/A"}
+          </p>
+        </div>
+
+        <div className="bg-accent p-6 rounded-xl shadow-md border bg-bg mb-8 h-96 sm:h-[28rem]">
           <Line data={chartData} options={chartOptions} />
         </div>
 
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-2">Items</h2>
-          <table className="min-w-full border">
-            <thead className="border-b bg-gray-100">
+        <div className="bg-accent rounded-xl shadow-md border bg-bgoverflow-x-auto">
+          <h2 className="text-xl font-semibold text-text p-4 border-b bg-bg drop-shadow-sm">
+            {t("budget.items")}
+          </h2>
+          <table className="min-w-full text-text">
+            <thead className="bg-button-bg text-button-text">
               <tr>
-                <th className="px-4 py-2 border-r">Date</th>
-                <th className="px-4 py-2 border-r">Quantity</th>
-                <th className="px-4 py-2 border-r">Unit Price</th>
-                <th className="px-4 py-2">Total Price</th>
+                <th className="py-3 px-4 text-sm font-semibold tracking-wide text-left">
+                  {t("budget.date")}
+                </th>
+                <th className="py-3 px-4 text-sm font-semibold tracking-wide text-left">
+                  {t("budget.quantity")}
+                </th>
+                <th className="py-3 px-4 text-sm font-semibold tracking-wide text-left">
+                  {t("budget.unit_price")}
+                </th>
+                <th className="py-3 px-4 text-sm font-semibold tracking-wide text-left">
+                  {t("budget.total_price")}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {items.map((item, i) => (
-                <tr key={i} className="border-b hover:bg-gray-50">
-                  <td className="px-4 py-2 border-r">
-                    {item.addedAt?.split("T")[0] || "N/A"}
+              {items.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="4"
+                    className="py-4 px-4 text-center text-text opacity-70 italic"
+                  >
+                    {t("budget.no_items_available")}
                   </td>
-                  <td className="px-4 py-2 border-r">{item.quantity}</td>
-                  <td className="px-4 py-2 border-r">{item.unitPrice}</td>
-                  <td className="px-4 py-2">{item.totalPrice}</td>
                 </tr>
-              ))}
+              ) : (
+                items.map((item, i) => (
+                  <tr key={i} className="border-b bg-bg hover:bg-secondary">
+                    <td className="py-3 px-4 text-sm">
+                      {item.addedAt?.split("T")[0] || "N/A"}
+                    </td>
+                    <td className="py-3 px-4 text-sm">
+                      {item.quantity || "-"}
+                    </td>
+                    <td className="py-3 px-4 text-sm">
+                      {item.unitPrice || "-"}
+                    </td>
+                    <td className="py-3 px-4 text-sm">
+                      {item.totalPrice || "-"}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+      `}</style>
     </div>
   );
 };

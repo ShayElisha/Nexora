@@ -11,22 +11,16 @@ const SupplierList = () => {
   const [error, setError] = useState(null);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // שדות לעדכון פרטי הספק (טקסט)
   const [formData, setFormData] = useState({});
-  // מצב כרטיסיות במודל – "details" או "files"
   const [activeTab, setActiveTab] = useState("details");
-  // state לקבצים
   const [files, setFiles] = useState(null);
-  // state למודל של רשימת הקבצים
   const [isAttachmentsModalOpen, setIsAttachmentsModalOpen] = useState(false);
   const [attachmentsSupplier, setAttachmentsSupplier] = useState(null);
 
-  // שליפת משתמש מאומת
   const { data: authData } = useQuery({ queryKey: ["authUser"] });
   const authUser = authData?.user;
   const isLoggedIn = !!authUser;
 
-  // שליפת ספקים
   const { mutate: fetchSuppliers, isLoading: suppliersLoading } = useMutation({
     mutationFn: async () => {
       const response = await axiosInstance.get("/suppliers");
@@ -47,7 +41,6 @@ const SupplierList = () => {
     },
   });
 
-  // שינוי סטטוס פעילות ספק
   const { mutate: toggleSupplierStatus } = useMutation({
     mutationFn: async ({ supplierId, isActive }) => {
       const response = await axiosInstance.put(`/suppliers/${supplierId}`, {
@@ -61,6 +54,7 @@ const SupplierList = () => {
           supplier._id === updatedSupplier._id ? updatedSupplier : supplier
         )
       );
+      toast.success(t("supplier.status_updated"));
     },
     onError: (err) => {
       toast.error(
@@ -69,7 +63,6 @@ const SupplierList = () => {
     },
   });
 
-  // עדכון ספק – קריאה אחת שמשלבת נתונים וקבצים
   const { mutate: updateSupplier } = useMutation({
     mutationFn: async ({ supplierId, formData }) => {
       const response = await axiosInstance.put(
@@ -114,11 +107,11 @@ const SupplierList = () => {
       Phone: supplier.Phone || "",
       Rating: supplier.Rating || "",
     });
+    setFiles(null); // איפוס קבצים בעת פתיחת המודל
     setActiveTab("details");
     setIsModalOpen(true);
   };
 
-  // פתיחת מודל לקבצים נלווים
   const openAttachmentsModal = (supplier) => {
     setAttachmentsSupplier(supplier);
     setIsAttachmentsModalOpen(true);
@@ -129,15 +122,12 @@ const SupplierList = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // פונקציית עדכון שמשלבת נתונים וקבצים
   const handleUpdate = () => {
     if (selectedSupplier) {
       const formDataObj = new FormData();
-      // הוספת שדות טקסטואליים ל־FormData
       for (const key in formData) {
         formDataObj.append(key, formData[key]);
       }
-      // הוספת קבצים אם קיימים
       if (files) {
         for (let i = 0; i < files.length; i++) {
           formDataObj.append("attachments", files[i]);
@@ -160,7 +150,7 @@ const SupplierList = () => {
 
   if (suppliersLoading) {
     return (
-      <div className="flex justify-center items-center h-96">
+      <div className="flex justify-center items-center h-96 bg-bg">
         <div className="animate-spin rounded-full h-24 w-24 border-t-4 border-primary"></div>
       </div>
     );
@@ -168,8 +158,10 @@ const SupplierList = () => {
 
   if (!isLoggedIn) {
     return (
-      <div className="flex justify-center items-center h-96">
-        <p className="text-red-500">{t("supplier.not_authenticated")}</p>
+      <div className="flex justify-center items-center h-96 bg-bg">
+        <p className="text-red-500 text-lg font-semibold">
+          {t("supplier.not_authenticated")}
+        </p>
       </div>
     );
   }
@@ -177,53 +169,55 @@ const SupplierList = () => {
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
       <div
-        className="flex flex-col md:flex-row w-full min-h-screen bg-bg text-text"
+        className="flex flex-col md:flex-row w-full min-h-screen bg-bg text-text animate-fade-in"
         dir={direction}
       >
         <div className="flex-1 py-12 px-6">
-          <h2 className="text-3xl font-bold text-primary mb-6 text-center">
+          <h2 className="text-3xl font-extrabold text-text mb-6 text-center tracking-tight drop-shadow-md">
             {t("supplier.list_title")}
           </h2>
-          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+          {error && (
+            <p className="text-red-500 text-center mb-6 font-medium bg-accent p-4 rounded-lg shadow-sm border border-border-color">
+              {error}
+            </p>
+          )}
           {suppliers.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {suppliers.map((supplier) => (
                 <div
                   key={supplier._id}
-                  className="relative bg-bg rounded-lg p-4 shadow-lg hover:scale-105 transition-transform duration-300 border border-border-color"
+                  className="relative bg-accent rounded-xl p-6 shadow-lg hover:scale-105 transition-transform duration-300 border border-border-color"
                 >
-                  {/* כפתור להצגת קבצים נלווים – המיקום תלוי בכיוון השפה */}
                   <button
                     onClick={() => openAttachmentsModal(supplier)}
-                    className="absolute top-2 p-1 bg-white rounded-full shadow hover:bg-gray-100"
+                    className="absolute top-2 p-2 bg-bg rounded-full shadow-md hover:bg-secondary hover:text-button-text transition-all duration-200 transform hover:scale-110"
                     style={
-                      direction === "rtl" ? { left: "2px" } : { right: "2px" }
+                      direction === "rtl" ? { left: "8px" } : { right: "8px" }
                     }
                     title={t("supplier.view_attachments")}
                   >
-                    {/* ניתן להחליף באייקון SVG או ספריית אייקונים */}
                     📄
                   </button>
-                  <h3 className="text-primary font-semibold mb-2">
+                  <h3 className="text-primary font-semibold text-lg mb-3 tracking-tight">
                     {supplier.SupplierName}
                   </h3>
-                  <p>
+                  <p className="text-text text-sm">
                     {t("supplier.contact")}:{" "}
                     {supplier.Contact || t("supplier.not_available")}
                   </p>
-                  <p>
+                  <p className="text-text text-sm">
                     {t("supplier.email")}:{" "}
                     {supplier.Email || t("supplier.not_available")}
                   </p>
-                  <p>
+                  <p className="text-text text-sm">
                     {t("supplier.phone")}:{" "}
                     {supplier.Phone || t("supplier.not_available")}
                   </p>
-                  <p>
+                  <p className="text-text text-sm">
                     {t("supplier.rating")}:{" "}
                     {supplier.Rating || t("supplier.not_available")}
                   </p>
-                  <div className="flex items-center mt-2">
+                  <div className="flex items-center mt-4">
                     <label className="flex items-center cursor-pointer">
                       <div className="relative">
                         <input
@@ -240,7 +234,7 @@ const SupplierList = () => {
                           }`}
                         ></div>
                         <div
-                          className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-300 ${
+                          className={`absolute left-1 top-1 bg-button-text w-4 h-4 rounded-full transition-transform duration-300 ${
                             supplier.IsActive ? "translate-x-4" : ""
                           }`}
                         ></div>
@@ -258,7 +252,7 @@ const SupplierList = () => {
                   </div>
                   <button
                     onClick={() => openModal(supplier)}
-                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300 w-full"
+                    className="mt-4 px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105 w-full"
                   >
                     {t("supplier.update")}
                   </button>
@@ -266,7 +260,7 @@ const SupplierList = () => {
               ))}
             </div>
           ) : (
-            <p className="text-center text-gray-400">
+            <p className="text-center text-text opacity-70 text-lg mt-6">
               {t("supplier.no_suppliers")}
             </p>
           )}
@@ -276,30 +270,30 @@ const SupplierList = () => {
         {isModalOpen && selectedSupplier && (
           <div
             dir={direction}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fadeIn"
           >
-            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-              <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">
+            <div className="bg-bg rounded-2xl shadow-2xl p-6 w-full max-w-md border border-border-color">
+              <h2 className="text-xl font-bold text-text mb-4 text-center tracking-tight drop-shadow-md">
                 {t("supplier.update_supplier")} -{" "}
                 {selectedSupplier.SupplierName}
               </h2>
-              <div className="flex justify-center space-x-4 mb-4">
+              <div className="flex justify-center space-x-4 mb-6">
                 <button
                   onClick={() => handleTabChange("details")}
-                  className={`px-4 py-2 rounded ${
+                  className={`px-4 py-2 rounded-full shadow-md transition-all duration-200 ${
                     activeTab === "details"
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-700"
+                      ? "bg-button-bg text-button-text"
+                      : "bg-accent text-text hover:bg-secondary hover:text-button-text"
                   }`}
                 >
                   {t("supplier.details")}
                 </button>
                 <button
                   onClick={() => handleTabChange("files")}
-                  className={`px-4 py-2 rounded ${
+                  className={`px-4 py-2 rounded-full shadow-md transition-all duration-200 ${
                     activeTab === "files"
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-700"
+                      ? "bg-button-bg text-button-text"
+                      : "bg-accent text-text hover:bg-secondary hover:text-button-text"
                   }`}
                 >
                   {t("supplier.attachments")}
@@ -308,7 +302,7 @@ const SupplierList = () => {
               {activeTab === "details" ? (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-text">
                       {t("supplier.name")}
                     </label>
                     <input
@@ -316,11 +310,11 @@ const SupplierList = () => {
                       name="SupplierName"
                       value={formData.SupplierName}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                      className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-text">
                       {t("supplier.contact")}
                     </label>
                     <input
@@ -328,11 +322,11 @@ const SupplierList = () => {
                       name="Contact"
                       value={formData.Contact}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                      className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-text">
                       {t("supplier.email")}
                     </label>
                     <input
@@ -340,11 +334,11 @@ const SupplierList = () => {
                       name="Email"
                       value={formData.Email}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                      className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-text">
                       {t("supplier.phone")}
                     </label>
                     <input
@@ -352,11 +346,11 @@ const SupplierList = () => {
                       name="Phone"
                       value={formData.Phone}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                      className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-text">
                       {t("supplier.rating")}
                     </label>
                     <input
@@ -364,19 +358,19 @@ const SupplierList = () => {
                       name="Rating"
                       value={formData.Rating}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                      className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                     />
                   </div>
                   <div className="flex justify-end mt-6 space-x-2">
                     <button
                       onClick={() => setIsModalOpen(false)}
-                      className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition duration-300"
+                      className="px-4 py-2 bg-gray-500 text-white rounded-full shadow-md hover:bg-gray-600 transition-all duration-200 transform hover:scale-105"
                     >
                       {t("supplier.cancel")}
                     </button>
                     <button
                       onClick={handleUpdate}
-                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition duration-300"
+                      className="px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105"
                     >
                       {t("supplier.save")}
                     </button>
@@ -385,26 +379,26 @@ const SupplierList = () => {
               ) : (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-text">
                       {t("supplier.select_files")}
                     </label>
                     <input
                       type="file"
                       multiple
                       onChange={handleFileChange}
-                      className="mt-1 block w-full"
+                      className="mt-1 block w-full p-2 border border-border-color rounded-lg text-sm text-text file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-button-text hover:file:bg-secondary transition-all duration-200"
                     />
                   </div>
                   <div className="flex justify-end mt-6 space-x-2">
                     <button
                       onClick={() => setIsModalOpen(false)}
-                      className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition duration-300"
+                      className="px-4 py-2 bg-gray-500 text-white rounded-full shadow-md hover:bg-gray-600 transition-all duration-200 transform hover:scale-105"
                     >
                       {t("supplier.cancel")}
                     </button>
                     <button
                       onClick={handleUpdate}
-                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition duration-300"
+                      className="px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105"
                     >
                       {t("supplier.upload_files")}
                     </button>
@@ -419,36 +413,39 @@ const SupplierList = () => {
         {isAttachmentsModalOpen && attachmentsSupplier && (
           <div
             dir={direction}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fadeIn"
           >
-            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <div className="bg-bg rounded-2xl shadow-2xl p-6 w-full max-w-md border border-border-color">
               <div
                 className={`flex ${
                   direction === "rtl" ? "flex-row-reverse" : ""
                 } justify-between items-center mb-4`}
               >
-                <h2 className="text-xl font-bold text-gray-800">
+                <h2 className="text-xl font-bold text-text tracking-tight">
                   {t("supplier.attachments_for")}{" "}
                   {attachmentsSupplier.SupplierName}
                 </h2>
                 <button
                   onClick={() => setIsAttachmentsModalOpen(false)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-text hover:text-gray-800 text-xl transition-all duration-200 transform hover:scale-110"
                 >
-                  &times;
+                  ×
                 </button>
               </div>
               <div className={direction === "rtl" ? "text-right" : "text-left"}>
                 {attachmentsSupplier.attachments &&
                 attachmentsSupplier.attachments.length > 0 ? (
-                  <ul className="list-disc pl-5">
+                  <ul className="space-y-2">
                     {attachmentsSupplier.attachments.map((file, index) => (
-                      <li key={index} className="mb-1">
+                      <li
+                        key={index}
+                        className="bg-accent p-3 rounded-lg shadow-sm border border-border-color hover:bg-primary hover:text-button-text transition-all duration-200"
+                      >
                         <a
                           href={file.fileUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-500 hover:underline"
+                          className="text-primary hover:underline font-medium"
                         >
                           {file.fileName}
                         </a>
@@ -456,7 +453,7 @@ const SupplierList = () => {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-gray-600">
+                  <p className="text-text text-center text-lg opacity-70">
                     {t("supplier.no_attachments")}
                   </p>
                 )}

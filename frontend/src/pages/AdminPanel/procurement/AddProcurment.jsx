@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { FaExclamationTriangle } from "react-icons/fa";
 
 // Zustand Stores
 import { useSupplierStore } from "../../../stores/useSupplierStore";
@@ -22,17 +23,14 @@ import PreviewModal from "./components/PreviewModal";
 // JSON
 import currency from "../finance/currency.json";
 import { useTranslation } from "react-i18next";
-
 import axiosInstance from "../../../lib/axios";
 
 const AddProcurement = () => {
   const { t } = useTranslation();
-
   const queryClient = useQueryClient();
   const { data: authData } = useQuery({ queryKey: ["authUser"] });
   const authUser = authData?.user;
 
-  console.log(authUser);
   // ----------------- Form Data ----------------- //
   const [formData, setFormData] = useState({
     companyId: authUser?.company || "",
@@ -63,7 +61,6 @@ const AddProcurement = () => {
   // ----------------- Local States ----------------- //
   const [products, setProducts] = useState([]);
   const [totalCost, setTotalCost] = useState(0);
-
   const [productData, setProductData] = useState({
     productId: "",
     productName: "",
@@ -73,47 +70,66 @@ const AddProcurement = () => {
     quantity: "",
     baseUnitPrice: 0,
   });
-
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [pdfBlobUrl, setPdfBlobUrl] = useState(""); // להצגת ה-PDF
+  const [pdfBlobUrl, setPdfBlobUrl] = useState("");
   const [selectedSupplier, setSelectedSupplier] = useState(null);
-
   const [isCreatingNewList, setIsCreatingNewList] = useState(false);
   const [newRequirement, setNewRequirement] = useState("");
   const [newSigners, setNewSigners] = useState([]);
+  const [previousSupplierId, setPreviousSupplierId] = useState(null);
+  const [error, setError] = useState("");
 
   // ----------------- Zustand Stores ----------------- //
   const { suppliers, fetchSuppliers } = useSupplierStore((state) => state);
-
-  const {
-    employees,
-    fetchEmployees, // => טעינת עובדים
-  } = useEmployeeStore((state) => state);
-
+  const { employees, fetchEmployees } = useEmployeeStore((state) => state);
   const {
     signatureLists,
     fetchSignatureLists,
     deleteSignatureList,
     createSignatureList,
   } = useSignatureStore((state) => state);
-
-  const {
-    fetchProductsBySupplier, // => טעינת מוצרים לפי ספק
-  } = useProductStore((state) => state);
+  const { fetchProductsBySupplier } = useProductStore((state) => state);
 
   // ----------------- useEffect ----------------- //
   useEffect(() => {
-    fetchSuppliers().catch(() =>
-      toast.error(t("procurement.failed_to_load_suppliers"))
-    );
-    fetchEmployees().catch(() =>
-      toast.error(t("procurement.failed_to_load_employees"))
-    );
-    fetchSignatureLists().catch(() =>
-      toast.error(t("procurement.failed_to_load_signatures"))
-    );
+    const fetchData = async () => {
+      try {
+        await Promise.all([
+          fetchSuppliers(),
+          fetchEmployees(),
+          fetchSignatureLists(),
+        ]);
+      } catch (err) {
+        setError(
+          t("procurement.failed_to_load_data") +
+            (err.response?.data?.message || err.message)
+        );
+      }
+    };
+    fetchData();
   }, [fetchSuppliers, fetchEmployees, fetchSignatureLists, t]);
+
+  useEffect(() => {
+    if (authUser) {
+      setFormData((prev) => ({ ...prev, companyId: authUser.company }));
+    }
+  }, [authUser]);
+
+  useEffect(() => {
+    if (!selectedSupplier || previousSupplierId === selectedSupplier._id)
+      return;
+    setFormData({
+      companyId: authUser?.company || "",
+      supplierId: selectedSupplier._id,
+      supplierName: selectedSupplier.SupplierName,
+      PurchaseOrder: generatePurchaseOrderNumber(),
+      purchaseDate: new Date().toISOString().split("T")[0],
+    });
+    setProducts([]);
+    setTotalCost(0);
+    setPreviousSupplierId(selectedSupplier._id);
+  }, [selectedSupplier, previousSupplierId, authUser?.company]);
 
   // ----------------- Mutations ----------------- //
   const { mutate: addProcurementMutation } = useMutation({
@@ -131,9 +147,9 @@ const AddProcurement = () => {
       resetForm();
     },
     onError: (error) => {
-      toast.error(
-        error?.response?.data?.message ||
-          t("procurement.failed_to_create_procurement")
+      setError(
+        t("procurement.failed_to_create_procurement") +
+          (error.response?.data?.message || error.message)
       );
     },
   });
@@ -160,149 +176,70 @@ const AddProcurement = () => {
         `https://openexchangerates.org/api/latest.json?app_id=${APP_ID}`
       );
       const rates = response.data.rates;
-
-      if (!rates[base]) {
-        throw new Error(t("procurement.base_currency_not_supported", { base }));
-      }
-      if (!rates[to]) {
-        throw new Error(t("procurement.target_currency_not_supported", { to }));
-      }
-
-      const finalRate = rates[to] / rates[base];
-      return finalRate;
+      if (!rates[base] || !rates[to])
+        throw new Error(t("procurement.currency_not_supported"));
+      return rates[to] / rates[base];
     } catch (error) {
       toast.error(t("procurement.fetch_conversion_error"));
       throw error;
     }
   };
-  useEffect(() => {
-    if (authUser) {
-      setFormData((prev) => ({
-        ...prev,
-        companyId: authUser.company,
-      }));
-    }
-  }, [authUser]);
 
-  const [previousSupplierId, setPreviousSupplierId] = useState(null);
-
-  useEffect(() => {
-    // אם לא נבחר ספק כלל
-    if (!selectedSupplier) {
-      return;
-    }
-
-    // אם המזהה של הספק החדש שווה למזהה של הספק הקודם, אל תאפס
-    if (previousSupplierId === selectedSupplier._id) {
-      return;
-    }
-
-    // במידה וזה ספק *חדש* – עשה איפוס
-    setFormData(() => ({
-      companyId: authUser?.company || "",
-      supplierId: selectedSupplier._id,
-      supplierName: selectedSupplier.SupplierName,
-      PurchaseOrder: generatePurchaseOrderNumber(),
-      purchaseDate: new Date().toISOString().split("T")[0],
-    }));
-
-    // איפוס מוצרים ועלויות
-    setProducts([]);
-    setTotalCost(0);
-
-    // עדכון previousSupplierId בסוף
-    setPreviousSupplierId(selectedSupplier._id);
-  }, [selectedSupplier, previousSupplierId, authUser?.company]);
-
-  // ----------------- Convert Currency ----------------- //
   const convertAllProductsForSelectedSupplier = async (selectedCurrency) => {
+    if (!selectedSupplier) {
+      toast.error(t("procurement.please_select_supplier_first"));
+      return;
+    }
     try {
-      // אם לא נבחר ספק, אין מה להמיר
-      if (!selectedSupplier) {
-        toast.error(t("procurement.please_select_supplier_first"));
-        return;
-      }
-
-      // שליפת מטבע הבסיס של הספק
       const supplierBaseCurrency = selectedSupplier.baseCurrency || "USD";
-
-      // סינון כל המוצרים השייכים לספק
       const supplierProducts = products.filter(
-        (product) => product.supplierId === selectedSupplier._id
+        (p) => p.supplierId === selectedSupplier._id
       );
-
       const updatedProducts = await Promise.all(
         supplierProducts.map(async (product) => {
           const basePrice = product.baseUnitPrice || product.unitPrice;
           const qty = product.quantity;
-
-          // אם המטבע הנבחר זהה למטבע הבסיס של הספק
           if (supplierBaseCurrency === selectedCurrency) {
-            return {
-              ...product,
-              unitPrice: basePrice,
-              total: basePrice * qty,
-            };
+            return { ...product, unitPrice: basePrice, total: basePrice * qty };
           }
-
-          // חישוב שער המרה
           const rate = await fetchExchangeRate(
             supplierBaseCurrency,
             selectedCurrency
           );
           const convertedPrice = (basePrice * rate).toFixed(2);
-          const convertedTotal = (convertedPrice * qty).toFixed(2);
-
           return {
             ...product,
             unitPrice: parseFloat(convertedPrice),
-            total: parseFloat(convertedTotal),
+            total: parseFloat((convertedPrice * qty).toFixed(2)),
           };
         })
       );
-
-      // החלפת המוצרים שסוננו במוצרים המעודכנים
-      const updatedProductList = products.map((product) => {
-        if (product.supplierId === selectedSupplier._id) {
-          const updatedProduct = updatedProducts.find(
-            (upd) => upd.sku === product.sku
-          );
-          return updatedProduct || product;
-        }
-        return product;
-      });
-
-      // חישוב עלות כוללת חדשה לספק הנוכחי
-      const newTotalCost = updatedProductList
-        .filter((p) => p.supplierId === selectedSupplier._id)
-        .reduce((acc, p) => acc + p.total, 0);
-
-      // עדכון State
+      const updatedProductList = products.map((p) =>
+        p.supplierId === selectedSupplier._id
+          ? updatedProducts.find((upd) => upd.sku === p.sku) || p
+          : p
+      );
       setProducts(updatedProductList);
-      setTotalCost(parseFloat(newTotalCost.toFixed(2)));
+      setTotalCost(
+        parseFloat(calculateTotalCost(updatedProductList).toFixed(2))
+      );
     } catch (error) {
       toast.error(t("procurement.failed_to_convert_currency"));
-      console.error("Currency conversion error:", error);
     }
   };
 
-  const calculateTotalCost = (products) => {
-    return products.reduce((acc, product) => acc + (product.total || 0), 0);
-  };
+  const calculateTotalCost = (products) =>
+    products.reduce((acc, product) => acc + (product.total || 0), 0);
 
   useEffect(() => {
-    const updatedTotalCost = calculateTotalCost(products);
-    setTotalCost(updatedTotalCost);
+    setTotalCost(calculateTotalCost(products));
   }, [products]);
+
   // ----------------- Create PDF ----------------- //
   const createPDF = async () => {
-    // שימוש ב-t עם override לשפה אנגלית
     const currencySymbol = getCurrencySymbol(formData.currency);
     const pdf = new jsPDF();
-
-    // כותרת
     pdf.setFontSize(10);
-    pdf.setTextColor(0, 0, 0);
     pdf.text(
       `${t("procurement.company", { lng: "en" })}: ${
         authUser?.company || "N/A"
@@ -324,8 +261,6 @@ const AddProcurement = () => {
       10,
       30
     );
-
-    // פרטי ספק
     pdf.text(
       `${t("procurement.supplier", { lng: "en" })}: ${
         formData.supplierName || "N/A"
@@ -347,11 +282,9 @@ const AddProcurement = () => {
       150,
       30
     );
-
     pdf.setDrawColor(200, 200, 200);
     pdf.line(10, 35, 200, 35);
 
-    // טבלת מוצרים
     const columns = [
       {
         header: t("procurement.product_name", { lng: "en" }),
@@ -366,18 +299,14 @@ const AddProcurement = () => {
       },
       { header: t("procurement.total", { lng: "en" }), dataKey: "total" },
     ];
-
     const rows = products.map((prod) => ({
       productName: prod.productName,
       sku: prod.SKU,
       category: prod.category,
       quantity: prod.quantity,
-      unitPrice: `${prod.unitPrice} ${getCurrencySymbol(formData.currency)}`,
-      total: `${prod.unitPrice * prod.quantity} ${getCurrencySymbol(
-        formData.currency
-      )}`,
+      unitPrice: `${prod.unitPrice} ${currencySymbol}`,
+      total: `${prod.unitPrice * prod.quantity} ${currencySymbol}`,
     }));
-
     pdf.autoTable({
       startY: 40,
       head: [columns.map((c) => c.header)],
@@ -391,39 +320,26 @@ const AddProcurement = () => {
       alternateRowStyles: { fillColor: [245, 245, 245] },
       margin: { top: 10, right: 10, bottom: 10, left: 10 },
     });
-
-    // סה"כ
     pdf.setFontSize(14);
     pdf.text(
       `${t("procurement.total_cost", {
         lng: "en",
-      })}: ${totalCost} ${getCurrencySymbol(formData.currency)}`,
+      })}: ${totalCost} ${currencySymbol}`,
       10,
       pdf.autoTable.previous.finalY + 10
     );
 
-    // הפיכת PDF ל-Blob ול-Base64
     const pdfBlob = pdf.output("blob");
-    const base64PDF = await new Promise((resolve, reject) => {
+    const base64PDF = await new Promise((resolve) => {
       const reader = new FileReader();
       reader.onloadend = () => resolve(reader.result.split(",")[1]);
-      reader.onerror = reject;
       reader.readAsDataURL(pdfBlob);
     });
-
-    // שמירה ב-formData לצורך שליחה לשרת
-    setFormData((prev) => ({
-      ...prev,
-      summeryProcurement: base64PDF,
-    }));
-
-    // החזרת כתובת Blob לצורך תצוגה מקדימה
+    setFormData((prev) => ({ ...prev, summeryProcurement: base64PDF }));
     return URL.createObjectURL(pdfBlob);
   };
 
   // ----------------- Handlers ----------------- //
-
-  // 1) handleFormChange
   const handleFormChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -432,27 +348,21 @@ const AddProcurement = () => {
     }));
   };
 
-  // 2) handleCurrencyChange
   const handleCurrencyChange = async (e) => {
     const newCurrency = e.target.value;
     setFormData((prev) => ({ ...prev, currency: newCurrency }));
     await convertAllProductsForSelectedSupplier(newCurrency);
   };
 
-  // 3) handleSupplierSelect
   const handleSupplierSelect = (supplierId) => {
     const selected = suppliers.find((s) => s._id === supplierId) || null;
     setSelectedSupplier(selected);
-
-    // עדכון פרטי הספק + מטבע הבסיס
     setFormData((prev) => ({
       ...prev,
       supplierId,
       supplierName: selected?.SupplierName || "",
-      currency: selected?.baseCurrency || "", // מטבע בסיס של הספק
+      currency: selected?.baseCurrency || "",
     }));
-
-    // טוען מוצרים של הספק
     if (supplierId) {
       fetchProductsBySupplier(supplierId).catch(() =>
         toast.error(t("procurement.failed_to_load_products"))
@@ -470,8 +380,6 @@ const AddProcurement = () => {
       quantity,
       baseUnitPrice,
     } = productData;
-
-    // בדיקה אם כל השדות נדרשים מולאו
     if (
       !productId ||
       !productName ||
@@ -481,34 +389,20 @@ const AddProcurement = () => {
       quantity <= 0
     ) {
       toast.error(t("procurement.please_fill_all_product_fields"));
-      console.log("Missing fields:", productData); // לוג נוסף
       return;
     }
-
     const qty = parseInt(quantity, 10);
-
-    // בדיקה אם המוצר כבר קיים ברשימה
-    const existingProductIndex = products.findIndex(
-      (product) => product.sku === sku
-    );
-
+    const existingProductIndex = products.findIndex((p) => p.sku === sku);
     if (existingProductIndex > -1) {
-      // אם המוצר כבר קיים, עדכן את הכמות בלבד
       const updatedProducts = [...products];
       updatedProducts[existingProductIndex].quantity += qty;
-
-      // עדכון השדה "total" למוצר הקיים
       updatedProducts[existingProductIndex].total =
         updatedProducts[existingProductIndex].quantity *
         updatedProducts[existingProductIndex].unitPrice;
-
       setProducts(updatedProducts);
       toast.success(t("procurement.product_quantity_updated_successfully"));
     } else {
-      // אם המוצר לא קיים, הוסף אותו למערך המוצרים
       const finalPrice = parseFloat(unitPrice);
-      const finalTotal = finalPrice * qty;
-
       const newProduct = {
         productId,
         productName,
@@ -516,33 +410,24 @@ const AddProcurement = () => {
         category,
         quantity: qty,
         unitPrice: finalPrice,
-        total: parseFloat(finalTotal.toFixed(2)), // חישוב מדויק
+        total: parseFloat((finalPrice * qty).toFixed(2)),
         baseUnitPrice: parseFloat(baseUnitPrice),
         supplierId: formData.supplierId,
       };
-
-      const updatedProducts = [...products, newProduct];
-      setProducts(updatedProducts);
+      setProducts([...products, newProduct]);
       toast.success(t("procurement.product_added_successfully"));
     }
-
-    // עדכון העלות הכוללת
-    const updatedTotalCost = calculateTotalCost(products);
-    setTotalCost(updatedTotalCost);
-
-    // איפוס שדות המוצר שנבחר
+    setTotalCost(calculateTotalCost(products));
     setProductData({
       productName: "",
       sku: "",
       category: "",
       baseUnitPrice: 0,
-      baseCurrency: "USD",
       unitPrice: 0,
       quantity: 0,
     });
   };
 
-  // 5) handlePreview
   const handlePreview = async () => {
     if (
       !formData.supplierId ||
@@ -553,42 +438,31 @@ const AddProcurement = () => {
       toast.error(t("procurement.please_fill_all_required_fields"));
       return;
     }
-
-    // צור PDF
     const blobUrl = await createPDF();
     setPdfBlobUrl(blobUrl);
     setShowPreviewModal(true);
   };
 
-  // 6) handleSubmit
   const handleSubmit = () => {
-    if (newSigners.length === 0) {
-      toast.error(t("procurement.signature_list_cannot_be_empty"));
+    if (
+      newSigners.length === 0 ||
+      !formData.summeryProcurement ||
+      !formData.supplierId ||
+      products.length === 0
+    ) {
+      toast.error(t("procurement.ensure_all_fields_completed"));
       return;
     }
-    if (!formData.summeryProcurement) {
-      toast.error(t("procurement.pdf_summary_not_generated"));
-      return;
-    }
-
-    // כאן אפשר להוסיף בדיקות נוספות לדרישות ספציפיות
-    if (!formData.supplierId || products.length === 0) {
-      toast.error(t("procurement.ensure_supplier_and_products"));
-      return;
-    }
-
     const combinedData = {
       ...formData,
       products,
       totalCost,
       signers: newSigners,
     };
-
     addProcurementMutation(combinedData);
     setShowPreviewModal(false);
   };
 
-  // 7) resetForm
   const resetForm = () => {
     setFormData({
       companyId: authUser?.company || "",
@@ -620,70 +494,87 @@ const AddProcurement = () => {
 
   // ----------------- Render ----------------- //
   return (
-    <div className="flex min-h-screen bg-gradient-to-r from-bg to-bg">
-      <div className="flex-1 p-6 bg-bg text-text">
-        <h1 className="text-2xl font-bold text-primary mb-6">
-          {t("procurement.add_procurement")}
-        </h1>
+    <div className="container mx-auto p-8 bg-gradient-to-br from-bg to-bg min-h-screen animate-fade-in">
+      <h1 className="text-4xl font-extrabold text-text mb-8 text-center tracking-tight drop-shadow-md">
+        {t("procurement.add_procurement")}
+      </h1>
 
-        {/* ספקים */}
-        <div className="mb-6">
-          <h2 className="text-lg font-bold text-secondary mb-4">
-            {t("procurement.supplier_details")}
-          </h2>
-          <SupplierSelect
-            supplierId={formData.supplierId}
-            onChange={handleSupplierSelect}
-          />
-
-          {selectedSupplier && (
-            <div className="p-4 bg-secondary rounded-md mt-2">
-              <p>
-                <strong>{t("procurement.phone")}:</strong>{" "}
-                {selectedSupplier.Phone || "N/A"}
-              </p>
-              <p>
-                <strong>{t("procurement.email")}:</strong>{" "}
-                {selectedSupplier.Email || "N/A"}
-              </p>
-              <p>
-                <strong>{t("procurement.address")}:</strong>{" "}
-                {selectedSupplier.Address || "N/A"}
-              </p>
-            </div>
-          )}
+      {error && (
+        <div className="bg-red-100 border-l-4 border-red-600 text-red-800 p-4 mb-8 rounded-lg shadow-lg animate-slide-in">
+          <p className="flex items-center">
+            <FaExclamationTriangle className="mr-2" /> {error}
+          </p>
         </div>
+      )}
 
-        <div className="mb-6">
-          <PaymentAndShipping
-            formData={formData}
-            handleFormChange={handleFormChange}
-            handleCurrencyChange={handleCurrencyChange}
-          />
-        </div>
+      {/* Supplier Section */}
+      <div className="mb-8 bg-white p-6 rounded-2xl shadow-2xl transform transition-all duration-500 hover:shadow-3xl">
+        <h2 className="text-2xl font-bold text-secondary mb-4 tracking-tight">
+          {t("procurement.supplier_details")}
+        </h2>
+        <SupplierSelect
+          supplierId={formData.supplierId}
+          onChange={handleSupplierSelect}
+        />
+        {selectedSupplier && (
+          <div className="mt-4 p-4 bg-gray-50 rounded-lg shadow-inner animate-slide-up">
+            <p className="text-text">
+              <strong className="text-primary">
+                {t("procurement.phone")}:
+              </strong>{" "}
+              {selectedSupplier.Phone || "N/A"}
+            </p>
+            <p className="text-text">
+              <strong className="text-primary">
+                {t("procurement.email")}:
+              </strong>{" "}
+              {selectedSupplier.Email || "N/A"}
+            </p>
+            <p className="text-text">
+              <strong className="text-primary">
+                {t("procurement.address")}:
+              </strong>{" "}
+              {selectedSupplier.Address || "N/A"}
+            </p>
+          </div>
+        )}
+      </div>
 
+      {/* Payment and Shipping Section */}
+      <div className="mb-8 bg-white p-6 rounded-2xl shadow-2xl transform transition-all duration-500 hover:shadow-3xl">
+        <PaymentAndShipping
+          formData={formData}
+          handleFormChange={handleFormChange}
+          handleCurrencyChange={handleCurrencyChange}
+        />
+      </div>
+
+      {/* Signatures Section */}
+      <div className="mb-8">
         <button
           onClick={() => setShowSignatureModal(true)}
-          className="bg-button-bg py-2 px-4 text-button-text rounded mt-4"
+          className="bg-gradient-to-r from-primary to-secondary text-button-text py-3 px-6 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
         >
           {t("procurement.select_signature_requirements")}
         </button>
-
         {newSigners.length > 0 && (
-          <div className="p-4 mt-4 bg-secondary rounded-md">
-            <h4 className="text-secondary font-bold mb-2">
+          <div className="mt-6 bg-white p-6 rounded-2xl shadow-2xl animate-slide-up">
+            <h4 className="text-xl font-bold text-secondary mb-4">
               {t("procurement.current_signers")}:
             </h4>
-            <ul className="list-disc list-inside">
+            <ul className="list-disc pl-5 text-text">
               {newSigners.map((signer, index) => (
-                <li key={index} className="text-text">
+                <li
+                  key={index}
+                  className="animate-slide-up"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
                   {signer.name} - {signer.role}
                 </li>
               ))}
             </ul>
           </div>
         )}
-
         <SignaturesModal
           isOpen={showSignatureModal}
           onClose={() => {
@@ -701,16 +592,16 @@ const AddProcurement = () => {
           deleteSignatureList={deleteSignatureList}
           createSignatureList={createSignatureList}
         />
+      </div>
 
-        {/* מוצרים */}
-        <div className="mt-4">
-          <h2 className="text-lg font-bold text-secondary mb-4">
-            {t("procurement.products")}
-          </h2>
-        </div>
+      {/* Products Section */}
+      <div className="mb-8 bg-white p-6 rounded-2xl shadow-2xl transform transition-all duration-500 hover:shadow-3xl">
+        <h2 className="text-2xl font-bold text-secondary mb-4 tracking-tight">
+          {t("procurement.products")}
+        </h2>
         <ProductSelector
           supplierId={formData.supplierId}
-          inventoryProducts={products} // שימוש במערך products שנשמר מ־useQuery
+          inventoryProducts={products}
           productData={productData}
           setProductData={setProductData}
           selectedSupplier={selectedSupplier}
@@ -722,83 +613,133 @@ const AddProcurement = () => {
           setProducts={setProducts}
         />
 
-        {/* טבלת מוצרים שהתווספו */}
         {products.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-lg font-bold text-secondary mb-4">
+          <div className="mt-6">
+            <h3 className="text-xl font-bold text-secondary mb-4">
               {t("procurement.products_list")}
-            </h2>
-            <table className="w-full border-collapse">
-              <thead>
-                <tr>
-                  <th className="border border-border-color p-2">
-                    {t("procurement.name")}
-                  </th>
-                  <th className="border border-border-color p-2">
-                    {t("procurement.sku")}
-                  </th>
-                  <th className="border border-border-color p-2">
-                    {t("procurement.category")}
-                  </th>
-                  <th className="border border-border-color p-2">
-                    {t("procurement.quantity")}
-                  </th>
-                  <th className="border border-border-color p-2">
-                    {t("procurement.unit_price")}
-                  </th>
-                  <th className="border border-border-color p-2">
-                    {t("procurement.total")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((p, index) => (
-                  <tr key={index}>
-                    <td className="border border-border-color p-2">
-                      {p.productName}
-                    </td>
-                    <td className="border border-border-color p-2">{p.SKU}</td>
-                    <td className="border border-border-color p-2">
-                      {p.category}
-                    </td>
-                    <td className="border border-border-color p-2">
-                      {p.quantity}
-                    </td>
-                    <td className="border border-border-color p-2">
-                      {p.unitPrice} {getCurrencySymbol(formData.currency)}
-                    </td>
-                    <td className="border border-border-color p-2">
-                      {p.total} {getCurrencySymbol(formData.currency)}
-                    </td>
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white rounded-xl shadow-lg">
+                <thead className="bg-gradient-to-r from-primary to-secondary text-button-text">
+                  <tr>
+                    <th className="py-4 px-6 text-left text-sm font-bold tracking-wider">
+                      {t("procurement.name")}
+                    </th>
+                    <th className="py-4 px-6 text-left text-sm font-bold tracking-wider">
+                      {t("procurement.sku")}
+                    </th>
+                    <th className="py-4 px-6 text-left text-sm font-bold tracking-wider">
+                      {t("procurement.category")}
+                    </th>
+                    <th className="py-4 px-6 text-left text-sm font-bold tracking-wider">
+                      {t("procurement.quantity")}
+                    </th>
+                    <th className="py-4 px-6 text-left text-sm font-bold tracking-wider">
+                      {t("procurement.unit_price")}
+                    </th>
+                    <th className="py-4 px-6 text-left text-sm font-bold tracking-wider">
+                      {t("procurement.total")}
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            <p className="text-right mt-4 font-bold">
+                </thead>
+                <tbody>
+                  {products.map((p, index) => (
+                    <tr
+                      key={index}
+                      className={`border-b border-border-color transition-all duration-300 ${
+                        index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                      } hover:bg-accent hover:shadow-inner animate-slide-up`}
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <td className="py-4 px-6 text-text font-medium">
+                        {p.productName}
+                      </td>
+                      <td className="py-4 px-6 text-text">{p.SKU}</td>
+                      <td className="py-4 px-6 text-text">{p.category}</td>
+                      <td className="py-4 px-6 text-text">{p.quantity}</td>
+                      <td className="py-4 px-6 text-text">
+                        {p.unitPrice} {getCurrencySymbol(formData.currency)}
+                      </td>
+                      <td className="py-4 px-6 text-text">
+                        {p.total} {getCurrencySymbol(formData.currency)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-right mt-4 text-xl font-bold text-text">
               {t("procurement.total_cost")}: {totalCost}{" "}
               {getCurrencySymbol(formData.currency)}
             </p>
           </div>
         )}
+      </div>
 
-        {/* Preview & Submit */}
+      {/* Preview Button */}
+      <div className="flex justify-end">
         <button
           type="button"
           onClick={handlePreview}
-          className="bg-button-bg py-2 px-4 text-button-text rounded mt-4"
+          className="bg-gradient-to-r from-button-bg to-accent text-button-text py-3 px-8 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
         >
           {t("procurement.preview_procurement")}
         </button>
-
-        <PreviewModal
-          showModal={showPreviewModal}
-          onClose={() => setShowPreviewModal(false)}
-          onSubmit={handleSubmit}
-          pdfBlobUrl={pdfBlobUrl}
-          totalCost={totalCost}
-          supplierName={formData.supplierName}
-        />
       </div>
+
+      <PreviewModal
+        showModal={showPreviewModal}
+        onClose={() => setShowPreviewModal(false)}
+        onSubmit={handleSubmit}
+        pdfBlobUrl={pdfBlobUrl}
+        totalCost={totalCost}
+        supplierName={formData.supplierName}
+      />
+
+      {/* Custom Animations */}
+      <style jsx global>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        @keyframes shake {
+          0%,
+          100% {
+            transform: translateX(0);
+          }
+          25% {
+            transform: translateX(-5px);
+          }
+          75% {
+            transform: translateX(5px);
+          }
+        }
+        .animate-slide-up {
+          animation: slideUp 0.4s ease-out;
+        }
+        .animate-slide-in {
+          animation: slideIn 0.4s ease-out;
+        }
+        .animate-shake {
+          animation: shake 0.3s ease-in-out;
+        }
+      `}</style>
     </div>
   );
 };

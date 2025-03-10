@@ -92,26 +92,33 @@ const DesignBox = () => {
     },
   };
 
+  // פונקציה שמחילה נושא
   const applyTheme = (themeName) => {
     const theme = themes[themeName];
     const root = document.documentElement;
     Object.keys(theme).forEach((key) => {
       root.style.setProperty(key, theme[key]);
     });
-    // עדכון רקע הדף בהתאם למשתנה --bg-color
+    // עדכון רקע הדף
     document.body.style.backgroundColor = theme["--bg-color"];
   };
 
-  // הגדרת נושא ברירת מחדל
-  useEffect(() => {
-    applyTheme("default");
-  }, []);
+  // נשתמש במצב (state) לאחסן את הנושא הנוכחי, נקרא מה- localStorage אם קיים, אחרת "default"
+  const [currentTheme, setCurrentTheme] = useState(() => {
+    return localStorage.getItem("selectedTheme") || "default";
+  });
 
-  // ניהול מצב פתיחת וסגירת הפלטה בלחיצה
+  // בכל פעם שהנושא מתעדכן במצב, נחיל אותו ונעדכן ב־localStorage
+  useEffect(() => {
+    applyTheme(currentTheme);
+    localStorage.setItem("selectedTheme", currentTheme);
+  }, [currentTheme]);
+
+  // ניהול פתיחה/סגירה של תיבת הבחירה
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
 
-  // סגירת הפלטה כאשר לוחצים מחוץ לאזור שלה
+  // סגירת תיבה בלחיצה מחוץ לאזור
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -126,6 +133,12 @@ const DesignBox = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [containerRef]);
+
+  // פונקציה לבחירת נושא (בלחיצת כפתור) - מעדכנת את המצב
+  const handleSelectTheme = (themeName) => {
+    setCurrentTheme(themeName);
+    setIsOpen(false);
+  };
 
   return (
     <div className="fixed bottom-4 right-4 z-50" ref={containerRef}>
@@ -151,10 +164,7 @@ const DesignBox = () => {
           {Object.keys(themes).map((themeName) => (
             <button
               key={themeName}
-              onClick={() => {
-                applyTheme(themeName);
-                setIsOpen(false);
-              }}
+              onClick={() => handleSelectTheme(themeName)}
               className="px-3 py-1 border rounded transition-colors hover:bg-gray-200 focus:outline-none"
             >
               {themeName}

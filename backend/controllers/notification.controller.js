@@ -13,29 +13,30 @@ import Project from "../models/project.model.js";
 const checkPendingSignaturesLogic = async (companyId) => {
   try {
     const now = new Date();
+ 
 
     const procurements = await Procurement.find({
       status: { $ne: "completed" },
       companyId: companyId,
     });
-    console.log("Procurements not signed:", procurements);
 
     const notifications = [];
 
     for (const procurement of procurements) {
       const { currentSignerIndex, signers, PurchaseOrder } = procurement;
-
       const currentSigner = signers.find(
         (signer) => signer.order === currentSignerIndex
       );
-      if (!currentSigner || currentSigner.hasSigned) continue;
+      if (!currentSigner || currentSigner.hasSigned) {
+        continue;
+      }
 
       const timeSinceLastTurn =
         now - new Date(currentSigner.timeStamp || procurement.createdAt);
       const oneDayInMs = 60 * 1000 * 60 * 24; // 24 hours in milliseconds
+      
 
       if (timeSinceLastTurn >= oneDayInMs) {
-        // Check if a similar notification was already sent in the last 24 hours
         const existingNotification = await Notification.findOne({
           companyId: companyId,
           employeeId: currentSigner.employeeId,
@@ -43,6 +44,7 @@ const checkPendingSignaturesLogic = async (companyId) => {
           type: "Reminder",
           createdAt: { $gte: new Date(now - oneDayInMs) }, // Within last 24 hours
         });
+       
 
         if (!existingNotification) {
           const message = `The signer ${currentSigner.name} has not signed Purchase Order ${PurchaseOrder} after 24 hours.`;
@@ -57,8 +59,12 @@ const checkPendingSignaturesLogic = async (companyId) => {
 
           await notification.save();
           notifications.push(notification);
-        }
-      }
+
+          // Reset timestamp to prevent repeated notifications
+          currentSigner.timeStamp = now;
+          await procurement.save();
+        } 
+      } 
     }
 
     return notifications;
@@ -68,17 +74,22 @@ const checkPendingSignaturesLogic = async (companyId) => {
   }
 };
 
-// HTTP controllers remain the same
+// HTTP controller to check pending signatures
 export const checkPendingSignatures = async (req, res) => {
   const token = req.cookies["auth_token"];
+ 
 
   if (!token) {
     return res.status(401).json({ success: false, message: "Unauthorized" });
   }
-  const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-  if (!decodedToken) {
+
+  let decodedToken;
+  try {
+    decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
     return res.status(401).json({ success: false, message: "Unauthorized" });
   }
+
   const companyId = decodedToken.companyId;
 
   try {
@@ -90,6 +101,7 @@ export const checkPendingSignatures = async (req, res) => {
       notifications,
     });
   } catch (error) {
+    console.error("Error in checkPendingSignatures:", error);
     res.status(500).json({
       success: false,
       message: "Error checking pending signatures",
@@ -98,24 +110,33 @@ export const checkPendingSignatures = async (req, res) => {
   }
 };
 
+// HTTP controller to get admin notifications
 export const getAdminNotifications = async (req, res) => {
-  try {
-    const token = req.cookies["auth_token"];
+  const token = req.cookies["auth_token"];
 
-    if (!token) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
-    }
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    if (!decodedToken) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
-    }
-    const companyId = decodedToken.companyId;
+
+  if (!token) {
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
+
+  let decodedToken;
+  try {
+    decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    console.log("Unauthorized: Invalid token", err.message);
+    return res.status(401).json({ success: false, message: "Unauthorized" });
+  }
+
+  const companyId = decodedToken.companyId;
+
+  try {
     const notifications = await Notification.find({
       companyId: companyId,
     }).sort({ createdAt: -1 });
 
     res.status(200).json({ success: true, data: notifications });
   } catch (error) {
+    console.error("Error fetching admin notifications:", error);
     res.status(500).json({
       success: false,
       message: "Error fetching admin notifications",
@@ -129,14 +150,14 @@ const checkPendingBudgetSignaturesLogic = async (companyId) => {
   try {
     const now = new Date();
 
+
     const budgets = await Budget.find({
       status: { $ne: "Approved" },
       companyId: companyId,
     });
 
-    console.log("Budgets not signed:", budgets);
-
     const notifications = [];
+    const oneDayInMs = 60 * 1000 * 60 * 24; // 24 hours in milliseconds
 
     for (const budget of budgets) {
       const { currentSignerIndex, signers, departmentOrProjectName } = budget;
@@ -144,21 +165,27 @@ const checkPendingBudgetSignaturesLogic = async (companyId) => {
       const currentSigner = signers.find(
         (signer) => signer.order === currentSignerIndex
       );
-      if (!currentSigner || currentSigner.hasSigned) continue;
+      if (!currentSigner || currentSigner.hasSigned) {
+        continue;
+      }
 
       const timeSinceLastTurn =
         now - new Date(currentSigner.timeStamp || budget.createdAt);
-      const oneDayInMs = 60 * 1000 * 60 * 24; // 24 hours in milliseconds
+     
 
       if (timeSinceLastTurn >= oneDayInMs) {
-        // בדיקת התראה קיימת מ-24 השעות האחרונות
+        // Check for existing notification in the last 24 hours
         const existingNotification = await Notification.findOne({
           companyId: companyId,
           employeeId: currentSigner.employeeId,
           budgetName: departmentOrProjectName,
           type: "Reminder",
-          createdAt: { $gte: new Date(now - oneDayInMs) }, // מ-24 השעות האחרונות
+          createdAt: { $gte: new Date(now - oneDayInMs) },
         });
+        console.log(
+          `Existing notification check for budget ${departmentOrProjectName}:`,
+          existingNotification
+        );
 
         if (!existingNotification) {
           const message = `The signer ${currentSigner.name} has not signed the budget for ${departmentOrProjectName} after 24 hours.`;
@@ -173,8 +200,13 @@ const checkPendingBudgetSignaturesLogic = async (companyId) => {
 
           await notification.save();
           notifications.push(notification);
+
+          // Reset timestamp to prevent repeated notifications
+          currentSigner.timeStamp = now;
+          await budget.save();
+
         }
-      }
+      } 
     }
 
     return notifications;
@@ -184,17 +216,24 @@ const checkPendingBudgetSignaturesLogic = async (companyId) => {
   }
 };
 
-// בקר HTTP לבדיקת חתימות תקציב בהמתנה
+// HTTP controller to check pending budget signatures
 export const checkPendingBudgetSignatures = async (req, res) => {
   const token = req.cookies["auth_token"];
 
+
   if (!token) {
+    console.log("Unauthorized: No token provided");
     return res.status(401).json({ success: false, message: "Unauthorized" });
   }
-  const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-  if (!decodedToken) {
+
+  let decodedToken;
+  try {
+    decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    console.log("Unauthorized: Invalid token", err.message);
     return res.status(401).json({ success: false, message: "Unauthorized" });
   }
+
   const companyId = decodedToken.companyId;
 
   try {
@@ -206,6 +245,7 @@ export const checkPendingBudgetSignatures = async (req, res) => {
       notifications,
     });
   } catch (error) {
+    console.error("Error in checkPendingBudgetSignatures:", error);
     res.status(500).json({
       success: false,
       message: "Error checking pending budget signatures",
@@ -214,7 +254,7 @@ export const checkPendingBudgetSignatures = async (req, res) => {
   }
 };
 
-cron.schedule("0 * * * *", async () => {
+cron.schedule("*/1 * * * *", async () => {
   try {
     const companies = await Company.find(); // קבלת כל החברות
 
@@ -395,60 +435,41 @@ const reminderEventsLogic = async (companyId) => {
       }
 
       let message;
-      let reminderType;
 
       if (event.eventType === "meeting") {
         if (timeUntilStart < twoHours && !event.twoHoursReminderSent) {
           message = `Reminder: There is a meeting in under two hours (Event: "${event.title}").`;
-          reminderType = "twoHours";
+          event.twoHoursReminderSent = true;
         } else if (timeUntilStart < oneDay && !event.dayReminderSent) {
           message = `Reminder: There is a meeting in under one day (Event: "${event.title}").`;
-          reminderType = "oneDay";
+          event.dayReminderSent = true;
         }
       } else if (event.eventType === "holiday") {
         if (timeUntilStart < oneDay && !event.dayReminderSent) {
           message = `Reminder: A holiday starts in under one day (Event: "${event.title}").`;
-          reminderType = "oneDay";
+          event.dayReminderSent = true;
         }
       } else {
         if (timeUntilStart < twoHours && !event.twoHoursReminderSent) {
           message = `Reminder: Your event "${event.title}" starts in under two hours.`;
-          reminderType = "twoHours";
+          event.twoHoursReminderSent = true;
         } else if (timeUntilStart < oneDay && !event.dayReminderSent) {
           message = `Reminder: Your event "${event.title}" starts in under 24 hours.`;
-          reminderType = "oneDay";
+          event.dayReminderSent = true;
         }
       }
 
       if (message) {
-        // בדיקת התראה קיימת עבור אותו אירוע ואותו סוג תזכורת
-        const existingNotification = await Notification.findOne({
+        const notification = new Notification({
           companyId,
-          employeeId: event.createdBy,
-          content: message, // בודקים שההודעה זהה
+          content: message,
           type: "Reminder",
-          createdAt: { $gte: new Date(now - oneDay) }, // ב-24 השעות האחרונות
+          employeeId: event.createdBy,
         });
 
-        if (!existingNotification) {
-          const notification = new Notification({
-            companyId,
-            content: message,
-            type: "Reminder",
-            employeeId: event.createdBy,
-          });
-
-          await notification.save();
-          notifications.push(notification);
-
-          // עדכון הדגלים של האירוע
-          if (reminderType === "twoHours") {
-            event.twoHoursReminderSent = true;
-          } else if (reminderType === "oneDay") {
-            event.dayReminderSent = true;
-          }
-          await event.save();
-        }
+        await notification.save();
+        notifications.push(notification);
+        await event.save();
       }
     }
 

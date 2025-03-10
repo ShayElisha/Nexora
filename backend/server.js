@@ -29,6 +29,7 @@ import projectRoutes from "./routes/project.route.js";
 import customerRoutes from "./routes/customers.route.js";
 import CustomerOrderRoutes from "./routes/CustomerOrder.route.js";
 import ProcurementProposalRoutes from "./routes/ProcurementProposal.route.js";
+import PerformanceReviewRoutes from "./routes/performanceReview.route.js";
 
 dotenv.config();
 
@@ -69,6 +70,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/CustomerOrder", CustomerOrderRoutes);
 app.use("/api/proposals", ProcurementProposalRoutes);
+app.use("/api/PerformanceReview", PerformanceReviewRoutes);
 
 app.post("/save-pdf", (req, res) => {
   const { pdfData, fileName } = req.body;

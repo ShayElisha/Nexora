@@ -1,4 +1,3 @@
-// src/pages/procurement/ProductList.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import axiosInstance from "../../../lib/axios";
@@ -12,25 +11,28 @@ const AttachedFilesModal = ({ files, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative mx-4">
+      <div className="bg-bg rounded-2xl shadow-2xl w-full max-w-md p-6 mx-4 transform transition-all duration-300 animate-slide-in relative">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
+          className="absolute top-4 right-4 text-text hover:text-gray-800 text-xl transition-all duration-200 transform hover:scale-110"
         >
           ×
         </button>
-        <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">
+        <h2 className="text-2xl font-bold text-text mb-4 text-center tracking-tight">
           {t("inventory.attached_files")}
         </h2>
         {files && files.length > 0 ? (
-          <ul className="space-y-1">
+          <ul className="space-y-2">
             {files.map((file, index) => (
-              <li key={index} className="bg-gray-100 p-2 rounded">
+              <li
+                key={index}
+                className="bg-accent p-3 rounded-lg shadow-sm border border-border-color hover:bg-primary hover:text-button-text transition-all duration-200"
+              >
                 <a
                   href={file.fileUrl || "#"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`text-blue-600 hover:underline ${
+                  className={`text-primary hover:underline font-medium ${
                     !file.fileUrl ? "pointer-events-none text-gray-400" : ""
                   }`}
                 >
@@ -40,7 +42,9 @@ const AttachedFilesModal = ({ files, onClose }) => {
             ))}
           </ul>
         ) : (
-          <p className="text-gray-500 text-center">{t("inventory.no_files")}</p>
+          <p className="text-text text-center text-lg opacity-70">
+            {t("inventory.no_files")}
+          </p>
         )}
       </div>
     </div>
@@ -347,24 +351,25 @@ const EditInventoryModal = ({ item, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl p-6 overflow-y-auto max-h-[85vh] relative mx-4">
+      <div className="bg-bg rounded-2xl shadow-2xl w-full max-w-3xl p-6 max-h-[85vh] overflow-y-auto mx-4 transform transition-all duration-300 animate-slide-in relative">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-xl"
+          className="absolute top-4 right-4 text-text hover:text-gray-800 text-xl transition-all duration-200 transform hover:scale-110"
         >
           ×
         </button>
-        <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">
+        <h2 className="text-2xl font-bold text-text mb-6 text-center tracking-tight drop-shadow-md">
           {t("inventory.edit_product_and_inventory")}
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="bg-gray-50 p-4 rounded border">
-            <h3 className="text-lg font-medium text-gray-700 mb-3">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Product Details */}
+          <div className="bg-accent p-4 rounded-xl border border-border-color shadow-sm">
+            <h3 className="text-xl font-semibold text-text mb-4">
               {t("inventory.product_details")}
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.sku")}
                 </label>
                 <input
@@ -372,11 +377,11 @@ const EditInventoryModal = ({ item, onClose }) => {
                   name="sku"
                   value={formData.sku}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.barcode")}
                 </label>
                 <input
@@ -384,11 +389,11 @@ const EditInventoryModal = ({ item, onClose }) => {
                   name="barcode"
                   value={formData.barcode}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.product_name")}
                 </label>
                 <input
@@ -396,16 +401,16 @@ const EditInventoryModal = ({ item, onClose }) => {
                   name="productName"
                   value={formData.productName}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 />
                 {errors.productName && (
                   <p className="text-red-500 text-xs mt-1">
-                    {t("errors.product_name_required")}
+                    {errors.productName}
                   </p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.unit_price")}
                 </label>
                 <input
@@ -413,16 +418,16 @@ const EditInventoryModal = ({ item, onClose }) => {
                   name="unitPrice"
                   value={formData.unitPrice}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 />
                 {errors.unitPrice && (
                   <p className="text-red-500 text-xs mt-1">
-                    {t("errors.unit_price_required")}
+                    {errors.unitPrice}
                   </p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.category")}
                 </label>
                 <input
@@ -430,26 +435,24 @@ const EditInventoryModal = ({ item, onClose }) => {
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 />
                 {errors.category && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {t("errors.category_required")}
-                  </p>
+                  <p className="text-red-500 text-xs mt-1">{errors.category}</p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.supplier_name")}
                 </label>
                 <select
                   name="supplierId"
                   value={formData.supplierId}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                   disabled={
                     formData.productType === "sale" || isLoadingSuppliers
                   }
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200 disabled:bg-accent disabled:opacity-50"
                 >
                   <option value="">{t("inventory.select_supplier")}</option>
                   {suppliersList?.map((supplier) => (
@@ -460,7 +463,7 @@ const EditInventoryModal = ({ item, onClose }) => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.length")}
                 </label>
                 <input
@@ -468,11 +471,11 @@ const EditInventoryModal = ({ item, onClose }) => {
                   name="length"
                   value={formData.length}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.width")}
                 </label>
                 <input
@@ -480,11 +483,11 @@ const EditInventoryModal = ({ item, onClose }) => {
                   name="width"
                   value={formData.width}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.height")}
                 </label>
                 <input
@@ -492,18 +495,18 @@ const EditInventoryModal = ({ item, onClose }) => {
                   name="height"
                   value={formData.height}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.product_type")}
                 </label>
                 <select
                   name="productType"
                   value={formData.productType}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 >
                   <option value="sale">{t("inventory.sale")}</option>
                   <option value="purchase">{t("inventory.purchase")}</option>
@@ -511,20 +514,20 @@ const EditInventoryModal = ({ item, onClose }) => {
                 </select>
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.product_image")}
                 </label>
                 {formData.productImage && (
-                  <div className="mt-2 flex items-center space-x-3">
+                  <div className="mt-2 flex items-center space-x-4">
                     <img
                       src={formData.productImage}
                       alt={formData.productName}
-                      className="w-20 h-20 object-cover rounded shadow-sm"
+                      className="w-20 h-20 object-cover rounded-lg shadow-md"
                     />
                     <button
                       type="button"
                       onClick={handleImageDelete}
-                      className="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
+                      className="px-3 py-1 bg-red-500 text-white rounded-full shadow-md hover:bg-red-600 transition-all duration-200 transform hover:scale-105"
                     >
                       {t("buttons.delete_image")}
                     </button>
@@ -534,27 +537,27 @@ const EditInventoryModal = ({ item, onClose }) => {
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
-                  className="mt-2 w-full p-1 border rounded text-sm"
+                  className="mt-2 w-full p-2 border border-border-color rounded-lg text-sm text-text file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-button-text hover:file:bg-secondary transition-all duration-200"
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.attached_files")}
                 </label>
                 {formData.attachments.length > 0 && (
-                  <ul className="mt-2 space-y-1">
+                  <ul className="mt-2 space-y-2">
                     {formData.attachments.map((file, index) => (
                       <li
                         key={index}
-                        className="flex items-center justify-between bg-gray-100 p-2 rounded"
+                        className="flex items-center justify-between bg-accent p-3 rounded-lg shadow-sm border border-border-color"
                       >
-                        <span className="text-sm">
+                        <span className="text-sm text-text truncate">
                           {file.fileName || file.name}
                         </span>
                         <button
                           type="button"
                           onClick={() => handleFileDelete(index)}
-                          className="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
+                          className="px-3 py-1 bg-red-500 text-white rounded-full shadow-md hover:bg-red-600 transition-all duration-200 transform hover:scale-105"
                         >
                           {t("buttons.delete")}
                         </button>
@@ -566,13 +569,13 @@ const EditInventoryModal = ({ item, onClose }) => {
                   <input
                     type="file"
                     onChange={handleFileChange}
-                    className="w-full p-1 border rounded text-sm"
+                    className="w-full p-2 border border-border-color rounded-lg text-sm text-text file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-button-text hover:file:bg-secondary transition-all duration-200"
                   />
                   <button
                     type="button"
                     onClick={handleFileAdd}
                     disabled={!newAttachedFile}
-                    className="px-2 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 disabled:bg-gray-400"
+                    className="px-3 py-1 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed"
                   >
                     {t("buttons.add_file")}
                   </button>
@@ -581,13 +584,14 @@ const EditInventoryModal = ({ item, onClose }) => {
             </div>
           </div>
 
-          <div className="bg-gray-50 p-4 rounded border">
-            <h3 className="text-lg font-medium text-gray-700 mb-3">
+          {/* Inventory Details */}
+          <div className="bg-accent p-4 rounded-xl border border-border-color shadow-sm">
+            <h3 className="text-xl font-semibold text-text mb-4">
               {t("inventory.inventory_details")}
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.quantity")}
                 </label>
                 <input
@@ -595,16 +599,14 @@ const EditInventoryModal = ({ item, onClose }) => {
                   name="quantity"
                   value={formData.quantity}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 />
                 {errors.quantity && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {t("errors.quantity_required")}
-                  </p>
+                  <p className="text-red-500 text-xs mt-1">{errors.quantity}</p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.min_stock_level")}
                 </label>
                 <input
@@ -612,16 +614,16 @@ const EditInventoryModal = ({ item, onClose }) => {
                   name="minStockLevel"
                   value={formData.minStockLevel}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 />
                 {errors.minStockLevel && (
                   <p className="text-red-500 text-xs mt-1">
-                    {t("errors.min_stock_level_required")}
+                    {errors.minStockLevel}
                   </p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.reorder_quantity")}
                 </label>
                 <input
@@ -629,16 +631,16 @@ const EditInventoryModal = ({ item, onClose }) => {
                   name="reorderQuantity"
                   value={formData.reorderQuantity}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 />
                 {errors.reorderQuantity && (
                   <p className="text-red-500 text-xs mt-1">
-                    {t("errors.reorder_quantity_required")}
+                    {errors.reorderQuantity}
                   </p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.batch_number")}
                 </label>
                 <input
@@ -646,11 +648,11 @@ const EditInventoryModal = ({ item, onClose }) => {
                   name="batchNumber"
                   value={formData.batchNumber}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.expiration_date")}
                 </label>
                 <input
@@ -658,11 +660,11 @@ const EditInventoryModal = ({ item, onClose }) => {
                   name="expirationDate"
                   value={formData.expirationDate}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.shelf_location")}
                 </label>
                 <input
@@ -670,11 +672,11 @@ const EditInventoryModal = ({ item, onClose }) => {
                   name="shelfLocation"
                   value={formData.shelfLocation}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-600">
+                <label className="block text-sm font-medium text-text">
                   {t("inventory.last_order_date")}
                 </label>
                 <input
@@ -682,26 +684,27 @@ const EditInventoryModal = ({ item, onClose }) => {
                   name="lastOrderDate"
                   value={formData.lastOrderDate}
                   onChange={handleChange}
-                  className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                  className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 />
               </div>
             </div>
           </div>
 
+          {/* BOM Section */}
           {(formData.productType === "sale" ||
             formData.productType === "both") && (
-            <div className="bg-gray-50 p-4 rounded border">
-              <h3 className="text-lg font-medium text-gray-700 mb-3">
+            <div className="bg-accent p-4 rounded-xl border border-border-color shadow-sm">
+              <h3 className="text-xl font-semibold text-text mb-4">
                 {t("product.bom.title")}
               </h3>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {bomComponents.map((comp, index) => (
                   <div
                     key={index}
-                    className="flex flex-col sm:flex-row items-start sm:items-end space-y-2 sm:space-y-0 sm:space-x-3 bg-white p-3 rounded border"
+                    className="flex flex-col sm:flex-row items-start sm:items-end space-y-4 sm:space-y-0 sm:space-x-4 bg-bg p-4 rounded-lg shadow-sm border border-border-color"
                   >
                     <div className="flex-1">
-                      <label className="block text-sm font-medium text-gray-600">
+                      <label className="block text-sm font-medium text-text">
                         {t("product.bom.component_id")}
                       </label>
                       <select
@@ -709,7 +712,7 @@ const EditInventoryModal = ({ item, onClose }) => {
                         onChange={(e) =>
                           handleBomChange(index, "componentId", e.target.value)
                         }
-                        className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                        className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200 disabled:bg-accent disabled:opacity-50"
                         disabled={isLoadingProducts}
                       >
                         <option value="">
@@ -722,8 +725,8 @@ const EditInventoryModal = ({ item, onClose }) => {
                         ))}
                       </select>
                     </div>
-                    <div className="w-full sm:w-20">
-                      <label className="block text-sm font-medium text-gray-600">
+                    <div className="w-full sm:w-24">
+                      <label className="block text-sm font-medium text-text">
                         {t("product.bom.quantity")}
                       </label>
                       <input
@@ -732,12 +735,12 @@ const EditInventoryModal = ({ item, onClose }) => {
                         onChange={(e) =>
                           handleBomChange(index, "quantity", e.target.value)
                         }
-                        className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                        className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                         min="1"
                       />
                     </div>
-                    <div className="w-full sm:w-20">
-                      <label className="block text-sm font-medium text-gray-600">
+                    <div className="w-full sm:w-24">
+                      <label className="block text-sm font-medium text-text">
                         {t("product.bom.unit_cost")}
                       </label>
                       <input
@@ -746,13 +749,13 @@ const EditInventoryModal = ({ item, onClose }) => {
                         onChange={(e) =>
                           handleBomChange(index, "unitCost", e.target.value)
                         }
-                        className="mt-1 w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                        className="mt-1 w-full p-2 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                       />
                     </div>
                     <button
                       type="button"
                       onClick={() => removeBomComponent(index)}
-                      className="mt-2 sm:mt-0 px-2 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+                      className="mt-2 sm:mt-0 px-3 py-1 bg-red-500 text-white rounded-full shadow-md hover:bg-red-600 transition-all duration-200 transform hover:scale-105"
                     >
                       {t("buttons.remove")}
                     </button>
@@ -761,7 +764,7 @@ const EditInventoryModal = ({ item, onClose }) => {
                 <button
                   type="button"
                   onClick={addBomComponent}
-                  className="mt-3 px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+                  className="mt-4 px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105"
                 >
                   {t("product.bom.add_component")}
                 </button>
@@ -769,17 +772,18 @@ const EditInventoryModal = ({ item, onClose }) => {
             </div>
           )}
 
-          <div className="flex justify-end space-x-3 mt-4">
+          {/* Form Actions */}
+          <div className="flex justify-end space-x-4 mt-6">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-500 text-white rounded text-sm hover:bg-gray-600"
+              className="px-4 py-2 bg-gray-500 text-white rounded-full shadow-md hover:bg-gray-600 transition-all duration-200 transform hover:scale-105"
             >
               {t("buttons.cancel")}
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700"
+              className="px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105"
             >
               {t("buttons.save")}
             </button>
@@ -1057,11 +1061,13 @@ const ProductList = () => {
   );
 
   const renderTable = (products, title) => (
-    <div className="mb-6">
-      <h2 className="text-xl font-medium text-primary mb-3">{title}</h2>
-      <div className="overflow-x-auto">
-        <table className="min-w-full table-auto bg-white rounded-lg shadow-sm border border-gray-200">
-          <thead>
+    <div className="mb-8">
+      <h2 className="text-2xl font-bold text-text mb-4 tracking-tight drop-shadow-md">
+        {title}
+      </h2>
+      <div className="overflow-x-auto shadow-2xl rounded-xl">
+        <table className="min-w-full">
+          <thead className="bg-gradient-to-r from-primary to-secondary text-button-text">
             <tr>
               {[
                 t("inventory.image"),
@@ -1075,7 +1081,7 @@ const ProductList = () => {
               ].map((header) => (
                 <th
                   key={header}
-                  className="py-2 px-3 text-left bg-secondary text-white text-sm font-medium border-b"
+                  className="py-4 px-6 text-left text-sm font-bold tracking-wider"
                 >
                   {header}
                 </th>
@@ -1087,54 +1093,56 @@ const ProductList = () => {
               <tr>
                 <td
                   colSpan={8}
-                  className="py-4 text-center text-gray-400 text-sm"
+                  className="py-6 text-center text-text text-lg opacity-70"
                 >
                   {t("inventory.no_products_available")}
                 </td>
               </tr>
             ) : (
-              products.map((item) => {
+              products.map((item, index) => {
                 const isExpanded = expandedRows.includes(item._id);
                 return (
                   <React.Fragment key={item._id}>
                     <tr
-                      className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
+                      className={`border-b border-border-color transition-all duration-300 ${
+                        index % 2 === 0 ? "bg-bg" : "bg-accent"
+                      } hover:bg-accent hover:shadow-inner cursor-pointer`}
                       onClick={() => handleToggleRow(item._id)}
                     >
-                      <td className="py-2 px-3">
+                      <td className="py-4 px-6">
                         {item.productImage ? (
                           <img
                             src={item.productImage}
                             alt={item.productName}
-                            className="w-10 h-10 object-cover rounded"
+                            className="w-12 h-12 object-cover rounded-lg shadow-sm"
                           />
                         ) : (
-                          <span className="text-sm text-gray-500">
+                          <span className="text-text text-sm opacity-70">
                             No Image
                           </span>
                         )}
                       </td>
-                      <td className="py-2 px-3 text-sm">
+                      <td className="py-4 px-6 text-text font-medium">
                         {item.productName || t("inventory.not_available")}
                       </td>
-                      <td className="py-2 px-3 text-sm">
+                      <td className="py-4 px-6 text-text">
                         {item.sku || t("inventory.not_available")}
                       </td>
-                      <td className="py-2 px-3 text-sm">
+                      <td className="py-4 px-6 text-text">
                         {item.barcode || t("inventory.not_available")}
                       </td>
-                      <td className="py-2 px-3 text-sm">
+                      <td className="py-4 px-6 text-text">
                         {item.supplierName || t("inventory.not_available")}
                       </td>
-                      <td className="py-2 px-3 text-sm">
+                      <td className="py-4 px-6 text-text">
                         {item.unitPrice || t("inventory.not_available")}
                       </td>
-                      <td className="py-2 px-3 text-sm">
+                      <td className="py-4 px-6 text-text">
                         {item.inventory?.quantity ?? 0}
                       </td>
-                      <td className="py-2 px-3 flex items-center justify-end space-x-2">
+                      <td className="py-4 px-6 flex items-center justify-end space-x-2">
                         <button
-                          className="p-1 bg-button-bg text-button-text rounded hover:bg-button-bg/80 text-sm"
+                          className="px-3 py-1 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleEdit(item._id);
@@ -1143,7 +1151,7 @@ const ProductList = () => {
                           {t("inventory.edit")}
                         </button>
                         <button
-                          className="p-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                          className="px-3 py-1 bg-red-500 text-white rounded-full shadow-md hover:bg-red-600 transition-all duration-200 transform hover:scale-105"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDelete(item._id);
@@ -1152,7 +1160,7 @@ const ProductList = () => {
                           {t("inventory.delete")}
                         </button>
                         <button
-                          className="p-1 text-gray-600 hover:text-gray-800"
+                          className="p-1 text-text hover:text-gray-800 transition-all duration-200 transform hover:scale-110"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleToggleRow(item._id);
@@ -1163,14 +1171,11 @@ const ProductList = () => {
                       </td>
                     </tr>
                     {isExpanded && (
-                      <tr className="bg-gray-100">
-                        <td
-                          colSpan={8}
-                          className="p-4 border-b border-gray-200"
-                        >
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                      <tr className="bg-accent">
+                        <td colSpan={8} className="p-6">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-text">
                             <div>
-                              <h3 className="text-base font-medium text-gray-700 mb-2">
+                              <h3 className="text-lg font-semibold text-text mb-3">
                                 {t("inventory.inventory_details")}
                               </h3>
                               <p>
@@ -1223,7 +1228,7 @@ const ProductList = () => {
                               </p>
                             </div>
                             <div>
-                              <h3 className="text-base font-medium text-gray-700 mb-2">
+                              <h3 className="text-lg font-semibold text-text mb-3">
                                 {t("inventory.additional_details")}
                               </h3>
                               <p>
@@ -1260,7 +1265,7 @@ const ProductList = () => {
                                   t("inventory.not_available")}
                               </p>
                               <button
-                                className="mt-2 px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+                                className="mt-4 px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   openFilesModal(item.attachments || []);
@@ -1285,154 +1290,168 @@ const ProductList = () => {
 
   if (error) {
     return (
-      <div className="flex min-h-screen bg-bg text-red-400 items-center justify-center p-4">
-        <p>Error: {error}</p>
+      <div className="min-h-screen bg-bg flex items-center justify-center p-4">
+        <p className="text-red-500 text-lg font-semibold">Error: {error}</p>
       </div>
     );
   }
 
   if (!isLoggedIn) {
     return (
-      <div className="flex min-h-screen bg-bg text-text items-center justify-center p-4">
-        <p>{t("inventory.please_log_in")}</p>
+      <div className="min-h-screen bg-bg flex items-center justify-center p-4">
+        <p className="text-text text-lg font-semibold">
+          {t("inventory.please_log_in")}
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-bg p-4">
-      <div className="container mx-auto w-full max-w-screen-xl bg-white rounded-lg shadow-sm p-4">
-        <h1 className="text-2xl font-medium text-primary mb-4 text-center">
-          {t("inventory.Product_Inventory_List")}
-        </h1>
+    <div className="min-h-screen bg-bg p-6 animate-fade-in">
+      <div className="container mx-auto max-w-screen-xl">
+        <div className="bg-bg rounded-2xl shadow-2xl p-6 sm:p-8 border border-border-color transform transition-all duration-500 hover:shadow-3xl">
+          <h1 className="text-3xl font-extrabold text-text mb-6 text-center tracking-tight drop-shadow-md">
+            {t("inventory.Product_Inventory_List")}
+          </h1>
 
-        <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-          <select
-            value={filterProductType}
-            onChange={(e) => setFilterProductType(e.target.value)}
-            className="w-full p-2 border rounded text-sm"
-          >
-            <option value="all">
-              {t("inventory.filter_all_product_types")}
-            </option>
-            <option value="sale">{t("inventory.sale_products")}</option>
-            <option value="purchase">{t("inventory.purchase_products")}</option>
-          </select>
-          <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            className="w-full p-2 border rounded text-sm"
-          >
-            <option value="all">{t("inventory.filter_all_categories")}</option>
-            {Array.from(
-              new Set(allProducts.map((prod) => prod.category).filter(Boolean))
-            ).map((category) => (
-              <option key={category} value={category}>
-                {category}
+          {/* Filters and Search */}
+          <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <select
+              value={filterProductType}
+              onChange={(e) => setFilterProductType(e.target.value)}
+              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-accent text-text"
+            >
+              <option value="all">
+                {t("inventory.filter_all_product_types")}
               </option>
-            ))}
-          </select>
-          <select
-            value={filterSupplier}
-            onChange={(e) => setFilterSupplier(e.target.value)}
-            className="w-full p-2 border rounded text-sm"
-          >
-            <option value="all">{t("inventory.filter_all_suppliers")}</option>
-            {Array.from(
-              new Set(
-                allProducts.map((prod) => prod.supplierName).filter(Boolean)
-              )
-            ).map((supplier) => (
-              <option key={supplier} value={supplier}>
-                {supplier}
+              <option value="sale">{t("inventory.sale_products")}</option>
+              <option value="purchase">
+                {t("inventory.purchase_products")}
               </option>
-            ))}
-          </select>
-          <select
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-            className="w-full p-2 border rounded text-sm"
-          >
-            <option value="">{t("inventory.sort_by")}</option>
-            <option value="productName_asc">
-              {t("inventory.sort_productName_asc")}
-            </option>
-            <option value="productName_desc">
-              {t("inventory.sort_productName_desc")}
-            </option>
-            <option value="sku_asc">{t("inventory.sort_sku_asc")}</option>
-            <option value="sku_desc">{t("inventory.sort_sku_desc")}</option>
-            <option value="barcode_asc">
-              {t("inventory.sort_barcode_asc")}
-            </option>
-            <option value="barcode_desc">
-              {t("inventory.sort_barcode_desc")}
-            </option>
-            <option value="unitPrice_asc">
-              {t("inventory.sort_unitPrice_asc")}
-            </option>
-            <option value="unitPrice_desc">
-              {t("inventory.sort_unitPrice_desc")}
-            </option>
-            <option value="category_asc">
-              {t("inventory.sort_category_asc")}
-            </option>
-            <option value="category_desc">
-              {t("inventory.sort_category_desc")}
-            </option>
-            <option value="supplierName_asc">
-              {t("inventory.sort_supplierName_asc")}
-            </option>
-            <option value="supplierName_desc">
-              {t("inventory.sort_supplierName_desc")}
-            </option>
-            <option value="quantity_asc">
-              {t("inventory.sort_quantity_asc")}
-            </option>
-            <option value="quantity_desc">
-              {t("inventory.sort_quantity_desc")}
-            </option>
-            <option value="minStockLevel_asc">
-              {t("inventory.sort_minStockLevel_asc")}
-            </option>
-            <option value="minStockLevel_desc">
-              {t("inventory.sort_minStockLevel_desc")}
-            </option>
-            <option value="reorderQuantity_asc">
-              {t("inventory.sort_reorderQuantity_asc")}
-            </option>
-            <option value="reorderQuantity_desc">
-              {t("inventory.sort_reorderQuantity_desc")}
-            </option>
-            <option value="volume_asc">{t("inventory.sort_volume_asc")}</option>
-            <option value="volume_desc">
-              {t("inventory.sort_volume_desc")}
-            </option>
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder={t("inventory.search_placeholder")}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-2 border rounded text-sm"
-          />
-        </div>
-
-        {loading ? (
-          <div className="text-center text-gray-400 text-sm">
-            Loading products...
+            </select>
+            <select
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-accent text-text"
+            >
+              <option value="all">
+                {t("inventory.filter_all_categories")}
+              </option>
+              {Array.from(
+                new Set(
+                  allProducts.map((prod) => prod.category).filter(Boolean)
+                )
+              ).map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+            <select
+              value={filterSupplier}
+              onChange={(e) => setFilterSupplier(e.target.value)}
+              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-accent text-text"
+            >
+              <option value="all">{t("inventory.filter_all_suppliers")}</option>
+              {Array.from(
+                new Set(
+                  allProducts.map((prod) => prod.supplierName).filter(Boolean)
+                )
+              ).map((supplier) => (
+                <option key={supplier} value={supplier}>
+                  {supplier}
+                </option>
+              ))}
+            </select>
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-accent text-text"
+            >
+              <option value="">{t("inventory.sort_by")}</option>
+              <option value="productName_asc">
+                {t("inventory.sort_productName_asc")}
+              </option>
+              <option value="productName_desc">
+                {t("inventory.sort_productName_desc")}
+              </option>
+              <option value="sku_asc">{t("inventory.sort_sku_asc")}</option>
+              <option value="sku_desc">{t("inventory.sort_sku_desc")}</option>
+              <option value="barcode_asc">
+                {t("inventory.sort_barcode_asc")}
+              </option>
+              <option value="barcode_desc">
+                {t("inventory.sort_barcode_desc")}
+              </option>
+              <option value="unitPrice_asc">
+                {t("inventory.sort_unitPrice_asc")}
+              </option>
+              <option value="unitPrice_desc">
+                {t("inventory.sort_unitPrice_desc")}
+              </option>
+              <option value="category_asc">
+                {t("inventory.sort_category_asc")}
+              </option>
+              <option value="category_desc">
+                {t("inventory.sort_category_desc")}
+              </option>
+              <option value="supplierName_asc">
+                {t("inventory.sort_supplierName_asc")}
+              </option>
+              <option value="supplierName_desc">
+                {t("inventory.sort_supplierName_desc")}
+              </option>
+              <option value="quantity_asc">
+                {t("inventory.sort_quantity_asc")}
+              </option>
+              <option value="quantity_desc">
+                {t("inventory.sort_quantity_desc")}
+              </option>
+              <option value="minStockLevel_asc">
+                {t("inventory.sort_minStockLevel_asc")}
+              </option>
+              <option value="minStockLevel_desc">
+                {t("inventory.sort_minStockLevel_desc")}
+              </option>
+              <option value="reorderQuantity_asc">
+                {t("inventory.sort_reorderQuantity_asc")}
+              </option>
+              <option value="reorderQuantity_desc">
+                {t("inventory.sort_reorderQuantity_desc")}
+              </option>
+              <option value="volume_asc">
+                {t("inventory.sort_volume_asc")}
+              </option>
+              <option value="volume_desc">
+                {t("inventory.sort_volume_desc")}
+              </option>
+            </select>
           </div>
-        ) : (
-          <>
-            {renderTable(saleProducts, t("inventory.sale_products"))}
-            {renderTable(purchaseProducts, t("inventory.purchase_products"))}
-          </>
-        )}
+          <div className="mb-6">
+            <input
+              type="text"
+              placeholder={t("inventory.search_placeholder")}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-accent text-text placeholder-opacity-50"
+            />
+          </div>
+
+          {/* Tables */}
+          {loading ? (
+            <div className="text-center text-text text-lg animate-pulse">
+              Loading products...
+            </div>
+          ) : (
+            <>
+              {renderTable(saleProducts, t("inventory.sale_products"))}
+              {renderTable(purchaseProducts, t("inventory.purchase_products"))}
+            </>
+          )}
+        </div>
       </div>
 
+      {/* Modals */}
       {modalOpen && selectedItem && (
         <EditInventoryModal item={selectedItem} onClose={closeModal} />
       )}

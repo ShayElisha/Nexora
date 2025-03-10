@@ -1,4 +1,3 @@
-// src/pages/procurement/Budgets.jsx
 import React, { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../../../lib/axios";
@@ -9,6 +8,7 @@ import { useTranslation } from "react-i18next";
 // ============== UpdateBudgetModal Component ==============
 const UpdateBudgetModal = ({ budget, onClose }) => {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     departmentOrProjectName: budget.departmentOrProjectName || "",
     amount: budget.amount || 0,
@@ -23,28 +23,25 @@ const UpdateBudgetModal = ({ budget, onClose }) => {
   });
   const [loading, setLoading] = useState(false);
 
-  // עדכון ה־state בכל שינוי בשדות הטופס
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // שליחה לשרת: PUT /budget/:id
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       await axiosInstance.put(`/budget/${budget._id}`, {
         ...formData,
-        resetSigners: true, // במקרה שרוצים לאפס חתימות
+        resetSigners: true,
       });
-      toast.success("Budget updated successfully!");
+      toast.success(t("budget.updated_successfully"));
       queryClient.invalidateQueries({ queryKey: ["budget"] });
       onClose();
     } catch (error) {
       console.error("Error updating budget:", error);
-      toast.error("Error updating budget");
+      toast.error(t("budget.error_updating"));
     } finally {
       setLoading(false);
     }
@@ -52,54 +49,43 @@ const UpdateBudgetModal = ({ budget, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
-      {/* רקע חצי-שקוף */}
       <div
-        className="absolute inset-0 bg-black bg-opacity-50 transition-all duration-300"
+        className="absolute inset-0 bg-black bg-opacity-60 transition-opacity duration-300"
         onClick={onClose}
       />
-      {/* תוכן המודאל */}
-      <div className="relative bg-white rounded-2xl p-8 w-full max-w-lg z-10 shadow-2xl transform transition-all duration-300">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-          Update Budget
+      <div className="relative bg-accent rounded-xl p-6 w-full max-w-lg z-10 shadow-2xl transform transition-all duration-300">
+        <h2 className="text-2xl sm:text-3xl font-bold text-text mb-6 text-center tracking-tight drop-shadow-md">
+          {t("budget.update_budget")}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* departmentOrProjectName */}
           <div>
-            <label className="block text-md font-semibold mb-2 text-gray-700">
-              Department / Project Name:
+            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
+              {t("budget.department_project_name")}
             </label>
             <input
               type="text"
               name="departmentOrProjectName"
               value={formData.departmentOrProjectName}
               onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-xl 
-                         focus:outline-none focus:ring-2 focus:ring-blue-500 
-                         transition-all"
+              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
               required
             />
           </div>
-
-          {/* amount */}
           <div>
-            <label className="block text-md font-semibold mb-2 text-gray-700">
-              Amount:
+            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
+              {t("budget.budget_amount")}
             </label>
             <input
               type="number"
               name="amount"
               value={formData.amount}
               onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-xl 
-                         focus:outline-none focus:ring-2 focus:ring-blue-500 
-                         transition-all"
+              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
             />
           </div>
-
-          {/* currency */}
           <div>
-            <label className="block text-md font-semibold mb-2 text-gray-700">
-              Currency:
+            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
+              {t("budget.currency")}
             </label>
             <input
               type="text"
@@ -107,81 +93,61 @@ const UpdateBudgetModal = ({ budget, onClose }) => {
               value={formData.currency}
               onChange={handleChange}
               placeholder="e.g. USD"
-              className="w-full p-3 border border-gray-300 rounded-xl 
-                         focus:outline-none focus:ring-2 focus:ring-blue-500 
-                         transition-all"
+              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
             />
           </div>
-
-          {/* startDate / endDate */}
-          <div className="flex space-x-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
-              <label className="block text-md font-semibold mb-2 text-gray-700">
-                Start Date:
+              <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
+                {t("budget.start_date")}
               </label>
               <input
                 type="date"
                 name="startDate"
                 value={formData.startDate}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-xl 
-                           focus:outline-none focus:ring-2 focus:ring-blue-500 
-                           transition-all"
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
               />
             </div>
             <div className="flex-1">
-              <label className="block text-md font-semibold mb-2 text-gray-700">
-                End Date:
+              <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
+                {t("budget.end_date")}
               </label>
               <input
                 type="date"
                 name="endDate"
                 value={formData.endDate}
                 onChange={handleChange}
-                className="w-full p-3 border border-gray-300 rounded-xl 
-                           focus:outline-none focus:ring-2 focus:ring-blue-500 
-                           transition-all"
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
               />
             </div>
           </div>
-
-          {/* notes */}
           <div>
-            <label className="block text-md font-semibold mb-2 text-gray-700">
-              Notes:
+            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
+              {t("budget.notes")}
             </label>
             <textarea
               name="notes"
               value={formData.notes}
               onChange={handleChange}
               rows="3"
-              className="w-full p-3 border border-gray-300 rounded-xl 
-                         focus:outline-none focus:ring-2 focus:ring-blue-500 
-                         transition-all"
-            ></textarea>
+              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
+            />
           </div>
-
-          {/* כפתורי שמירה/ביטול */}
-          <div className="flex justify-end space-x-4 pt-2">
+          <div className="flex justify-end gap-4 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2 rounded-xl border border-gray-300 
-                         text-gray-700 hover:bg-gray-200 
-                         focus:outline-none transition-transform 
-                         transform hover:scale-105"
+              className="px-5 py-2 bg-bg border border-border-color text-text rounded-full shadow-md hover:bg-gray-200 transition-all duration-200"
             >
-              Cancel
+              {t("budget.cancel")}
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 
-                         text-white font-semibold shadow-lg hover:from-blue-700 
-                         hover:to-blue-800 transition-transform transform hover:scale-105 
-                         disabled:opacity-50"
+              className="px-6 py-2 bg-button-bg text-button-text rounded-full shadow-lg hover:bg-secondary transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {loading ? "Updating..." : "Update Budget"}
+              {loading ? t("budget.updating") : t("budget.update_budget")}
             </button>
           </div>
         </form>
@@ -198,10 +164,8 @@ const Budgets = () => {
   const [selectedBudgetForUpdate, setSelectedBudgetForUpdate] = useState(null);
 
   const { data: authData } = useQuery({ queryKey: ["authUser"] });
-  const authUser = authData?.user;
   const queryClient = useQueryClient();
 
-  // שליפת התקציבים
   const {
     data: budgets,
     isLoading,
@@ -210,7 +174,7 @@ const Budgets = () => {
     queryKey: ["budget"],
     queryFn: async () => {
       const response = await axiosInstance.get(`/budget`);
-      return response.data.data; // מניח שהשדה data.data מכיל את המערך
+      return response.data.data;
     },
     onError: (err) => {
       toast.error(`${t("budget.error_create_budget")}: ${err.message}`);
@@ -219,45 +183,39 @@ const Budgets = () => {
 
   if (isLoading) {
     return (
-      <div className="text-center mt-10 text-lg text-gray-700">
-        {t("loading")}...
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-primary"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center text-red-500 mt-10">
-        {t("error")}: {error.message}
+      <div className="text-center text-red-500 font-medium text-lg mt-10">
+        {t("budget.error")}: {error.message}
       </div>
     );
   }
 
-  // פתיחת/סגירת שורת פירוט
   const handleRowClick = (budgetId) => {
     setExpandedRow((prev) => (prev === budgetId ? null : budgetId));
   };
 
-  // פתיחת מודאל "Update Budget"
   const handleOpenUpdateModal = (budget) => {
     setSelectedBudgetForUpdate(budget);
   };
 
-  // סגירת המודאל
   const handleCloseUpdateModal = () => {
     setSelectedBudgetForUpdate(null);
   };
 
-  // סינון חיפוש
   const filteredBudgets = (budgets || []).filter((budget) => {
     const term = searchTerm.toLowerCase();
-
     const deptName = budget.departmentOrProjectName?.toLowerCase() || "";
     const amountStr = budget.amount?.toString()?.toLowerCase() || "";
     const spentStr = budget.spentAmount?.toString()?.toLowerCase() || "";
     const currencyStr = budget.currency?.toLowerCase() || "";
     const statusStr = budget.status?.toLowerCase() || "";
-
     const startDateStr = budget.startDate
       ? new Date(budget.startDate).toLocaleDateString().toLowerCase()
       : "";
@@ -277,65 +235,55 @@ const Budgets = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-gray-100 to-gray-200 py-10">
-      <div className="container mx-auto px-4 md:px-8">
-        <h1 className="text-3xl font-extrabold text-gray-800 mb-8 text-center tracking-tight">
+    <div className="min-h-screen bg-bg py-10 animate-fade-in">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-text mb-8 text-center tracking-tight drop-shadow-md">
           {t("budget.budgets")}
         </h1>
 
-        {/* שורת חיפוש */}
-        <div className="mb-6 flex items-center justify-center">
+        <div className="mb-6 flex justify-center">
           <input
             type="text"
-            placeholder={t("search")}
+            placeholder={t("budget.search")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="p-3 rounded-xl bg-white text-gray-700 w-full max-w-md 
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 
-                       shadow-md transition-all"
+            className="w-full max-w-md p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200 placeholder-opacity-50"
           />
         </div>
 
-        {/* כפתור להוספת תקציב חדש */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-8">
           <Link
             to="/dashboard/finance/add-budget"
-            className="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 
-                       text-white rounded-xl shadow-lg font-semibold 
-                       hover:from-green-600 hover:to-green-700 transition-transform 
-                       transform hover:scale-105"
+            className="px-6 py-3 bg-button-bg text-button-text rounded-full shadow-lg hover:bg-secondary transition-all duration-200"
           >
             {t("budget.add_budget")}
           </Link>
         </div>
 
-        {/* טבלת תקציבים */}
-        <div className="overflow-x-auto shadow-2xl rounded-xl bg-white">
-          <table className="min-w-full text-gray-800">
-            <thead className="bg-gradient-to-r from-blue-100 to-blue-200 text-gray-700 text-lg">
+        <div className="overflow-x-auto rounded-xl shadow-xl bg-accent border border-border-color">
+          <table className="min-w-full text-text">
+            <thead className="bg-button-bg text-button-text">
               <tr className="text-center">
-                {" "}
-                {/* כותרות מיושרות למרכז */}
-                <th className="py-3 px-4 border-b border-gray-300">
+                <th className="py-3 px-4 text-sm font-semibold tracking-wide">
                   {t("budget.department_project_name")}
                 </th>
-                <th className="py-3 px-4 border-b border-gray-300">
+                <th className="py-3 px-4 text-sm font-semibold tracking-wide">
                   {t("budget.budget_amount")}
                 </th>
-                <th className="py-3 px-4 border-b border-gray-300">
+                <th className="py-3 px-4 text-sm font-semibold tracking-wide">
                   {t("budget.spent_amount")}
                 </th>
-                <th className="py-3 px-4 border-b border-gray-300">
+                <th className="py-3 px-4 text-sm font-semibold tracking-wide">
                   {t("budget.currency")}
                 </th>
-                <th className="py-3 px-4 border-b border-gray-300">
+                <th className="py-3 px-4 text-sm font-semibold tracking-wide">
                   {t("budget.period")}
                 </th>
-                <th className="py-3 px-4 border-b border-gray-300">
+                <th className="py-3 px-4 text-sm font-semibold tracking-wide">
                   {t("budget.status")}
                 </th>
-                <th className="py-3 px-4 border-b border-gray-300">
-                  {t("actions")}
+                <th className="py-3 px-4 text-sm font-semibold tracking-wide">
+                  {t("budget.actions")}
                 </th>
               </tr>
             </thead>
@@ -344,7 +292,7 @@ const Budgets = () => {
                 <tr>
                   <td
                     colSpan="7"
-                    className="py-6 px-4 text-center text-gray-500"
+                    className="py-6 px-4 text-center text-text opacity-70 italic"
                   >
                     {t("budget.no_budgets_available")}
                   </td>
@@ -354,222 +302,203 @@ const Budgets = () => {
                   const isExpanded = expandedRow === budget._id;
                   const startStr = budget.startDate
                     ? new Date(budget.startDate).toLocaleDateString()
-                    : "";
+                    : "-";
                   const endStr = budget.endDate
                     ? new Date(budget.endDate).toLocaleDateString()
-                    : "";
-
-                  // חיפוש החותם המתאים ל-createdBy (אם קיים)
-                  let creatorName = "";
-                  if (
-                    budget.signers &&
-                    budget.signers.length > 0 &&
-                    budget.createdBy
-                  ) {
-                    const creatorSigner = budget.signers.find(
+                    : "-";
+                  const creatorName =
+                    budget.signers?.find(
                       (signer) =>
                         String(signer.employeeId) === String(budget.createdBy)
-                    );
-                    if (creatorSigner) {
-                      creatorName = creatorSigner.name;
-                    }
-                  }
+                    )?.name || t("budget.unknown_creator");
 
                   return (
                     <React.Fragment key={budget._id}>
-                      {/* שורה ראשית */}
                       <tr
-                        className="cursor-pointer hover:bg-gray-100 
-                                   border-b border-gray-300 transition-colors text-center"
+                        className="border-b border-border-color hover:bg-accent cursor-pointer text-center"
                         onClick={() => handleRowClick(budget._id)}
                       >
-                        <td className="py-2 px-4">
-                          {budget.departmentOrProjectName}
+                        <td className="py-3 px-4 text-sm">
+                          {budget.departmentOrProjectName || "-"}
                         </td>
-                        <td className="py-2 px-4">{budget.amount}</td>
-                        <td className="py-2 px-4">{budget.spentAmount}</td>
-                        <td className="py-2 px-4">{budget.currency}</td>
-                        <td className="py-2 px-4">{`${startStr} - ${endStr}`}</td>
-                        <td className="py-2 px-4">
-                          <span className="font-semibold">
-                            {t(`budget.${budget.status}`, {
-                              defaultValue: budget.status,
-                            })}
-                          </span>
+                        <td className="py-3 px-4 text-sm">
+                          {budget.amount || "-"}
                         </td>
-                        <td className="py-2 px-4 space-x-2">
-                          {/* לינק לפרטים */}
+                        <td className="py-3 px-4 text-sm">
+                          {budget.spentAmount || "-"}
+                        </td>
+                        <td className="py-3 px-4 text-sm">
+                          {budget.currency || "-"}
+                        </td>
+                        <td className="py-3 px-4 text-sm">{`${startStr} - ${endStr}`}</td>
+                        <td className="py-3 px-4 text-sm font-semibold">
+                          {t(`budget.${budget.status}`, {
+                            defaultValue: budget.status,
+                          })}
+                        </td>
+                        <td className="py-3 px-4 space-x-2">
                           <Link
                             to={`/dashboard/finance/budget-details/${budget._id}`}
-                            className="inline-block text-blue-600 
-                                       hover:text-blue-700 font-semibold 
-                                       underline-offset-2 hover:underline
-                                       transition-colors"
+                            className="text-primary hover:text-secondary font-semibold transition-all duration-200"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            {t("details")}
+                            {t("budget.details")}
                           </Link>
-                          {/* כפתור עדכון התקציב */}
                           <button
-                            className="inline-block text-purple-600 
-                                       hover:text-purple-700 font-semibold 
-                                       underline-offset-2 hover:underline
-                                       transition-colors p-2"
+                            className="text-purple-500 hover:text-purple-600 font-semibold transition-all duration-200"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleOpenUpdateModal(budget);
                             }}
                           >
-                            {t("update")}
+                            {t("budget.update")}
                           </button>
                         </td>
                       </tr>
-
-                      {/* שורת פירוט מורחבת */}
                       {isExpanded && (
-                        <tr className="bg-gray-50">
-                          <td
-                            colSpan={7}
-                            className="p-4 border-b border-gray-300 text-center"
-                          >
-                            {/* שם העובד שיצר את התקציב */}
-                            <div className="mb-3 text-gray-700">
-                              <strong>{t("budget.created_by")}:</strong>{" "}
-                              {creatorName || t("budget.unknown_creator")}
-                            </div>
-
-                            {/* רשימת מוצרים (items) */}
-                            <div className="mb-4 text-gray-700">
-                              <strong className="text-lg">
-                                {t("budget.items")}
-                              </strong>
-                              {budget.items && budget.items.length > 0 ? (
-                                <div className="overflow-x-auto mt-2">
-                                  <table className="w-full border border-gray-300 text-sm">
-                                    <thead className="bg-gray-100 text-gray-700">
-                                      <tr className="text-center">
-                                        <th className="py-2 px-3 border-b border-gray-300">
-                                          {t("budget.product_name")}
-                                        </th>
-                                        <th className="py-2 px-3 border-b border-gray-300">
-                                          {t("budget.quantity")}
-                                        </th>
-                                        <th className="py-2 px-3 border-b border-gray-300">
-                                          {t("budget.unit_price")}
-                                        </th>
-                                        <th className="py-2 px-3 border-b border-gray-300">
-                                          {t("budget.total_price")}
-                                        </th>
-                                        <th className="py-2 px-3 border-b border-gray-300">
-                                          {t("budget.added_at")}
-                                        </th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {budget.items.map((item, idx) => (
-                                        <tr
-                                          key={item._id || idx}
-                                          className="hover:bg-gray-50 transition-colors text-center"
-                                        >
-                                          <td className="py-2 px-3 border-b border-gray-200">
-                                            {item.productId?.productName ||
-                                              t("budget.no_name")}
-                                          </td>
-                                          <td className="py-2 px-3 border-b border-gray-200">
-                                            {item.quantity}
-                                          </td>
-                                          <td className="py-2 px-3 border-b border-gray-200">
-                                            {item.unitPrice}
-                                          </td>
-                                          <td className="py-2 px-3 border-b border-gray-200">
-                                            {item.totalPrice}
-                                          </td>
-                                          <td className="py-2 px-3 border-b border-gray-200">
-                                            {item.addedAt
-                                              ? new Date(
-                                                  item.addedAt
-                                                ).toLocaleString()
-                                              : "-"}
-                                          </td>
+                        <tr className="bg-bg border-b border-border-color">
+                          <td colSpan="7" className="p-4 text-text">
+                            <div className="space-y-4">
+                              <div>
+                                <strong className="text-sm font-semibold">
+                                  {t("budget.created_by")}:
+                                </strong>{" "}
+                                <span className="text-sm">{creatorName}</span>
+                              </div>
+                              <div>
+                                <strong className="text-sm font-semibold">
+                                  {t("budget.items")}:
+                                </strong>
+                                {budget.items && budget.items.length > 0 ? (
+                                  <div className="overflow-x-auto mt-2">
+                                    <table className="w-full border border-border-color text-sm">
+                                      <thead className="bg-button-bg text-button-text">
+                                        <tr className="text-center">
+                                          <th className="py-2 px-3">
+                                            {t("budget.product_name")}
+                                          </th>
+                                          <th className="py-2 px-3">
+                                            {t("budget.quantity")}
+                                          </th>
+                                          <th className="py-2 px-3">
+                                            {t("budget.unit_price")}
+                                          </th>
+                                          <th className="py-2 px-3">
+                                            {t("budget.total_price")}
+                                          </th>
+                                          <th className="py-2 px-3">
+                                            {t("budget.added_at")}
+                                          </th>
                                         </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                </div>
-                              ) : (
-                                <div className="mt-2 text-gray-500">
-                                  {t("budget.no_items")}
+                                      </thead>
+                                      <tbody>
+                                        {budget.items.map((item, idx) => (
+                                          <tr
+                                            key={item._id || idx}
+                                            className="border-b border-border-color hover:bg-accent text-center"
+                                          >
+                                            <td className="py-2 px-3">
+                                              {item.productId?.productName ||
+                                                t("budget.no_name")}
+                                            </td>
+                                            <td className="py-2 px-3">
+                                              {item.quantity || "-"}
+                                            </td>
+                                            <td className="py-2 px-3">
+                                              {item.unitPrice || "-"}
+                                            </td>
+                                            <td className="py-2 px-3">
+                                              {item.totalPrice || "-"}
+                                            </td>
+                                            <td className="py-2 px-3">
+                                              {item.addedAt
+                                                ? new Date(
+                                                    item.addedAt
+                                                  ).toLocaleString()
+                                                : "-"}
+                                            </td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                ) : (
+                                  <div className="mt-2 text-sm opacity-70">
+                                    {t("budget.no_items")}
+                                  </div>
+                                )}
+                              </div>
+                              {budget.signers && budget.signers.length > 0 && (
+                                <div>
+                                  <strong className="text-sm font-semibold">
+                                    {t("budget.signers")}:
+                                  </strong>
+                                  <div className="overflow-x-auto mt-2">
+                                    <table className="w-full border border-border-color text-sm">
+                                      <thead className="bg-button-bg text-button-text">
+                                        <tr className="text-center">
+                                          <th className="py-2 px-3">
+                                            {t("budget.signer_name")}
+                                          </th>
+                                          <th className="py-2 px-3">
+                                            {t("budget.signer_role")}
+                                          </th>
+                                          <th className="py-2 px-3">
+                                            {t("budget.has_signed")}
+                                          </th>
+                                          <th className="py-2 px-3">
+                                            {t("budget.signature_time")}
+                                          </th>
+                                          <th className="py-2 px-3">
+                                            {t("budget.signature")}
+                                          </th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {budget.signers.map(
+                                          (signer, sIndex) => (
+                                            <tr
+                                              key={signer._id || sIndex}
+                                              className="border-b border-border-color hover:bg-accent text-center"
+                                            >
+                                              <td className="py-2 px-3">
+                                                {signer.name || "-"}
+                                              </td>
+                                              <td className="py-2 px-3">
+                                                {signer.role || "-"}
+                                              </td>
+                                              <td className="py-2 px-3">
+                                                {signer.hasSigned
+                                                  ? t("budget.yes")
+                                                  : t("budget.no")}
+                                              </td>
+                                              <td className="py-2 px-3">
+                                                {signer.timeStamp
+                                                  ? new Date(
+                                                      signer.timeStamp
+                                                    ).toLocaleString()
+                                                  : "-"}
+                                              </td>
+                                              <td className="py-2 px-3">
+                                                {signer.signatureUrl ? (
+                                                  <img
+                                                    src={signer.signatureUrl}
+                                                    alt="signature"
+                                                    className="max-h-12 mx-auto"
+                                                  />
+                                                ) : (
+                                                  "-"
+                                                )}
+                                              </td>
+                                            </tr>
+                                          )
+                                        )}
+                                      </tbody>
+                                    </table>
+                                  </div>
                                 </div>
                               )}
                             </div>
-
-                            {/* חתימות (signers) */}
-                            {budget.signers && budget.signers.length > 0 && (
-                              <div className="text-gray-700">
-                                <strong className="text-lg">
-                                  {t("budget.signers")}
-                                </strong>
-                                <div className="overflow-x-auto mt-2">
-                                  <table className="w-full border border-gray-300 text-sm">
-                                    <thead className="bg-gray-100 text-gray-700">
-                                      <tr className="text-center">
-                                        <th className="py-2 px-3 border-b border-gray-300">
-                                          {t("budget.signer_name")}
-                                        </th>
-                                        <th className="py-2 px-3 border-b border-gray-300">
-                                          {t("budget.signer_role")}
-                                        </th>
-                                        <th className="py-2 px-3 border-b border-gray-300">
-                                          {t("budget.has_signed")}
-                                        </th>
-                                        <th className="py-2 px-3 border-b border-gray-300">
-                                          {t("budget.signature_time")}
-                                        </th>
-                                        <th className="py-2 px-3 border-b border-gray-300">
-                                          {t("budget.signature")}
-                                        </th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {budget.signers.map((signer, sIndex) => (
-                                        <tr
-                                          key={signer._id || sIndex}
-                                          className="hover:bg-gray-50 transition-colors text-center"
-                                        >
-                                          <td className="py-2 px-3 border-b border-gray-200">
-                                            {signer.name}
-                                          </td>
-                                          <td className="py-2 px-3 border-b border-gray-200">
-                                            {signer.role}
-                                          </td>
-                                          <td className="py-2 px-3 border-b border-gray-200">
-                                            {signer.hasSigned ? "Yes" : "No"}
-                                          </td>
-                                          <td className="py-2 px-3 border-b border-gray-200">
-                                            {signer.timeStamp
-                                              ? new Date(
-                                                  signer.timeStamp
-                                                ).toLocaleString()
-                                              : "-"}
-                                          </td>
-                                          <td className="py-2 px-3 border-b border-gray-200">
-                                            {signer.signatureUrl ? (
-                                              <img
-                                                src={signer.signatureUrl}
-                                                alt="signature"
-                                                className="max-h-16"
-                                              />
-                                            ) : (
-                                              "-"
-                                            )}
-                                          </td>
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                </div>
-                              </div>
-                            )}
                           </td>
                         </tr>
                       )}
@@ -582,13 +511,20 @@ const Budgets = () => {
         </div>
       </div>
 
-      {/* מודאל עדכון תקציב (רק אם לחצו על כפתור Update) */}
       {selectedBudgetForUpdate && (
         <UpdateBudgetModal
           budget={selectedBudgetForUpdate}
           onClose={handleCloseUpdateModal}
         />
       )}
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+      `}</style>
     </div>
   );
 };

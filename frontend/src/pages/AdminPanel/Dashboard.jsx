@@ -28,7 +28,12 @@ ChartJS.register(
   LineElement
 );
 
-// רכיב חדש ליצירת צורות זזות ברקע
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+};
+
+// רכיב אנימציה לצורות ללא רקע
 const AnimatedShapes = () => {
   const shapes = [
     {
@@ -36,7 +41,6 @@ const AnimatedShapes = () => {
         width: "100px",
         height: "100px",
         borderRadius: "50%",
-        background: "rgba(29, 78, 216, 0.2)",
       },
       initial: { x: 0, y: 0 },
       animate: { x: [0, 50, 0], y: [0, -50, 0] },
@@ -48,7 +52,6 @@ const AnimatedShapes = () => {
         width: "150px",
         height: "150px",
         borderRadius: "50%",
-        background: "rgba(16, 185, 129, 0.2)",
       },
       initial: { x: 0, y: 0 },
       animate: { x: [0, -50, 0], y: [0, 50, 0] },
@@ -60,14 +63,12 @@ const AnimatedShapes = () => {
         width: "80px",
         height: "80px",
         borderRadius: "50%",
-        background: "rgba(99, 102, 241, 0.2)",
       },
       initial: { x: 0, y: 0 },
       animate: { x: [0, 30, 0], y: [0, -30, 0] },
       transition: { duration: 18, repeat: Infinity, ease: "easeInOut" },
       pos: { top: "50%", left: "80%" },
     },
-    // ניתן להוסיף עוד צורות לפי הצורך
   ];
 
   return (
@@ -163,7 +164,9 @@ const Dashboard = () => {
           axiosInstance.get("/reports/dashboard", { withCredentials: true }),
           axiosInstance.get(
             `/reports/budget-by-project?projectId=${defaultProjectId}`,
-            { withCredentials: true }
+            {
+              withCredentials: true,
+            }
           ),
           axiosInstance.get("/reports/detailed-finance", {
             withCredentials: true,
@@ -173,18 +176,24 @@ const Dashboard = () => {
           }),
           axiosInstance.get(
             `/reports/procurement-by-supplier?supplierId=${defaultSupplierId}`,
-            { withCredentials: true }
+            {
+              withCredentials: true,
+            }
           ),
           axiosInstance.get(
             `/reports/event-by-type?eventType=${defaultEventType}`,
-            { withCredentials: true }
+            {
+              withCredentials: true,
+            }
           ),
           axiosInstance.get("/reports/inventory-reorder", {
             withCredentials: true,
           }),
           axiosInstance.get(
             `/reports/employee-performance?employeeId=${defaultEmployeeId}`,
-            { withCredentials: true }
+            {
+              withCredentials: true,
+            }
           ),
           axiosInstance.get("/reports/supplier-performance", {
             withCredentials: true,
@@ -223,11 +232,11 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-bg">
+      <div className="flex items-center justify-center h-screen">
         <motion.div
           className="w-16 h-16 border-4 border-t-4 border-border-color rounded-full"
           animate={{ rotate: 360 }}
-          transition={{ loop: Infinity, duration: 1 }}
+          transition={{ repeat: Infinity, duration: 1 }}
         />
       </div>
     );
@@ -235,7 +244,7 @@ const Dashboard = () => {
 
   if (error) return <div className="p-4 text-red-600">{error}</div>;
 
-  // עיבוד נתונים לדוגמה (תקציב)
+  // עיבוד נתונים (תקציב)
   const totalBudget = Number(budgetSummary.totalBudget) || 0;
   const totalSpent = Number(budgetSummary.totalSpent) || 0;
   const remainingBudget = totalBudget - totalSpent;
@@ -353,14 +362,12 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-bg text-text overflow-hidden">
-      {/* הוספת הרכיב עם הצורות הזזות */}
+    <div className="relative min-h-screen text-text overflow-hidden">
+      {/* צורות אנימציה ללא רקע */}
       <AnimatedShapes />
-
-      {/* צורות רקע נוספות עם אנימציות */}
       <div className="absolute inset-0 z-0">
         <motion.div
-          className="absolute bg-primary opacity-30 rounded-full"
+          className="absolute rounded-full"
           style={{
             width: "300px",
             height: "300px",
@@ -371,7 +378,7 @@ const Dashboard = () => {
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         />
         <motion.div
-          className="absolute bg-secondary opacity-30 rounded-full"
+          className="absolute rounded-full"
           style={{
             width: "400px",
             height: "400px",
@@ -382,7 +389,7 @@ const Dashboard = () => {
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
         />
         <motion.div
-          className="absolute bg-accent opacity-30 rounded-full"
+          className="absolute rounded-full"
           style={{
             width: "250px",
             height: "250px",
@@ -394,9 +401,9 @@ const Dashboard = () => {
         />
       </div>
 
-      <div className="relative z-10 p-8">
+      <div className="relative z-10 container mx-auto p-4 sm:p-6 md:p-8">
         <motion.h1
-          className="text-4xl font-extrabold mb-6 text-center text-primary"
+          className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-6 text-center text-primary"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8 }}
@@ -404,9 +411,9 @@ const Dashboard = () => {
           {t("dashboard.title")}
         </motion.h1>
 
-        {/* כרטיסי סיכום */}
+        {/* כרטיסי סיכום עם רקע */}
         <motion.section
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8"
           initial="hidden"
           animate="visible"
           variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
@@ -414,50 +421,42 @@ const Dashboard = () => {
           <motion.div
             variants={cardVariant}
             whileHover={{ scale: 1.05 }}
-            className="p-6 bg-bg bg-opacity-75 rounded-xl shadow-xl border border-border-color"
+            className="p-4 sm:p-6 bg-bg bg-opacity-75 rounded-xl shadow-xl border border-border-color text-sm sm:text-base"
           >
-            <p className="text-lg font-semibold">
-              {t("dashboard.total_budgets")}
-            </p>
-            <p className="mt-2 text-2xl font-bold">
-              {budgetSummary.count || 0}
-            </p>
+            <p className="font-semibold">{t("dashboard.total_budgets")}</p>
+            <p className="mt-2 text-xl font-bold">{budgetSummary.count || 0}</p>
           </motion.div>
           <motion.div
             variants={cardVariant}
             whileHover={{ scale: 1.05 }}
-            className="p-6 bg-bg bg-opacity-75 rounded-xl shadow-xl border border-border-color"
+            className="p-4 sm:p-6 bg-bg bg-opacity-75 rounded-xl shadow-xl border border-border-color text-sm sm:text-base"
           >
-            <p className="text-lg font-semibold">
-              {t("dashboard.total_budget")}
-            </p>
-            <p className="mt-2 text-2xl font-bold">{totalBudget}</p>
+            <p className="font-semibold">{t("dashboard.total_budget")}</p>
+            <p className="mt-2 text-xl font-bold">{totalBudget}</p>
           </motion.div>
           <motion.div
             variants={cardVariant}
             whileHover={{ scale: 1.05 }}
-            className="p-6 bg-bg bg-opacity-75 rounded-xl shadow-xl border border-border-color"
+            className="p-4 sm:p-6 bg-bg bg-opacity-75 rounded-xl shadow-xl border border-border-color text-sm sm:text-base"
           >
-            <p className="text-lg font-semibold">
-              {t("dashboard.total_spent")}
-            </p>
-            <p className="mt-2 text-2xl font-bold">{totalSpent}</p>
+            <p className="font-semibold">{t("dashboard.total_spent")}</p>
+            <p className="mt-2 text-xl font-bold">{totalSpent}</p>
           </motion.div>
           <motion.div
             variants={cardVariant}
             whileHover={{ scale: 1.05 }}
-            className="p-6 bg-bg bg-opacity-75 rounded-xl shadow-xl border border-border-color"
+            className="p-4 sm:p-6 bg-bg bg-opacity-75 rounded-xl shadow-xl border border-border-color text-sm sm:text-base"
           >
-            <p className="text-lg font-semibold">{t("dashboard.remaining")}</p>
-            <p className="mt-2 text-2xl font-bold text-secondary">
+            <p className="font-semibold">{t("dashboard.remaining")}</p>
+            <p className="mt-2 text-xl font-bold text-secondary">
               {remainingBudget}
             </p>
           </motion.div>
         </motion.section>
 
-        {/* גרפים */}
+        {/* גרפים עם רקע */}
         <motion.section
-          className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-8"
           initial="hidden"
           animate="visible"
           variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
@@ -465,53 +464,63 @@ const Dashboard = () => {
           <motion.div
             variants={cardVariant}
             whileHover={{ scale: 1.05 }}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-6"
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6"
           >
-            <h2 className="text-xl font-bold mb-4 text-secondary">
+            <h2 className="text-lg sm:text-xl font-bold mb-4 text-secondary">
               {t("dashboard.budget_distribution")}
             </h2>
-            <Doughnut data={budgetDoughnutData} />
+            <div className="w-full h-64 sm:h-80 md:h-96">
+              <Doughnut data={budgetDoughnutData} options={chartOptions} />
+            </div>
           </motion.div>
           <motion.div
             variants={cardVariant}
             whileHover={{ scale: 1.05 }}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-6"
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6"
           >
-            <h2 className="text-xl font-bold mb-4 text-secondary">
+            <h2 className="text-lg sm:text-xl font-bold mb-4 text-secondary">
               {t("dashboard.finance_summary")}
             </h2>
-            <Bar data={financeBarData} />
+            <div className="w-full h-64 sm:h-80 md:h-96">
+              <Bar data={financeBarData} options={chartOptions} />
+            </div>
           </motion.div>
           <motion.div
             variants={cardVariant}
             whileHover={{ scale: 1.05 }}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-6"
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6"
           >
-            <h2 className="text-xl font-bold mb-4 text-secondary">
+            <h2 className="text-lg sm:text-xl font-bold mb-4 text-secondary">
               {t("dashboard.task_summary")}
             </h2>
-            <Pie data={taskPieData} />
+            <div className="w-full h-64 sm:h-80 md:h-96">
+              <Pie data={taskPieData} options={chartOptions} />
+            </div>
           </motion.div>
           <motion.div
             variants={cardVariant}
             whileHover={{ scale: 1.05 }}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-6"
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6"
           >
-            <h2 className="text-xl font-bold mb-4 text-secondary">
+            <h2 className="text-lg sm:text-xl font-bold mb-4 text-secondary">
               {t("dashboard.procurement_summary")}
             </h2>
-            <Line data={procurementLineData} />
+            <div className="w-full h-64 sm:h-80 md:h-96">
+              <Line data={procurementLineData} options={chartOptions} />
+            </div>
           </motion.div>
           <motion.div
             variants={cardVariant}
             whileHover={{ scale: 1.05 }}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-6"
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6"
           >
-            <h2 className="text-xl font-bold mb-4 text-secondary">
+            <h2 className="text-lg sm:text-xl font-bold mb-4 text-secondary">
               {t("dashboard.low_stock_items")}
             </h2>
             {lowStockItems.length > 0 ? (
-              <Radar data={lowStockRadarData} />
+              <div className="w-full h-64 sm:h-80 md:h-96">
+                <Radar data={lowStockRadarData} options={chartOptions} />
+              </div>
             ) : (
               <p>{t("dashboard.no_data")}</p>
             )}
@@ -519,13 +528,15 @@ const Dashboard = () => {
           <motion.div
             variants={cardVariant}
             whileHover={{ scale: 1.05 }}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-6"
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6"
           >
-            <h2 className="text-xl font-bold mb-4 text-secondary">
+            <h2 className="text-lg sm:text-xl font-bold mb-4 text-secondary">
               {t("dashboard.supplier_report")}
             </h2>
             {supplierReport.length > 0 ? (
-              <Doughnut data={supplierPieData} />
+              <div className="w-full h-64 sm:h-80 md:h-96">
+                <Doughnut data={supplierPieData} options={chartOptions} />
+              </div>
             ) : (
               <p>{t("dashboard.no_data")}</p>
             )}
@@ -533,20 +544,22 @@ const Dashboard = () => {
           <motion.div
             variants={cardVariant}
             whileHover={{ scale: 1.05 }}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-6 md:col-span-2"
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6 sm:col-span-2"
           >
-            <h2 className="text-xl font-bold mb-4 text-secondary">
+            <h2 className="text-lg sm:text-xl font-bold mb-4 text-secondary">
               {t("dashboard.signature_report")}
             </h2>
             {signatureReport.length > 0 ? (
-              <Doughnut data={signatureDoughnutData} />
+              <div className="w-full h-64 sm:h-80 md:h-96">
+                <Doughnut data={signatureDoughnutData} options={chartOptions} />
+              </div>
             ) : (
               <p>{t("dashboard.no_data")}</p>
             )}
           </motion.div>
         </motion.section>
 
-        {/* טבלאות */}
+        {/* טבלאות עם רקע */}
         <motion.section
           className="space-y-8"
           initial="hidden"
@@ -554,22 +567,25 @@ const Dashboard = () => {
           variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
         >
           {/* טבלת אירועים קרובים */}
-          <motion.div variants={cardVariant}>
-            <h2 className="text-2xl font-bold mb-4 text-secondary">
+          <motion.div
+            variants={cardVariant}
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6 text-xs sm:text-sm"
+          >
+            <h2 className="text-xl font-bold mb-4 text-secondary">
               {t("dashboard.upcoming_events")}
             </h2>
             {upcomingEvents.length > 0 ? (
               <div className="overflow-x-auto">
-                <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                <table className="min-w-full rounded-xl border border-border-color">
                   <thead>
                     <tr>
-                      <th className="py-3 px-4 border-b border-border-color">
+                      <th className="py-2 px-2 border-b border-border-color">
                         {t("dashboard.title")}
                       </th>
-                      <th className="py-3 px-4 border-b border-border-color">
+                      <th className="py-2 px-2 border-b border-border-color">
                         {t("dashboard.start_date")}
                       </th>
-                      <th className="py-3 px-4 border-b border-border-color">
+                      <th className="py-2 px-2 border-b border-border-color">
                         {t("dashboard.event_type")}
                       </th>
                     </tr>
@@ -577,13 +593,13 @@ const Dashboard = () => {
                   <tbody>
                     {upcomingEvents.map((event) => (
                       <tr key={event._id}>
-                        <td className="py-3 px-4 border-b border-border-color">
+                        <td className="py-2 px-2 border-b border-border-color">
                           {event.title}
                         </td>
-                        <td className="py-3 px-4 border-b border-border-color">
+                        <td className="py-2 px-2 border-b border-border-color">
                           {new Date(event.startDate).toLocaleString()}
                         </td>
-                        <td className="py-3 px-4 border-b border-border-color">
+                        <td className="py-2 px-2 border-b border-border-color">
                           {event.eventType}
                         </td>
                       </tr>
@@ -597,25 +613,28 @@ const Dashboard = () => {
           </motion.div>
 
           {/* טבלת ספקים */}
-          <motion.div variants={cardVariant}>
-            <h2 className="text-2xl font-bold mb-4 text-secondary">
+          <motion.div
+            variants={cardVariant}
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6 text-xs sm:text-sm"
+          >
+            <h2 className="text-xl font-bold mb-4 text-secondary">
               {t("dashboard.supplier_report")}
             </h2>
             {supplierReport.length > 0 ? (
               <div className="overflow-x-auto">
-                <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                <table className="min-w-full rounded-xl border border-border-color">
                   <thead>
                     <tr>
-                      <th className="py-3 px-4 border-b border-border-color">
+                      <th className="py-2 px-2 border-b border-border-color">
                         {t("dashboard.supplier_name")}
                       </th>
-                      <th className="py-3 px-4 border-b border-border-color">
+                      <th className="py-2 px-2 border-b border-border-color">
                         {t("dashboard.email")}
                       </th>
-                      <th className="py-3 px-4 border-b border-border-color">
+                      <th className="py-2 px-2 border-b border-border-color">
                         {t("dashboard.phone")}
                       </th>
-                      <th className="py-3 px-4 border-b border-border-color">
+                      <th className="py-2 px-2 border-b border-border-color">
                         {t("dashboard.status")}
                       </th>
                     </tr>
@@ -623,16 +642,16 @@ const Dashboard = () => {
                   <tbody>
                     {supplierReport.map((supplier) => (
                       <tr key={supplier._id}>
-                        <td className="py-3 px-4 border-b border-border-color">
+                        <td className="py-2 px-2 border-b border-border-color">
                           {supplier.SupplierName}
                         </td>
-                        <td className="py-3 px-4 border-b border-border-color">
+                        <td className="py-2 px-2 border-b border-border-color">
                           {supplier.Email}
                         </td>
-                        <td className="py-3 px-4 border-b border-border-color">
+                        <td className="py-2 px-2 border-b border-border-color">
                           {supplier.Phone}
                         </td>
-                        <td className="py-3 px-4 border-b border-border-color">
+                        <td className="py-2 px-2 border-b border-border-color">
                           {supplier.IsActive
                             ? t("dashboard.active")
                             : t("dashboard.inactive")}
@@ -648,19 +667,22 @@ const Dashboard = () => {
           </motion.div>
 
           {/* טבלת דוח חתימות */}
-          <motion.div variants={cardVariant}>
-            <h2 className="text-2xl font-bold mb-4 text-secondary">
+          <motion.div
+            variants={cardVariant}
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6 text-xs sm:text-sm"
+          >
+            <h2 className="text-xl font-bold mb-4 text-secondary">
               {t("dashboard.signature_report")}
             </h2>
             {signatureReport.length > 0 ? (
               <div className="overflow-x-auto">
-                <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                <table className="min-w-full rounded-xl border border-border-color">
                   <thead>
                     <tr>
-                      <th className="py-3 px-4 border-b border-border-color">
+                      <th className="py-2 px-2 border-b border-border-color">
                         {t("dashboard.signature_name")}
                       </th>
-                      <th className="py-3 px-4 border-b border-border-color">
+                      <th className="py-2 px-2 border-b border-border-color">
                         {t("dashboard.status")}
                       </th>
                     </tr>
@@ -668,10 +690,10 @@ const Dashboard = () => {
                   <tbody>
                     {signatureReport.map((sig) => (
                       <tr key={sig._id}>
-                        <td className="py-3 px-4 border-b border-border-color">
+                        <td className="py-2 px-2 border-b border-border-color">
                           {sig.name}
                         </td>
-                        <td className="py-3 px-4 border-b border-border-color">
+                        <td className="py-2 px-2 border-b border-border-color">
                           {sig.status || "N/A"}
                         </td>
                       </tr>
@@ -684,49 +706,52 @@ const Dashboard = () => {
             )}
           </motion.div>
 
-          {/* דוחות מפורטים */}
-          <motion.div variants={cardVariant}>
-            <h2 className="text-2xl font-bold mb-4 text-secondary">
+          {/* דוחות מפורטים עם רקע */}
+          <motion.div
+            variants={cardVariant}
+            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6 text-xs sm:text-sm"
+          >
+            <h2 className="text-xl font-bold mb-4 text-secondary">
               {t("dashboard.detailed_reports")}
             </h2>
-            <div className="space-y-8">
+            <div className="space-y-6">
               {/* Detailed Budget by Project */}
               <div>
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="text-lg font-semibold mb-2">
                   {t("dashboard.budget_by_project")}
                 </h3>
                 {detailedBudgetByProject &&
                 detailedBudgetByProject.count !== undefined ? (
                   <div className="overflow-x-auto">
-                    <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                    <table className="min-w-full rounded-xl border border-border-color">
                       <thead>
                         <tr>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.project_id")}
                           </th>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.total_budget")}
                           </th>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.total_spent")}
                           </th>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.count")}
                           </th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr>
-                          <td className="py-3 px-4 border-b border-border-color">
+                          <td className="py-2 px-2 border-b border-border-color">
                             {detailedBudgetByProject._id || "-"}
                           </td>
-                          <td className="py-3 px-4 border-b border-border-color">
+                          <td className="py-2 px-2 border-b border-border-color">
                             {detailedBudgetByProject.totalBudget || 0}
                           </td>
-                          <td className="py-3 px-4 border-b border-border-color">
+                          <td className="py-2 px-2 border-b border-border-color">
                             {detailedBudgetByProject.totalSpent || 0}
                           </td>
-                          <td className="py-3 px-4 border-b border-border-color">
+                          <td className="py-2 px-2 border-b border-border-color">
                             {detailedBudgetByProject.count || 0}
                           </td>
                         </tr>
@@ -739,21 +764,21 @@ const Dashboard = () => {
               </div>
               {/* Detailed Finance */}
               <div>
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="text-lg font-semibold mb-2">
                   {t("dashboard.detailed_finance")}
                 </h3>
                 {detailedFinance.length > 0 ? (
                   <div className="overflow-x-auto">
-                    <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                    <table className="min-w-full rounded-xl border border-border-color">
                       <thead>
                         <tr>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.transaction_type")}
                           </th>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.total_amount")}
                           </th>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.transaction_count")}
                           </th>
                         </tr>
@@ -761,13 +786,13 @@ const Dashboard = () => {
                       <tbody>
                         {detailedFinance.map((tx, idx) => (
                           <tr key={idx}>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {tx.transactionType}
                             </td>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {tx.transactionAmount}
                             </td>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {tx.count}
                             </td>
                           </tr>
@@ -781,18 +806,18 @@ const Dashboard = () => {
               </div>
               {/* Detailed Task */}
               <div>
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="text-lg font-semibold mb-2">
                   {t("dashboard.detailed_task")}
                 </h3>
                 {detailedTask.length > 0 ? (
                   <div className="overflow-x-auto">
-                    <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                    <table className="min-w-full rounded-xl border border-border-color">
                       <thead>
                         <tr>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.status")}
                           </th>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.count")}
                           </th>
                         </tr>
@@ -800,10 +825,10 @@ const Dashboard = () => {
                       <tbody>
                         {detailedTask.map((item, idx) => (
                           <tr key={idx}>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {item._id}
                             </td>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {item.count}
                             </td>
                           </tr>
@@ -817,21 +842,21 @@ const Dashboard = () => {
               </div>
               {/* Detailed Procurement by Supplier */}
               <div>
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="text-lg font-semibold mb-2">
                   {t("dashboard.procurement_by_supplier")}
                 </h3>
                 {procurementBySupplier.length > 0 ? (
                   <div className="overflow-x-auto">
-                    <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                    <table className="min-w-full rounded-xl border border-border-color">
                       <thead>
                         <tr>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.supplier_id")}
                           </th>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.total_cost")}
                           </th>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.order_count")}
                           </th>
                         </tr>
@@ -839,13 +864,13 @@ const Dashboard = () => {
                       <tbody>
                         {procurementBySupplier.map((item, idx) => (
                           <tr key={idx}>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {item._id}
                             </td>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {item.totalCost}
                             </td>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {item.count}
                             </td>
                           </tr>
@@ -859,21 +884,21 @@ const Dashboard = () => {
               </div>
               {/* Detailed Event by Type */}
               <div>
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="text-lg font-semibold mb-2">
                   {t("dashboard.event_by_type")}
                 </h3>
                 {eventByType.length > 0 ? (
                   <div className="overflow-x-auto">
-                    <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                    <table className="min-w-full rounded-xl border border-border-color">
                       <thead>
                         <tr>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.event_title")}
                           </th>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.start_date")}
                           </th>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.event_type")}
                           </th>
                         </tr>
@@ -881,13 +906,13 @@ const Dashboard = () => {
                       <tbody>
                         {eventByType.map((event, idx) => (
                           <tr key={idx}>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {event.title}
                             </td>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {new Date(event.startDate).toLocaleString()}
                             </td>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {event.eventType}
                             </td>
                           </tr>
@@ -901,21 +926,21 @@ const Dashboard = () => {
               </div>
               {/* Detailed Inventory Reorder */}
               <div>
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="text-lg font-semibold mb-2">
                   {t("dashboard.inventory_reorder")}
                 </h3>
                 {inventoryReorder.length > 0 ? (
                   <div className="overflow-x-auto">
-                    <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                    <table className="min-w-full rounded-xl border border-border-color">
                       <thead>
                         <tr>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.product_name")}
                           </th>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.quantity")}
                           </th>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.min_stock")}
                           </th>
                         </tr>
@@ -923,14 +948,14 @@ const Dashboard = () => {
                       <tbody>
                         {inventoryReorder.map((item, idx) => (
                           <tr key={idx}>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {item.productId?.productName ||
                                 t("dashboard.no_product_name")}
                             </td>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {item.quantity}
                             </td>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {item.minStockLevel}
                             </td>
                           </tr>
@@ -944,7 +969,7 @@ const Dashboard = () => {
               </div>
               {/* Detailed Employee Performance */}
               <div>
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="text-lg font-semibold mb-2">
                   {t("dashboard.employee_performance")}
                 </h3>
                 {employeePerformance.tasks &&
@@ -952,13 +977,13 @@ const Dashboard = () => {
                   <div>
                     <h4 className="font-bold mb-2">{t("dashboard.tasks")}</h4>
                     <div className="overflow-x-auto mb-4">
-                      <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                      <table className="min-w-full rounded-xl border border-border-color">
                         <thead>
                           <tr>
-                            <th className="py-3 px-4 border-b border-border-color">
+                            <th className="py-2 px-2 border-b border-border-color">
                               {t("dashboard.task_status")}
                             </th>
-                            <th className="py-3 px-4 border-b border-border-color">
+                            <th className="py-2 px-2 border-b border-border-color">
                               {t("dashboard.count")}
                             </th>
                           </tr>
@@ -966,10 +991,10 @@ const Dashboard = () => {
                         <tbody>
                           {employeePerformance.tasks.map((item, idx) => (
                             <tr key={idx}>
-                              <td className="py-3 px-4 border-b border-border-color">
+                              <td className="py-2 px-2 border-b border-border-color">
                                 {item._id}
                               </td>
-                              <td className="py-3 px-4 border-b border-border-color">
+                              <td className="py-2 px-2 border-b border-border-color">
                                 {item.count}
                               </td>
                             </tr>
@@ -984,13 +1009,13 @@ const Dashboard = () => {
                             {t("dashboard.procurements")}
                           </h4>
                           <div className="overflow-x-auto">
-                            <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                            <table className="min-w-full rounded-xl border border-border-color">
                               <thead>
                                 <tr>
-                                  <th className="py-3 px-4 border-b border-border-color">
+                                  <th className="py-2 px-2 border-b border-border-color">
                                     {t("dashboard.order_status")}
                                   </th>
-                                  <th className="py-3 px-4 border-b border-border-color">
+                                  <th className="py-2 px-2 border-b border-border-color">
                                     {t("dashboard.count")}
                                   </th>
                                 </tr>
@@ -999,10 +1024,10 @@ const Dashboard = () => {
                                 {employeePerformance.procurements.map(
                                   (item, idx) => (
                                     <tr key={idx}>
-                                      <td className="py-3 px-4 border-b border-border-color">
+                                      <td className="py-2 px-2 border-b border-border-color">
                                         {item._id}
                                       </td>
-                                      <td className="py-3 px-4 border-b border-border-color">
+                                      <td className="py-2 px-2 border-b border-border-color">
                                         {item.count}
                                       </td>
                                     </tr>
@@ -1020,24 +1045,24 @@ const Dashboard = () => {
               </div>
               {/* Detailed Supplier Performance */}
               <div>
-                <h3 className="text-xl font-semibold mb-2">
+                <h3 className="text-lg font-semibold mb-2">
                   {t("dashboard.supplier_performance")}
                 </h3>
                 {supplierPerformance.length > 0 ? (
                   <div className="overflow-x-auto">
-                    <table className="min-w-full bg-bg bg-opacity-75 rounded-xl border border-border-color">
+                    <table className="min-w-full rounded-xl border border-border-color">
                       <thead>
                         <tr>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.supplier_name")}
                           </th>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.order_count")}
                           </th>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.total_cost")}
                           </th>
-                          <th className="py-3 px-4 border-b border-border-color">
+                          <th className="py-2 px-2 border-b border-border-color">
                             {t("dashboard.email")}
                           </th>
                         </tr>
@@ -1045,16 +1070,16 @@ const Dashboard = () => {
                       <tbody>
                         {supplierPerformance.map((item, idx) => (
                           <tr key={idx}>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {item.supplierName}
                             </td>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {item.orderCount}
                             </td>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {item.totalCost}
                             </td>
-                            <td className="py-3 px-4 border-b border-border-color">
+                            <td className="py-2 px-2 border-b border-border-color">
                               {item.Email}
                             </td>
                           </tr>

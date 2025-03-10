@@ -51,6 +51,8 @@ import FinanceList from "./pages/employeePages/financePages/financeList.jsx";
 import FinanceAdd from "./pages/employeePages/financePages/AddFinance.jsx";
 import ProcurementProposals from "./pages/employeePages/manageProducts/ProcurementProposals.jsx";
 import ProcurementProposalsList from "./pages/AdminPanel/procurement/ProcurementProposals.jsx";
+import AddPerformanceReview from "./pages/AdminPanel/performanceReview/AddPerformanceReview.jsx";
+import PerformanceReview from "./pages/AdminPanel/performanceReview/PerformanceReview.jsx";
 
 const App = () => {
   const { data: authUser, isLoading } = useQuery({
@@ -159,6 +161,11 @@ const App = () => {
             path="ProcurementProposalsList"
             element={<ProcurementProposalsList />}
           />
+          <Route
+            path="AddPerformanceReview"
+            element={<AddPerformanceReview />}
+          />
+          <Route path="performance-reviews" element={<PerformanceReview />} />
           <Route path="products" element={<ProductList />} />
           <Route path="Events" element={<Events />} />
           <Route path="add-product" element={<AddProduct />} />

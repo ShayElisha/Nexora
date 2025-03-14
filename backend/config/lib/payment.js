@@ -1,21 +1,6 @@
 export const plans = [
   {
-    plan_id: "price_1QfaEzBFRfT42fsU2n1C5uIm",
-    plan_name: "Free",
-    duration: "Monthly",
-    price: "$0",
-    features: [
-      "1 Admin User",
-      "Basic Dashboard",
-      "Task Tracking (up to 10 tasks)",
-      "Employee Management (up to 10 employees)",
-      "Limited Reporting",
-      "Basic Integrations (e.g., Google Calendar)",
-      "Community Support",
-    ],
-  },
-  {
-    plan_id: "price_1QfaNiBFRfT42fsU64KsqkH4",
+    plan_id: "price_1R1nNaP3lkFdaee3v9vay7c6",
     plan_name: "Basic",
     duration: "Monthly",
     price: "$199",
@@ -34,7 +19,7 @@ export const plans = [
     ],
   },
   {
-    plan_id: "price_1QfaTRBFRfT42fsU0hABnL5B",
+    plan_id: "price_1R1nPFP3lkFdaee3nuJPl8mS",
     plan_name: "Pro",
     duration: "Monthly",
     price: "$399",
@@ -56,7 +41,7 @@ export const plans = [
     ],
   },
   {
-    plan_id: "price_1QfaUEBFRfT42fsU4DHmeyYT",
+    plan_id: "price_1R1nQ5P3lkFdaee3igrctc6N",
     plan_name: "Enterprise",
     duration: "Monthly",
     price: "$599",
@@ -82,7 +67,7 @@ export const plans = [
   },
   // Yearly Plans
   {
-    plan_id: "price_1QfaYSBFRfT42fsUh7FKQt9o",
+    plan_id: "price_1R1nQxP3lkFdaee348NMdsvS",
     plan_name: "Basic",
     duration: "Yearly",
     price: "$1999",
@@ -101,7 +86,7 @@ export const plans = [
     ],
   },
   {
-    plan_id: "price_1QfaZ7BFRfT42fsUVeON05L7",
+    plan_id: "price_1R1nRXP3lkFdaee3CtAROmwC",
     plan_name: "Pro",
     duration: "Yearly",
     price: "$3999",
@@ -123,7 +108,7 @@ export const plans = [
     ],
   },
   {
-    plan_id: "price_1QfaZQBFRfT42fsUjQAhaHPs",
+    plan_id: "price_1R1nS7P3lkFdaee36Uov4BPY",
     plan_name: "Enterprise",
     duration: "Yearly",
     price: "$5999",

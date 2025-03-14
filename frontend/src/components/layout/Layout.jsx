@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import SideBar from "../../pages/AdminPanel/layouts/Sidebar";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import { FaGlobe } from "react-icons/fa";
+import { FaGlobe, FaRocket } from "react-icons/fa";
+import { GrUpdate } from "react-icons/gr";
 import Flag from "react-world-flags";
 import DesignBox from "./DesignBox";
 import { motion } from "framer-motion";
+import PricingPlans from "../../pages/payment/PricingPlans";
+import axiosInstance from "../../lib/axios";
 
 const AnimatedShapes = () => {
   const shapes = [
@@ -822,13 +825,107 @@ const AnimatedShapes = () => {
   );
 };
 
+const ChatBot = () => {
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+
+  const toggleChat = () => {
+    setIsChatOpen(!isChatOpen);
+  };
+
+  const sendMessage = async () => {
+    if (!input.trim()) return;
+    setMessages((prev) => [...prev, { text: input, sender: "user" }]);
+    try {
+      const response = await axiosInstance.post("/chatAi", { message: input });
+      setMessages((prev) => [
+        ...prev,
+        { text: response.data.reply, sender: "bot" },
+      ]);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setMessages((prev) => [
+        ...prev,
+        { text: "שגיאה בתקשורת עם השרת", sender: "bot" },
+      ]);
+    }
+    setInput("");
+  };
+
+  return ReactDOM.createPortal(
+    <div className="fixed bottom-16 right-2 z-50">
+      {/* כפתור הצ'אט – מוצג רק כאשר החלון סגור */}
+      {!isChatOpen && (
+        <button
+          onClick={toggleChat}
+          className="bg-secondary text-button-text p-3 rounded-full shadow-lg hover:bg-secondary animate-fade-in"
+        >
+          צ'אט
+        </button>
+      )}
+
+      {/* חלון הצ'אט – מוצג כאשר isChatOpen=true */}
+      {isChatOpen && (
+        <div className="mt-2 w-80 h-96 bg-bg shadow-lg rounded-lg flex flex-col animate-fade-in animate-slide-down">
+          <div className="bg-primary text-button-text p-2 rounded-t-lg flex justify-between animate-slide-in">
+            <span>צ'אט בוט</span>
+            <button onClick={toggleChat} className="text-button-text">
+              ✕
+            </button>
+          </div>
+          <div className="flex-1 p-2 overflow-y-auto">
+            {messages.map((msg, index) => (
+              <div
+                key={index}
+                className={`mb-2 ${
+                  msg.sender === "user" ? "text-right" : "text-left"
+                }`}
+              >
+                <span
+                  className={`inline-block p-2 rounded-lg ${
+                    msg.sender === "user"
+                      ? "bg-secondary text-white"
+                      : "bg-accent text-white"
+                  }`}
+                >
+                  {msg.text}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="p-2 border-t border-border-color">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+              className="w-full p-2 border border-border-color rounded placeholder:text-text focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="כתוב הודעה..."
+            />
+            <button
+              onClick={sendMessage}
+              className="mt-2 w-full bg-secondary text-button-text p-2 rounded hover:bg-secondary transition-colors duration-200"
+            >
+              שלח
+            </button>
+          </div>
+        </div>
+      )}
+    </div>,
+    document.body
+  );
+};
+
 const Layout = ({ children }) => {
   const { data: authData } = useQuery({ queryKey: ["authUser"] });
   const authUser = authData?.user;
   const isAdmin = authUser?.role === "Admin";
+  const currentPlan = authUser?.pack || "No Plan";
 
   const { t, i18n } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
@@ -888,27 +985,48 @@ const Layout = ({ children }) => {
           className={`flex-grow w-full px-4 sm:px-6 md:px-8 2xl:px-12 pt-2 ${
             isAdmin
               ? isRTL
-                ? "md:mr-0 lg:mr-0 xl:mr-64 2xl:mr-56"
-                : "md:ml-0 lg:ml-0 xl:ml-64 2xl:ml-56"
+                ? "md:pr-0 lg:pr-0 xl:pr-64 2xl:pr-64"
+                : "md:pl-0 lg:pl-0 xl:pl-64 2xl:pl-64"
               : ""
           }`}
         >
-          <div className="relative mt-16 mb-8 overflow-hidden">
-            <AnimatedShapes />
-            <button
-              type="button"
-              className="inline-flex items-center px-4 py-2 sm:px-5 sm:py-3 xl:px-6 xl:py-3 bg-gradient-to-r from-primary to-secondary text-button-text rounded-full shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300 transform z-20"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            >
-              <FaGlobe
-                className={`w-5 h-5 sm:w-6 sm:h-6 xl:w-7 xl:h-7 ${
-                  isRTL ? "ml-2" : "mr-2"
-                }`}
-              />
-              <span className="truncate font-semibold">
-                {t("language.change_language")}
-              </span>
-            </button>
+          <div className="relative pt-16 pb-12 overflow-hidden">
+            {authUser && <AnimatedShapes />}
+            {authUser && <ChatBot />}
+            <div className="flex items-center space-x-4 rtl:space-x-reverse">
+              <button
+                type="button"
+                className="inline-flex items-center px-4 py-2 sm:px-5 sm:py-3 xl:px-6 xl:py-3 bg-gradient-to-r from-primary to-secondary text-button-text rounded-full shadow-sm hover:shadow-md transition-all duration-200 z-20"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              >
+                <FaGlobe
+                  className={`w-5 h-5 sm:w-6 sm:h-6 xl:w-7 xl:h-7 ${
+                    isRTL ? "ml-2" : "mr-2"
+                  }`}
+                />
+                <span className="truncate font-semibold">
+                  {t("language.change_language")}
+                </span>
+              </button>
+
+              {authUser && (
+                <button
+                  type="button"
+                  className="inline-flex items-center px-4 py-2 sm:px-5 sm:py-3 xl:px-6 xl:py-3 bg-gradient-to-r from-accent to-primary text-button-text rounded-full shadow-sm hover:shadow-md transition-all duration-200 z-20"
+                  onClick={() => setIsPricingModalOpen(true)}
+                >
+                  <GrUpdate
+                    className={`w-5 h-5 sm:w-6 sm:h-6 xl:w-7 xl:h-7 ${
+                      isRTL ? "ml-2" : "mr-2"
+                    }`}
+                  />
+                  <span className="truncate font-semibold">
+                    {t("layout.upgrade")} {currentPlan}
+                  </span>
+                </button>
+              )}
+            </div>
+
             {isDropdownOpen && (
               <div
                 className={`absolute ${
@@ -934,6 +1052,21 @@ const Layout = ({ children }) => {
                 ))}
               </div>
             )}
+
+            {isPricingModalOpen && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto animate-slide-down relative">
+                  <button
+                    className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+                    onClick={() => setIsPricingModalOpen(false)}
+                  >
+                    ✕
+                  </button>
+                  <PricingPlans currentPlan={currentPlan} />
+                </div>
+              </div>
+            )}
+
             <div className={isRTL ? "text-right" : "text-left"}>{children}</div>
           </div>
         </main>

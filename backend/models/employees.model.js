@@ -1,22 +1,5 @@
 import mongoose from "mongoose";
 
-// Schema for specific positions in the company
-const positionSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  // The general role category that this specific position falls under
-  generalRole: {
-    type: String,
-    enum: ["Admin", "Manager", "Employee"],
-    required: true,
-  },
-});
-
-const Position = mongoose.model("Position", positionSchema);
-
 const employeeSchema = new mongoose.Schema(
   {
     companyId: {
@@ -56,11 +39,10 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    // במקום שדה תפקיד בודד, אנו מקשרים לכל עובד תפקיד ספציפי מתוך רשימת התפקידים
-    position: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Position",
-      required: true,
+    role: {
+      type: String,
+      required: false,
+      enum: ["Admin", "Manager", "Employee", ""],
     },
     phone: {
       type: String,
@@ -81,7 +63,7 @@ const employeeSchema = new mongoose.Schema(
       },
     ],
     benefits: {
-      type: Array, // לדוגמה: ["Health Insurance", "401k"]
+      type: Array, // Example: ["Health Insurance", "401k"]
     },
     performanceReviews: [
       {
@@ -118,4 +100,4 @@ const employeeSchema = new mongoose.Schema(
 
 const Employee = mongoose.model("Employee", employeeSchema);
 
-export default { Employee, Position };
+export default Employee;

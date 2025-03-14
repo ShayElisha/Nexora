@@ -235,7 +235,7 @@ const Budgets = () => {
   });
 
   return (
-    <div className="min-h-screen bg-bg py-10 animate-fade-in">
+    <div className="min-h-screen  py-10 animate-fade-in">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-text mb-8 text-center tracking-tight drop-shadow-md">
           {t("budget.budgets")}
@@ -260,7 +260,7 @@ const Budgets = () => {
           </Link>
         </div>
 
-        <div className="overflow-x-auto rounded-xl shadow-xl bg-accent border border-border-color">
+        <div className="overflow-x-auto rounded-xl shadow-2xl bg-bg border border-border-color">
           <table className="min-w-full text-text">
             <thead className="bg-button-bg text-button-text">
               <tr className="text-center">

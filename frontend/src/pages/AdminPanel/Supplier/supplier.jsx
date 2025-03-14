@@ -169,7 +169,7 @@ const SupplierList = () => {
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
       <div
-        className="flex flex-col md:flex-row w-full min-h-screen bg-bg text-text animate-fade-in"
+        className="flex flex-col md:flex-row w-full min-h-screen  text-text animate-fade-in"
         dir={direction}
       >
         <div className="flex-1 py-12 px-6">
@@ -186,7 +186,7 @@ const SupplierList = () => {
               {suppliers.map((supplier) => (
                 <div
                   key={supplier._id}
-                  className="relative bg-accent rounded-xl p-6 shadow-lg hover:scale-105 transition-transform duration-300 border border-border-color"
+                  className="relative bg-bg rounded-xl p-6 shadow-lg hover:scale-105 hover:shadow-neutral-800 hover:shadow-2xl transition-transform duration-300 border border-border-color"
                 >
                   <button
                     onClick={() => openAttachmentsModal(supplier)}

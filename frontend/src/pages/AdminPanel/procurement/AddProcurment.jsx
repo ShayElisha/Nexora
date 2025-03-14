@@ -494,7 +494,7 @@ const AddProcurement = () => {
 
   // ----------------- Render ----------------- //
   return (
-    <div className="container mx-auto p-8 bg-gradient-to-br from-bg to-bg min-h-screen animate-fade-in">
+    <div className="container mx-auto p-8  min-h-screen animate-fade-in">
       <h1 className="text-4xl font-extrabold text-text mb-8 text-center tracking-tight drop-shadow-md">
         {t("procurement.add_procurement")}
       </h1>

@@ -15,6 +15,7 @@ import {
   LineElement,
 } from "chart.js";
 import { Bar, Doughnut, Pie, Radar, Line } from "react-chartjs-2";
+import * as XLSX from "xlsx";
 
 ChartJS.register(
   CategoryScale,
@@ -31,204 +32,1300 @@ ChartJS.register(
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
-};
-
-// רכיב אנימציה לצורות ללא רקע
-const AnimatedShapes = () => {
-  const shapes = [
-    {
-      style: {
-        width: "100px",
-        height: "100px",
-        borderRadius: "50%",
-      },
-      initial: { x: 0, y: 0 },
-      animate: { x: [0, 50, 0], y: [0, -50, 0] },
-      transition: { duration: 20, repeat: Infinity, ease: "easeInOut" },
-      pos: { top: "10%", left: "5%" },
-    },
-    {
-      style: {
-        width: "150px",
-        height: "150px",
-        borderRadius: "50%",
-      },
-      initial: { x: 0, y: 0 },
-      animate: { x: [0, -50, 0], y: [0, 50, 0] },
-      transition: { duration: 25, repeat: Infinity, ease: "easeInOut" },
-      pos: { bottom: "15%", right: "10%" },
-    },
-    {
-      style: {
-        width: "80px",
-        height: "80px",
-        borderRadius: "50%",
-      },
-      initial: { x: 0, y: 0 },
-      animate: { x: [0, 30, 0], y: [0, -30, 0] },
-      transition: { duration: 18, repeat: Infinity, ease: "easeInOut" },
-      pos: { top: "50%", left: "80%" },
-    },
-  ];
-
-  return (
-    <>
-      {shapes.map((shape, idx) => (
-        <motion.div
-          key={idx}
-          style={{
-            position: "absolute",
-            ...shape.style,
-            ...shape.pos,
-          }}
-          initial={shape.initial}
-          animate={shape.animate}
-          transition={shape.transition}
-        />
-      ))}
-    </>
-  );
+  plugins: {
+    legend: { display: true },
+    tooltip: { enabled: true },
+  },
 };
 
 const Dashboard = () => {
   const { t } = useTranslation();
-
-  // State לדוחות בסיסיים
-  const [budgetSummary, setBudgetSummary] = useState({});
-  const [financeSummary, setFinanceSummary] = useState([]);
-  const [taskSummary, setTaskSummary] = useState([]);
-  const [procurementSummary, setProcurementSummary] = useState([]);
-  const [upcomingEvents, setUpcomingEvents] = useState([]);
-  const [lowStockItems, setLowStockItems] = useState([]);
-  const [supplierReport, setSupplierReport] = useState([]);
-  const [signatureReport, setSignatureReport] = useState([]);
-  const [dashboardReport, setDashboardReport] = useState({});
-
-  // State לדוחות מפורטים
-  const [detailedBudgetByProject, setDetailedBudgetByProject] = useState({});
-  const [detailedFinance, setDetailedFinance] = useState([]);
-  const [detailedTask, setDetailedTask] = useState([]);
-  const [procurementBySupplier, setProcurementBySupplier] = useState([]);
-  const [eventByType, setEventByType] = useState([]);
-  const [inventoryReorder, setInventoryReorder] = useState([]);
-  const [employeePerformance, setEmployeePerformance] = useState({});
-  const [supplierPerformance, setSupplierPerformance] = useState([]);
-
+  const [dashboardData, setDashboardData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // מזהים ברירת מחדל
-  const defaultProjectId = "000000000000000000000001";
-  const defaultSupplierId = "000000000000000000000002";
-  const defaultEmployeeId = "000000000000000000000003";
-  const defaultEventType = "default";
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
   useEffect(() => {
-    const fetchReports = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const [
-          budgetRes,
-          financeRes,
-          taskRes,
-          procurementRes,
-          eventsRes,
-          lowStockRes,
-          supplierRes,
-          signatureRes,
-          dashboardRes,
-          detailedBudgetByProjectRes,
-          detailedFinanceRes,
-          detailedTaskRes,
-          procurementBySupplierRes,
-          eventByTypeRes,
-          inventoryReorderRes,
-          employeePerformanceRes,
-          supplierPerformanceRes,
-        ] = await Promise.all([
-          axiosInstance.get("/reports/budget-summary", {
+        const response = await axiosInstance.get(
+          "/reports/super-unified-report",
+          {
             withCredentials: true,
-          }),
-          axiosInstance.get("/reports/finance-summary", {
-            withCredentials: true,
-          }),
-          axiosInstance.get("/reports/task-summary", { withCredentials: true }),
-          axiosInstance.get("/reports/procurement-summary", {
-            withCredentials: true,
-          }),
-          axiosInstance.get("/reports/upcoming-events", {
-            withCredentials: true,
-          }),
-          axiosInstance.get("/reports/low-stock", { withCredentials: true }),
-          axiosInstance.get("/reports/suppliers", { withCredentials: true }),
-          axiosInstance.get("/reports/signatures", { withCredentials: true }),
-          axiosInstance.get("/reports/dashboard", { withCredentials: true }),
-          axiosInstance.get(
-            `/reports/budget-by-project?projectId=${defaultProjectId}`,
-            {
-              withCredentials: true,
-            }
-          ),
-          axiosInstance.get("/reports/detailed-finance", {
-            withCredentials: true,
-          }),
-          axiosInstance.get("/reports/detailed-task", {
-            withCredentials: true,
-          }),
-          axiosInstance.get(
-            `/reports/procurement-by-supplier?supplierId=${defaultSupplierId}`,
-            {
-              withCredentials: true,
-            }
-          ),
-          axiosInstance.get(
-            `/reports/event-by-type?eventType=${defaultEventType}`,
-            {
-              withCredentials: true,
-            }
-          ),
-          axiosInstance.get("/reports/inventory-reorder", {
-            withCredentials: true,
-          }),
-          axiosInstance.get(
-            `/reports/employee-performance?employeeId=${defaultEmployeeId}`,
-            {
-              withCredentials: true,
-            }
-          ),
-          axiosInstance.get("/reports/supplier-performance", {
-            withCredentials: true,
-          }),
-        ]);
-
-        setBudgetSummary(budgetRes.data.data || {});
-        setFinanceSummary(financeRes.data.data || []);
-        setTaskSummary(taskRes.data.data || []);
-        setProcurementSummary(procurementRes.data.data || []);
-        setUpcomingEvents(eventsRes.data.data || []);
-        setLowStockItems(lowStockRes.data.data || []);
-        setSupplierReport(supplierRes.data.data || []);
-        setSignatureReport(signatureRes.data.data || []);
-        setDashboardReport(dashboardRes.data.data || {});
-
-        setDetailedBudgetByProject(detailedBudgetByProjectRes.data.data || {});
-        setDetailedFinance(detailedFinanceRes.data.data || []);
-        setDetailedTask(detailedTaskRes.data.data || []);
-        setProcurementBySupplier(procurementBySupplierRes.data.data || []);
-        setEventByType(eventByTypeRes.data.data || []);
-        setInventoryReorder(inventoryReorderRes.data.data || []);
-        setEmployeePerformance(employeePerformanceRes.data.data || {});
-        setSupplierPerformance(supplierPerformanceRes.data.data || []);
-
+          }
+        );
+        setDashboardData(response.data.data || {});
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching reports:", err);
-        setError("Error fetching reports data");
+        console.error("Error fetching dashboard data:", err);
+        setError(
+          `Error fetching dashboard data: ${
+            err.response?.data?.message || err.message
+          }`
+        );
         setLoading(false);
       }
     };
-
-    fetchReports();
+    fetchDashboardData();
   }, []);
+
+  const exportToExcel = (data, fileName) => {
+    const worksheet = XLSX.utils.json_to_sheet(data || []);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, `${fileName}.xlsx`);
+  };
+
+  const emptyChartData = {
+    labels: [t("dashboard.no_data")],
+    datasets: [
+      {
+        data: [1],
+        backgroundColor: ["#E0E0E0"],
+        borderColor: ["#B0B0B0"],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const categories = [
+    "Budget",
+    "Finance",
+    "Tasks",
+    "Procurement",
+    "Events",
+    "Inventory",
+    "Suppliers",
+    "Customers",
+    "Departments",
+    "Performance",
+    "Products",
+    "Projects",
+  ];
+
+  const categoryCharts = {
+    Budget: [
+      {
+        title: t("dashboard.budget_summary"),
+        type: "Doughnut",
+        data: {
+          labels: dashboardData.budgetSummary?.map(
+            (item) => item._id || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.budgetSummary?.map(
+                (item) => item.totalBudget
+              ) || [1],
+              backgroundColor: dashboardData.budgetSummary
+                ? ["#FF6384", "#36A2EB", "#FFCE56"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.budget_spent"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.budgetSummary?.map(
+            (item) => item._id || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.spent"),
+              data: dashboardData.budgetSummary?.map(
+                (item) => item.totalSpent
+              ) || [0],
+              backgroundColor: dashboardData.budgetSummary
+                ? "rgba(255, 99, 132, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.budget_remaining"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.budgetSummary?.map(
+            (item) => item._id || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.remaining"),
+              data: dashboardData.budgetSummary?.map(
+                (item) => (item.totalBudget || 0) - (item.totalSpent || 0)
+              ) || [0],
+              backgroundColor: dashboardData.budgetSummary
+                ? "rgba(75, 192, 192, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.budget_count"),
+        type: "Pie",
+        data: {
+          labels: dashboardData.budgetSummary?.map(
+            (item) => item._id || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.budgetSummary?.map(
+                (item) => item.count || 0
+              ) || [1],
+              backgroundColor: dashboardData.budgetSummary
+                ? ["#FFCE56", "#4BC0C0", "#36A2EB"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.budget_trend"),
+        type: "Line",
+        data: {
+          labels: dashboardData.budgetSummary?.map(
+            (item) => item._id || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.total_budget"),
+              data: dashboardData.budgetSummary?.map(
+                (item) => item.totalBudget || 0
+              ) || [0],
+              borderColor: dashboardData.budgetSummary ? "#FF6384" : "#B0B0B0",
+              fill: false,
+            },
+          ],
+        },
+      },
+    ],
+    Finance: [
+      {
+        title: t("dashboard.finance_summary"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.financeSummary?.map(
+            (item) => `${item._id.type}-${item._id.status}`
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.finance_amount"),
+              data: dashboardData.financeSummary?.map(
+                (item) => item.totalAmount
+              ) || [0],
+              backgroundColor: dashboardData.financeSummary
+                ? "rgba(54, 162, 235, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.finance_by_type"),
+        type: "Pie",
+        data: {
+          labels: dashboardData.financeSummary?.map(
+            (item) => item._id.type || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.financeSummary?.map(
+                (item) => item.totalAmount || 0
+              ) || [1],
+              backgroundColor: dashboardData.financeSummary
+                ? ["#FF6384", "#36A2EB", "#FFCE56"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.finance_count"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.financeSummary?.map(
+            (item) => `${item._id.type}-${item._id.status}`
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.count"),
+              data: dashboardData.financeSummary?.map(
+                (item) => item.count || 0
+              ) || [0],
+              backgroundColor: dashboardData.financeSummary
+                ? "rgba(255, 99, 132, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.finance_trend"),
+        type: "Line",
+        data: {
+          labels: dashboardData.financeSummary?.map(
+            (item) => `${item._id.type}-${item._id.status}`
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.amount"),
+              data: dashboardData.financeSummary?.map(
+                (item) => item.totalAmount || 0
+              ) || [0],
+              borderColor: dashboardData.financeSummary ? "#4BC0C0" : "#B0B0B0",
+              fill: false,
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.finance_status"),
+        type: "Doughnut",
+        data: {
+          labels: dashboardData.financeSummary?.map(
+            (item) => item._id.status || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.financeSummary?.map(
+                (item) => item.count || 0
+              ) || [1],
+              backgroundColor: dashboardData.financeSummary
+                ? ["#FFCE56", "#36A2EB", "#FF6384"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+    ],
+    Tasks: [
+      {
+        title: t("dashboard.task_summary"),
+        type: "Pie",
+        data: {
+          labels: dashboardData.taskSummary?.map(
+            (item) => `${item._id.status}-${item._id.priority}`
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.taskSummary?.map((item) => item.count) || [1],
+              backgroundColor: dashboardData.taskSummary
+                ? ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.task_overdue"),
+        type: "Pie",
+        data: {
+          labels: dashboardData.overdueTasks?.map(
+            (item) => item.title || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.overdueTasks?.map(
+                (item) => item.daysOverdue || 1
+              ) || [1],
+              backgroundColor: dashboardData.overdueTasks
+                ? ["#FF6384", "#36A2EB", "#FFCE56"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.task_count_by_status"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.taskSummary?.map(
+            (item) => item._id.status || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.count"),
+              data: dashboardData.taskSummary?.map(
+                (item) => item.count || 0
+              ) || [0],
+              backgroundColor: dashboardData.taskSummary
+                ? "rgba(75, 192, 192, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.task_priority"),
+        type: "Doughnut",
+        data: {
+          labels: dashboardData.taskSummary?.map(
+            (item) => item._id.priority || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.taskSummary?.map(
+                (item) => item.count || 0
+              ) || [1],
+              backgroundColor: dashboardData.taskSummary
+                ? ["#FFCE56", "#4BC0C0", "#36A2EB"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.task_trend"),
+        type: "Line",
+        data: {
+          labels: dashboardData.taskSummary?.map(
+            (item) => `${item._id.status}-${item._id.priority}`
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.count"),
+              data: dashboardData.taskSummary?.map(
+                (item) => item.count || 0
+              ) || [0],
+              borderColor: dashboardData.taskSummary ? "#FF6384" : "#B0B0B0",
+              fill: false,
+            },
+          ],
+        },
+      },
+    ],
+    Procurement: [
+      {
+        title: t("dashboard.procurement_summary"),
+        type: "Line",
+        data: {
+          labels: dashboardData.procurementSummary?.map(
+            (item) => `${item._id.status}-${item._id.paymentStatus}`
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.total_cost"),
+              data: dashboardData.procurementSummary?.map(
+                (item) => item.totalCost
+              ) || [0],
+              borderColor: dashboardData.procurementSummary
+                ? "#FF6384"
+                : "#B0B0B0",
+              fill: false,
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.procurement_count"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.procurementSummary?.map(
+            (item) => `${item._id.status}-${item._id.paymentStatus}`
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.count"),
+              data: dashboardData.procurementSummary?.map(
+                (item) => item.count || 0
+              ) || [0],
+              backgroundColor: dashboardData.procurementSummary
+                ? "rgba(54, 162, 235, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.procurement_status"),
+        type: "Pie",
+        data: {
+          labels: dashboardData.procurementSummary?.map(
+            (item) => item._id.status || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.procurementSummary?.map(
+                (item) => item.count || 0
+              ) || [1],
+              backgroundColor: dashboardData.procurementSummary
+                ? ["#FFCE56", "#36A2EB", "#FF6384"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.procurement_payment"),
+        type: "Doughnut",
+        data: {
+          labels: dashboardData.procurementSummary?.map(
+            (item) => item._id.paymentStatus || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.procurementSummary?.map(
+                (item) => item.totalCost || 0
+              ) || [1],
+              backgroundColor: dashboardData.procurementSummary
+                ? ["#4BC0C0", "#FF6384", "#36A2EB"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.procurement_trend"),
+        type: "Line",
+        data: {
+          labels: dashboardData.procurementSummary?.map(
+            (item) => `${item._id.status}-${item._id.paymentStatus}`
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.cost_trend"),
+              data: dashboardData.procurementSummary?.map(
+                (item) => item.totalCost || 0
+              ) || [0],
+              borderColor: dashboardData.procurementSummary
+                ? "#36A2EB"
+                : "#B0B0B0",
+              fill: false,
+            },
+          ],
+        },
+      },
+    ],
+    Events: [
+      {
+        title: t("dashboard.upcoming_events"),
+        type: "Pie",
+        data: {
+          labels: dashboardData.upcomingEvents?.map(
+            (item) => item.title || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.upcomingEvents?.map(() => 1) || [1],
+              backgroundColor: dashboardData.upcomingEvents
+                ? ["#4BC0C0", "#FFCE56", "#36A2EB"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.event_participants"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.upcomingEvents?.map(
+            (item) => item.title || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.participants"),
+              data: dashboardData.upcomingEvents?.map(
+                (item) => item.participants?.length || 0
+              ) || [0],
+              backgroundColor: dashboardData.upcomingEvents
+                ? "rgba(255, 99, 132, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.event_duration"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.upcomingEvents?.map(
+            (item) => item.title || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.duration"),
+              data: dashboardData.upcomingEvents?.map(
+                (item) =>
+                  (new Date(item.endDate) - new Date(item.startDate)) /
+                    (1000 * 60 * 60 * 24) || 0
+              ) || [0],
+              backgroundColor: dashboardData.upcomingEvents
+                ? "rgba(75, 192, 192, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.event_trend"),
+        type: "Line",
+        data: {
+          labels: dashboardData.upcomingEvents?.map(
+            (item) => item.title || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.count"),
+              data: dashboardData.upcomingEvents?.map(() => 1) || [0],
+              borderColor: dashboardData.upcomingEvents ? "#FF6384" : "#B0B0B0",
+              fill: false,
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.event_distribution"),
+        type: "Doughnut",
+        data: {
+          labels: dashboardData.upcomingEvents?.map(
+            (item) => item.title || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.upcomingEvents?.map(() => 1) || [1],
+              backgroundColor: dashboardData.upcomingEvents
+                ? ["#36A2EB", "#FFCE56", "#4BC0C0"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+    ],
+    Inventory: [
+      {
+        title: t("dashboard.low_stock_items"),
+        type: "Radar",
+        data: {
+          labels: dashboardData.lowStockInventory?.map(
+            (item) => item.productId?.productName || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.current_stock"),
+              data: dashboardData.lowStockInventory?.map(
+                (item) => item.quantity
+              ) || [0],
+              backgroundColor: dashboardData.lowStockInventory
+                ? "rgba(255, 206, 86, 0.2)"
+                : "rgba(224, 224, 224, 0.2)",
+              borderColor: dashboardData.lowStockInventory
+                ? "#FFCE56"
+                : "#B0B0B0",
+            },
+            {
+              label: t("dashboard.min_stock"),
+              data: dashboardData.lowStockInventory?.map(
+                (item) => item.minStockLevel
+              ) || [0],
+              backgroundColor: dashboardData.lowStockInventory
+                ? "rgba(75, 192, 192, 0.2)"
+                : "rgba(224, 224, 224, 0.2)",
+              borderColor: dashboardData.lowStockInventory
+                ? "#4BC0C0"
+                : "#B0B0B0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.inventory_expiration"),
+        type: "Radar",
+        data: {
+          labels: dashboardData.inventoryExpiration?.map(
+            (item) => item.productId?.productName || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.days_to_expire"),
+              data: dashboardData.inventoryExpiration?.map(
+                (item) => item.daysToExpire || 0
+              ) || [0],
+              backgroundColor: dashboardData.inventoryExpiration
+                ? "rgba(255, 99, 132, 0.2)"
+                : "rgba(224, 224, 224, 0.2)",
+              borderColor: dashboardData.inventoryExpiration
+                ? "#FF6384"
+                : "#B0B0B0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.low_stock_count"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.lowStockInventory?.map(
+            (item) => item.productId?.productName || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.quantity"),
+              data: dashboardData.lowStockInventory?.map(
+                (item) => item.quantity || 0
+              ) || [0],
+              backgroundColor: dashboardData.lowStockInventory
+                ? "rgba(54, 162, 235, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.expiration_count"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.inventoryExpiration?.map(
+            (item) => item.productId?.productName || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.count"),
+              data: dashboardData.inventoryExpiration?.map(() => 1) || [0],
+              backgroundColor: dashboardData.inventoryExpiration
+                ? "rgba(255, 99, 132, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.inventory_trend"),
+        type: "Line",
+        data: {
+          labels: dashboardData.lowStockInventory?.map(
+            (item) => item.productId?.productName || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.quantity"),
+              data: dashboardData.lowStockInventory?.map(
+                (item) => item.quantity || 0
+              ) || [0],
+              borderColor: dashboardData.lowStockInventory
+                ? "#36A2EB"
+                : "#B0B0B0",
+              fill: false,
+            },
+          ],
+        },
+      },
+    ],
+    Suppliers: [
+      {
+        title: t("dashboard.supplier_report"),
+        type: "Pie",
+        data: {
+          labels: [t("dashboard.active"), t("dashboard.inactive")],
+          datasets: [
+            {
+              data: dashboardData.suppliers
+                ? [
+                    dashboardData.suppliers.filter((s) => s.IsActive).length,
+                    dashboardData.suppliers.filter((s) => !s.IsActive).length,
+                  ]
+                : [1, 0],
+              backgroundColor: dashboardData.suppliers
+                ? ["#36A2EB", "#FF6384"]
+                : ["#E0E0E0", "#E0E0E0"],
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.supplier_rating"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.suppliers?.map(
+            (item) => item.SupplierName || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.rating"),
+              data: dashboardData.suppliers?.map(
+                (item) => item.Rating || 0
+              ) || [0],
+              backgroundColor: dashboardData.suppliers
+                ? "rgba(75, 192, 192, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.supplier_count"),
+        type: "Doughnut",
+        data: {
+          labels: [t("dashboard.active"), t("dashboard.inactive")],
+          datasets: [
+            {
+              data: dashboardData.suppliers
+                ? [
+                    dashboardData.suppliers.filter((s) => s.IsActive).length,
+                    dashboardData.suppliers.filter((s) => !s.IsActive).length,
+                  ]
+                : [1, 0],
+              backgroundColor: dashboardData.suppliers
+                ? ["#4BC0C0", "#FFCE56"]
+                : ["#E0E0E0", "#E0E0E0"],
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.supplier_trend"),
+        type: "Line",
+        data: {
+          labels: dashboardData.suppliers?.map(
+            (item) => item.SupplierName || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.rating"),
+              data: dashboardData.suppliers?.map(
+                (item) => item.Rating || 0
+              ) || [0],
+              borderColor: dashboardData.suppliers ? "#FF6384" : "#B0B0B0",
+              fill: false,
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.supplier_distribution"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.suppliers?.map(
+            (item) => item.SupplierName || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.count"),
+              data: dashboardData.suppliers?.map(() => 1) || [0],
+              backgroundColor: dashboardData.suppliers
+                ? "rgba(255, 99, 132, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+    ],
+    Customers: [
+      {
+        title: t("dashboard.customer_summary"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.customerSummary?.map(
+            (item) => item._id || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.customer_count"),
+              data: dashboardData.customerSummary?.map(
+                (item) => item.count
+              ) || [0],
+              backgroundColor: dashboardData.customerSummary
+                ? "rgba(255, 99, 132, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.customer_orders"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.customerOrderSummary?.map(
+            (item) => item._id || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.order_amount"),
+              data: dashboardData.customerOrderSummary?.map(
+                (item) => item.totalAmount
+              ) || [0],
+              backgroundColor: dashboardData.customerOrderSummary
+                ? "rgba(75, 192, 192, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.order_count"),
+        type: "Pie",
+        data: {
+          labels: dashboardData.customerOrderSummary?.map(
+            (item) => item._id || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.customerOrderSummary?.map(
+                (item) => item.totalOrders || 0
+              ) || [1],
+              backgroundColor: dashboardData.customerOrderSummary
+                ? ["#FF6384", "#36A2EB", "#FFCE56"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.customer_trend"),
+        type: "Line",
+        data: {
+          labels: dashboardData.customerSummary?.map(
+            (item) => item._id || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.count"),
+              data: dashboardData.customerSummary?.map(
+                (item) => item.count || 0
+              ) || [0],
+              borderColor: dashboardData.customerSummary
+                ? "#4BC0C0"
+                : "#B0B0B0",
+              fill: false,
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.order_status"),
+        type: "Doughnut",
+        data: {
+          labels: dashboardData.customerOrderSummary?.map(
+            (item) => item._id || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.customerOrderSummary?.map(
+                (item) => item.totalOrders || 0
+              ) || [1],
+              backgroundColor: dashboardData.customerOrderSummary
+                ? ["#FFCE56", "#36A2EB", "#FF6384"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+    ],
+    Departments: [
+      {
+        title: t("dashboard.department_summary"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.departmentSummary?.map(() => "Total") || [
+            t("dashboard.no_data"),
+          ],
+          datasets: [
+            {
+              label: t("dashboard.dept_count"),
+              data: dashboardData.departmentSummary?.map(
+                (item) => item.totalDepartments
+              ) || [0],
+              backgroundColor: dashboardData.departmentSummary
+                ? "rgba(153, 102, 255, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.employee_distribution"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.employees?.map(
+            (item) => item.department || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.employee_count"),
+              data: dashboardData.employees?.map(() => 1) || [0],
+              backgroundColor: dashboardData.employees
+                ? "rgba(255, 205, 86, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.dept_trend"),
+        type: "Line",
+        data: {
+          labels: dashboardData.departmentSummary?.map(() => "Total") || [
+            t("dashboard.no_data"),
+          ],
+          datasets: [
+            {
+              label: t("dashboard.count"),
+              data: dashboardData.departmentSummary?.map(
+                (item) => item.totalDepartments || 0
+              ) || [0],
+              borderColor: dashboardData.departmentSummary
+                ? "#FF6384"
+                : "#B0B0B0",
+              fill: false,
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.employee_count"),
+        type: "Pie",
+        data: {
+          labels: dashboardData.employees?.map(
+            (item) => item.department || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.employees?.map(() => 1) || [1],
+              backgroundColor: dashboardData.employees
+                ? ["#36A2EB", "#FFCE56", "#4BC0C0"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.dept_distribution"),
+        type: "Doughnut",
+        data: {
+          labels: dashboardData.departmentSummary?.map(() => "Total") || [
+            t("dashboard.no_data"),
+          ],
+          datasets: [
+            {
+              data: dashboardData.departmentSummary?.map(
+                (item) => item.totalDepartments || 0
+              ) || [1],
+              backgroundColor: dashboardData.departmentSummary
+                ? ["#FF6384", "#36A2EB", "#FFCE56"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+    ],
+    Performance: [
+      {
+        title: t("dashboard.performance_reviews"),
+        type: "Line",
+        data: {
+          labels: dashboardData.performanceReviews?.map(
+            (item) => item.employeeId?.name || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.performance_score"),
+              data: dashboardData.performanceReviews?.map(
+                (item) => item.score || 0
+              ) || [0],
+              borderColor: dashboardData.performanceReviews
+                ? "#4BC0C0"
+                : "#B0B0B0",
+              fill: false,
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.performance_distribution"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.performanceReviews?.map(
+            (item) => item.employeeId?.name || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.score"),
+              data: dashboardData.performanceReviews?.map(
+                (item) => item.score || 0
+              ) || [0],
+              backgroundColor: dashboardData.performanceReviews
+                ? "rgba(255, 99, 132, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.performance_count"),
+        type: "Pie",
+        data: {
+          labels: dashboardData.performanceReviews?.map(
+            (item) => item.employeeId?.name || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.performanceReviews?.map(() => 1) || [1],
+              backgroundColor: dashboardData.performanceReviews
+                ? ["#FF6384", "#36A2EB", "#FFCE56"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.performance_trend"),
+        type: "Line",
+        data: {
+          labels: dashboardData.performanceReviews?.map(
+            (item) => item.employeeId?.name || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.score_trend"),
+              data: dashboardData.performanceReviews?.map(
+                (item) => item.score || 0
+              ) || [0],
+              borderColor: dashboardData.performanceReviews
+                ? "#36A2EB"
+                : "#B0B0B0",
+              fill: false,
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.performance_summary"),
+        type: "Doughnut",
+        data: {
+          labels: dashboardData.performanceReviews?.map(
+            (item) => item.employeeId?.name || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.performanceReviews?.map(
+                (item) => item.score || 0
+              ) || [1],
+              backgroundColor: dashboardData.performanceReviews
+                ? ["#FFCE56", "#4BC0C0", "#FF6384"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+    ],
+    Products: [
+      {
+        title: t("dashboard.product_summary"),
+        type: "Pie",
+        data: {
+          labels: dashboardData.products?.map(
+            (item) => item.productName || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.products?.map(() => 1) || [1],
+              backgroundColor: dashboardData.products
+                ? ["#FF6384", "#36A2EB", "#FFCE56"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.product_trees"),
+        type: "Radar",
+        data: {
+          labels: dashboardData.productTrees?.map(
+            (item) => item.productId?.productName || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.component_count"),
+              data: dashboardData.productTrees?.map(
+                (item) => item.components?.length || 0
+              ) || [0],
+              backgroundColor: dashboardData.productTrees
+                ? "rgba(54, 162, 235, 0.2)"
+                : "rgba(224, 224, 224, 0.2)",
+              borderColor: dashboardData.productTrees ? "#36A2EB" : "#B0B0B0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.product_count"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.products?.map(
+            (item) => item.productName || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.count"),
+              data: dashboardData.products?.map(() => 1) || [0],
+              backgroundColor: dashboardData.products
+                ? "rgba(255, 99, 132, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.product_trend"),
+        type: "Line",
+        data: {
+          labels: dashboardData.products?.map(
+            (item) => item.productName || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.count"),
+              data: dashboardData.products?.map(() => 1) || [0],
+              borderColor: dashboardData.products ? "#FF6384" : "#B0B0B0",
+              fill: false,
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.product_distribution"),
+        type: "Doughnut",
+        data: {
+          labels: dashboardData.products?.map(
+            (item) => item.productName || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.products?.map(() => 1) || [1],
+              backgroundColor: dashboardData.products
+                ? ["#36A2EB", "#FFCE56", "#4BC0C0"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+    ],
+    Projects: [
+      {
+        title: t("dashboard.project_status"),
+        type: "Pie",
+        data: {
+          labels: dashboardData.projects?.map(
+            (item) => item.status || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.projects?.map(() => 1) || [1],
+              backgroundColor: dashboardData.projects
+                ? ["#FF6384", "#36A2EB", "#FFCE56"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.project_count"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.projects?.map(
+            (item) => item.status || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.count"),
+              data: dashboardData.projects?.map(() => 1) || [0],
+              backgroundColor: dashboardData.projects
+                ? "rgba(75, 192, 192, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.project_team_size"),
+        type: "Bar",
+        data: {
+          labels: dashboardData.projects?.map(
+            (item) => item.projectName || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.team_size"),
+              data: dashboardData.projects?.map(
+                (item) => item.teamMembers?.length || 0
+              ) || [0],
+              backgroundColor: dashboardData.projects
+                ? "rgba(255, 99, 132, 0.6)"
+                : "#E0E0E0",
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.project_trend"),
+        type: "Line",
+        data: {
+          labels: dashboardData.projects?.map(
+            (item) => item.projectName || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              label: t("dashboard.count"),
+              data: dashboardData.projects?.map(() => 1) || [0],
+              borderColor: dashboardData.projects ? "#4BC0C0" : "#B0B0B0",
+              fill: false,
+            },
+          ],
+        },
+      },
+      {
+        title: t("dashboard.project_distribution"),
+        type: "Doughnut",
+        data: {
+          labels: dashboardData.projects?.map(
+            (item) => item.status || "Unknown"
+          ) || [t("dashboard.no_data")],
+          datasets: [
+            {
+              data: dashboardData.projects?.map(() => 1) || [1],
+              backgroundColor: dashboardData.projects
+                ? ["#FFCE56", "#36A2EB", "#FF6384"]
+                : ["#E0E0E0"],
+            },
+          ],
+        },
+      },
+    ],
+  };
+
+  const categoryTables = {
+    Budget: dashboardData.budgetSummary || [],
+    Finance: dashboardData.financeSummary || [],
+    Tasks: dashboardData.taskSummary || [],
+    Procurement: dashboardData.procurementSummary || [],
+    Events: dashboardData.upcomingEvents || [],
+    Inventory: dashboardData.lowStockInventory || [],
+    Suppliers: dashboardData.suppliers || [],
+    Customers: dashboardData.customerSummary || [],
+    Departments: dashboardData.departmentSummary || [],
+    Performance: dashboardData.performanceReviews || [],
+    Products: dashboardData.products || [],
+    Projects: dashboardData.projects || [],
+  };
+
+  const getKeyFields = (category) => {
+    const data = categoryTables[category];
+    if (!data || data.length === 0) {
+      return ["ID", "Value", "Status"];
+    }
+    const sample = data[0];
+    const keys = Object.keys(sample).filter(
+      (key) =>
+        key !== "__v" &&
+        key !== "_id" &&
+        key !== "updatedAt" &&
+        key !== "createdAt"
+    );
+    return keys.slice(0, 3); // Limit to 3 key fields for simplicity
+  };
 
   if (loading) {
     return (
@@ -244,118 +1341,23 @@ const Dashboard = () => {
 
   if (error) return <div className="p-4 text-red-600">{error}</div>;
 
-  // עיבוד נתונים (תקציב)
-  const totalBudget = Number(budgetSummary.totalBudget) || 0;
-  const totalSpent = Number(budgetSummary.totalSpent) || 0;
-  const remainingBudget = totalBudget - totalSpent;
-
-  // הגדרות נתוני גרפים
-  const budgetDoughnutData = {
-    labels: [t("dashboard.spent"), t("dashboard.remaining")],
-    datasets: [
-      {
-        data: [totalSpent, remainingBudget],
-        backgroundColor: ["var(--color-primary)", "var(--color-secondary)"],
-      },
-    ],
+  const renderChart = (chart) => {
+    switch (chart.type) {
+      case "Bar":
+        return <Bar data={chart.data} options={chartOptions} />;
+      case "Doughnut":
+        return <Doughnut data={chart.data} options={chartOptions} />;
+      case "Pie":
+        return <Pie data={chart.data} options={chartOptions} />;
+      case "Radar":
+        return <Radar data={chart.data} options={chartOptions} />;
+      case "Line":
+        return <Line data={chart.data} options={chartOptions} />;
+      default:
+        return null;
+    }
   };
 
-  const financeBarData = {
-    labels: financeSummary.map((item) => item._id),
-    datasets: [
-      {
-        label: t("dashboard.finance_amount"),
-        data: financeSummary.map((item) => item.totalAmount),
-        backgroundColor: "rgba(54, 162, 235, 0.6)",
-      },
-    ],
-  };
-
-  const taskPieData = {
-    labels: taskSummary.map((item) => item._id),
-    datasets: [
-      {
-        data: taskSummary.map((item) => item.count),
-        backgroundColor: [
-          "rgba(255, 99, 132, 0.6)",
-          "rgba(54, 162, 235, 0.6)",
-          "rgba(255, 206, 86, 0.6)",
-          "rgba(75, 192, 192, 0.6)",
-        ],
-      },
-    ],
-  };
-
-  const procurementLineData = {
-    labels: procurementSummary.map((item) => item._id),
-    datasets: [
-      {
-        label: t("dashboard.procurement_total_cost"),
-        data: procurementSummary.map((item) => item.totalCost),
-        fill: false,
-        borderColor: "#FF6384",
-      },
-    ],
-  };
-
-  const lowStockRadarData = {
-    labels: lowStockItems.map(
-      (item) => item.productId?.productName || t("dashboard.no_product_name")
-    ),
-    datasets: [
-      {
-        label: t("dashboard.current_stock"),
-        data: lowStockItems.map((item) => item.quantity),
-        backgroundColor: "rgba(255, 206, 86, 0.2)",
-        borderColor: "rgba(255, 206, 86, 1)",
-        borderWidth: 1,
-      },
-      {
-        label: t("dashboard.min_stock"),
-        data: lowStockItems.map((item) => item.minStockLevel),
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        borderColor: "rgba(75, 192, 192, 1)",
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const activeSuppliersCount = supplierReport.filter((s) => s.IsActive).length;
-  const inactiveSuppliersCount = supplierReport.filter(
-    (s) => !s.IsActive
-  ).length;
-  const supplierPieData = {
-    labels: [t("dashboard.active"), t("dashboard.inactive")],
-    datasets: [
-      {
-        data: [activeSuppliersCount, inactiveSuppliersCount],
-        backgroundColor: ["var(--color-primary)", "var(--color-secondary)"],
-      },
-    ],
-  };
-
-  const signatureStatusCounts = signatureReport.reduce((acc, sig) => {
-    const status = sig.status || "N/A";
-    acc[status] = (acc[status] || 0) + 1;
-    return acc;
-  }, {});
-  const signatureLabels = Object.keys(signatureStatusCounts);
-  const signatureData = Object.values(signatureStatusCounts);
-  const signatureDoughnutData = {
-    labels: signatureLabels,
-    datasets: [
-      {
-        data: signatureData,
-        backgroundColor: [
-          "var(--color-primary)",
-          "var(--color-secondary)",
-          "var(--color-accent)",
-        ],
-      },
-    ],
-  };
-
-  // אנימציות לכרטיסי סיכום
   const cardVariant = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
@@ -363,44 +1365,6 @@ const Dashboard = () => {
 
   return (
     <div className="relative min-h-screen text-text overflow-hidden">
-      {/* צורות אנימציה ללא רקע */}
-      <AnimatedShapes />
-      <div className="absolute inset-0 z-0">
-        <motion.div
-          className="absolute rounded-full"
-          style={{
-            width: "300px",
-            height: "300px",
-            top: "-50px",
-            left: "-100px",
-          }}
-          animate={{ x: [0, 100, 0], y: [0, 50, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.div
-          className="absolute rounded-full"
-          style={{
-            width: "400px",
-            height: "400px",
-            bottom: "-100px",
-            right: "-150px",
-          }}
-          animate={{ x: [0, -1000, 0], y: [0, -500, 0] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.div
-          className="absolute rounded-full"
-          style={{
-            width: "250px",
-            height: "250px",
-            bottom: "100px",
-            left: "-80px",
-          }}
-          animate={{ x: [0, 500, 0], y: [0, -300, 0] }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-        />
-      </div>
-
       <div className="relative z-10 container mx-auto p-4 sm:p-6 md:p-8">
         <motion.h1
           className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-6 text-center text-primary"
@@ -411,689 +1375,131 @@ const Dashboard = () => {
           {t("dashboard.title")}
         </motion.h1>
 
-        {/* כרטיסי סיכום עם רקע */}
-        <motion.section
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8"
-          initial="hidden"
-          animate="visible"
-          variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
-        >
-          <motion.div
-            variants={cardVariant}
-            whileHover={{ scale: 1.05 }}
-            className="p-4 sm:p-6 bg-bg bg-opacity-75 rounded-xl shadow-xl border border-border-color text-sm sm:text-base"
+        <div className="mb-6">
+          <label htmlFor="categorySelect" className="mr-2 font-semibold">
+            {t("dashboard.select_category")}:
+          </label>
+          <select
+            id="categorySelect"
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="p-2 rounded-md border border-border-color bg-bg text-text"
           >
-            <p className="font-semibold">{t("dashboard.total_budgets")}</p>
-            <p className="mt-2 text-xl font-bold">{budgetSummary.count || 0}</p>
-          </motion.div>
-          <motion.div
-            variants={cardVariant}
-            whileHover={{ scale: 1.05 }}
-            className="p-4 sm:p-6 bg-bg bg-opacity-75 rounded-xl shadow-xl border border-border-color text-sm sm:text-base"
-          >
-            <p className="font-semibold">{t("dashboard.total_budget")}</p>
-            <p className="mt-2 text-xl font-bold">{totalBudget}</p>
-          </motion.div>
-          <motion.div
-            variants={cardVariant}
-            whileHover={{ scale: 1.05 }}
-            className="p-4 sm:p-6 bg-bg bg-opacity-75 rounded-xl shadow-xl border border-border-color text-sm sm:text-base"
-          >
-            <p className="font-semibold">{t("dashboard.total_spent")}</p>
-            <p className="mt-2 text-xl font-bold">{totalSpent}</p>
-          </motion.div>
-          <motion.div
-            variants={cardVariant}
-            whileHover={{ scale: 1.05 }}
-            className="p-4 sm:p-6 bg-bg bg-opacity-75 rounded-xl shadow-xl border border-border-color text-sm sm:text-base"
-          >
-            <p className="font-semibold">{t("dashboard.remaining")}</p>
-            <p className="mt-2 text-xl font-bold text-secondary">
-              {remainingBudget}
-            </p>
-          </motion.div>
-        </motion.section>
+            <option value="All">{t("dashboard.all_categories")}</option>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        {/* גרפים עם רקע */}
-        <motion.section
-          className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-8"
-          initial="hidden"
-          animate="visible"
-          variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
-        >
-          <motion.div
-            variants={cardVariant}
-            whileHover={{ scale: 1.05 }}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6"
-          >
-            <h2 className="text-lg sm:text-xl font-bold mb-4 text-secondary">
-              {t("dashboard.budget_distribution")}
-            </h2>
-            <div className="w-full h-64 sm:h-80 md:h-96">
-              <Doughnut data={budgetDoughnutData} options={chartOptions} />
-            </div>
-          </motion.div>
-          <motion.div
-            variants={cardVariant}
-            whileHover={{ scale: 1.05 }}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6"
-          >
-            <h2 className="text-lg sm:text-xl font-bold mb-4 text-secondary">
-              {t("dashboard.finance_summary")}
-            </h2>
-            <div className="w-full h-64 sm:h-80 md:h-96">
-              <Bar data={financeBarData} options={chartOptions} />
-            </div>
-          </motion.div>
-          <motion.div
-            variants={cardVariant}
-            whileHover={{ scale: 1.05 }}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6"
-          >
-            <h2 className="text-lg sm:text-xl font-bold mb-4 text-secondary">
-              {t("dashboard.task_summary")}
-            </h2>
-            <div className="w-full h-64 sm:h-80 md:h-96">
-              <Pie data={taskPieData} options={chartOptions} />
-            </div>
-          </motion.div>
-          <motion.div
-            variants={cardVariant}
-            whileHover={{ scale: 1.05 }}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6"
-          >
-            <h2 className="text-lg sm:text-xl font-bold mb-4 text-secondary">
-              {t("dashboard.procurement_summary")}
-            </h2>
-            <div className="w-full h-64 sm:h-80 md:h-96">
-              <Line data={procurementLineData} options={chartOptions} />
-            </div>
-          </motion.div>
-          <motion.div
-            variants={cardVariant}
-            whileHover={{ scale: 1.05 }}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6"
-          >
-            <h2 className="text-lg sm:text-xl font-bold mb-4 text-secondary">
-              {t("dashboard.low_stock_items")}
-            </h2>
-            {lowStockItems.length > 0 ? (
-              <div className="w-full h-64 sm:h-80 md:h-96">
-                <Radar data={lowStockRadarData} options={chartOptions} />
-              </div>
-            ) : (
-              <p>{t("dashboard.no_data")}</p>
-            )}
-          </motion.div>
-          <motion.div
-            variants={cardVariant}
-            whileHover={{ scale: 1.05 }}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6"
-          >
-            <h2 className="text-lg sm:text-xl font-bold mb-4 text-secondary">
-              {t("dashboard.supplier_report")}
-            </h2>
-            {supplierReport.length > 0 ? (
-              <div className="w-full h-64 sm:h-80 md:h-96">
-                <Doughnut data={supplierPieData} options={chartOptions} />
-              </div>
-            ) : (
-              <p>{t("dashboard.no_data")}</p>
-            )}
-          </motion.div>
-          <motion.div
-            variants={cardVariant}
-            whileHover={{ scale: 1.05 }}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6 sm:col-span-2"
-          >
-            <h2 className="text-lg sm:text-xl font-bold mb-4 text-secondary">
-              {t("dashboard.signature_report")}
-            </h2>
-            {signatureReport.length > 0 ? (
-              <div className="w-full h-64 sm:h-80 md:h-96">
-                <Doughnut data={signatureDoughnutData} options={chartOptions} />
-              </div>
-            ) : (
-              <p>{t("dashboard.no_data")}</p>
-            )}
-          </motion.div>
-        </motion.section>
+        {(selectedCategory === "All" ? categories : [selectedCategory]).map(
+          (category) => (
+            <motion.section
+              key={category}
+              className="mb-12"
+              initial="hidden"
+              animate="visible"
+              variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
+            >
+              <h2 className="text-2xl font-bold mb-6 text-secondary">
+                {category}
+              </h2>
 
-        {/* טבלאות עם רקע */}
-        <motion.section
-          className="space-y-8"
-          initial="hidden"
-          animate="visible"
-          variants={{ visible: { transition: { staggerChildren: 0.2 } } }}
-        >
-          {/* טבלת אירועים קרובים */}
-          <motion.div
-            variants={cardVariant}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6 text-xs sm:text-sm"
-          >
-            <h2 className="text-xl font-bold mb-4 text-secondary">
-              {t("dashboard.upcoming_events")}
-            </h2>
-            {upcomingEvents.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full rounded-xl border border-border-color">
-                  <thead>
-                    <tr>
-                      <th className="py-2 px-2 border-b border-border-color">
-                        {t("dashboard.title")}
-                      </th>
-                      <th className="py-2 px-2 border-b border-border-color">
-                        {t("dashboard.start_date")}
-                      </th>
-                      <th className="py-2 px-2 border-b border-border-color">
-                        {t("dashboard.event_type")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {upcomingEvents.map((event) => (
-                      <tr key={event._id}>
-                        <td className="py-2 px-2 border-b border-border-color">
-                          {event.title}
-                        </td>
-                        <td className="py-2 px-2 border-b border-border-color">
-                          {new Date(event.startDate).toLocaleString()}
-                        </td>
-                        <td className="py-2 px-2 border-b border-border-color">
-                          {event.eventType}
-                        </td>
+              {/* Charts */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+                {categoryCharts[category].map((chart, index) => (
+                  <motion.div
+                    key={index}
+                    variants={cardVariant}
+                    className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6"
+                  >
+                    <h3 className="text-lg font-bold mb-4 text-secondary">
+                      {chart.title}
+                    </h3>
+                    <div className="w-full h-64">{renderChart(chart)}</div>
+                    <button
+                      onClick={() =>
+                        exportToExcel(
+                          categoryTables[category],
+                          `${category}_Chart_${index}`
+                        )
+                      }
+                      className="mt-4 px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-80 transition"
+                    >
+                      {t("dashboard.export_to_excel")}
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Summary Table */}
+              <motion.div
+                variants={cardVariant}
+                className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6"
+              >
+                <h3 className="text-lg font-bold mb-4 text-secondary">
+                  {t(`dashboard.${category.toLowerCase()}_summary_table`)}
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-primary text-white">
+                        {getKeyFields(category).map((key) => (
+                          <th key={key} className="p-2 border-b">
+                            {key.charAt(0).toUpperCase() + key.slice(1)}
+                          </th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p>{t("dashboard.no_data")}</p>
-            )}
-          </motion.div>
-
-          {/* טבלת ספקים */}
-          <motion.div
-            variants={cardVariant}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6 text-xs sm:text-sm"
-          >
-            <h2 className="text-xl font-bold mb-4 text-secondary">
-              {t("dashboard.supplier_report")}
-            </h2>
-            {supplierReport.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full rounded-xl border border-border-color">
-                  <thead>
-                    <tr>
-                      <th className="py-2 px-2 border-b border-border-color">
-                        {t("dashboard.supplier_name")}
-                      </th>
-                      <th className="py-2 px-2 border-b border-border-color">
-                        {t("dashboard.email")}
-                      </th>
-                      <th className="py-2 px-2 border-b border-border-color">
-                        {t("dashboard.phone")}
-                      </th>
-                      <th className="py-2 px-2 border-b border-border-color">
-                        {t("dashboard.status")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {supplierReport.map((supplier) => (
-                      <tr key={supplier._id}>
-                        <td className="py-2 px-2 border-b border-border-color">
-                          {supplier.SupplierName}
-                        </td>
-                        <td className="py-2 px-2 border-b border-border-color">
-                          {supplier.Email}
-                        </td>
-                        <td className="py-2 px-2 border-b border-border-color">
-                          {supplier.Phone}
-                        </td>
-                        <td className="py-2 px-2 border-b border-border-color">
-                          {supplier.IsActive
-                            ? t("dashboard.active")
-                            : t("dashboard.inactive")}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p>{t("dashboard.no_data")}</p>
-            )}
-          </motion.div>
-
-          {/* טבלת דוח חתימות */}
-          <motion.div
-            variants={cardVariant}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6 text-xs sm:text-sm"
-          >
-            <h2 className="text-xl font-bold mb-4 text-secondary">
-              {t("dashboard.signature_report")}
-            </h2>
-            {signatureReport.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full rounded-xl border border-border-color">
-                  <thead>
-                    <tr>
-                      <th className="py-2 px-2 border-b border-border-color">
-                        {t("dashboard.signature_name")}
-                      </th>
-                      <th className="py-2 px-2 border-b border-border-color">
-                        {t("dashboard.status")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {signatureReport.map((sig) => (
-                      <tr key={sig._id}>
-                        <td className="py-2 px-2 border-b border-border-color">
-                          {sig.name}
-                        </td>
-                        <td className="py-2 px-2 border-b border-border-color">
-                          {sig.status || "N/A"}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p>{t("dashboard.no_data")}</p>
-            )}
-          </motion.div>
-
-          {/* דוחות מפורטים עם רקע */}
-          <motion.div
-            variants={cardVariant}
-            className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6 text-xs sm:text-sm"
-          >
-            <h2 className="text-xl font-bold mb-4 text-secondary">
-              {t("dashboard.detailed_reports")}
-            </h2>
-            <div className="space-y-6">
-              {/* Detailed Budget by Project */}
-              <div>
-                <h3 className="text-lg font-semibold mb-2">
-                  {t("dashboard.budget_by_project")}
-                </h3>
-                {detailedBudgetByProject &&
-                detailedBudgetByProject.count !== undefined ? (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full rounded-xl border border-border-color">
-                      <thead>
-                        <tr>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.project_id")}
-                          </th>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.total_budget")}
-                          </th>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.total_spent")}
-                          </th>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.count")}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td className="py-2 px-2 border-b border-border-color">
-                            {detailedBudgetByProject._id || "-"}
-                          </td>
-                          <td className="py-2 px-2 border-b border-border-color">
-                            {detailedBudgetByProject.totalBudget || 0}
-                          </td>
-                          <td className="py-2 px-2 border-b border-border-color">
-                            {detailedBudgetByProject.totalSpent || 0}
-                          </td>
-                          <td className="py-2 px-2 border-b border-border-color">
-                            {detailedBudgetByProject.count || 0}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p>{t("dashboard.no_data")}</p>
-                )}
-              </div>
-              {/* Detailed Finance */}
-              <div>
-                <h3 className="text-lg font-semibold mb-2">
-                  {t("dashboard.detailed_finance")}
-                </h3>
-                {detailedFinance.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full rounded-xl border border-border-color">
-                      <thead>
-                        <tr>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.transaction_type")}
-                          </th>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.total_amount")}
-                          </th>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.transaction_count")}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {detailedFinance.map((tx, idx) => (
-                          <tr key={idx}>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {tx.transactionType}
-                            </td>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {tx.transactionAmount}
-                            </td>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {tx.count}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p>{t("dashboard.no_data")}</p>
-                )}
-              </div>
-              {/* Detailed Task */}
-              <div>
-                <h3 className="text-lg font-semibold mb-2">
-                  {t("dashboard.detailed_task")}
-                </h3>
-                {detailedTask.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full rounded-xl border border-border-color">
-                      <thead>
-                        <tr>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.status")}
-                          </th>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.count")}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {detailedTask.map((item, idx) => (
-                          <tr key={idx}>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {item._id}
-                            </td>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {item.count}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p>{t("dashboard.no_data")}</p>
-                )}
-              </div>
-              {/* Detailed Procurement by Supplier */}
-              <div>
-                <h3 className="text-lg font-semibold mb-2">
-                  {t("dashboard.procurement_by_supplier")}
-                </h3>
-                {procurementBySupplier.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full rounded-xl border border-border-color">
-                      <thead>
-                        <tr>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.supplier_id")}
-                          </th>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.total_cost")}
-                          </th>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.order_count")}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {procurementBySupplier.map((item, idx) => (
-                          <tr key={idx}>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {item._id}
-                            </td>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {item.totalCost}
-                            </td>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {item.count}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p>{t("dashboard.no_data")}</p>
-                )}
-              </div>
-              {/* Detailed Event by Type */}
-              <div>
-                <h3 className="text-lg font-semibold mb-2">
-                  {t("dashboard.event_by_type")}
-                </h3>
-                {eventByType.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full rounded-xl border border-border-color">
-                      <thead>
-                        <tr>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.event_title")}
-                          </th>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.start_date")}
-                          </th>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.event_type")}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {eventByType.map((event, idx) => (
-                          <tr key={idx}>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {event.title}
-                            </td>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {new Date(event.startDate).toLocaleString()}
-                            </td>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {event.eventType}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p>{t("dashboard.no_data")}</p>
-                )}
-              </div>
-              {/* Detailed Inventory Reorder */}
-              <div>
-                <h3 className="text-lg font-semibold mb-2">
-                  {t("dashboard.inventory_reorder")}
-                </h3>
-                {inventoryReorder.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full rounded-xl border border-border-color">
-                      <thead>
-                        <tr>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.product_name")}
-                          </th>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.quantity")}
-                          </th>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.min_stock")}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {inventoryReorder.map((item, idx) => (
-                          <tr key={idx}>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {item.productId?.productName ||
-                                t("dashboard.no_product_name")}
-                            </td>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {item.quantity}
-                            </td>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {item.minStockLevel}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p>{t("dashboard.no_data")}</p>
-                )}
-              </div>
-              {/* Detailed Employee Performance */}
-              <div>
-                <h3 className="text-lg font-semibold mb-2">
-                  {t("dashboard.employee_performance")}
-                </h3>
-                {employeePerformance.tasks &&
-                employeePerformance.tasks.length > 0 ? (
-                  <div>
-                    <h4 className="font-bold mb-2">{t("dashboard.tasks")}</h4>
-                    <div className="overflow-x-auto mb-4">
-                      <table className="min-w-full rounded-xl border border-border-color">
-                        <thead>
-                          <tr>
-                            <th className="py-2 px-2 border-b border-border-color">
-                              {t("dashboard.task_status")}
-                            </th>
-                            <th className="py-2 px-2 border-b border-border-color">
-                              {t("dashboard.count")}
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {employeePerformance.tasks.map((item, idx) => (
-                            <tr key={idx}>
-                              <td className="py-2 px-2 border-b border-border-color">
-                                {item._id}
+                    </thead>
+                    <tbody>
+                      {categoryTables[category].length > 0 ? (
+                        categoryTables[category].map((item, index) => (
+                          <tr
+                            key={index}
+                            className="hover:bg-gray-100 border-b"
+                          >
+                            {getKeyFields(category).map((key, i) => (
+                              <td key={i} className="p-2">
+                                {typeof item[key] === "object" &&
+                                item[key] !== null
+                                  ? JSON.stringify(item[key])
+                                  : item[key] !== undefined
+                                  ? String(item[key])
+                                  : "N/A"}
                               </td>
-                              <td className="py-2 px-2 border-b border-border-color">
-                                {item.count}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                    {employeePerformance.procurements &&
-                      employeePerformance.procurements.length > 0 && (
-                        <div>
-                          <h4 className="font-bold mb-2">
-                            {t("dashboard.procurements")}
-                          </h4>
-                          <div className="overflow-x-auto">
-                            <table className="min-w-full rounded-xl border border-border-color">
-                              <thead>
-                                <tr>
-                                  <th className="py-2 px-2 border-b border-border-color">
-                                    {t("dashboard.order_status")}
-                                  </th>
-                                  <th className="py-2 px-2 border-b border-border-color">
-                                    {t("dashboard.count")}
-                                  </th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {employeePerformance.procurements.map(
-                                  (item, idx) => (
-                                    <tr key={idx}>
-                                      <td className="py-2 px-2 border-b border-border-color">
-                                        {item._id}
-                                      </td>
-                                      <td className="py-2 px-2 border-b border-border-color">
-                                        {item.count}
-                                      </td>
-                                    </tr>
-                                  )
-                                )}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
+                            ))}
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan={getKeyFields(category).length}
+                            className="p-2 text-center text-gray-500"
+                          >
+                            {t("dashboard.no_data_available")}
+                          </td>
+                        </tr>
                       )}
-                  </div>
-                ) : (
-                  <p>{t("dashboard.no_data")}</p>
-                )}
-              </div>
-              {/* Detailed Supplier Performance */}
-              <div>
-                <h3 className="text-lg font-semibold mb-2">
-                  {t("dashboard.supplier_performance")}
-                </h3>
-                {supplierPerformance.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full rounded-xl border border-border-color">
-                      <thead>
-                        <tr>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.supplier_name")}
-                          </th>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.order_count")}
-                          </th>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.total_cost")}
-                          </th>
-                          <th className="py-2 px-2 border-b border-border-color">
-                            {t("dashboard.email")}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {supplierPerformance.map((item, idx) => (
-                          <tr key={idx}>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {item.supplierName}
-                            </td>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {item.orderCount}
-                            </td>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {item.totalCost}
-                            </td>
-                            <td className="py-2 px-2 border-b border-border-color">
-                              {item.Email}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p>{t("dashboard.no_data")}</p>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        </motion.section>
+                    </tbody>
+                  </table>
+                </div>
+                <button
+                  onClick={() =>
+                    exportToExcel(
+                      categoryTables[category],
+                      `${category}_Summary`
+                    )
+                  }
+                  className="mt-4 px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-80 transition"
+                >
+                  {t("dashboard.export_to_excel")}
+                </button>
+              </motion.div>
+            </motion.section>
+          )
+        )}
       </div>
     </div>
   );

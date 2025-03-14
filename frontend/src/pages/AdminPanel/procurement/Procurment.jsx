@@ -327,7 +327,7 @@ const Procurement = () => {
   const supplierId = formData.supplierId;
 
   return (
-    <div className="flex min-h-screen bg-bg animate-fade-in">
+    <div className="flex min-h-screen  animate-fade-in">
       <div className="container mx-auto max-w-6xl p-6 text-text">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-center mb-6 text-text tracking-tight drop-shadow-md">
           {t("procurement.records_title")}

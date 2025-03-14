@@ -113,7 +113,7 @@ const Finance = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-bg animate-fade-in">
+    <div className="flex min-h-screen  animate-fade-in">
       <div className="flex-1 container mx-auto max-w-full p-4 sm:p-6 lg:p-8">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-center mb-4 sm:mb-6 text-text tracking-tight drop-shadow-md">
           {t("finance.title")}
@@ -184,7 +184,7 @@ const Finance = () => {
             {t("errors.loading_error")} {error?.message}
           </div>
         ) : (
-          <div className="bg-accent rounded-2xl shadow-2xl p-4 sm:p-6 border border-border-color">
+          <div className=" rounded-2xl shadow-2xl p-4 sm:p-6 border bg-bg">
             <div className="overflow-x-auto">
               <table className="min-w-full text-text rounded-lg overflow-hidden">
                 <thead>
@@ -218,7 +218,7 @@ const Finance = () => {
                     return (
                       <React.Fragment key={doc._id}>
                         <tr
-                          className="border-b border-border-color cursor-pointer hover:bg-accent transition-all duration-200"
+                          className="border-b border-border-color cursor-pointer hover:bg-secondary transition-all duration-200"
                           onClick={() => handleRowClick(doc._id)}
                         >
                           <td className="py-3 px-4 sm:px-6 text-sm sm:text-base">

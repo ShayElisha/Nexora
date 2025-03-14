@@ -147,7 +147,7 @@ const ReceiptPurchase = () => {
   }, [discrepancies]);
 
   return (
-    <div className="min-h-screen bg-bg  flex flex-col items-center py-10 animate-fade-in">
+    <div className="min-h-screen   flex flex-col items-center py-10 animate-fade-in">
       <div className="container mx-auto p-6 sm:p-8 w-full max-w-6xl">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-text mb-8 tracking-tight drop-shadow-md text-center">
           {t("receipts.pending_title")}

@@ -120,7 +120,7 @@ const AddSupplier = ({ authUser }) => {
   };
 
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 animate-fade-in">
+    <div className="min-h-screen  flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 animate-fade-in">
       <div className="max-w-3xl w-full space-y-8">
         <div>
           <h2 className="text-center text-3xl font-extrabold text-text mb-8 tracking-tight drop-shadow-md">
@@ -129,7 +129,7 @@ const AddSupplier = ({ authUser }) => {
         </div>
         <form
           onSubmit={handleSubmit}
-          className="bg-accent p-8 rounded-2xl shadow-2xl border border-border-color transform transition-all duration-500 hover:shadow-3xl"
+          className="bg-bg p-8 rounded-2xl shadow-2xl border border-border-color transform transition-all duration-500 hover:shadow-3xl"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* פרטי ספק */}

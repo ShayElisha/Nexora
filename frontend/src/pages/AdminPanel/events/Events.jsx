@@ -323,7 +323,7 @@ const Events = () => {
         {t("events.calendar")}
       </h1>
       {/* Calendar Container */}
-      <div className="flex-grow w-full px-4">
+      <div className="flex-grow w-full px-4 z-50">
         <Calendar
           locale={i18n.language}
           onClickDay={openModalForDate}

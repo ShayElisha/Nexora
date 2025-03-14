@@ -363,7 +363,7 @@ const EditInventoryModal = ({ item, onClose }) => {
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Product Details */}
-          <div className="bg-accent p-4 rounded-xl border border-border-color shadow-sm">
+          <div className="bg-bg p-4 rounded-xl border border-border-color shadow-sm">
             <h3 className="text-xl font-semibold text-text mb-4">
               {t("inventory.product_details")}
             </h3>
@@ -585,7 +585,7 @@ const EditInventoryModal = ({ item, onClose }) => {
           </div>
 
           {/* Inventory Details */}
-          <div className="bg-accent p-4 rounded-xl border border-border-color shadow-sm">
+          <div className="bg-bg p-4 rounded-xl border border-border-color shadow-sm">
             <h3 className="text-xl font-semibold text-text mb-4">
               {t("inventory.inventory_details")}
             </h3>
@@ -1106,7 +1106,7 @@ const ProductList = () => {
                     <tr
                       className={`border-b border-border-color transition-all duration-300 ${
                         index % 2 === 0 ? "bg-bg" : "bg-accent"
-                      } hover:bg-accent hover:shadow-inner cursor-pointer`}
+                      } hover:bg-secondary hover:shadow-inner cursor-pointer`}
                       onClick={() => handleToggleRow(item._id)}
                     >
                       <td className="py-4 px-6">
@@ -1142,7 +1142,7 @@ const ProductList = () => {
                       </td>
                       <td className="py-4 px-6 flex items-center justify-end space-x-2">
                         <button
-                          className="px-3 py-1 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105"
+                          className="px-3 py-1 bg-button-bg text-button-text rounded-full shadow-md hover:bg-accent transition-all duration-200 transform hover:scale-105"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleEdit(item._id);
@@ -1171,7 +1171,7 @@ const ProductList = () => {
                       </td>
                     </tr>
                     {isExpanded && (
-                      <tr className="bg-accent">
+                      <tr className="bg-bg hover:bg-secondary">
                         <td colSpan={8} className="p-6">
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-text">
                             <div>
@@ -1265,7 +1265,7 @@ const ProductList = () => {
                                   t("inventory.not_available")}
                               </p>
                               <button
-                                className="mt-4 px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105"
+                                className="mt-4 px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-accent transition-all duration-200 transform hover:scale-105"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   openFilesModal(item.attachments || []);
@@ -1307,7 +1307,7 @@ const ProductList = () => {
   }
 
   return (
-    <div className="min-h-screen bg-bg p-6 animate-fade-in">
+    <div className="min-h-screen  p-6 animate-fade-in">
       <div className="container mx-auto max-w-screen-xl">
         <div className="bg-bg rounded-2xl shadow-2xl p-6 sm:p-8 border border-border-color transform transition-all duration-500 hover:shadow-3xl">
           <h1 className="text-3xl font-extrabold text-text mb-6 text-center tracking-tight drop-shadow-md">
@@ -1319,7 +1319,7 @@ const ProductList = () => {
             <select
               value={filterProductType}
               onChange={(e) => setFilterProductType(e.target.value)}
-              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-accent text-text"
+              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-bg text-text"
             >
               <option value="all">
                 {t("inventory.filter_all_product_types")}
@@ -1332,7 +1332,7 @@ const ProductList = () => {
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-accent text-text"
+              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-bg text-text"
             >
               <option value="all">
                 {t("inventory.filter_all_categories")}
@@ -1350,7 +1350,7 @@ const ProductList = () => {
             <select
               value={filterSupplier}
               onChange={(e) => setFilterSupplier(e.target.value)}
-              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-accent text-text"
+              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-bg text-text"
             >
               <option value="all">{t("inventory.filter_all_suppliers")}</option>
               {Array.from(
@@ -1366,7 +1366,7 @@ const ProductList = () => {
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
-              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-accent text-text"
+              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-bg text-text"
             >
               <option value="">{t("inventory.sort_by")}</option>
               <option value="productName_asc">
@@ -1433,7 +1433,7 @@ const ProductList = () => {
               placeholder={t("inventory.search_placeholder")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-accent text-text placeholder-opacity-50"
+              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-bg text-text placeholder-opacity-50"
             />
           </div>
 

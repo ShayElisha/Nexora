@@ -25,26 +25,25 @@ const CreateTask = () => {
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
 
-  // מצבים חדשים עבור פרטי המחלקה והפרויקט (לצורך סינון העובדים לפי צוות)
   const [departmentDetails, setDepartmentDetails] = useState(null);
   const [projectDetails, setProjectDetails] = useState(null);
 
+  // הזמנות
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]); // array of item._id
+
   const [loading, setLoading] = useState(false);
 
   // --------------------------------------------------
-  // 1) Fetch departments, projects, employees manually
+  // 1) Fetch departments
   // --------------------------------------------------
-
-  // Fetch departments
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
         const res = await axiosInstance.get("/departments");
         const options = res.data.data.map((dept) => ({
-          id: dept._id, // Use dept._id for consistency
+          id: dept._id,
           name: dept.name,
         }));
         setDepartmentOptions(options);
@@ -56,7 +55,9 @@ const CreateTask = () => {
     fetchDepartments();
   }, [t]);
 
-  // Fetch projects when departmentId changes
+  // --------------------------------------------------
+  // 2) Fetch projects when departmentId changes
+  // --------------------------------------------------
   useEffect(() => {
     if (formData.departmentId) {
       const fetchProjects = async () => {
@@ -64,9 +65,9 @@ const CreateTask = () => {
           const res = await axiosInstance.get(
             `/departments/projectName/${formData.departmentId}`
           );
-          // Important: use project.id from the API response (not project.projectId)
+          // בהנחה שה־API מחזיר שדה "id" לפרויקט
           const options = res.data.data.map((project) => ({
-            id: project.id, // Correct: using the 'id' field from the API response
+            id: project.id,
             name: project.name,
             endDate: project.endDate,
           }));
@@ -82,7 +83,9 @@ const CreateTask = () => {
     }
   }, [formData.departmentId, t]);
 
-  // Fetch employees
+  // --------------------------------------------------
+  // 3) Fetch employees
+  // --------------------------------------------------
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -96,7 +99,9 @@ const CreateTask = () => {
     fetchEmployees();
   }, [t]);
 
-  // Fetch department details to get teamMembers when a department is selected
+  // --------------------------------------------------
+  // 4) Fetch department details
+  // --------------------------------------------------
   useEffect(() => {
     if (formData.departmentId) {
       axiosInstance
@@ -113,7 +118,9 @@ const CreateTask = () => {
     }
   }, [formData.departmentId]);
 
-  // Fetch project details to get teamMembers when a project is selected
+  // --------------------------------------------------
+  // 5) Fetch project details
+  // --------------------------------------------------
   useEffect(() => {
     if (formData.projectId) {
       axiosInstance
@@ -130,18 +137,20 @@ const CreateTask = () => {
     }
   }, [formData.projectId]);
 
-  // Filter employees by selected department and project (אם נבחר פרויקט)
+  // --------------------------------------------------
+  // 6) Filter employees by dept & project
+  // --------------------------------------------------
   useEffect(() => {
     let filtered = [];
     if (departmentDetails && departmentDetails.teamMembers) {
-      // מסננים את העובדים אשר מופיעים ב־teamMembers של המחלקה
+      // teamMembers => [{employeeId: "XXX"}, ...]
       filtered = employees.filter((emp) =>
         departmentDetails.teamMembers.some(
           (member) => String(member.employeeId) === String(emp._id)
         )
       );
     }
-    // אם נבחר גם פרוייקט, מסננים עוד לפי חברי הצוות בפרוייקט
+    // אם פרויקט נבחר, מצמצמים עוד לפי projectDetails.teamMembers
     if (formData.projectId && projectDetails && projectDetails.teamMembers) {
       filtered = filtered.filter((emp) =>
         projectDetails.teamMembers.some(
@@ -159,7 +168,7 @@ const CreateTask = () => {
   ]);
 
   // --------------------------------------------------
-  // 2) Fetch orders & store them in state
+  // 7) Fetch orders, filter by unallocated items
   // --------------------------------------------------
   const fetchOrders = async () => {
     try {
@@ -184,31 +193,27 @@ const CreateTask = () => {
     fetchOrders();
   }, [t]);
 
-  // -----------------------------
-  // 3) Handlers for the form
-  // -----------------------------
+  // --------------------------------------------------
+  // Handlers
+  // --------------------------------------------------
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+    // אם שינינו מחלקה, איפסנו פרויקט
     if (name === "departmentId") {
       setFormData((prev) => ({ ...prev, projectId: "" }));
     }
   };
 
   const handleAssignedChange = (e) => {
-    const selectedOptions = Array.from(
-      e.target.selectedOptions,
-      (option) => option.value
-    );
-    setFormData((prev) => ({
-      ...prev,
-      assignedTo: selectedOptions,
-    }));
+    const selected = Array.from(e.target.selectedOptions, (o) => o.value);
+    setFormData((prev) => ({ ...prev, assignedTo: selected }));
   };
 
+  // בחירת הזמנה
   const handleOrderChange = (e) => {
     const order = orders.find((o) => o._id === e.target.value);
     setSelectedOrder(order || null);
@@ -222,6 +227,7 @@ const CreateTask = () => {
     }));
   };
 
+  // בחירת פריטים מההזמנה
   const handleItemChange = (itemId) => {
     setSelectedItems((prev) =>
       prev.includes(itemId)
@@ -230,25 +236,28 @@ const CreateTask = () => {
     );
   };
 
-  // -----------------------------
-  // 4) Submit form to create task
-  // -----------------------------
+  // --------------------------------------------------
+  // 8) Create task (Submit)
+  // --------------------------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
+    // בדיקות מינימליות
     if (!formData.departmentId) {
       toast.error(t("createTask.department_required"));
       setLoading(false);
       return;
     }
 
+    // אם נבחרה הזמנה אבל לא נבחר שום פריט
     if (selectedOrder && selectedItems.length === 0) {
       toast.error("אנא בחר לפחות פריט אחד מההזמנה");
       setLoading(false);
       return;
     }
 
+    // בונים מערך של פריטי הזמנה
     const orderItemsArray = selectedOrder
       ? selectedItems.map((itemId) => {
           const item = selectedOrder.items.find((i) => i._id === itemId);
@@ -261,24 +270,26 @@ const CreateTask = () => {
         })
       : [];
 
-    // בניית אובייקט הנתונים למשלוח – כולל שדות הזמנה ופרוייקט רק אם נבחרו
+    // אובייקט השליחה
     const taskData = {
+      // מכיל departmentId, projectId, וכו'
       ...formData,
+
+      // אם נבחרה הזמנה
       ...(selectedOrder && {
         orderId: selectedOrder._id,
         orderItems: orderItemsArray,
       }),
-      ...(formData.projectId && {
-        // במקרה שנבחר פרוייקט, אנו שולחים את המזהה בהתאם למחלקה
-        project: {
-          projectId: formData.projectId,
-        },
-      }),
+
+      // **לא** שולחים { project: { projectId: ... } }! רק projectId ישירות
+      // ולכן לא צריך פה שום דבר נוסף, כי formData.projectId כבר קיים
     };
 
     try {
       await axiosInstance.post("/tasks", taskData);
       toast.success(t("createTask.success"));
+
+      // איפוס
       await fetchOrders();
       setSelectedOrder(null);
       setSelectedItems([]);
@@ -304,11 +315,11 @@ const CreateTask = () => {
     (p) => p.id === formData.projectId
   );
 
-  // -----------------------------
-  // 5) Render
-  // -----------------------------
+  // --------------------------------------------------
+  // Render
+  // --------------------------------------------------
   return (
-    <div className="max-w-3xl mx-auto p-4 bg-bg text-text border border-border-color rounded-lg shadow-md">
+    <div className="container mx-auto max-w-4xl p-8 bg-bg rounded-2xl shadow-2xl border border-border-color transform transition-all duration-500 hover:shadow-3xl">
       <h2 className="text-3xl font-bold mb-6 text-primary">
         {t("createTask.title")}
       </h2>

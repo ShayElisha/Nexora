@@ -13,13 +13,13 @@ export const signUp = async (req, res) => {
       lastName,
       email,
       password,
-      role,
       gender,
       identity,
       phone,
       department,
       address,
     } = req.body;
+    let role = req.body.role; // מוגדר בנפרד, עם let
 
     const profileImageFile = req.file;
 
@@ -84,6 +84,7 @@ export const signUp = async (req, res) => {
         req.cookies["email_approved_jwt"] || req.cookies["auth_token"];
 
       // אם אין טוקן – לא נוכל לשלוף מזהה חברה ונחזיר שגיאה
+      console.log("token:", token);
       if (!token) {
         return res.status(401).json({
           success: false,
@@ -139,6 +140,10 @@ export const signUp = async (req, res) => {
         success: false,
         message: "Email already exists under this company",
       });
+    }
+    const firstEmp = await Employee.find({ companyId });
+    if (firstEmp.length === 0) {
+      role = "Admin";
     }
 
     // Hashing לסיסמה

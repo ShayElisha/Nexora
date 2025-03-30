@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../../lib/axios";
 import toast from "react-hot-toast";
 import SignatureCanvas from "react-signature-canvas";
@@ -8,9 +8,10 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 
 const Navbar = ({ isRTL }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const signaturePadRef = useRef(null);
+  const navigate = useNavigate();
 
   // States
   const [showPopup, setShowPopup] = useState(false);
@@ -234,6 +235,144 @@ const Navbar = ({ isRTL }) => {
     }
   };
 
+  const handleOrderClick = async (notificationId) => {
+    try {
+      const notification = adminNotifications.find(
+        (n) => n._id === notificationId
+      );
+      console.log("תוכן ההתראה:", notification?.content);
+
+      // Extract product name from notification content
+      const productNameMatch = notification?.content.match(
+        /The quantity of the product "?([^"]*)"?(?= is below the minimum stock level)/
+      );
+      const productName = productNameMatch ? productNameMatch[1] : null;
+      if (!productName) {
+        throw new Error("לא ניתן לחלץ את שם המוצר מההתראה");
+      }
+      console.log("שם המוצר שחולץ:", productName);
+
+      // Search for products by name
+      const productSearchResp = await axiosInstance.get(
+        `/product/search-by-name`,
+        {
+          params: { name: productName },
+        }
+      );
+      console.log("תגובת חיפוש מוצר:", productSearchResp.data);
+      if (
+        !productSearchResp.data.success ||
+        !productSearchResp.data.data?.length
+      ) {
+        throw new Error("לא נמצא מוצר עם השם הזה");
+      }
+      const products = productSearchResp.data.data;
+
+      // Find the product below minimum stock level
+      let product = null;
+      for (const p of products) {
+        try {
+          const inventoryResponse = await axiosInstance.get(
+            `/inventory/${p._id}`
+          );
+          const inventory = inventoryResponse.data.data;
+          if (inventory && inventory.quantity < inventory.minStockLevel) {
+            product = p;
+            break;
+          }
+        } catch (err) {
+          console.warn(`בדיקת מלאי נכשלה עבור מזהה ${p._id}:`, err.message);
+        }
+      }
+      product = product || products[0]; // Fallback to first product if none found below min stock
+      console.log("מוצר שנבחר:", product);
+
+      if (!product?._id) {
+        throw new Error("מזהה המוצר חסר בתוצאת החיפוש");
+      }
+
+      const {
+        unitPrice = 0,
+        sku = "",
+        category = "",
+        supplierId = "",
+      } = product;
+
+      // Fetch reorder quantity
+      let reorderQuantity = 0;
+      try {
+        const inventoryResponse = await axiosInstance.get(
+          `/inventory/${product._id}`
+        );
+        console.log("תגובת API מלאי:", inventoryResponse.data);
+        reorderQuantity = inventoryResponse.data.data?.reorderQuantity || 0;
+      } catch (err) {
+        console.warn(`הבאת מלאי נכשלה עבור מזהה ${product._id}:`, err.message);
+      }
+
+      // Fetch supplier details
+      let supplier = {};
+      if (supplierId) {
+        try {
+          const supplierResponse = await axiosInstance.get(
+            `/suppliers/${supplierId}`
+          );
+          console.log("תגובת API ספק:", supplierResponse.data);
+          if (!supplierResponse.data.success) {
+            throw new Error(
+              supplierResponse.data.error || "נכשל בהבאת פרטי הספק"
+            );
+          }
+          supplier = supplierResponse.data.data;
+        } catch (err) {
+          console.error(`הבאת ספק נכשלה עבור מזהה ${supplierId}:`, err.message);
+          supplier = {
+            _id: supplierId,
+            SupplierName: "ספק לא ידוע",
+            baseCurrency: "USD",
+          };
+        }
+      } else {
+        console.warn("לא סופק מזהה ספק ממידע המוצר");
+        supplier = { SupplierName: "ספק לא ידוע", baseCurrency: "USD" };
+      }
+
+      // Mark notification as read
+      await axiosInstance.post(`/notifications/mark-as-read`, {
+        notificationId,
+      });
+
+      // Navigate with validated data
+      const stateData = {
+        productId: product._id,
+        productName: product.productName || productName,
+        supplierId: supplier._id || supplierId,
+        supplierName: supplier.SupplierName || "ספק לא ידוע",
+        baseCurrency: supplier.baseCurrency || "USD",
+        quantity: reorderQuantity,
+        unitPrice: unitPrice || 0,
+        sku: sku || "",
+        category: category || "",
+      };
+      console.log("מנווט עם נתונים:", stateData);
+      navigate("/dashboard/add-procurement-record", { state: stateData });
+
+      refetchAdminNotifications();
+    } catch (error) {
+      console.error("שגיאה בטיפול בלחיצה על הזמנה:", error);
+      let errorMessage = t("navbar.notifications.orderError");
+      if (error.response) {
+        errorMessage =
+          error.response.data.error ||
+          error.response.data.message ||
+          errorMessage;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      toast.error(errorMessage);
+    }
+  };
+
   // Handlers: Hamburger Menu
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
@@ -248,7 +387,7 @@ const Navbar = ({ isRTL }) => {
     {
       label: t("navbar.products"),
       subMenu: [
-        { to: "/dashboard/products", text: t("navbar.all_products") },
+        { to: "/dashboard/products", text: t(" Policies.all_products") },
         { to: "/dashboard/add-product", text: t("navbar.add_product") },
       ],
     },
@@ -292,7 +431,7 @@ const Navbar = ({ isRTL }) => {
         },
         {
           to: "/dashboard/procurement/approveProcurment",
-          text: "Receipt Purchase",
+          text: t("navbar.receipt_purchase"),
         },
         {
           label: t("navbar.ProcurementProposals"),
@@ -356,10 +495,7 @@ const Navbar = ({ isRTL }) => {
           to: "/dashboard/AddPerformanceReview",
           text: t("navbar.add_reviewForm"),
         },
-        {
-          to: "/dashboard/performance-reviews",
-          text: t("navbar.review_List"),
-        },
+        { to: "/dashboard/performance-reviews", text: t("navbar.review_List") },
       ],
     },
     {
@@ -374,6 +510,16 @@ const Navbar = ({ isRTL }) => {
       subMenu: [
         { to: "/dashboard/Customers/Orders", text: t("navbar.Orders List") },
         { to: "/dashboard/Customers/AddOrder", text: t("navbar.Add-Orders") },
+        {
+          label: t("navbar.customer"),
+          subMenu: [
+            { to: "/dashboard/Customers", text: t("navbar.customer_list") },
+            {
+              to: "/dashboard/Customers/Add-Customer",
+              text: t("navbar.add_customer"),
+            },
+          ],
+        },
       ],
     },
     {
@@ -463,7 +609,7 @@ const Navbar = ({ isRTL }) => {
                       openSubDropdown === uniqueSubIndex ? null : uniqueSubIndex
                     );
                   }}
-                  className={`w-full py-1  text-[var(--color-primary)] font-medium hover:text-[var(--color-accent)] transition-all duration-300 ease-in-out relative ${
+                  className={`w-full py-1 text-[var(--color-primary)] font-medium hover:text-[var(--color-accent)] transition-all duration-300 ease-in-out relative ${
                     isRTL ? "text-right" : "text-left"
                   }`}
                 >
@@ -522,7 +668,7 @@ const Navbar = ({ isRTL }) => {
         {isLoggedIn && (
           <button
             onClick={toggleMenu}
-            className="2xl:hidden text-white  focus:outline-none flex-shrink-0 hover:text-[var(--color-accent)] transition-colors duration-200"
+            className="2xl:hidden text-white focus:outline-none flex-shrink-0 hover:text-[var(--color-accent)] transition-colors duration-200"
             aria-label="Toggle menu"
           >
             {isMenuOpen ? (
@@ -560,13 +706,13 @@ const Navbar = ({ isRTL }) => {
                       <span className="ml-1 text-xs">
                         {openDropdown === index ? "▲" : "▼"}
                       </span>
-                      <span className="absolute  bottom-0 left-1/2 w-0 h-[2px] bg-[var(--color-accent)] transition-all duration-300 ease-in-out group-hover:w-full group-hover:left-0"></span>
+                      <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-[var(--color-accent)] transition-all duration-300 ease-in-out group-hover:w-full group-hover:left-0"></span>
                     </button>
                     {openDropdown === index && (
                       <div
                         className={`absolute ${
                           isRTL ? "right-0" : "left-0"
-                        } mt-2  bg-white text-[var(--color-primary)] rounded-lg shadow-lg p-3 w-64 z-50 border border-[var(--color-accent)] animate-slide-down`}
+                        } mt-2 bg-white text-[var(--color-primary)] rounded-lg shadow-lg p-3 w-64 z-50 border border-[var(--color-accent)] animate-slide-down`}
                       >
                         {renderSubMenu(navItem.subMenu, index)}
                       </div>
@@ -778,36 +924,65 @@ const Navbar = ({ isRTL }) => {
                       {isLoadingNotifications ? (
                         <p className="text-sm">{t("notifications.loading")}</p>
                       ) : adminNotifications.length > 0 ? (
-                        adminNotifications.map((notification) => (
-                          <div
-                            key={notification._id}
-                            onClick={() =>
-                              !notification.isRead &&
-                              markNotificationAsRead(notification._id)
-                            }
-                            className={`relative border-b mb-1 pb-1 pl-2 pr-4 cursor-pointer rounded-lg ${
-                              notification.isRead
-                                ? "bg-gray-100 opacity-70"
-                                : "bg-white hover:bg-[var(--color-accent)] hover:text-white"
-                            } transition-all duration-200`}
-                          >
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteNotification(notification._id);
-                              }}
-                              className="absolute top-0 right-0 px-1 py-0.5 bg-red-500 text-white rounded-full hover:bg-red-600 text-xs shadow-sm transition-all duration-200"
+                        adminNotifications.map((notification) => {
+                          const isInventoryNotification =
+                            notification.PurchaseOrder === "Inventory";
+                          const productIdMatch = notification.content.match(
+                            /product (.*) is below/
+                          );
+                          const productId =
+                            isInventoryNotification && productIdMatch
+                              ? productIdMatch[1]
+                              : null;
+
+                          return (
+                            <div
+                              key={notification._id}
+                              onClick={() =>
+                                !notification.isRead &&
+                                !isInventoryNotification &&
+                                markNotificationAsRead(notification._id)
+                              }
+                              className={`relative border-b mb-1 pb-1 pl-2 pr-4 rounded-lg ${
+                                notification.isRead
+                                  ? "bg-gray-100 opacity-70"
+                                  : "bg-white hover:bg-[var(--color-accent)] hover:text-white"
+                              } transition-all duration-200`}
                             >
-                              ×
-                            </button>
-                            <p className="text-sm">{notification.content}</p>
-                            <span className="text-sm text-gray-500 block">
-                              {new Date(
-                                notification.createdAt
-                              ).toLocaleString()}
-                            </span>
-                          </div>
-                        ))
+                              {!isInventoryNotification && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    deleteNotification(notification._id);
+                                  }}
+                                  className="absolute top-0 right-0 px-1 py-0.5 bg-red-500 text-white rounded-full hover:bg-red-600 text-xs shadow-sm transition-all duration-200"
+                                >
+                                  ×
+                                </button>
+                              )}
+                              <p className="text-sm">{notification.content}</p>
+                              <span className="text-sm text-gray-500 block">
+                                {new Date(
+                                  notification.createdAt
+                                ).toLocaleString()}
+                              </span>
+                              {isInventoryNotification &&
+                                !notification.isRead && (
+                                  <div className="mt-2 flex justify-end space-x-2">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleOrderClick(notification._id);
+                                      }}
+                                      className="px-2 py-1 bg-[var(--color-primary)] text-white rounded-full hover:bg-[var(--color-secondary)] text-xs transition-all duration-300"
+                                    >
+                                      {t("navbar.notifications.order")}
+                                    </button>
+                                  </div>
+                                )}
+                            </div>
+                          );
+                        })
                       ) : (
                         <p className="text-sm">
                           {t("navbar.notifications.no_notifications")}
@@ -989,18 +1164,37 @@ const Navbar = ({ isRTL }) => {
       {/* Custom Animations */}
       <style>{`
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideDown {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        .animate-slide-down { animation: slideDown 0.3s ease-out forwards; }
-        .group:hover .group-hover\\:w-full { width: 100%; }
-        .group:hover .group-hover\\:left-0 { left: 0; }
-      `}</style>
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+                     to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          @keyframes slideDown {
+            from {
+              opacity: 0;
+              transform: translateY(-10px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+          }
+          .animate-slide-down {
+            animation: slideDown 0.3s ease-out forwards;
+          }
+          .group:hover .group-hover\\:w-full {
+            width: 100%;
+          }
+          .group:hover .group-hover\\:left-0 {
+            left: 0;
+          }
+        `}</style>
     </nav>
   );
 };

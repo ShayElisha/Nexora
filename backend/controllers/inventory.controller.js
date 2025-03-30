@@ -2,6 +2,8 @@
 import Inventory from "../models/inventory.model.js";
 import Product from "../models/product.model.js";
 import jwt from "jsonwebtoken";
+import Notification from "../models/notification.model.js";
+import Employee from "../models/employees.model.js";
 
 /**
  * Create a new inventory item
@@ -111,13 +113,39 @@ export const getAllInventoryItems = async (req, res) => {
     });
   }
 };
+// controllers/inventory.controller.js
+export const getInventoryByProductId = async (req, res) => {
+  try {
+    const token = req.cookies["auth_token"];
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const companyId = decodedToken.companyId;
 
-/**
- * Update inventory item by allowed fields
- */
+    const inventory = await Inventory.findOne({
+      productId: req.params.productId,
+      companyId,
+    });
+    if (!inventory) {
+      return res.status(404).json({
+        success: false,
+        message: "Inventory not found for this product",
+      });
+    }
+    res.status(200).json({ success: true, data: inventory });
+  } catch (error) {
+    console.error("Error fetching inventory:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch inventory",
+      error: error.message,
+    });
+  }
+};
 export const updateInventoryItem = async (req, res) => {
   try {
-    // בדיקת טוקן
+    // Token verification
     const token = req.cookies["auth_token"];
     if (!token) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
@@ -128,10 +156,7 @@ export const updateInventoryItem = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid token" });
     }
 
-    // כאן req.params.id הוא מזהה המוצר (productId)
     const productId = req.params.id;
-
-    // חילוץ שדות לעדכון מהבקשה
     const {
       quantity,
       minStockLevel,
@@ -142,7 +167,17 @@ export const updateInventoryItem = async (req, res) => {
       lastOrderDate,
     } = req.body;
 
-    // מציאת רשומת מלאי לפי productId ו-companyId
+    const employee = await Employee.findOne({
+      companyId,
+      role: "Admin",
+    });
+    if (!employee) {
+      return res.status(404).json({
+        success: false,
+        message: "No Admin found for this company.",
+      });
+    }
+
     const inventoryItem = await Inventory.findOne({ productId, companyId });
     if (!inventoryItem) {
       return res
@@ -150,23 +185,67 @@ export const updateInventoryItem = async (req, res) => {
         .json({ success: false, message: "Inventory item not found." });
     }
 
-    // עדכון השדות – מעדכנים רק אם נשלח ערך
-    if (quantity !== undefined) inventoryItem.quantity = quantity;
-    if (minStockLevel !== undefined)
+    // Fetch product details to get the product name
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Product not found." });
+    }
+    const productName = product.productName || "Unknown Product";
+
+    // אם המלאי יורד מתחת לרמה המינימלית
+    if (
+      typeof quantity === "number" && // רק אם נשלח quantity
+      inventoryItem.quantity - quantity < inventoryItem.minStockLevel
+    ) {
+      // בדיקה שאין כבר התראה קיימת עם אותו תוכן ושעדיין לא נקראה
+      const notificationContent = `The quantity of the product ${productName} is below the minimum stock level. Please order more.`;
+      const existingNotification = await Notification.findOne({
+        companyId,
+        content: notificationContent,
+        employeeId: employee._id,
+        isRead: false,
+      });
+
+      if (!existingNotification) {
+        const newNotification = new Notification({
+          companyId,
+          content: notificationContent,
+          employeeId: employee._id,
+          type: "Warning",
+          PurchaseOrder: "Inventory", // לצורך זיהוי שההזמנה קשורה למלאי
+        });
+        await newNotification.save();
+      }
+    }
+
+    // עדכון פרטי הפריט במלאי
+    if (typeof quantity === "number") {
+      inventoryItem.quantity = inventoryItem.quantity - quantity;
+    }
+    if (typeof minStockLevel === "number") {
       inventoryItem.minStockLevel = minStockLevel;
-    if (reorderQuantity !== undefined)
+    }
+    if (typeof reorderQuantity === "number") {
       inventoryItem.reorderQuantity = reorderQuantity;
-    if (batchNumber !== undefined) inventoryItem.batchNumber = batchNumber;
-    if (expirationDate !== undefined)
+    }
+    if (batchNumber !== undefined) {
+      inventoryItem.batchNumber = batchNumber;
+    }
+    if (expirationDate !== undefined) {
       inventoryItem.expirationDate = expirationDate
         ? new Date(expirationDate)
         : null;
-    if (shelfLocation !== undefined)
+    }
+    if (shelfLocation !== undefined) {
       inventoryItem.shelfLocation = shelfLocation;
-    if (lastOrderDate !== undefined)
+    }
+    if (lastOrderDate !== undefined) {
       inventoryItem.lastOrderDate = lastOrderDate
         ? new Date(lastOrderDate)
         : null;
+    }
 
     const updatedInventory = await inventoryItem.save();
 
@@ -180,10 +259,6 @@ export const updateInventoryItem = async (req, res) => {
     });
   }
 };
-
-/**
- * Delete inventory item by id
- */
 export const deleteInventoryItem = async (req, res) => {
   try {
     const deletedInventoryItem = await Inventory.findByIdAndDelete(

@@ -65,7 +65,7 @@ const CreateCompanyForm = () => {
   return (
     <form
       onSubmit={handleCreateCompany}
-      className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 lg:gap-x-8 px-4 py-6"
+      className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 lg:gap-x-8 px-4 py-6 bg-bg animate-fadeIn"
     >
       {/* Input Fields */}
       {[
@@ -138,52 +138,69 @@ const CreateCompanyForm = () => {
       ].map((field, idx) => (
         <div
           key={idx}
-          className="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500"
+          className="flex flex-col gap-1 animate-fadeIn"
+          style={{ animationDelay: `${idx * 0.05}s` }}
         >
-          <input
-            type={field.type}
-            name={field.label.toLowerCase().replace(" ", "")}
-            placeholder={field.label}
-            value={field.value}
-            onChange={(e) => field.setValue(e.target.value)}
-            className="w-full bg-transparent outline-none text-gray-700 placeholder-zinc-700"
-          />
+          <label className="text-sm font-medium text-text">{field.label}</label>
+          <div className="flex items-center gap-2 border border-border-color rounded-md px-3 py-2 focus-within:ring-2 focus-within:ring-primary transition-all duration-200">
+            <input
+              type={field.type}
+              name={field.label.toLowerCase().replace(" ", "")}
+              placeholder={field.label}
+              value={field.value}
+              onChange={(e) => field.setValue(e.target.value)}
+              className="w-full bg-transparent outline-none text-text placeholder-secondary"
+            />
+          </div>
         </div>
       ))}
 
       {/* Industry Dropdown */}
-      <div className="flex items-center gap-2 border border-gray-300 rounded-md px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500">
-        <select
-          value={industry}
-          onChange={(e) => setIndustry(e.target.value)}
-          className="w-full bg-transparent outline-none text-gray-700 placeholder-zinc-700"
-        >
-          <option value="">{t("company.select_industry")}</option>
-          <option value="Technology">
-            {t("company.industries.technology")}
-          </option>
-          <option value="Retail">{t("company.industries.retail")}</option>
-          <option value="Finance">{t("company.industries.finance")}</option>
-          <option value="Healthcare">
-            {t("company.industries.healthcare")}
-          </option>
-          <option value="Education">{t("company.industries.education")}</option>
-          <option value="Real Estate">
-            {t("company.industries.real_estate")}
-          </option>
-          <option value="Manufacturing">
-            {t("company.industries.manufacturing")}
-          </option>
-          <option value="Other">{t("company.industries.other")}</option>
-        </select>
+      <div
+        className="flex flex-col gap-1 animate-fadeIn"
+        style={{ animationDelay: `${11 * 0.05}s` }}
+      >
+        <label className="text-sm font-medium text-text">
+          {t("company.industry")}
+        </label>
+        <div className="flex items-center gap-2 border border-border-color rounded-md px-3 py-2 focus-within:ring-2 focus-within:ring-primary transition-all duration-200">
+          <select
+            value={industry}
+            onChange={(e) => setIndustry(e.target.value)}
+            className="w-full bg-transparent outline-none text-text placeholder-secondary"
+          >
+            <option value="">{t("company.select_industry")}</option>
+            <option value="Technology">
+              {t("company.industries.technology")}
+            </option>
+            <option value="Retail">{t("company.industries.retail")}</option>
+            <option value="Finance">{t("company.industries.finance")}</option>
+            <option value="Healthcare">
+              {t("company.industries.healthcare")}
+            </option>
+            <option value="Education">
+              {t("company.industries.education")}
+            </option>
+            <option value="Real Estate">
+              {t("company.industries.real_estate")}
+            </option>
+            <option value="Manufacturing">
+              {t("company.industries.manufacturing")}
+            </option>
+            <option value="Other">{t("company.industries.other")}</option>
+          </select>
+        </div>
       </div>
 
       {/* Submit Button */}
-      <div className="col-span-1 sm:col-span-2 lg:col-span-3 flex justify-center">
+      <div
+        className="col-span-1 sm:col-span-2 lg:col-span-3 flex justify-center mt-4 animate-fadeIn"
+        style={{ animationDelay: `${12 * 0.05}s` }}
+      >
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full sm:w-auto bg-zinc-800 text-white px-6 py-2 rounded-md hover:bg-zinc-900 transition duration-300 ease-in-out"
+          className="w-full sm:w-auto bg-button-bg text-button-text px-6 py-2 rounded-md hover:bg-secondary focus:ring-2 focus:ring-accent focus:ring-offset-2 disabled:bg-gray-400 transition-all duration-300 ease-in-out flex items-center justify-center gap-2"
         >
           {isLoading ? (
             <Loader className="size-5 animate-spin" />

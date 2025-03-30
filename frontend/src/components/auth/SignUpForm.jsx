@@ -1,4 +1,3 @@
-// SignUpForm.jsx
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
@@ -24,13 +23,12 @@ import AddDepartmentModal from "../../pages/AdminPanel/departments/Add_Departmen
 
 const SignUpForm = () => {
   const queryClient = useQueryClient();
-  const { t } = useTranslation(); // שימוש במילון 'signUpForm'
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const companyIdFromQuery = queryParams.get("companyId");
 
-  // Fetch authenticated user data
   const { data: authData } = useQuery({ queryKey: ["authUser"] });
   const authUser = authData?.user;
 
@@ -38,8 +36,8 @@ const SignUpForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [profileImageFile, setProfileImageFile] = useState(null);
   const [profileImageUrl, setProfileImageUrl] = useState("");
+  const [isAddDeptModalOpen, setIsAddDeptModalOpen] = useState(false);
 
-  // Fetch departments
   const {
     data: departments = [],
     refetch: refetchDepartments,
@@ -50,13 +48,8 @@ const SignUpForm = () => {
       const res = await axiosInstance.get("/departments");
       return res.data?.data || [];
     },
-    // enabled: !!authUser,
   });
 
-  // State for opening/closing the AddDepartmentModal
-  const [isAddDeptModalOpen, setIsAddDeptModalOpen] = useState(false);
-
-  // Validation Schema
   const validationSchema = Yup.object({
     name: Yup.string().required(t("signUpForm.validation.first_name_required")),
     lastName: Yup.string().required(
@@ -95,7 +88,6 @@ const SignUpForm = () => {
     role: Yup.string().notRequired(),
   });
 
-  // Formik
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -107,19 +99,12 @@ const SignUpForm = () => {
       identity: "",
       department: "",
       role: "",
-      address: {
-        street: "",
-        city: "",
-        country: "",
-        postalCode: "",
-      },
+      address: { street: "", city: "", country: "", postalCode: "" },
     },
     validationSchema,
     onSubmit: async (values) => {
       setLoading(true);
       const formData = new FormData();
-
-      // Basic fields
       formData.append("name", values.name);
       formData.append("lastName", values.lastName);
       formData.append("email", values.email);
@@ -127,34 +112,24 @@ const SignUpForm = () => {
       formData.append("phone", values.phone);
       formData.append("gender", values.gender);
       formData.append("identity", values.identity || "");
-      if (!authUser && companyIdFromQuery) {
+      if (!authUser && companyIdFromQuery)
         formData.append("companyId", companyIdFromQuery);
-      }
-
-      // Only if user is logged in (authUser), set department & role
       if (authUser) {
         formData.append("department", values.department || "");
         formData.append("role", values.role || "");
       }
-
-      // Address fields
       formData.append("address[street]", values.address.street);
       formData.append("address[city]", values.address.city);
       formData.append("address[country]", values.address.country);
       formData.append("address[postalCode]", values.address.postalCode);
-
-      // Profile Image (optional)
-      if (profileImageFile) {
-        formData.append("profileImage", profileImageFile);
-      } else if (profileImageUrl) {
+      if (profileImageFile) formData.append("profileImage", profileImageFile);
+      else if (profileImageUrl)
         formData.append("profileImageUrl", profileImageUrl);
-      }
 
       try {
         const response = await axiosInstance.post("/auth/signup", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-
         if (response.data.success) {
           toast.success(t("messages.signup_success"));
           navigate("/login");
@@ -169,7 +144,6 @@ const SignUpForm = () => {
     },
   });
 
-  // Function to remove profile image
   const removeProfileImage = () => {
     setProfileImageFile(null);
     setProfileImageUrl("");
@@ -177,8 +151,10 @@ const SignUpForm = () => {
 
   return (
     <>
-      {/* טופס עם טקסט שחור */}
-      <form onSubmit={formik.handleSubmit} className="space-y-6 text-black">
+      <form
+        onSubmit={formik.handleSubmit}
+        className="space-y-6 text-text animate-fadeIn"
+      >
         {/* Row 1: First Name & Last Name */}
         <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
           <InputField
@@ -226,45 +202,26 @@ const SignUpForm = () => {
             placeholder={t("signUpForm.placeholders.identity")}
             formik={formik}
           />
-          {/* Gender */}
-          <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium">
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-text mb-1">
               {t("signUpForm.form.gender")}
             </label>
             <div className="flex items-center space-x-4">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="gender"
-                  value="Male"
-                  checked={formik.values.gender === "Male"}
-                  onChange={formik.handleChange}
-                  className="form-radio"
-                />
-                <span className="ml-2">{t("signUpForm.options.male")}</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="gender"
-                  value="Female"
-                  checked={formik.values.gender === "Female"}
-                  onChange={formik.handleChange}
-                  className="form-radio"
-                />
-                <span className="ml-2">{t("signUpForm.options.female")}</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  name="gender"
-                  value="Other"
-                  checked={formik.values.gender === "Other"}
-                  onChange={formik.handleChange}
-                  className="form-radio"
-                />
-                <span className="ml-2">{t("signUpForm.options.other")}</span>
-              </label>
+              {["Male", "Female", "Other"].map((gender) => (
+                <label key={gender} className="flex items-center">
+                  <input
+                    type="radio"
+                    name="gender"
+                    value={gender}
+                    checked={formik.values.gender === gender}
+                    onChange={formik.handleChange}
+                    className="form-radio text-primary focus:ring-primary"
+                  />
+                  <span className="ml-2 text-text">
+                    {t(`signUpForm.options.${gender.toLowerCase()}`)}
+                  </span>
+                </label>
+              ))}
             </div>
             {formik.touched.gender && formik.errors.gender && (
               <p className="text-sm text-red-500 mt-1">
@@ -276,7 +233,7 @@ const SignUpForm = () => {
 
         {/* Row 4: Phone */}
         <div className="flex-1">
-          <label className="block text-sm font-medium mb-1">
+          <label className="block text-sm font-medium text-text mb-1">
             {t("signUpForm.form.phone")}
           </label>
           <PhoneInput
@@ -284,9 +241,9 @@ const SignUpForm = () => {
             enableSearch
             searchPlaceholder={t("signUpForm.placeholders.search_country")}
             containerClass="react-tel-input w-full"
-            inputClass="!w-full !h-10 !pl-10 !border-gray-300 !rounded-md"
-            buttonClass="!bg-gray-100 hover:!bg-gray-200 !border !border-gray-300"
-            searchClass="!w-full !border !border-gray-300 !rounded-md px-2 py-1"
+            inputClass="!w-full !h-10 !pl-10 !border !border-border-color !rounded-md !bg-bg !text-text !placeholder-secondary focus:!ring-2 focus:!ring-primary focus:!border-primary"
+            buttonClass="!bg-secondary hover:!bg-accent !border !border-border-color"
+            searchClass="!w-full !border !border-border-color !rounded-md px-2 py-1 !text-text !bg-bg"
             placeholder={t("signUpForm.placeholders.enter_phone")}
             value={formik.values.phone}
             onChange={(phone) => formik.setFieldValue("phone", phone)}
@@ -314,11 +271,11 @@ const SignUpForm = () => {
           />
         </div>
 
-        {/* Row 6: מחלקה & תפקיד (department & role) - רק אם יש authUser */}
+        {/* Row 6: Department & Role (only if authUser) */}
         {authUser && (
           <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
             <div className="flex-1">
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-medium text-text mb-1">
                 {t("signUpForm.form.department") || "בחר מחלקה"}
               </label>
               <div className="flex items-center space-x-2">
@@ -327,7 +284,7 @@ const SignUpForm = () => {
                     name="department"
                     value={formik.values.department}
                     onChange={formik.handleChange}
-                    className="w-full py-2 pl-3 pr-8 rounded-md border border-gray-300"
+                    className="w-full py-2 pl-3 pr-8 rounded-md border border-border-color bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                   >
                     <option value="">
                       {t("signUpForm.placeholders.department_select") ||
@@ -344,11 +301,10 @@ const SignUpForm = () => {
                     )}
                   </select>
                 </div>
-                {/* כפתור "+" לפתיחת מודאל */}
                 <button
                   type="button"
                   onClick={() => setIsAddDeptModalOpen(true)}
-                  className="inline-flex items-center p-2 bg-gray-200 text-gray-600 rounded-md hover:bg-gray-300"
+                  className="inline-flex items-center p-2 bg-secondary text-button-text rounded-md hover:bg-accent transition-all duration-200"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
@@ -391,16 +347,16 @@ const SignUpForm = () => {
 
         {/* Profile Image (Optional) */}
         <div className="flex-1">
-          <label className="block text-sm font-medium mb-1">
+          <label className="block text-sm font-medium text-text mb-1">
             {t("signUpForm.form.profile_image")} ({t("optional")})
           </label>
           <div className="relative flex items-center gap-2">
             <button
               type="button"
-              className="p-2 bg-blue-100 rounded-md hover:bg-gray-300"
+              className="p-2 bg-secondary rounded-md hover:bg-accent transition-all duration-200"
               onClick={() => document.getElementById("fileInput").click()}
             >
-              <Send className="text-gray-600" />
+              <Send className="text-button-text" />
             </button>
             <input
               id="fileInput"
@@ -414,7 +370,7 @@ const SignUpForm = () => {
               placeholder={t("signUpForm.placeholders.upload_image_or_url")}
               value={profileImageUrl}
               onChange={(e) => setProfileImageUrl(e.target.value)}
-              className="w-full py-2 px-3 border border-gray-300 rounded-md"
+              className="w-full py-2 px-3 border border-border-color rounded-md bg-bg text-text placeholder-secondary focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
             />
           </div>
           {(profileImageFile || profileImageUrl) && (
@@ -426,12 +382,12 @@ const SignUpForm = () => {
                     : profileImageUrl
                 }
                 alt={t("signUpForm.form.image_preview")}
-                className="w-16 h-16 rounded-full object-cover"
+                className="w-16 h-16 rounded-full object-cover border-2 border-border-color"
               />
               <button
                 type="button"
                 onClick={removeProfileImage}
-                className="absolute -top-2 -right-2 bg-white text-gray-500 hover:text-gray-700 rounded-full p-1 shadow"
+                className="absolute -top-2 -right-2 bg-button-bg text-button-text hover:bg-secondary rounded-full p-1 shadow transition-all duration-200"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -443,7 +399,7 @@ const SignUpForm = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2 mt-6 bg-blue-600 text-white font-medium rounded-md shadow-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+          className="w-full py-2 mt-6 bg-button-bg text-button-text font-medium rounded-md shadow-md hover:bg-secondary focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-gray-400 transition-all duration-300"
         >
           {loading
             ? t("signUpForm.buttons.signing_up")
@@ -451,7 +407,7 @@ const SignUpForm = () => {
         </button>
       </form>
 
-      {/* מודאל להוספת מחלקה */}
+      {/* Add Department Modal */}
       {isAddDeptModalOpen && (
         <AddDepartmentModal
           onClose={() => setIsAddDeptModalOpen(false)}
@@ -468,9 +424,9 @@ const SignUpForm = () => {
 // InputField Component
 const InputField = ({ label, icon, name, placeholder, formik }) => (
   <div className="flex-1">
-    <label className="block text-sm font-medium mb-1">{label}</label>
+    <label className="block text-sm font-medium text-text mb-1">{label}</label>
     <div className="relative">
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary">
         {icon}
       </div>
       <input
@@ -480,12 +436,20 @@ const InputField = ({ label, icon, name, placeholder, formik }) => (
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
         value={formik.getFieldProps(name).value}
-        className="pl-10 w-full py-2 rounded-md border border-gray-300 shadow-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+        className={`pl-10 w-full py-2 rounded-md border border-border-color bg-bg text-text placeholder-secondary focus:ring-2 focus:ring-primary focus:border-primary shadow-sm transition-all duration-200 ${
+          formik.touched[name.split(".")[0]] &&
+          formik.errors[name.split(".")[0]]
+            ? "border-red-500"
+            : ""
+        }`}
       />
     </div>
-    {formik.touched[name] && formik.errors[name] && (
-      <p className="text-sm text-red-500 mt-1">{formik.errors[name]}</p>
-    )}
+    {formik.touched[name.split(".")[0]] &&
+      formik.errors[name.split(".")[0]] && (
+        <p className="text-sm text-red-500 mt-1">
+          {formik.errors[name.split(".")[0]]}
+        </p>
+      )}
   </div>
 );
 
@@ -500,9 +464,9 @@ const PasswordField = ({
   setShowPassword,
 }) => (
   <div className="flex-1">
-    <label className="block text-sm font-medium mb-1">{label}</label>
+    <label className="block text-sm font-medium text-text mb-1">{label}</label>
     <div className="relative">
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary">
         {icon}
       </div>
       <input
@@ -510,13 +474,16 @@ const PasswordField = ({
         name={name}
         placeholder={placeholder}
         onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
         value={formik.values[name]}
-        className="pl-10 pr-10 w-full py-2 rounded-md border border-gray-300 shadow-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+        className={`pl-10 pr-10 w-full py-2 rounded-md border border-border-color bg-bg text-text placeholder-secondary focus:ring-2 focus:ring-primary focus:border-primary shadow-sm transition-all duration-200 ${
+          formik.touched[name] && formik.errors[name] ? "border-red-500" : ""
+        }`}
       />
       <button
         type="button"
         onClick={() => setShowPassword(!showPassword)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-accent transition-colors duration-200"
       >
         {showPassword ? <EyeOff /> : <Eye />}
       </button>

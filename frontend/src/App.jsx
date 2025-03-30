@@ -2,7 +2,7 @@ import { Navigate, Route, Routes, Outlet } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "./lib/axios";
-import "../src/components/layout/i18n.js"; // וודא שזה נמצא בתחילת הקובץ
+import "../src/components/layout/i18n.js"; // Ensure i18n is initialized
 
 import Layout from "./components/layout/Layout";
 import HomePage from "./pages/HomePage";
@@ -73,7 +73,6 @@ const App = () => {
     },
   });
 
-  // Protect Admin Routes
   const AdminRoute = ({ authUser }) => {
     return authUser?.user?.role === "Admin" ? (
       <Outlet />
@@ -100,119 +99,152 @@ const App = () => {
   }
 
   return (
-    <Layout>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            authUser?.user?.role === "Admin" ? (
-              <Navigate to="/dashboard" replace />
-            ) : authUser?.user?.role === "Employee" ||
-              authUser?.user?.role === "Manager" ? (
-              <Navigate to="/employee" replace />
-            ) : (
-              <HomePage />
-            )
-          }
-        />
-        <Route path="/create-company" element={<CreateCompanyPage />} />
-        <Route
-          path="/supplier/updateProcurement/:purchaseOrder"
-          element={<UpdateForSupplier />}
-        />
+    <>
+      <Layout>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              authUser?.user?.role === "Admin" ? (
+                <Navigate to="/dashboard" replace />
+              ) : authUser?.user?.role === "Employee" ||
+                authUser?.user?.role === "Manager" ? (
+                <Navigate to="/employee" replace />
+              ) : (
+                <HomePage />
+              )
+            }
+          />
+          <Route path="/create-company" element={<CreateCompanyPage />} />
+          <Route
+            path="/supplier/updateProcurement/:purchaseOrder"
+            element={<UpdateForSupplier />}
+          />
+          <Route path="/pricing-plans" element={<PricingPlans />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/payment/completed" element={<Success />} />
+          <Route path="/payment/cancelled" element={<Fail />} />
+          <Route path="/nexora" element={<NexoraAdmin />} />
+          <Route path="/signup" element={<SignUpPage />} />
 
-        <Route path="/pricing-plans" element={<PricingPlans />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/payment/completed" element={<Success />} />
-        <Route path="/payment/cancelled" element={<Fail />} />
-        <Route path="/nexora" element={<NexoraAdmin />} />
-        <Route path="/signup" element={<SignUpPage />} />
+          <Route
+            path="/employee"
+            element={<EmployeeRoute authUser={authUser} />}
+          >
+            <Route index element={<EmployeeDashboard />} />
+            <Route path="finance" element={<FinanceList />} />
+            <Route path="AddFinance" element={<FinanceAdd />} />
+            <Route
+              path="ProcurementProposals"
+              element={<ProcurementProposals />}
+            />
+            <Route
+              path="ProcurementProposalsList"
+              element={<ProcurementProposalsList />}
+            />
+            <Route path="products" element={<Products />} />
+          </Route>
 
-        <Route path="/employee" element={<EmployeeRoute authUser={authUser} />}>
-          <Route index element={<EmployeeDashboard />} />
-          <Route path="finance" element={<FinanceList />} />
-          <Route path="AddFinance" element={<FinanceAdd />} />
           <Route
-            path="ProcurementProposals"
-            element={<ProcurementProposals />}
+            path="/login"
+            element={!authUser ? <LoginPage /> : <Navigate to="/" />}
           />
-          <Route
-            path="ProcurementProposalsList"
-            element={<ProcurementProposalsList />}
-          />
-          <Route path="products" element={<Products />} />
-        </Route>
 
-        <Route
-          path="/login"
-          element={!authUser ? <LoginPage /> : <Navigate to="/" />}
-        />
+          <Route path="/dashboard" element={<AdminRoute authUser={authUser} />}>
+            <Route index element={<Dashboard />} />
+            <Route
+              path="ProcurementProposals"
+              element={<ProcurementProposals />}
+            />
+            <Route
+              path="ProcurementProposalsList"
+              element={<ProcurementProposalsList />}
+            />
+            <Route
+              path="AddPerformanceReview"
+              element={<AddPerformanceReview />}
+            />
+            <Route path="performance-reviews" element={<PerformanceReview />} />
+            <Route path="products" element={<ProductList />} />
+            <Route path="Events" element={<Events />} />
+            <Route path="add-product" element={<AddProduct />} />
+            <Route
+              path="add-supplier"
+              element={<AddSupplier authUser={authUser} />}
+            />
+            <Route path="supplier" element={<Supplier />} />
+            <Route path="finance" element={<Finance />} />
+            <Route path="finance/Budgets" element={<Budgets />} />
+            <Route path="finance/add-budget" element={<AddOrEditBudget />} />
+            <Route path="projects/add-project" element={<AddProject />} />
+            <Route path="projects" element={<ProjectsList />} />
+            <Route
+              path="finance/budget-details/:id"
+              element={<BudgetDetails />}
+            />
+            <Route path="add-finance-record" element={<AddFinance />} />
+            <Route path="employees" element={<Users />} />
+            <Route path="add-procurement-record" element={<AddProcurment />} />
+            <Route path="signup" element={<EmployeeSignup />} />
+            <Route path="procurement" element={<Procurement />} />
+            <Route
+              path="procurement/approveProcurment"
+              element={<ReceiptPurchase />}
+            />
+            <Route path="historySignature" element={<HistorySignature />} />
+            <Route path="historyAllSignature" element={<AllSignatures />} />
+            <Route path="tasks/Add-Tasks" element={<CreateTask />} />
+            <Route path="tasks" element={<TasksList />} />
+            <Route
+              path="department/Add-Department"
+              element={<Add_Department />}
+            />
+            <Route
+              path="department/DepartmentList"
+              element={<DepartmentList />}
+            />
+            <Route path="Customers/Add-Customer" element={<AddCustomers />} />
+            <Route path="Customers" element={<CustomersList />} />
+            <Route path="Customers/Orders" element={<OrdersList />} />
+            <Route path="Customers/AddOrder" element={<AddOrders />} />
+          </Route>
+        </Routes>
+      </Layout>
 
-        {/* Dashboard and Admin-only Routes */}
-        <Route path="/dashboard" element={<AdminRoute authUser={authUser} />}>
-          <Route index element={<Dashboard />} />
-          <Route
-            path="ProcurementProposals"
-            element={<ProcurementProposals />}
-          />
-          <Route
-            path="ProcurementProposalsList"
-            element={<ProcurementProposalsList />}
-          />
-          <Route
-            path="AddPerformanceReview"
-            element={<AddPerformanceReview />}
-          />
-          <Route path="performance-reviews" element={<PerformanceReview />} />
-          <Route path="products" element={<ProductList />} />
-          <Route path="Events" element={<Events />} />
-          <Route path="add-product" element={<AddProduct />} />
-          <Route path="add-supplier" element={<AddSupplier />} />
-          <Route path="supplier" element={<Supplier />} />
-          <Route path="finance" element={<Finance />} />
-          <Route path="finance/Budgets" element={<Budgets />} />
-          <Route path="finance/add-budget" element={<AddOrEditBudget />} />
-          <Route path="projects/add-project" element={<AddProject />} />
-          <Route path="projects" element={<ProjectsList />} />
-          <Route
-            path="ProcurementProposalsList"
-            element={<ProcurementProposalsList />}
-          />
-          <Route
-            path="finance/budget-details/:id"
-            element={<BudgetDetails />}
-          />
-          <Route path="add-finance-record" element={<AddFinance />} />
-          <Route path="employees" element={<Users />} />
-          <Route path="add-procurement-record" element={<AddProcurment />} />
-          <Route path="signup" element={<EmployeeSignup />} />
-          <Route path="procurement" element={<Procurement />} />
-          <Route
-            path="procurement/approveProcurment"
-            element={<ReceiptPurchase />}
-          />
-          <Route path="historySignature" element={<HistorySignature />} />
-          <Route path="historyAllSignature" element={<AllSignatures />} />
-          <Route path="tasks/Add-Tasks" element={<CreateTask />} />
-          <Route path="tasks" element={<TasksList />} />
-          <Route
-            path="department/Add-Department"
-            element={<Add_Department />}
-          />
-          <Route
-            path="department/DepartmentList"
-            element={<DepartmentList />}
-          />
-          <Route path="Customers/Add-Customer" element={<AddCustomers />} />
-          <Route path="Customers" element={<CustomersList />} />
-          <Route path="Customers/Orders" element={<OrdersList />} />
-          <Route path="Customers/AddOrder" element={<AddOrders />} />
-        </Route>
-      </Routes>
-      <Toaster />
-    </Layout>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            zIndex: 10000,
+            background: "#ffffff",
+            color: "#333333",
+            padding: "20px 25px",
+            borderRadius: "10px",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.25)",
+          },
+          success: {
+            style: {
+              borderLeft: "4px solid #22c55e", // Green for success
+            },
+            iconTheme: {
+              primary: "#22c55e", // Green icon
+              secondary: "#ffffff", // White background for icon
+            },
+          },
+          error: {
+            style: {
+              borderLeft: "4px solid #ef4444", // Red for errors
+            },
+            iconTheme: {
+              primary: "#ef4444", // Red icon
+              secondary: "#ffffff", // White background for icon
+            },
+          },
+        }}
+      />
+    </>
   );
 };
 

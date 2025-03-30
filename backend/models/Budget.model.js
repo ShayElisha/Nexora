@@ -45,10 +45,10 @@ const BudgetSchema = new mongoose.Schema({
     ref: "employee",
     required: true,
   },
-  updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "employees" },
   approvals: [
     {
-      approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: "employees" },
       approvedAt: { type: Date },
       comment: { type: String },
     },

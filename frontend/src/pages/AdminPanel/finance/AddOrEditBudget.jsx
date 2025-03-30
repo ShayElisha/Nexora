@@ -304,8 +304,8 @@ const AddBudget = () => {
   };
 
   return (
-    <div className="min-h-screen bg-bg flex justify-center py-10 animate-fade-in">
-      <div className="w-full max-w-4xl p-8 bg-accent rounded-xl shadow-xl border border-border-color">
+    <div className="min-h-screen  flex justify-center py-10 animate-fade-in">
+      <div className="w-full max-w-4xl p-8 bg-bg rounded-xl shadow-xl border border-border-color">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-text mb-8 text-center tracking-tight drop-shadow-md">
           {t("budget.create_budget")}
         </h1>

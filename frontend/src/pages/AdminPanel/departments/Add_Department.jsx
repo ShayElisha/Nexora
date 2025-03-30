@@ -9,7 +9,7 @@ const Add_Department = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    managerId: "",
+    departmentManager: "",
     teamMembers: [],
   });
   const [employees, setEmployees] = useState([]);
@@ -66,7 +66,7 @@ const Add_Department = () => {
       setFormData({
         name: "",
         description: "",
-        managerId: "",
+        departmentManager: "",
         teamMembers: [],
       });
     } catch (error) {
@@ -79,7 +79,7 @@ const Add_Department = () => {
   };
 
   return (
-    <div className="container mx-auto p-8 bg-gradient-to-br from-bg to-bg min-h-screen animate-fade-in">
+    <div className="max-w-3xl mx-auto p-8 bg-bg min-h-screen animate-fade-in">
       <h2 className="text-4xl font-extrabold text-text mb-8 text-center tracking-tight drop-shadow-md">
         {t("addDepartment.title")}
       </h2>
@@ -136,16 +136,19 @@ const Add_Department = () => {
             {t("addDepartment.managerLabel")}
           </label>
           <select
-            id="managerId"
-            name="managerId"
-            value={formData.managerId}
+            id="departmentManager"
+            name="departmentManager"
+            value={formData.departmentManager}
             onChange={handleChange}
             required
             className="w-full p-4 border border-border-color rounded-lg focus:ring-4 focus:ring-primary focus:border-primary transition-all duration-300 bg-white text-text shadow-sm hover:shadow-md"
           >
             <option value="">{t("addDepartment.selectManager")}</option>
             {employees
-              .filter((employee) => employee.role === "Manager")
+              .filter(
+                (employee) =>
+                  employee.role === "Manager" || employee.role === "Admin"
+              )
               .map((employee) => (
                 <option key={employee._id} value={employee._id}>
                   {employee.name} {employee.lastName}

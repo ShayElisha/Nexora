@@ -133,13 +133,13 @@ const AddOrders = () => {
   };
 
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center p-6 animate-fade-in">
+    <div className="min-h-screen  flex items-center justify-center p-6 animate-fade-in">
       {authLoading ? (
         <div className="flex justify-center items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-primary"></div>
         </div>
       ) : (
-        <div className="w-full max-w-3xl bg-accent p-8 rounded-xl shadow-lg">
+        <div className="w-full max-w-3xl bg-bg p-8 rounded-xl shadow-lg">
           <h1 className="text-3xl font-extrabold text-text mb-8 tracking-tight drop-shadow-md text-center">
             {t("order.create_internal_order")}
           </h1>
@@ -214,7 +214,7 @@ const AddOrders = () => {
                           onChange={(e) =>
                             handleItemChange(index, "product", e.target.value)
                           }
-                          className="w-full p-3 rounded-md bg-accent text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200 border border-border-color"
+                          className="w-full p-3 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200 border border-border-color"
                         >
                           <option value="">{t("order.choose_product")}</option>
                           {products.map((prod) => (
@@ -238,7 +238,7 @@ const AddOrders = () => {
                           }}
                           min="1"
                           max={availableStock}
-                          className="w-full p-3 rounded-md bg-accent text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200 border border-border-color"
+                          className="w-full p-3 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200 border border-border-color"
                           placeholder={t("order.quantity")}
                         />
                       </div>
@@ -252,7 +252,7 @@ const AddOrders = () => {
                           min="0"
                           max="100"
                           disabled={orderDiscount > 0}
-                          className="w-full p-3 rounded-md bg-accent text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200 border border-border-color disabled:opacity-50"
+                          className="w-full p-3 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200 border border-border-color disabled:opacity-50"
                           placeholder={t("order.discount")}
                         />
                       </div>

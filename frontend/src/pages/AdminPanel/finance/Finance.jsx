@@ -13,6 +13,8 @@ const Finance = () => {
   const [expandedRow, setExpandedRow] = useState(null);
   const [showDocumentsModal, setShowDocumentsModal] = useState(false);
   const [selectedDocuments, setSelectedDocuments] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1); // Pagination state
+  const recordsPerPage = 12; // 12 records per page
 
   const queryClient = useQueryClient();
 
@@ -98,6 +100,107 @@ const Finance = () => {
     });
   }
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredData.length / recordsPerPage);
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = filteredData.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    const maxPagesToShow = 5;
+
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(
+          <button
+            key={i}
+            onClick={() => paginate(i)}
+            className={`px-3 py-1 rounded-full mx-1 ${
+              currentPage === i
+                ? "bg-button-bg text-button-text"
+                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+            }`}
+          >
+            {i}
+          </button>
+        );
+      }
+    } else {
+      const startPage = Math.max(1, currentPage - 2);
+      const endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+      if (startPage > 1) {
+        pageNumbers.push(
+          <button
+            key={1}
+            onClick={() => paginate(1)}
+            className={`px-3 py-1 rounded-full mx-1 ${
+              currentPage === 1
+                ? "bg-button-bg text-button-text"
+                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+            }`}
+          >
+            1
+          </button>
+        );
+        if (startPage > 2) {
+          pageNumbers.push(
+            <span key="start-dots" className="mx-1">
+              ...
+            </span>
+          );
+        }
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(
+          <button
+            key={i}
+            onClick={() => paginate(i)}
+            className={`px-3 py-1 rounded-full mx-1 ${
+              currentPage === i
+                ? "bg-button-bg text-button-text"
+                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+            }`}
+          >
+            {i}
+          </button>
+        );
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          pageNumbers.push(
+            <span key="end-dots" className="mx-1">
+              ...
+            </span>
+          );
+        }
+        pageNumbers.push(
+          <button
+            key={totalPages}
+            onClick={() => paginate(totalPages)}
+            className={`px-3 py-1 rounded-full mx-1 ${
+              currentPage === totalPages
+                ? "bg-button-bg text-button-text"
+                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+            }`}
+          >
+            {totalPages}
+          </button>
+        );
+      }
+    }
+
+    return pageNumbers;
+  };
+
   const handleRowClick = (rowId) => {
     setExpandedRow((prev) => (prev === rowId ? null : rowId));
   };
@@ -113,7 +216,7 @@ const Finance = () => {
   };
 
   return (
-    <div className="flex min-h-screen  animate-fade-in">
+    <div className="flex min-h-screen animate-fade-in">
       <div className="flex-1 container mx-auto max-w-full p-4 sm:p-6 lg:p-8">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-center mb-4 sm:mb-6 text-text tracking-tight drop-shadow-md">
           {t("finance.title")}
@@ -184,7 +287,7 @@ const Finance = () => {
             {t("errors.loading_error")} {error?.message}
           </div>
         ) : (
-          <div className=" rounded-2xl shadow-2xl p-4 sm:p-6 border bg-bg">
+          <div className="rounded-2xl shadow-2xl p-4 sm:p-6 border bg-bg">
             <div className="overflow-x-auto">
               <table className="min-w-full text-text rounded-lg overflow-hidden">
                 <thead>
@@ -213,7 +316,7 @@ const Finance = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredData.map((doc) => {
+                  {currentRecords.map((doc) => {
                     const isExpanded = expandedRow === doc._id;
                     return (
                       <React.Fragment key={doc._id}>
@@ -297,10 +400,38 @@ const Finance = () => {
                   })}
                 </tbody>
               </table>
-              {filteredData.length === 0 && (
+              {filteredData.length === 0 ? (
                 <div className="text-center text-text mt-4 sm:mt-6 text-sm sm:text-base font-semibold opacity-70">
                   {t("finance.no_data_found")}
                 </div>
+              ) : (
+                totalPages > 1 && (
+                  <div className="flex justify-center items-center mt-8 space-x-2">
+                    <button
+                      onClick={() => paginate(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className={`px-3 py-1 rounded-full ${
+                        currentPage === 1
+                          ? "bg-gray-300 cursor-not-allowed"
+                          : "bg-button-bg text-button-text hover:bg-secondary"
+                      }`}
+                    >
+                      ←
+                    </button>
+                    {renderPageNumbers()}
+                    <button
+                      onClick={() => paginate(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className={`px-3 py-1 rounded-full ${
+                        currentPage === totalPages
+                          ? "bg-gray-300 cursor-not-allowed"
+                          : "bg-button-bg text-button-text hover:bg-secondary"
+                      }`}
+                    >
+                      →
+                    </button>
+                  </div>
+                )
               )}
             </div>
           </div>

@@ -97,14 +97,16 @@ const ProcurementProposals = () => {
       return response.data;
     },
     onSuccess: (updatedProposal) => {
-      toast.success("סטטוס הצעת הרכש עודכן בהצלחה");
+      toast.success(t("procurement.procurement_created_successfully"));
       setProposals((prev) =>
         prev.map((p) => (p._id === updatedProposal._id ? updatedProposal : p))
       );
     },
     onError: (error) => {
       toast.error(
-        "עדכון הסטטוס נכשל: " + (error?.response?.data?.message || "")
+        t("procurement.update_status_failed") +
+          ": " +
+          (error?.response?.data?.message || "")
       );
     },
   });
@@ -155,7 +157,7 @@ const ProcurementProposals = () => {
         setProposals(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         setProposals([]);
-        toast.error("אירעה שגיאה בטעינת ההצעות");
+        toast.error(t("procurement.error_loading_proposals"));
       } finally {
         setLoading(false);
       }
@@ -185,15 +187,15 @@ const ProcurementProposals = () => {
   const handleStatusChange = (proposal, newStatus) => {
     if (newStatus === "approved") {
       const wantsToCreateNow = window.confirm(
-        "האם ליצור תעודת רכש מיד עבור ההצעה?"
+        t("procurement.create_procurement_now_confirm")
       );
       if (wantsToCreateNow) {
         setSelectedProposal(proposal);
         const proposalProducts = proposal.items.map((item) => ({
           productId: item.productId || "",
-          productName: item.productName || "Unknown Product",
+          productName: item.productName || t("procurement.no_product_name"),
           sku: item.sku || "",
-          category: item.category || "Uncategorized",
+          category: item.category || t("procurement.uncategorized"),
           quantity: item.quantity || 0,
           unitPrice: item.unitPrice || 0,
           total: (item.quantity || 0) * (item.unitPrice || 0),
@@ -360,15 +362,12 @@ const ProcurementProposals = () => {
     rejected: 4,
   };
 
-  // מייצרים מערך ממוין לפני הרינדור
   const sortedProposals = [...proposals].sort((a, b) => {
     const statusA = a.status || "pending";
     const statusB = b.status || "pending";
-    // 1) השוואה לפי סדר הסטטוס
     if (statusA !== statusB) {
       return (statusOrder[statusA] || 999) - (statusOrder[statusB] || 999);
     }
-    // 2) אם אותו סטטוס - השוואה לפי expectedDeliveryDate בסדר עולה
     const dateA = a.expectedDeliveryDate
       ? new Date(a.expectedDeliveryDate)
       : null;
@@ -376,12 +375,11 @@ const ProcurementProposals = () => {
       ? new Date(b.expectedDeliveryDate)
       : null;
 
-    // אם אין תאריך A => נדחה לסוף
     if (!dateA && !dateB) return 0;
     if (!dateA) return 1;
     if (!dateB) return -1;
 
-    return dateA - dateB; // הכי מוקדם קודם
+    return dateA - dateB;
   });
 
   // יצירת PDF
@@ -392,7 +390,7 @@ const ProcurementProposals = () => {
     pdf.setFontSize(10);
     pdf.text(
       `${t("procurement.company", { lng: "en" })}: ${
-        authUser?.company || "N/A"
+        authUser?.company || t("procurement.not_available")
       }`,
       10,
       20
@@ -406,7 +404,7 @@ const ProcurementProposals = () => {
     );
     pdf.text(
       `${t("procurement.address", { lng: "en" })}: ${
-        formData.DeliveryAddress || "N/A"
+        formData.DeliveryAddress || t("procurement.not_available")
       }`,
       10,
       30
@@ -414,21 +412,21 @@ const ProcurementProposals = () => {
 
     pdf.text(
       `${t("procurement.supplier", { lng: "en" })}: ${
-        formData.supplierName || "N/A"
+        formData.supplierName || t("procurement.not_available")
       }`,
       150,
       20
     );
     pdf.text(
       `${t("procurement.phone", { lng: "en" })}: ${
-        selectedSupplier?.Phone || "N/A"
+        selectedSupplier?.Phone || t("procurement.not_available")
       }`,
       150,
       25
     );
     pdf.text(
       `${t("procurement.email", { lng: "en" })}: ${
-        selectedSupplier?.Email || "N/A"
+        selectedSupplier?.Email || t("procurement.not_available")
       }`,
       150,
       30
@@ -444,10 +442,7 @@ const ProcurementProposals = () => {
       },
       { header: t("procurement.sku", { lng: "en" }), dataKey: "SKU" },
       { header: t("procurement.category", { lng: "en" }), dataKey: "category" },
-      {
-        header: t("procurement.quantity", { lng: "en" }),
-        dataKey: "quantity",
-      },
+      { header: t("procurement.quantity", { lng: "en" }), dataKey: "quantity" },
       {
         header: t("procurement.unit_price", { lng: "en" }),
         dataKey: "unitPrice",
@@ -475,9 +470,9 @@ const ProcurementProposals = () => {
 
     pdf.setFontSize(14);
     pdf.text(
-      `${t("procurement.total_cost", {
-        lng: "en",
-      })}: ${totalCost.toFixed(2)} ${currencySymbol}`,
+      `${t("procurement.total_cost", { lng: "en" })}: ${totalCost.toFixed(
+        2
+      )} ${currencySymbol}`,
       10,
       pdf.autoTable.previous.finalY + 10
     );
@@ -601,9 +596,9 @@ const ProcurementProposals = () => {
     setSelectedProposal(proposal);
     const proposalProducts = proposal.items.map((item) => ({
       productId: item.productId || "",
-      productName: item.productName || "Unknown Product",
+      productName: item.productName || t("procurement.no_product_name"),
       sku: item.sku || "",
-      category: item.category || "Uncategorized",
+      category: item.category || t("procurement.uncategorized"),
       quantity: item.quantity || 0,
       unitPrice: item.unitPrice || 0,
       total: (item.quantity || 0) * (item.unitPrice || 0),
@@ -631,16 +626,24 @@ const ProcurementProposals = () => {
     authUser?.role === "Admin" || authUser?.role === "Manager";
 
   if (loading) {
-    return <div className="text-center text-gray-500">טוען הצעות...</div>;
+    return (
+      <div className="text-center text-gray-500">
+        {t("procurement.loading_proposals")}
+      </div>
+    );
   }
 
   return (
-    <div className="p-5 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">הצעות רכש</h1>
+    <div className="container mx-auto max-w-4xl p-8 bg-bg rounded-2xl shadow-2xl border border-border-color transform transition-all duration-500 hover:shadow-3xl">
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">
+        {t("procurement.proposals")}
+      </h1>
 
       <section>
         {sortedProposals.length === 0 ? (
-          <p className="text-gray-500 text-center">אין הצעות להצגה</p>
+          <p className="text-gray-500 text-center">
+            {t("procurement.no_proposals")}
+          </p>
         ) : (
           <ul className="space-y-6">
             {sortedProposals.map((proposal) => (
@@ -650,40 +653,39 @@ const ProcurementProposals = () => {
               >
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-medium text-gray-800">
-                    {proposal.title || "ללא כותרת"}
+                    {proposal.title || t("procurement.no_title")}
                   </h2>
                   {proposal.status === "approved and waiting order" &&
                     canCreatePurchaseOrder && (
                       <button
                         onClick={() => openPurchaseOrderModal(proposal)}
                         className="text-blue-600 hover:text-blue-800"
-                        title="צור תעודת רכש"
+                        title={t("procurement.create_procurement")}
                       >
-                        📦{" "}
-                        {/* Replace with an icon from a library like react-icons */}
+                        📦
                       </button>
                     )}
                 </div>
                 <p className="text-gray-600 mt-1">
-                  {proposal.description || "ללא תיאור"}
+                  {proposal.description || t("procurement.no_description")}
                 </p>
 
                 <p className="text-gray-700 mt-2">
-                  <strong>נוצר ע"י:</strong>{" "}
+                  <strong>{t("procurement.created_by")}:</strong>{" "}
                   {proposal.createdBy?.name ||
                     proposal.createdBy?._id ||
-                    "לא זמין"}
+                    t("procurement.not_available")}
                 </p>
                 <p className="text-gray-700">
-                  <strong>תאריך בקשה:</strong>{" "}
+                  <strong>{t("procurement.request_date")}:</strong>{" "}
                   {proposal.requestedDate
                     ? new Date(proposal.requestedDate).toLocaleDateString()
-                    : "לא זמין"}
+                    : t("procurement.not_available")}
                 </p>
 
                 <div className="mt-2 flex items-center">
                   <label className="text-gray-700 font-medium mr-2">
-                    סטטוס:
+                    {t("procurement.status")}:
                   </label>
                   {proposal.status === "pending" ? (
                     <select
@@ -693,9 +695,15 @@ const ProcurementProposals = () => {
                       }
                       className="border border-gray-300 rounded-md p-1 focus:ring-blue-500 focus:border-blue-500"
                     >
-                      <option value="pending">בהמתנה</option>
-                      <option value="approved">מאושר</option>
-                      <option value="rejected">נדחה</option>
+                      <option value="pending">
+                        {t("procurement.pending")}
+                      </option>
+                      <option value="approved">
+                        {t("procurement.approved")}
+                      </option>
+                      <option value="rejected">
+                        {t("procurement.rejected")}
+                      </option>
                     </select>
                   ) : (
                     <span className="font-semibold text-blue-600">
@@ -705,25 +713,34 @@ const ProcurementProposals = () => {
                 </div>
 
                 <p className="text-gray-700 mt-2">
-                  <strong>סכום משוער:</strong>{" "}
-                  {proposal.totalEstimatedCost || "לא זמין"}
+                  <strong>{t("procurement.estimated_cost")}:</strong>{" "}
+                  {proposal.totalEstimatedCost ||
+                    t("procurement.not_available")}
                 </p>
 
                 <div className="mt-2">
-                  <strong className="text-gray-700">מוצרים לרכישה:</strong>
+                  <strong className="text-gray-700">
+                    {t("procurement.products_for_purchase")}:
+                  </strong>
                   <ul className="list-disc pl-5 mt-1">
                     {Array.isArray(proposal.items) &&
                     proposal.items.length > 0 ? (
                       proposal.items.map((item, idx) => (
                         <li key={idx} className="text-gray-600">
-                          {item.productName || "ללא שם"} | SKU: {item.sku} |
-                          קטגוריה: {item.category} | כמות: {item.quantity} |
-                          התקבלו: {item.receivedQuantity || 0} | מחיר יחידה:{" "}
-                          {item.unitPrice} | סה"כ: {item.total}
+                          {item.productName || t("procurement.no_product_name")}{" "}
+                          | {t("procurement.sku")}: {item.sku} |{" "}
+                          {t("procurement.category")}: {item.category} |{" "}
+                          {t("procurement.quantity")}: {item.quantity} |{" "}
+                          {t("procurement.received_quantity")}:{" "}
+                          {item.receivedQuantity || 0} |{" "}
+                          {t("procurement.unit_price")}: {item.unitPrice} |{" "}
+                          {t("procurement.total")}: {item.total}
                         </li>
                       ))
                     ) : (
-                      <li className="text-gray-500">אין מוצרים לרכישה</li>
+                      <li className="text-gray-500">
+                        {t("procurement.no_products")}
+                      </li>
                     )}
                   </ul>
                 </div>
@@ -731,7 +748,9 @@ const ProcurementProposals = () => {
                 {proposal.expectedDeliveryDate &&
                   !isNaN(new Date(proposal.expectedDeliveryDate).getTime()) && (
                     <p className="text-gray-700 mt-2">
-                      <strong>תאריך אספקה צפוי:</strong>{" "}
+                      <strong>
+                        {t("procurement.expected_delivery_date")}:
+                      </strong>{" "}
                       {new Date(
                         proposal.expectedDeliveryDate
                       ).toLocaleDateString()}
@@ -740,14 +759,16 @@ const ProcurementProposals = () => {
 
                 {proposal.notes && (
                   <p className="text-gray-700 mt-2">
-                    <strong>הערות:</strong> {proposal.notes}
+                    <strong>{t("procurement.notes")}:</strong> {proposal.notes}
                   </p>
                 )}
 
                 {Array.isArray(proposal.attachments) &&
                   proposal.attachments.length > 0 && (
                     <div className="mt-2">
-                      <strong className="text-gray-700">קבצים מצורפים:</strong>
+                      <strong className="text-gray-700">
+                        {t("procurement.attachments")}:
+                      </strong>
                       <ul className="list-disc pl-5 mt-1">
                         {proposal.attachments.map((url, idx) => (
                           <li key={idx}>
@@ -789,15 +810,15 @@ const ProcurementProposals = () => {
                 <div className="p-4 bg-secondary rounded-md mt-2">
                   <p>
                     <strong>{t("procurement.phone")}:</strong>{" "}
-                    {selectedSupplier.Phone || "N/A"}
+                    {selectedSupplier.Phone || t("procurement.not_available")}
                   </p>
                   <p>
                     <strong>{t("procurement.email")}:</strong>{" "}
-                    {selectedSupplier.Email || "N/A"}
+                    {selectedSupplier.Email || t("procurement.not_available")}
                   </p>
                   <p>
                     <strong>{t("procurement.address")}:</strong>{" "}
-                    {selectedSupplier.Address || "N/A"}
+                    {selectedSupplier.Address || t("procurement.not_available")}
                   </p>
                 </div>
               )}
@@ -900,7 +921,7 @@ const ProcurementProposals = () => {
                   </tbody>
                 </table>
               ) : (
-                <p className="text-gray-500">אין מוצרים לרכישה</p>
+                <p className="text-gray-500">{t("procurement.no_products")}</p>
               )}
               <p className="text-right mt-4 font-bold">
                 {t("procurement.total_cost")}: {totalCost}{" "}
@@ -930,7 +951,7 @@ const ProcurementProposals = () => {
                 onClick={() => setShowModal(false)}
                 className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
               >
-                ביטול
+                {t("procurement.cancel")}
               </button>
             </div>
           </div>

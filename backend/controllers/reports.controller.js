@@ -10,7 +10,7 @@ import Event from "../models/events.model.js";
 import Inventory from "../models/inventory.model.js";
 import Suppliers from "../models/suppliers.model.js";
 import Employee from "../models/employees.model.js";
-import Customer from "../models/Customers.model.js";
+import Customer from "../models/customers.model.js";
 import CustomerOrder from "../models/CustomerOrder.model.js";
 import Department from "../models/Department.model.js";
 import PerformanceReview from "../models/performanceReview.model.js";

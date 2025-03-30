@@ -12,7 +12,7 @@ import Suppliers from "../models/suppliers.model.js";
 import Employee from "../models/employees.model.js";
 import Customer from "../models/customers.model.js";
 import CustomerOrder from "../models/CustomerOrder.model.js";
-import Department from "../models/Department.model.js";
+import Department from "../models/department.model.js";
 import PerformanceReview from "../models/performanceReview.model.js";
 import Product from "../models/product.model.js";
 import ProcurementProposal from "../models/ProcurementProposal.model.js";

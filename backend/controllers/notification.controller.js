@@ -1,7 +1,7 @@
 // backend/controllers/notification.controller.js
 import Procurement from "../models/procurement.model.js";
 import Notification from "../models/notification.model.js";
-import Budget from "../models/budget.model.js";
+import Budget from "../models/Budget.model.js";
 import Event from "../models/events.model.js";
 
 import Company from "../models/companies.model.js"; // ייבוא מודל העובד

@@ -1,5 +1,5 @@
 import CustomerOrder from "../models/CustomerOrder.model.js";
-import Product from "../models/Product.model.js"; // Used to fetch unitPrice for products
+import Product from "../models/product.model.js"; // Used to fetch unitPrice for products
 import jwt from "jsonwebtoken";
 
 // Create a new customer order

@@ -139,14 +139,19 @@ const AddProject = () => {
 
   // סינון מנהלי הפרויקט מתוך העובדים במחלקה – נניח שהערך ב־emp.role הוא "Manager"
   const projectManagers = departmentEmployees.filter(
-    (emp) => emp.role && emp.role.toLowerCase() === "manager"
+    (emp) => emp.role && ["manager", "admin"].includes(emp.role.toLowerCase())
   );
+
   console.log("projectManagers", projectManagers);
 
   return (
     <div className="min-h-screen bg-bg flex items-center justify-center p-4">
-      <div className="bg-bg p-6 rounded shadow-md w-full max-w-lg text-text">
-        <h1 className="text-2xl font-bold mb-4 text-primary">
+      <div
+        className="bg-bg p-6 rounded w-full max-w-lg text-text z-50"
+        style={{ boxShadow: "14px 14px 16px rgba(0, 0, 0, 0.2)" }}
+      >
+        {" "}
+        <h1 className="text-2xl  font-bold mb-4 text-primary">
           {t("project.create_title")}
         </h1>
         <form onSubmit={formik.handleSubmit} className="space-y-4">

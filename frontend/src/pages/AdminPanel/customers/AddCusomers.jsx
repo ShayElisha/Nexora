@@ -7,7 +7,6 @@ const AddCustomers = () => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
 
-  // מצב הטופס לפי המודל (למעט createdBy/updatedBy, אותם נטפל בצד השרת)
   const [customer, setCustomer] = useState({
     name: "",
     email: "",
@@ -16,24 +15,21 @@ const AddCustomers = () => {
     company: "",
     website: "",
     industry: "",
-    status: "Prospect", // Active, Inactive, or Prospect
-    customerType: "Corporate", // "Individual" or "Corporate"
+    status: "Prospect",
+    customerType: "Corporate",
     dateOfBirth: "",
     gender: "",
     preferredContactMethod: "",
     lastContacted: "",
-    // customerSince - נותר ריק כדי שהשרת יגדיר כברירת מחדל
-    contacts: [], // מערך של אנשי קשר
+    contacts: [],
     notes: "",
   });
 
-  // Handler לשינוי בשדות הטופס
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCustomer((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handler לניהול אנשי קשר (contacts)
   const handleContactChange = (index, e) => {
     const { name, value } = e.target;
     const updatedContacts = [...customer.contacts];
@@ -57,10 +53,8 @@ const AddCustomers = () => {
     setCustomer((prev) => ({ ...prev, contacts: updatedContacts }));
   };
 
-  // Handler לשליחת הטופס
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // בדיקה בסיסית - שם ואימייל הם שדות חובה
     if (!customer.name || !customer.email) {
       toast.error(
         t("customer.name_email_required", "Name and email are required")
@@ -69,13 +63,11 @@ const AddCustomers = () => {
     }
     setLoading(true);
     try {
-      // שליחת הנתונים לשרת; שדה customerSince יוגדר בשרת כברירת מחדל
       const response = await axiosInstance.post("/customers", customer);
       if (response.data.success) {
         toast.success(
           t("customer.success_create", "Customer added successfully")
         );
-        // איפוס הטופס
         setCustomer({
           name: "",
           email: "",
@@ -111,16 +103,16 @@ const AddCustomers = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="w-full max-w-2xl bg-white p-6 rounded shadow-md">
-        <h1 className="text-2xl font-bold mb-4 text-center">
+    <div className="min-h-screen flex items-center justify-center py-10 animate-fade-in">
+      <div className="bg-bg rounded-xl p-6 w-full max-w-2xl min-h-[80vh] overflow-y-auto shadow-xl">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-text mb-6 tracking-tight drop-shadow-sm text-center">
           {t("customer.add_title", "Add Customer")}
         </h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Info */}
           <div className="grid grid-cols-1 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-text">
                 {t("customer.name", "Name")}
               </label>
               <input
@@ -128,11 +120,11 @@ const AddCustomers = () => {
                 name="name"
                 value={customer.name}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded p-2"
+                className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-text">
                 {t("customer.email", "Email")}
               </label>
               <input
@@ -140,11 +132,11 @@ const AddCustomers = () => {
                 name="email"
                 value={customer.email}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded p-2"
+                className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-text">
                 {t("customer.phone", "Phone")}
               </label>
               <input
@@ -152,11 +144,11 @@ const AddCustomers = () => {
                 name="phone"
                 value={customer.phone}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded p-2"
+                className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-text">
                 {t("customer.address", "Address")}
               </label>
               <input
@@ -164,11 +156,11 @@ const AddCustomers = () => {
                 name="address"
                 value={customer.address}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded p-2"
+                className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-text">
                 {t("customer.company", "Company")}
               </label>
               <input
@@ -176,11 +168,11 @@ const AddCustomers = () => {
                 name="company"
                 value={customer.company}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded p-2"
+                className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-text">
                 {t("customer.website", "Website")}
               </label>
               <input
@@ -188,11 +180,11 @@ const AddCustomers = () => {
                 name="website"
                 value={customer.website}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded p-2"
+                className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-text">
                 {t("customer.industry", "Industry")}
               </label>
               <input
@@ -200,18 +192,18 @@ const AddCustomers = () => {
                 name="industry"
                 value={customer.industry}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded p-2"
+                className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-text">
                 {t("customer.status", "Status")}
               </label>
               <select
                 name="status"
                 value={customer.status}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded p-2"
+                className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
               >
                 <option value="Active">
                   {t("customer.status_active", "Active")}
@@ -225,14 +217,14 @@ const AddCustomers = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-text">
                 {t("customer.customerType", "Customer Type")}
               </label>
               <select
                 name="customerType"
                 value={customer.customerType}
                 onChange={handleChange}
-                className="mt-1 block w-full border border-gray-300 rounded p-2"
+                className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
               >
                 <option value="Individual">
                   {t("customer.individual", "Individual")}
@@ -244,11 +236,10 @@ const AddCustomers = () => {
             </div>
           </div>
 
-          {/* Fields for Individual customers */}
           {customer.customerType === "Individual" && (
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-text">
                   {t("customer.dateOfBirth", "Date of Birth")}
                 </label>
                 <input
@@ -256,18 +247,18 @@ const AddCustomers = () => {
                   name="dateOfBirth"
                   value={customer.dateOfBirth}
                   onChange={handleChange}
-                  className="mt-1 block w-full border border-gray-300 rounded p-2"
+                  className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-text">
                   {t("customer.gender", "Gender")}
                 </label>
                 <select
                   name="gender"
                   value={customer.gender}
                   onChange={handleChange}
-                  className="mt-1 block w-full border border-gray-300 rounded p-2"
+                  className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
                 >
                   <option value="">
                     {t("customer.selectGender", "Select Gender")}
@@ -282,16 +273,15 @@ const AddCustomers = () => {
             </div>
           )}
 
-          {/* Preferred Contact Method */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-text">
               {t("customer.preferredContactMethod", "Preferred Contact Method")}
             </label>
             <select
               name="preferredContactMethod"
               value={customer.preferredContactMethod}
               onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded p-2"
+              className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
             >
               <option value="">
                 {t("customer.selectContactMethod", "Select Method")}
@@ -302,9 +292,8 @@ const AddCustomers = () => {
             </select>
           </div>
 
-          {/* Last Contacted */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-text">
               {t("customer.lastContacted", "Last Contacted")}
             </label>
             <input
@@ -312,37 +301,39 @@ const AddCustomers = () => {
               name="lastContacted"
               value={customer.lastContacted}
               onChange={handleChange}
-              className="mt-1 block w-full border border-gray-300 rounded p-2"
+              className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
             />
           </div>
 
-          {/* Contacts */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-text">
               {t("customer.contacts", "Contacts")}
             </label>
             {customer.contacts.map((contact, index) => (
-              <div key={index} className="border p-2 rounded mb-2">
+              <div
+                key={index}
+                className="border border-border-color p-3 rounded-md mb-3 bg-bg shadow-sm"
+              >
                 <div className="flex justify-between items-center mb-2">
-                  <span className="font-semibold">
+                  <span className="font-semibold text-text">
                     {t("customer.contact", "Contact")} {index + 1}
                   </span>
                   <button
                     type="button"
                     onClick={() => removeContact(index)}
-                    className="text-red-600 text-sm"
+                    className="px-3 py-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all duration-200 text-sm"
                   >
                     {t("customer.remove", "Remove")}
                   </button>
                 </div>
-                <div className="grid grid-cols-1 gap-2">
+                <div className="grid grid-cols-1 gap-3">
                   <input
                     type="text"
                     name="name"
                     placeholder={t("customer.contactName", "Name")}
                     value={contact.name}
                     onChange={(e) => handleContactChange(index, e)}
-                    className="border p-1 rounded w-full"
+                    className="w-full p-2 rounded-md bg-accent text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
                   />
                   <input
                     type="text"
@@ -350,7 +341,7 @@ const AddCustomers = () => {
                     placeholder={t("customer.contactPosition", "Position")}
                     value={contact.position}
                     onChange={(e) => handleContactChange(index, e)}
-                    className="border p-1 rounded w-full"
+                    className="w-full p-2 rounded-md bg-accent text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
                   />
                   <input
                     type="email"
@@ -358,7 +349,7 @@ const AddCustomers = () => {
                     placeholder={t("customer.contactEmail", "Email")}
                     value={contact.email}
                     onChange={(e) => handleContactChange(index, e)}
-                    className="border p-1 rounded w-full"
+                    className="w-full p-2 rounded-md bg-accent text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
                   />
                   <input
                     type="text"
@@ -366,7 +357,7 @@ const AddCustomers = () => {
                     placeholder={t("customer.contactPhone", "Phone")}
                     value={contact.phone}
                     onChange={(e) => handleContactChange(index, e)}
-                    className="border p-1 rounded w-full"
+                    className="w-full p-2 rounded-md bg-accent text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
                   />
                 </div>
               </div>
@@ -374,15 +365,14 @@ const AddCustomers = () => {
             <button
               type="button"
               onClick={addContact}
-              className="bg-green-500 text-white px-3 py-1 rounded"
+              className="px-4 py-2 bg-green-500 text-white rounded-full shadow-md hover:bg-green-600 transition-all duration-200"
             >
               {t("customer.addContact", "Add Contact")}
             </button>
           </div>
 
-          {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-text">
               {t("customer.notes", "Notes")}
             </label>
             <textarea
@@ -390,21 +380,31 @@ const AddCustomers = () => {
               value={customer.notes}
               onChange={handleChange}
               rows="3"
-              className="mt-1 block w-full border border-gray-300 rounded p-2"
-            ></textarea>
+              className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
+            />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded mt-4"
-          >
-            {loading
-              ? t("customer.creating", "Creating...")
-              : t("customer.submit", "Add Customer")}
-          </button>
+          <div className="flex justify-end gap-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-5 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 disabled:opacity-50"
+            >
+              {loading
+                ? t("customer.creating", "Creating...")
+                : t("customer.submit", "Add Customer")}
+            </button>
+          </div>
         </form>
       </div>
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+      `}</style>
     </div>
   );
 };

@@ -64,10 +64,10 @@ const SignupEmployee = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-bg text-text animate-fade-in">
+    <div className="flex min-h-screen  text-text animate-fade-in">
       <div className="flex-1 p-6 sm:p-8 max-w-4xl mx-auto">
         {/* כרטיס להרשמה לעובדים */}
-        <div className="bg-accent p-6 rounded-xl shadow-xl border border-border-color mb-8">
+        <div className="bg-bg p-6 rounded-xl shadow-xl border border-border-color mb-8">
           <h2 className="text-xl sm:text-2xl font-semibold text-text mb-4 tracking-tight drop-shadow-md">
             {t("signupEmployee.instructions.employee_signup")}
           </h2>
@@ -75,7 +75,7 @@ const SignupEmployee = () => {
         </div>
 
         {/* כרטיס עבור QR וקישור */}
-        <div className="bg-accent p-6 rounded-xl shadow-xl border border-border-color mb-8">
+        <div className="bg-bg p-6 rounded-xl shadow-xl border border-border-color mb-8">
           <h2 className="text-xl sm:text-2xl font-semibold text-text mb-4 tracking-tight drop-shadow-md">
             {t("signupEmployee.instructions.scan_qr_code")}
           </h2>
@@ -99,7 +99,7 @@ const SignupEmployee = () => {
         </div>
 
         {/* כרטיס לשליחת הקישור */}
-        <div className="bg-accent p-6 rounded-xl shadow-xl border border-border-color">
+        <div className="bg-bg p-6 rounded-xl shadow-xl border border-border-color">
           <h3 className="text-lg sm:text-xl font-semibold text-text mb-4 tracking-tight drop-shadow-md">
             {t("signupEmployee.instructions.select_send_option")}
           </h3>

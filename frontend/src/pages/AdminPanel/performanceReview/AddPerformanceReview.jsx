@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import axiosInstance from "../../../lib/axios";
 import { useNavigate } from "react-router-dom";
 import { FaExclamationTriangle, FaPlus, FaTrash } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const AddPerformanceReview = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     employeeIds: [],
@@ -24,11 +26,11 @@ const AddPerformanceReview = () => {
         const res = await axiosInstance.get("/employees");
         setEmployees(Array.isArray(res.data.data) ? res.data.data : res.data);
       } catch (err) {
-        setError("שגיאה בטעינת העובדים");
+        setError(t("performanceReview.error_loading_employees"));
       }
     };
     fetchEmployees();
-  }, []);
+  }, [t]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -81,16 +83,19 @@ const AddPerformanceReview = () => {
         navigate("/performance-reviews");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "שגיאה ביצירת הביקורות");
+      setError(
+        err.response?.data?.message ||
+          t("performanceReview.error_creating_reviews")
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container mx-auto p-8 bg-gradient-to-br from-bg to-bg min-h-screen animate-fade-in">
+    <div className="min-h-screen mx-auto p-8 bg-bg animate-fade-in">
       <h1 className="text-4xl font-extrabold text-text mb-8 text-center tracking-tight drop-shadow-md">
-        צור ביקורת ביצועים חדשה
+        {t("performanceReview.create_new_review")}
       </h1>
 
       {error && (
@@ -105,7 +110,7 @@ const AddPerformanceReview = () => {
         {/* בחירת עובדים */}
         <div className="animate-slide-up">
           <label className="block mb-2 text-text font-semibold">
-            בחר עובדים
+            {t("performanceReview.select_employees")}
           </label>
           <select
             name="employeeIds"
@@ -122,13 +127,15 @@ const AddPerformanceReview = () => {
             ))}
           </select>
           <p className="text-sm text-text mt-1 opacity-70">
-            החזק Ctrl/Cmd לבחירת מספר עובדים
+            {t("performanceReview.select_employees_hint")}
           </p>
         </div>
 
         {/* כותרת */}
         <div className="animate-slide-up" style={{ animationDelay: "100ms" }}>
-          <label className="block mb-2 text-text font-semibold">כותרת</label>
+          <label className="block mb-2 text-text font-semibold">
+            {t("performanceReview.title")}
+          </label>
           <input
             type="text"
             name="title"
@@ -142,7 +149,7 @@ const AddPerformanceReview = () => {
         {/* תאריך יעד */}
         <div className="animate-slide-up" style={{ animationDelay: "200ms" }}>
           <label className="block mb-2 text-text font-semibold">
-            תאריך יעד
+            {t("performanceReview.deadline")}
           </label>
           <input
             type="date"
@@ -156,7 +163,9 @@ const AddPerformanceReview = () => {
 
         {/* שאלות */}
         <div className="animate-slide-up" style={{ animationDelay: "300ms" }}>
-          <label className="block mb-2 text-text font-semibold">שאלות</label>
+          <label className="block mb-2 text-text font-semibold">
+            {t("performanceReview.questions")}
+          </label>
           {formData.questions.map((question, index) => (
             <div
               key={index}
@@ -165,7 +174,7 @@ const AddPerformanceReview = () => {
             >
               <input
                 type="text"
-                placeholder="נוסח השאלה"
+                placeholder={t("performanceReview.question_placeholder")}
                 value={question.text}
                 onChange={(e) =>
                   handleQuestionChange(index, "text", e.target.value)
@@ -180,8 +189,12 @@ const AddPerformanceReview = () => {
                 }
                 className="w-full p-3 border border-border-color rounded-lg focus:ring-4 focus:ring-primary focus:border-primary transition-all duration-300 bg-gray-50 text-text shadow-sm hover:shadow-md"
               >
-                <option value="rating">דירוג</option>
-                <option value="text">טקסט</option>
+                <option value="rating">
+                  {t("performanceReview.responseType.rating")}
+                </option>
+                <option value="text">
+                  {t("performanceReview.responseType.text")}
+                </option>
               </select>
               <select
                 value={question.category}
@@ -190,10 +203,18 @@ const AddPerformanceReview = () => {
                 }
                 className="w-full p-3 border border-border-color rounded-lg focus:ring-4 focus:ring-primary focus:border-primary transition-all duration-300 bg-gray-50 text-text shadow-sm hover:shadow-md"
               >
-                <option value="Skills">מיומנויות</option>
-                <option value="Performance">ביצועים</option>
-                <option value="Teamwork">עבודת צוות</option>
-                <option value="Other">אחר</option>
+                <option value="Skills">
+                  {t("performanceReview.category.skills")}
+                </option>
+                <option value="Performance">
+                  {t("performanceReview.category.performance")}
+                </option>
+                <option value="Teamwork">
+                  {t("performanceReview.category.teamwork")}
+                </option>
+                <option value="Other">
+                  {t("performanceReview.category.other")}
+                </option>
               </select>
               {formData.questions.length > 1 && (
                 <button
@@ -201,7 +222,8 @@ const AddPerformanceReview = () => {
                   onClick={() => removeQuestion(index)}
                   className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600 transition-all duration-300 transform hover:scale-105 hover:shadow-md flex items-center"
                 >
-                  <FaTrash className="mr-2" /> מחק
+                  <FaTrash className="mr-2" />{" "}
+                  {t("performanceReview.remove_question")}
                 </button>
               )}
             </div>
@@ -211,7 +233,7 @@ const AddPerformanceReview = () => {
             onClick={addQuestion}
             className="bg-gradient-to-r from-primary to-secondary text-button-text px-4 py-2 rounded-full hover:bg-secondary transition-all duration-300 transform hover:scale-105 hover:shadow-md flex items-center mt-2"
           >
-            <FaPlus className="mr-2" /> הוסף שאלה
+            <FaPlus className="mr-2" /> {t("performanceReview.add_question")}
           </button>
         </div>
 
@@ -226,7 +248,9 @@ const AddPerformanceReview = () => {
                 : "bg-gradient-to-r from-button-bg to-accent"
             }`}
           >
-            {loading ? "שולח..." : "צור ביקורות"}
+            {loading
+              ? t("performanceReview.sending")
+              : t("performanceReview.create_reviews")}
           </button>
         </div>
       </form>

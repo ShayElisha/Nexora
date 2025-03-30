@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../../lib/axios";
 import { FaEdit, FaEye, FaExclamationTriangle, FaSearch } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const PerformanceReviewList = () => {
+  const { t } = useTranslation();
+
   const [reviews, setReviews] = useState([]);
   const [filteredReviews, setFilteredReviews] = useState([]);
   const [error, setError] = useState("");
@@ -27,13 +30,14 @@ const PerformanceReviewList = () => {
         setFilteredReviews(sortedReviews);
       } catch (err) {
         setError(
-          "שגיאה בטעינת הביקורות: " +
+          t("performanceReview.error_loading_reviews") +
+            ": " +
             (err.response?.data?.message || err.message)
         );
       }
     };
     fetchReviews();
-  }, []);
+  }, [t]);
 
   const handleSearch = (e) => {
     const query = e.target.value.toLowerCase();
@@ -52,7 +56,7 @@ const PerformanceReviewList = () => {
           ? `${review.responses[0].reviewerId?.firstName || ""} ${
               review.responses[0].reviewerId?.lastName || ""
             }`.toLowerCase()
-          : "לא נענה";
+          : t("performanceReview.not_answered");
       return (
         title.includes(query) ||
         employee.includes(query) ||
@@ -107,7 +111,7 @@ const PerformanceReviewList = () => {
     if (!selectedReview) return;
 
     if (!isFormComplete()) {
-      setFormError("כל השאלות חייבות להיענות לפני השליחה.");
+      setFormError(t("performanceReview.all_questions_required"));
       return;
     }
 
@@ -136,9 +140,11 @@ const PerformanceReviewList = () => {
       setFilteredReviews(sortedReviews);
       handleCloseModal();
     } catch (err) {
-      console.error("שגיאה מלאה:", err);
+      console.error("Error:", err);
       alert(
-        "שגיאה בשליחת התשובות: " + (err.response?.data?.message || err.message)
+        t("performanceReview.error_submitting_answers") +
+          ": " +
+          (err.response?.data?.message || err.message)
       );
     }
   };
@@ -146,7 +152,7 @@ const PerformanceReviewList = () => {
   return (
     <div className="container mx-auto p-8 bg-gradient-to-br from-bg to-bg min-h-screen animate-fade-in">
       <h1 className="text-4xl font-extrabold text-text mb-8 text-center tracking-tight drop-shadow-md">
-        רשימת ביקורות ביצועים
+        {t("performanceReview.list_title")}
       </h1>
 
       {error && (
@@ -164,7 +170,7 @@ const PerformanceReviewList = () => {
             type="text"
             value={searchQuery}
             onChange={handleSearch}
-            placeholder="חפש לפי כותרת, עובד, תאריך, סטטוס או ממלא..."
+            placeholder={t("performanceReview.search_placeholder")}
             className="w-full p-4 pl-12 border border-border-color rounded-full shadow-md focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 bg-white text-text placeholder-gray-400"
           />
           <FaSearch
@@ -176,7 +182,7 @@ const PerformanceReviewList = () => {
 
       {filteredReviews.length === 0 ? (
         <p className="text-text text-center text-lg font-medium animate-fade-in">
-          אין ביקורות זמינות
+          {t("performanceReview.no_reviews")}
         </p>
       ) : (
         <div className="overflow-x-auto shadow-2xl rounded-xl bg-white transform transition-all duration-500 hover:shadow-3xl">
@@ -184,22 +190,22 @@ const PerformanceReviewList = () => {
             <thead className="bg-gradient-to-r from-primary to-secondary text-button-text">
               <tr>
                 <th className="py-4 px-6 text-left text-sm font-bold tracking-wider">
-                  כותרת
+                  {t("performanceReview.table_title")}
                 </th>
                 <th className="py-4 px-6 text-left text-sm font-bold tracking-wider">
-                  עובד
+                  {t("performanceReview.table_employee")}
                 </th>
                 <th className="py-4 px-6 text-left text-sm font-bold tracking-wider">
-                  תאריך יעד
+                  {t("performanceReview.table_deadline")}
                 </th>
                 <th className="py-4 px-6 text-left text-sm font-bold tracking-wider">
-                  סטטוס
+                  {t("performanceReview.table_status")}
                 </th>
                 <th className="py-4 px-6 text-left text-sm font-bold tracking-wider">
-                  מילא את הטופס
+                  {t("performanceReview.table_reviewer")}
                 </th>
                 <th className="py-4 px-6 text-center text-sm font-bold tracking-wider">
-                  פעולה
+                  {t("performanceReview.table_action")}
                 </th>
               </tr>
             </thead>
@@ -210,7 +216,7 @@ const PerformanceReviewList = () => {
                     ? `${review.responses[0].reviewerId?.firstName || ""} ${
                         review.responses[0].reviewerId?.lastName || ""
                       }`.trim()
-                    : "לא נענה";
+                    : t("performanceReview.not_answered");
                 return (
                   <tr
                     key={review._id}
@@ -248,7 +254,7 @@ const PerformanceReviewList = () => {
                         <button
                           onClick={() => handleOpenViewModal(review)}
                           className="text-primary hover:text-secondary transition-all duration-200 transform hover:scale-125 hover:rotate-6"
-                          title="צפה בתשובות"
+                          title={t("performanceReview.view_answers")}
                         >
                           <FaEye size={24} />
                         </button>
@@ -256,7 +262,7 @@ const PerformanceReviewList = () => {
                         <button
                           onClick={() => handleOpenEditModal(review)}
                           className="text-accent hover:text-primary transition-all duration-200 transform hover:scale-125 hover:rotate-6"
-                          title="מלא טופס"
+                          title={t("performanceReview.fill_form")}
                         >
                           <FaEdit size={24} />
                         </button>
@@ -275,7 +281,7 @@ const PerformanceReviewList = () => {
         <div className="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center transition-opacity duration-500 animate-fade-in">
           <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-lg w-full transform transition-all duration-300 scale-95 hover:scale-100 border border-border-color">
             <h2 className="text-2xl font-bold text-text mb-6 tracking-tight drop-shadow-sm">
-              ענה על: {selectedReview.title}
+              {t("performanceReview.answer_for")}: {selectedReview.title}
             </h2>
             {selectedReview.questions.map((q, idx) => (
               <div
@@ -292,7 +298,9 @@ const PerformanceReviewList = () => {
                     value={answers[idx] || ""}
                     onChange={(e) => handleAnswerChange(idx, e.target.value)}
                     className="w-full p-3 border border-border-color rounded-lg focus:ring-4 focus:ring-primary focus:border-primary transition-all duration-300 bg-gray-50 text-text placeholder-gray-400 shadow-sm hover:shadow-md"
-                    placeholder={`דירוג (1-${q.maxRating || 5})`}
+                    placeholder={`${t(
+                      "performanceReview.rating_placeholder"
+                    )} (1-${q.maxRating || 5})`}
                     required
                   />
                 ) : (
@@ -301,7 +309,7 @@ const PerformanceReviewList = () => {
                     onChange={(e) => handleAnswerChange(idx, e.target.value)}
                     className="w-full p-3 border border-border-color rounded-lg focus:ring-4 focus:ring-primary focus:border-primary transition-all duration-300 bg-gray-50 text-text placeholder-gray-400 resize-none shadow-sm hover:shadow-md"
                     rows="4"
-                    placeholder="כתוב תשובה כאן..."
+                    placeholder={t("performanceReview.text_placeholder")}
                     required
                   />
                 )}
@@ -322,13 +330,13 @@ const PerformanceReviewList = () => {
                 }`}
                 disabled={!isFormComplete()}
               >
-                שלח
+                {t("performanceReview.submit")}
               </button>
               <button
                 onClick={handleCloseModal}
                 className="px-6 py-2 bg-gradient-to-r from-secondary to-primary text-button-text rounded-full hover:bg-secondary transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
               >
-                בטל
+                {t("performanceReview.cancel")}
               </button>
             </div>
           </div>
@@ -340,7 +348,7 @@ const PerformanceReviewList = () => {
         <div className="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center transition-opacity duration-500 animate-fade-in">
           <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-lg w-full transform transition-all duration-300 scale-95 hover:scale-100 border border-border-color">
             <h2 className="text-2xl font-bold text-text mb-6 tracking-tight drop-shadow-sm">
-              צפה ב: {selectedReview.title}
+              {t("performanceReview.view_for")}: {selectedReview.title}
             </h2>
             {selectedReview.questions.map((question, idx) => {
               const response = selectedReview.responses.find((r) =>
@@ -361,9 +369,11 @@ const PerformanceReviewList = () => {
                     {question.text}
                   </p>
                   <p className="text-text bg-gray-100 p-4 rounded-lg shadow-inner">
-                    תשובה:{" "}
+                    {t("performanceReview.answer")}:{" "}
                     <span className="font-medium">
-                      {answer ? answer.value : "לא נענה"}
+                      {answer
+                        ? answer.value
+                        : t("performanceReview.not_answered")}
                     </span>
                   </p>
                 </div>
@@ -374,7 +384,7 @@ const PerformanceReviewList = () => {
                 onClick={handleCloseModal}
                 className="px-6 py-2 bg-gradient-to-r from-secondary to-primary text-button-text rounded-full hover:bg-secondary transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
               >
-                סגור
+                {t("performanceReview.close")}
               </button>
             </div>
           </div>

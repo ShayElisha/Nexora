@@ -1,114 +1,159 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../../../lib/axios";
+import { useTranslation } from "react-i18next";
 
 const CustomersList = () => {
-  const { data, isLoading, error } = useQuery({
+  const { t } = useTranslation();
+
+  const {
+    data: customers = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["customers"],
     queryFn: async () => {
       const res = await axiosInstance.get("/customers");
-      return res.data.data; // הנחה: הנתונים נמצאים ב-res.data.data
+      return res.data.data; // Assuming the data is in res.data.data
     },
   });
 
   if (isLoading)
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-xl text-gray-600">Loading...</p>
+      <div className="min-h-screen bg-bg flex justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-primary"></div>
       </div>
     );
-  if (error)
+  if (isError)
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-xl text-red-500">Error fetching customers</p>
+      <div className="min-h-screen bg-bg flex justify-center items-center">
+        <div className="text-red-500 font-medium text-lg">
+          {t("customersList.error_loading_customers")}
+        </div>
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
-        Customers List
-      </h1>
-      <div className="container mx-auto px-4">
-        {/* Responsive grid: 1 column on small screens, 2 on medium, 3 on large */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {data.map((customer) => (
-            <div
-              key={customer._id}
-              className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition duration-300"
-            >
-              <div className="p-6">
-                {/* חלק 1: מידע בסיסי */}
-                <div className="mb-4 border-b pb-2">
-                  <h2 className="text-2xl font-semibold text-gray-800">
-                    {customer.name}
+    <div className="min-h-screen flex flex-col items-center py-10 animate-fade-in">
+      <div className="max-w-7xl mx-auto p-6 sm:p-8 w-full">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-text mb-8 tracking-tight drop-shadow-md text-center">
+          {t("customersList.title")}
+        </h1>
+        {customers.length === 0 ? (
+          <p className="text-text opacity-70 text-center italic">
+            {t("customersList.no_customers_found")}
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {customers.map((customer) => (
+              <div
+                key={customer._id}
+                className="bg-bg rounded-xl shadow-md flex flex-col transition-transform hover:scale-105 hover:shadow-lg"
+              >
+                <div className="p-5 border-b border-border-color">
+                  <h2 className="text-xl font-semibold text-text truncate">
+                    {customer.name || t("customersList.unnamed_customer")}
                   </h2>
-                  <p className="text-sm text-gray-500">{customer.email}</p>
-                  <p className="text-sm text-gray-500">
-                    {customer.phone || "No phone"}
+                  <p className="text-sm text-text opacity-70">
+                    {customer.email || t("customersList.no_email")}
                   </p>
                 </div>
-                {/* חלק 2: פרטי חברה וסטטוס */}
-                <div className="mb-4 border-b pb-2">
-                  <p className="text-sm text-gray-700">
-                    <span className="font-medium">Company:</span>{" "}
-                    {customer.company || "N/A"}
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    <span className="font-medium">Website:</span>{" "}
-                    {customer.website || "N/A"}
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    <span className="font-medium">Industry:</span>{" "}
-                    {customer.industry || "N/A"}
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    <span className="font-medium">Status:</span>{" "}
-                    {customer.status}
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    <span className="font-medium">Type:</span>{" "}
-                    {customer.customerType}
-                  </p>
-                </div>
-                {/* חלק 3: פרטים נוספים */}
-                <div>
+                <div className="p-5 flex-grow">
+                  <div className="grid grid-cols-2 gap-4 text-sm text-text">
+                    <div>
+                      <p>
+                        <strong className="font-semibold">
+                          {t("customersList.phone")}
+                        </strong>{" "}
+                        {customer.phone || t("customersList.not_available")}
+                      </p>
+                      <p>
+                        <strong className="font-semibold">
+                          {t("customersList.company")}
+                        </strong>{" "}
+                        {customer.company || t("customersList.not_available")}
+                      </p>
+                      <p>
+                        <strong className="font-semibold">
+                          {t("customersList.website")}
+                        </strong>{" "}
+                        {customer.website || t("customersList.not_available")}
+                      </p>
+                      <p>
+                        <strong className="font-semibold">
+                          {t("customersList.industry")}
+                        </strong>{" "}
+                        {customer.industry || t("customersList.not_available")}
+                      </p>
+                    </div>
+                    <div>
+                      <p>
+                        <strong className="font-semibold">
+                          {t("customersList.status")}
+                        </strong>{" "}
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs ${
+                            customer.status === "Active"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
+                          {customer.status || t("customersList.not_available")}
+                        </span>
+                      </p>
+                      <p>
+                        <strong className="font-semibold">
+                          {t("customersList.type")}
+                        </strong>{" "}
+                        {customer.customerType ||
+                          t("customersList.not_available")}
+                      </p>
+                      <p>
+                        <strong className="font-semibold">
+                          {t("customersList.customer_since")}
+                        </strong>{" "}
+                        {customer.customerSince
+                          ? new Date(
+                              customer.customerSince
+                            ).toLocaleDateString()
+                          : t("customersList.not_available")}
+                      </p>
+                      <p>
+                        <strong className="font-semibold">
+                          {t("customersList.last_contacted")}
+                        </strong>{" "}
+                        {customer.lastContacted
+                          ? new Date(
+                              customer.lastContacted
+                            ).toLocaleDateString()
+                          : t("customersList.not_available")}
+                      </p>
+                    </div>
+                  </div>
                   {customer.customerType === "Individual" && (
-                    <>
-                      <p className="text-sm text-gray-700">
-                        <span className="font-medium">DOB:</span>{" "}
+                    <div className="mt-4 text-sm text-text">
+                      <p>
+                        <strong className="font-semibold">
+                          {t("customersList.DOB")}
+                        </strong>{" "}
                         {customer.dateOfBirth
                           ? new Date(customer.dateOfBirth).toLocaleDateString()
-                          : "N/A"}
+                          : t("customersList.not_available")}
                       </p>
-                      <p className="text-sm text-gray-700">
-                        <span className="font-medium">Gender:</span>{" "}
-                        {customer.gender || "N/A"}
+                      <p>
+                        <strong className="font-semibold">
+                          {t("customersList.gender")}
+                        </strong>{" "}
+                        {customer.gender || t("customersList.not_available")}
                       </p>
-                    </>
+                    </div>
                   )}
-                  <p className="text-sm text-gray-700">
-                    <span className="font-medium">Preferred Contact:</span>{" "}
-                    {customer.preferredContactMethod || "N/A"}
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    <span className="font-medium">Last Contacted:</span>{" "}
-                    {customer.lastContacted
-                      ? new Date(customer.lastContacted).toLocaleDateString()
-                      : "N/A"}
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    <span className="font-medium">Customer Since:</span>{" "}
-                    {customer.customerSince
-                      ? new Date(customer.customerSince).toLocaleDateString()
-                      : "N/A"}
-                  </p>
                   {customer.contacts && customer.contacts.length > 0 && (
-                    <div className="mt-2">
-                      <p className="text-sm font-medium text-gray-800">
-                        Contacts:
+                    <div className="mt-4 text-sm text-text">
+                      <p className="font-semibold">
+                        {t("customersList.contacts")}
                       </p>
-                      <ul className="list-disc list-inside text-sm text-gray-700">
+                      <ul className="list-disc list-inside opacity-80">
                         {customer.contacts.map((contact, index) => (
                           <li key={index}>
                             {contact.name}{" "}
@@ -120,16 +165,32 @@ const CustomersList = () => {
                     </div>
                   )}
                   {customer.notes && (
-                    <p className="mt-2 text-sm text-gray-600">
-                      <span className="font-medium">Notes:</span> {customer.notes}
+                    <p className="mt-4 text-sm text-text opacity-80">
+                      <strong className="font-semibold">
+                        {t("customersList.notes")}
+                      </strong>{" "}
+                      {customer.notes}
                     </p>
                   )}
                 </div>
+                <div className="p-5 border-t border-border-color flex justify-end">
+                  <button className="px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200">
+                    {t("customersList.view_details")}
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+      `}</style>
     </div>
   );
 };

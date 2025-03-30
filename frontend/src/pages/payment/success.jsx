@@ -9,17 +9,16 @@ import {
 
 const Success = () => {
   const query = new URLSearchParams(window.location.search);
-  const sessionId = query.get("session_id"); // Extract session ID from the success URL
+  const sessionId = query.get("session_id");
 
   console.log("Sending session ID:", sessionId);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const hasFetched = useRef(false); // Add a ref to prevent multiple calls
+  const hasFetched = useRef(false);
 
   const navigate = useNavigate();
 
-  // Function to send the session ID to the backend and save the payment
   const savePayment = async () => {
     if (!sessionId) {
       setError("Session ID not found. Payment verification failed.");
@@ -28,13 +27,11 @@ const Success = () => {
     }
 
     try {
-      // Send session ID to the backend
       const response = await axiosInstance.post("/payment/save-payment", {
         sessionId,
       });
       console.log("Server response:", response.data);
 
-      // Handle success response
       if (response.data.success) {
         toast.success("Payment saved successfully!");
       } else {
@@ -54,62 +51,59 @@ const Success = () => {
   useEffect(() => {
     if (!hasFetched.current) {
       savePayment();
-      hasFetched.current = true; // Prevent multiple calls
+      hasFetched.current = true;
     }
   }, [sessionId]);
 
   const handleReturnHome = () => {
-    navigate("/"); // Navigate back to the dashboard
+    navigate("/");
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white px-4">
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 opacity-20"></div>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-bg px-4 relative overflow-hidden">
+      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-primary via-secondary to-accent opacity-10 animate-fadeIn"></div>
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center h-screen">
-          {/* Loader */}
-          <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-
-          {/* Text */}
-          <p className="mt-4 text-lg font-medium text-gray-700">
+        <div className="flex flex-col items-center justify-center h-screen animate-fadeIn">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="mt-4 text-lg font-medium text-text">
             Processing your payment...
           </p>
         </div>
       ) : error ? (
-        <>
-          <ExclamationCircleIcon className="w-16 h-16 text-red-500 mb-4" />
-          <h1 className="text-3xl font-bold text-red-600 mb-4">
-            Payment Failed
-          </h1>
-          <p className="text-lg text-gray-700 mb-8">{error}</p>
+        <div className="text-center animate-fadeIn">
+          <ExclamationCircleIcon className="w-16 h-16 text-red-500 mb-4 mx-auto" />
+          <h1 className="text-3xl font-bold text-text mb-4">Payment Failed</h1>
+          <p className="text-lg text-secondary mb-8 max-w-md mx-auto">
+            {error}
+          </p>
           <button
             onClick={handleReturnHome}
-            className="px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+            className="px-6 py-3 bg-button-bg text-button-text rounded-md hover:bg-secondary transition-all duration-200"
           >
             Return to Home
           </button>
-        </>
+        </div>
       ) : (
-        <>
-          <CheckCircleIcon className="w-16 h-16 text-green-500 mb-4 animate-bounce" />
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
+        <div className="text-center animate-fadeIn">
+          <CheckCircleIcon className="w-16 h-16 text-primary mb-4 mx-auto animate-bounce" />
+          <h1 className="text-4xl font-extrabold text-text mb-4">
             Payment Successful!
           </h1>
-          <p className="text-lg text-gray-700 mb-6 text-center max-w-2xl">
+          <p className="text-lg text-secondary mb-6 max-w-2xl mx-auto">
             Thank you for your purchase. Your transaction has been successfully
             completed, and your subscription is now active.
           </p>
-          <p className="text-base text-gray-600 mb-8 text-center max-w-2xl">
+          <p className="text-base text-secondary mb-8 max-w-2xl mx-auto">
             An invoice has been sent to your registered email. Please check your
             inbox for payment details and further instructions.
           </p>
           <button
             onClick={handleReturnHome}
-            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold shadow-lg transition-all"
+            className="px-6 py-3 bg-button-bg text-button-text rounded-lg font-semibold shadow-lg hover:bg-accent focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200"
           >
             Return to Dashboard
           </button>
-        </>
+        </div>
       )}
     </div>
   );

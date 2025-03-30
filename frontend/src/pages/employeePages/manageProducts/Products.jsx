@@ -95,7 +95,7 @@ const Products = () => {
       await Promise.all(
         selectedProducts.map((item) =>
           axiosInstance.put(`/inventory/${item.productId}`, {
-            quantity: -item.quantity,
+            quantity: item.quantity,
           })
         )
       );

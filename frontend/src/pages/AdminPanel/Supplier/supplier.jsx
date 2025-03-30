@@ -2,11 +2,10 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next";
-
+import { useTranslation } from "react-i18next"; 
 const SupplierList = () => {
   const { t, i18n } = useTranslation();
-  const direction = i18n.dir(); // "rtl" או "ltr"
+  const direction = i18n.dir(); // "rtl" or "ltr"
   const [suppliers, setSuppliers] = useState([]);
   const [error, setError] = useState(null);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
@@ -16,6 +15,8 @@ const SupplierList = () => {
   const [files, setFiles] = useState(null);
   const [isAttachmentsModalOpen, setIsAttachmentsModalOpen] = useState(false);
   const [attachmentsSupplier, setAttachmentsSupplier] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); // Pagination state
+  const suppliersPerPage = 12; // 12 suppliers per page
 
   const { data: authData } = useQuery({ queryKey: ["authUser"] });
   const authUser = authData?.user;
@@ -107,7 +108,7 @@ const SupplierList = () => {
       Phone: supplier.Phone || "",
       Rating: supplier.Rating || "",
     });
-    setFiles(null); // איפוס קבצים בעת פתיחת המודל
+    setFiles(null);
     setActiveTab("details");
     setIsModalOpen(true);
   };
@@ -148,6 +149,107 @@ const SupplierList = () => {
     setFiles(e.target.files);
   };
 
+  // Pagination logic
+  const totalPages = Math.ceil(suppliers.length / suppliersPerPage);
+  const indexOfLastSupplier = currentPage * suppliersPerPage;
+  const indexOfFirstSupplier = indexOfLastSupplier - suppliersPerPage;
+  const currentSuppliers = suppliers.slice(
+    indexOfFirstSupplier,
+    indexOfLastSupplier
+  );
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    const maxPagesToShow = 5;
+
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(
+          <button
+            key={i}
+            onClick={() => paginate(i)}
+            className={`px-3 py-1 rounded-full mx-1 ${
+              currentPage === i
+                ? "bg-button-bg text-button-text"
+                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+            }`}
+          >
+            {i}
+          </button>
+        );
+      }
+    } else {
+      const startPage = Math.max(1, currentPage - 2);
+      const endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+      if (startPage > 1) {
+        pageNumbers.push(
+          <button
+            key={1}
+            onClick={() => paginate(1)}
+            className={`px-3 py-1 rounded-full mx-1 ${
+              currentPage === 1
+                ? "bg-button-bg text-button-text"
+                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+            }`}
+          >
+            1
+          </button>
+        );
+        if (startPage > 2) {
+          pageNumbers.push(
+            <span key="start-dots" className="mx-1">
+              ...
+            </span>
+          );
+        }
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(
+          <button
+            key={i}
+            onClick={() => paginate(i)}
+            className={`px-3 py-1 rounded-full mx-1 ${
+              currentPage === i
+                ? "bg-button-bg text-button-text"
+                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+            }`}
+          >
+            {i}
+          </button>
+        );
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          pageNumbers.push(
+            <span key="end-dots" className="mx-1">
+              ...
+            </span>
+          );
+        }
+        pageNumbers.push(
+          <button
+            key={totalPages}
+            onClick={() => paginate(totalPages)}
+            className={`px-3 py-1 rounded-full mx-1 ${
+              currentPage === totalPages
+                ? "bg-button-bg text-button-text"
+                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+            }`}
+          >
+            {totalPages}
+          </button>
+        );
+      }
+    }
+
+    return pageNumbers;
+  };
+
   if (suppliersLoading) {
     return (
       <div className="flex justify-center items-center h-96 bg-bg">
@@ -169,7 +271,7 @@ const SupplierList = () => {
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
       <div
-        className="flex flex-col md:flex-row w-full min-h-screen  text-text animate-fade-in"
+        className="flex flex-col md:flex-row w-full min-h-screen text-text animate-fade-in"
         dir={direction}
       >
         <div className="flex-1 py-12 px-6">
@@ -182,83 +284,115 @@ const SupplierList = () => {
             </p>
           )}
           {suppliers.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {suppliers.map((supplier) => (
-                <div
-                  key={supplier._id}
-                  className="relative bg-bg rounded-xl p-6 shadow-lg hover:scale-105 hover:shadow-neutral-800 hover:shadow-2xl transition-transform duration-300 border border-border-color"
-                >
-                  <button
-                    onClick={() => openAttachmentsModal(supplier)}
-                    className="absolute top-2 p-2 bg-bg rounded-full shadow-md hover:bg-secondary hover:text-button-text transition-all duration-200 transform hover:scale-110"
-                    style={
-                      direction === "rtl" ? { left: "8px" } : { right: "8px" }
-                    }
-                    title={t("supplier.view_attachments")}
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {currentSuppliers.map((supplier) => (
+                  <div
+                    key={supplier._id}
+                    className="relative bg-bg rounded-xl p-6 shadow-lg hover:scale-105 hover:shadow-neutral-800 hover:shadow-2xl transition-transform duration-300 border border-border-color"
                   >
-                    📄
-                  </button>
-                  <h3 className="text-primary font-semibold text-lg mb-3 tracking-tight">
-                    {supplier.SupplierName}
-                  </h3>
-                  <p className="text-text text-sm">
-                    {t("supplier.contact")}:{" "}
-                    {supplier.Contact || t("supplier.not_available")}
-                  </p>
-                  <p className="text-text text-sm">
-                    {t("supplier.email")}:{" "}
-                    {supplier.Email || t("supplier.not_available")}
-                  </p>
-                  <p className="text-text text-sm">
-                    {t("supplier.phone")}:{" "}
-                    {supplier.Phone || t("supplier.not_available")}
-                  </p>
-                  <p className="text-text text-sm">
-                    {t("supplier.rating")}:{" "}
-                    {supplier.Rating || t("supplier.not_available")}
-                  </p>
-                  <div className="flex items-center mt-4">
-                    <label className="flex items-center cursor-pointer">
-                      <div className="relative">
-                        <input
-                          type="checkbox"
-                          checked={supplier.IsActive}
-                          onChange={() =>
-                            handleToggle(supplier._id, supplier.IsActive)
-                          }
-                          className="sr-only"
-                        />
-                        <div
-                          className={`block w-10 h-6 rounded-full transition-colors duration-300 ${
-                            supplier.IsActive ? "bg-green-500" : "bg-red-500"
+                    <button
+                      onClick={() => openAttachmentsModal(supplier)}
+                      className="absolute top-2 p-2 bg-bg rounded-full shadow-md hover:bg-secondary hover:text-button-text transition-all duration-200 transform hover:scale-110"
+                      style={
+                        direction === "rtl" ? { left: "8px" } : { right: "8px" }
+                      }
+                      title={t("supplier.view_attachments")}
+                    >
+                      📄
+                    </button>
+                    <h3 className="text-primary font-semibold text-lg mb-3 tracking-tight">
+                      {supplier.SupplierName}
+                    </h3>
+                    <p className="text-text text-sm">
+                      {t("supplier.contact")}:{" "}
+                      {supplier.Contact || t("supplier.not_available")}
+                    </p>
+                    <p className="text-text text-sm">
+                      {t("supplier.email")}:{" "}
+                      {supplier.Email || t("supplier.not_available")}
+                    </p>
+                    <p className="text-text text-sm">
+                      {t("supplier.phone")}:{" "}
+                      {supplier.Phone || t("supplier.not_available")}
+                    </p>
+                    <p className="text-text text-sm">
+                      {t("supplier.rating")}:{" "}
+                      {supplier.Rating || t("supplier.not_available")}
+                    </p>
+                    <div className="flex items-center mt-4">
+                      <label className="flex items-center cursor-pointer">
+                        <div className="relative">
+                          <input
+                            type="checkbox"
+                            checked={supplier.IsActive}
+                            onChange={() =>
+                              handleToggle(supplier._id, supplier.IsActive)
+                            }
+                            className="sr-only"
+                          />
+                          <div
+                            className={`block w-10 h-6 rounded-full transition-colors duration-300 ${
+                              supplier.IsActive ? "bg-green-500" : "bg-red-500"
+                            }`}
+                          ></div>
+                          <div
+                            className={`absolute left-1 top-1 bg-button-text w-4 h-4 rounded-full transition-transform duration-300 ${
+                              supplier.IsActive ? "translate-x-4" : ""
+                            }`}
+                          ></div>
+                        </div>
+                        <span
+                          className={`ml-2 text-sm font-semibold ${
+                            supplier.IsActive
+                              ? "text-green-500"
+                              : "text-red-500"
                           }`}
-                        ></div>
-                        <div
-                          className={`absolute left-1 top-1 bg-button-text w-4 h-4 rounded-full transition-transform duration-300 ${
-                            supplier.IsActive ? "translate-x-4" : ""
-                          }`}
-                        ></div>
-                      </div>
-                      <span
-                        className={`ml-2 text-sm font-semibold ${
-                          supplier.IsActive ? "text-green-500" : "text-red-500"
-                        }`}
-                      >
-                        {supplier.IsActive
-                          ? t("supplier.active")
-                          : t("supplier.inactive")}
-                      </span>
-                    </label>
+                        >
+                          {supplier.IsActive
+                            ? t("supplier.active")
+                            : t("supplier.inactive")}
+                        </span>
+                      </label>
+                    </div>
+                    <button
+                      onClick={() => openModal(supplier)}
+                      className="mt-4 px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105 w-full"
+                    >
+                      {t("supplier.update")}
+                    </button>
                   </div>
+                ))}
+              </div>
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center mt-8 space-x-2">
                   <button
-                    onClick={() => openModal(supplier)}
-                    className="mt-4 px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105 w-full"
+                    onClick={() => paginate(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`px-3 py-1 rounded-full ${
+                      currentPage === 1
+                        ? "bg-gray-300 cursor-not-allowed"
+                        : "bg-button-bg text-button-text hover:bg-secondary"
+                    }`}
                   >
-                    {t("supplier.update")}
+                    {direction === "rtl" ? "→" : "←"}
+                  </button>
+                  {renderPageNumbers()}
+                  <button
+                    onClick={() => paginate(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`px-3 py-1 rounded-full ${
+                      currentPage === totalPages
+                        ? "bg-gray-300 cursor-not-allowed"
+                        : "bg-button-bg text-button-text hover:bg-secondary"
+                    }`}
+                  >
+                    {direction === "rtl" ? "←" : "→"}
                   </button>
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           ) : (
             <p className="text-center text-text opacity-70 text-lg mt-6">
               {t("supplier.no_suppliers")}
@@ -266,7 +400,7 @@ const SupplierList = () => {
           )}
         </div>
 
-        {/* מודל לעדכון פרטי ספק */}
+        {/* Supplier Update Modal */}
         {isModalOpen && selectedSupplier && (
           <div
             dir={direction}
@@ -409,7 +543,7 @@ const SupplierList = () => {
           </div>
         )}
 
-        {/* מודל להצגת קבצים נלווים */}
+        {/* Attachments Modal */}
         {isAttachmentsModalOpen && attachmentsSupplier && (
           <div
             dir={direction}

@@ -162,6 +162,8 @@ const Budgets = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedRow, setExpandedRow] = useState(null);
   const [selectedBudgetForUpdate, setSelectedBudgetForUpdate] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); // Pagination state
+  const budgetsPerPage = 12; // 12 budgets per page
 
   const { data: authData } = useQuery({ queryKey: ["authUser"] });
   const queryClient = useQueryClient();
@@ -234,8 +236,109 @@ const Budgets = () => {
     );
   });
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredBudgets.length / budgetsPerPage);
+  const indexOfLastBudget = currentPage * budgetsPerPage;
+  const indexOfFirstBudget = indexOfLastBudget - budgetsPerPage;
+  const currentBudgets = filteredBudgets.slice(
+    indexOfFirstBudget,
+    indexOfLastBudget
+  );
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    const maxPagesToShow = 5;
+
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(
+          <button
+            key={i}
+            onClick={() => paginate(i)}
+            className={`px-3 py-1 rounded-full mx-1 ${
+              currentPage === i
+                ? "bg-button-bg text-button-text"
+                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+            }`}
+          >
+            {i}
+          </button>
+        );
+      }
+    } else {
+      const startPage = Math.max(1, currentPage - 2);
+      const endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+      if (startPage > 1) {
+        pageNumbers.push(
+          <button
+            key={1}
+            onClick={() => paginate(1)}
+            className={`px-3 py-1 rounded-full mx-1 ${
+              currentPage === 1
+                ? "bg-button-bg text-button-text"
+                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+            }`}
+          >
+            1
+          </button>
+        );
+        if (startPage > 2) {
+          pageNumbers.push(
+            <span key="start-dots" className="mx-1">
+              ...
+            </span>
+          );
+        }
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(
+          <button
+            key={i}
+            onClick={() => paginate(i)}
+            className={`px-3 py-1 rounded-full mx-1 ${
+              currentPage === i
+                ? "bg-button-bg text-button-text"
+                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+            }`}
+          >
+            {i}
+          </button>
+        );
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          pageNumbers.push(
+            <span key="end-dots" className="mx-1">
+              ...
+            </span>
+          );
+        }
+        pageNumbers.push(
+          <button
+            key={totalPages}
+            onClick={() => paginate(totalPages)}
+            className={`px-3 py-1 rounded-full mx-1 ${
+              currentPage === totalPages
+                ? "bg-button-bg text-button-text"
+                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+            }`}
+          >
+            {totalPages}
+          </button>
+        );
+      }
+    }
+
+    return pageNumbers;
+  };
+
   return (
-    <div className="min-h-screen  py-10 animate-fade-in">
+    <div className="min-h-screen py-10 animate-fade-in">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-text mb-8 text-center tracking-tight drop-shadow-md">
           {t("budget.budgets")}
@@ -298,7 +401,7 @@ const Budgets = () => {
                   </td>
                 </tr>
               ) : (
-                filteredBudgets.map((budget) => {
+                currentBudgets.map((budget) => {
                   const isExpanded = expandedRow === budget._id;
                   const startStr = budget.startDate
                     ? new Date(budget.startDate).toLocaleDateString()
@@ -508,6 +611,33 @@ const Budgets = () => {
               )}
             </tbody>
           </table>
+          {filteredBudgets.length > 0 && totalPages > 1 && (
+            <div className="flex justify-center items-center mt-8 space-x-2">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 rounded-full ${
+                  currentPage === 1
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-button-bg text-button-text hover:bg-secondary"
+                }`}
+              >
+                ←
+              </button>
+              {renderPageNumbers()}
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1 rounded-full ${
+                  currentPage === totalPages
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-button-bg text-button-text hover:bg-secondary"
+                }`}
+              >
+                →
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

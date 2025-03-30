@@ -4,26 +4,23 @@ import { axiosInstance } from "../../../lib/axios";
 import { useTranslation } from "react-i18next";
 
 const AllSignatures = () => {
-  const { t } = useTranslation(); // שימוש במילון 'allSignatures'
+  const { t } = useTranslation(); // Using 'allSignatures' dictionary
 
   const [documents, setDocuments] = useState([]);
   const [budgetSignatures, setBudgetSignatures] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // טיפול בשגיאות – נציג הודעות במקום להפיל את המסך
   const [errorMessage, setErrorMessage] = useState(null);
-
   const [modalContent, setModalContent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // פונקציה לעדכון הודעות שגיאה (מצרפת הודעות אם כבר קיימת אחת)
+  // Function to append error messages
   const appendError = (msg) => {
     setErrorMessage((prev) => (prev ? `${prev} | ${msg}` : msg));
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      // 1) Fetch לרכש
+      // Fetch procurement data
       try {
         const procurementResponse = await axiosInstance.get(
           "/procurement/all-signatures",
@@ -49,7 +46,7 @@ const AllSignatures = () => {
         }
       }
 
-      // 2) Fetch לתקציב
+      // Fetch budget data
       try {
         const budgetResponse = await axiosInstance.get("/budget", {
           withCredentials: true,
@@ -92,263 +89,277 @@ const AllSignatures = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center p-6">
-        <p>{t("allSignatures.loading")}</p>
+      <div className="flex items-center justify-center min-h-screen bg-bg">
+        <div className="animate-spin rounded-full h-24 w-24 border-t-4 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="flex justify-center p-6 bg-bg text-text">
-      <div className="w-4/5">
-        {/* הצגת הודעות שגיאה במידה וקיימות */}
+    <div className="min-h-screen flex items-start justify-center py-12 px-4 sm:px-6 lg:px-8 animate-fade-in">
+      <div className=" p-8 rounded-2xl shadow-2xl w-full max-w-5xl border bg-bg transform transition-all duration-500 hover:shadow-3xl">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-center mb-6 text-text tracking-tight drop-shadow-md">
+          {t("allSignatures.title")}
+        </h1>
+
+        {/* Error Message */}
         {errorMessage && (
-          <div className="text-center text-red-500 mb-4">{errorMessage}</div>
+          <div className="text-center text-red-500 mb-6 font-semibold">
+            {errorMessage}
+          </div>
         )}
 
-        {/* טבלה ראשונה – מסמכים (רכש) */}
-        <h2 className="text-2xl font-bold mb-6 text-center text-primary">
-          {t("allSignatures.allDocuments")}
-        </h2>
-
-        <div className="max-h-[600px] overflow-auto mb-8 border border-border-color">
-          <table className="w-full border-collapse">
-            <thead className="bg-secondary">
-              <tr>
-                <th className="border border-border-color px-4 py-2">
-                  {t("allSignatures.purchaseOrder")}
-                </th>
-                <th className="border border-border-color px-4 py-2">
-                  {t("allSignatures.supplierName")}
-                </th>
-                <th className="border border-border-color px-4 py-2">
-                  {t("allSignatures.approvalStatus")}
-                </th>
-                <th className="border border-border-color px-4 py-2">
-                  {t("allSignatures.signers")}
-                </th>
-                <th className="border border-border-color px-4 py-2">
-                  {t("allSignatures.document")}
-                </th>
-                <th className="border border-border-color px-4 py-2">
-                  {t("allSignatures.status")}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {documents.length === 0 ? (
+        {/* Procurement Documents Table */}
+        <div className="mb-12">
+          <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-primary">
+            {t("allSignatures.allDocuments")}
+          </h2>
+          <div className="max-h-[400px] overflow-auto border border-border-color rounded-lg">
+            <table className="w-full border-collapse">
+              <thead className="bg-secondary text-text sticky top-0">
                 <tr>
-                  <td
-                    colSpan="6"
-                    className="border border-border-color px-4 py-2 text-center text-gray-500"
-                  >
-                    {t("allSignatures.no_documents_found")}
-                  </td>
+                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                    {t("allSignatures.purchaseOrder")}
+                  </th>
+                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                    {t("allSignatures.supplierName")}
+                  </th>
+                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                    {t("allSignatures.approvalStatus")}
+                  </th>
+                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                    {t("allSignatures.signers")}
+                  </th>
+                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                    {t("allSignatures.document")}
+                  </th>
+                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                    {t("allSignatures.status")}
+                  </th>
                 </tr>
-              ) : (
-                documents.map((doc, index) => (
-                  <tr key={index} className="hover:bg-secondary/50">
-                    <td className="border border-border-color px-4 py-2">
-                      {doc.PurchaseOrder || "N/A"}
-                    </td>
-                    <td className="border border-border-color px-4 py-2">
-                      {doc.supplierName || "N/A"}
-                    </td>
-                    <td className="border border-border-color px-4 py-2">
-                      {doc.approvalStatus || t("allSignatures.pending")}
-                    </td>
-                    <td className="border border-border-color px-4 py-2">
-                      <ul className="max-h-20 overflow-y-scroll space-y-4">
-                        {doc.signers.map((signer, i) => (
-                          <li
-                            key={i}
-                            className="flex items-center space-x-4 bg-bg p-3 rounded-lg shadow border border-border-color"
-                          >
-                            <div className="flex-shrink-0">
-                              {signer.signatureUrl ? (
-                                <img
-                                  src={signer.signatureUrl}
-                                  alt={t("allSignatures.signature")}
-                                  className="w-12 h-12 object-contain border border-border-color rounded-md cursor-pointer"
-                                  onClick={() =>
-                                    openModal(
-                                      <img
-                                        src={signer.signatureUrl}
-                                        alt={t("allSignatures.signature")}
-                                        className="w-full h-auto"
-                                      />
-                                    )
-                                  }
-                                />
-                              ) : (
-                                <div className="w-12 h-12 flex items-center justify-center bg-gray-200 text-gray-500 text-sm border border-border-color rounded-md">
-                                  {t("allSignatures.no_image")}
-                                </div>
-                              )}
-                            </div>
-                            <div>
-                              <p className="font-medium text-text">
-                                {signer.name || t("allSignatures.unknown")}
-                              </p>
-                              <p className="text-sm text-gray-500">
-                                {signer.hasSigned
-                                  ? t("allSignatures.signed")
-                                  : t("allSignatures.pending")}
-                              </p>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td className="border border-border-color px-4 py-2">
-                      {doc.summeryProcurement ? (
-                        <button
-                          onClick={() =>
-                            openModal(
-                              <iframe
-                                src={doc.summeryProcurement}
-                                title={t("allSignatures.documentViewer")}
-                                className="w-full h-96"
-                              ></iframe>
-                            )
-                          }
-                          className="text-primary hover:underline"
-                        >
-                          {t("allSignatures.viewDocument")}
-                        </button>
-                      ) : (
-                        t("allSignatures.no_document")
-                      )}
-                    </td>
-                    <td className="border border-border-color px-4 py-2">
-                      {doc.status || t("allSignatures.n_a")}
+              </thead>
+              <tbody>
+                {documents.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan="6"
+                      className="border border-border-color px-4 py-3 text-center text-gray-500"
+                    >
+                      {t("allSignatures.no_documents_found")}
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  documents.map((doc, index) => (
+                    <tr
+                      key={index}
+                      className="hover:bg-secondary/20 transition-all duration-200"
+                    >
+                      <td className="border border-border-color px-4 py-3 text-text">
+                        {doc.PurchaseOrder || "N/A"}
+                      </td>
+                      <td className="border border-border-color px-4 py-3 text-text">
+                        {doc.supplierName || "N/A"}
+                      </td>
+                      <td className="border border-border-color px-4 py-3 text-text">
+                        {doc.approvalStatus || t("allSignatures.pending")}
+                      </td>
+                      <td className="border border-border-color px-4 py-3">
+                        <ul className="max-h-20 overflow-y-auto space-y-2">
+                          {doc.signers.map((signer, i) => (
+                            <li
+                              key={i}
+                              className="flex items-center space-x-3 bg-bg p-2 rounded-lg shadow-sm border border-border-color"
+                            >
+                              <div className="flex-shrink-0">
+                                {signer.signatureUrl ? (
+                                  <img
+                                    src={signer.signatureUrl}
+                                    alt={t("allSignatures.signature")}
+                                    className="w-10 h-10 object-contain border border-border-color rounded-md cursor-pointer hover:ring-2 hover:ring-primary transition-all duration-200"
+                                    onClick={() =>
+                                      openModal(
+                                        <img
+                                          src={signer.signatureUrl}
+                                          alt={t("allSignatures.signature")}
+                                          className="w-full h-auto"
+                                        />
+                                      )
+                                    }
+                                  />
+                                ) : (
+                                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 text-gray-500 text-xs border border-border-color rounded-md">
+                                    {t("allSignatures.no_image")}
+                                  </div>
+                                )}
+                              </div>
+                              <div>
+                                <p className="font-medium text-text text-sm">
+                                  {signer.name || t("allSignatures.unknown")}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {signer.hasSigned
+                                    ? t("allSignatures.signed")
+                                    : t("allSignatures.pending")}
+                                </p>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </td>
+                      <td className="border border-border-color px-4 py-3 text-text">
+                        {doc.summeryProcurement ? (
+                          <button
+                            onClick={() =>
+                              openModal(
+                                <iframe
+                                  src={doc.summeryProcurement}
+                                  title={t("allSignatures.documentViewer")}
+                                  className="w-full h-96 rounded-lg"
+                                ></iframe>
+                              )
+                            }
+                            className="text-primary hover:underline focus:ring-2 focus:ring-primary rounded-md px-2 py-1 transition-all duration-200"
+                          >
+                            {t("allSignatures.viewDocument")}
+                          </button>
+                        ) : (
+                          t("allSignatures.no_document")
+                        )}
+                      </td>
+                      <td className="border border-border-color px-4 py-3 text-text">
+                        {doc.status || t("allSignatures.n_a")}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        {/* טבלה שנייה – תקציב */}
-        <h2 className="text-2xl font-bold mb-6 text-center text-primary">
-          {t("allSignatures.budgetSignatures")}
-        </h2>
-
-        <div className="max-h-[600px] overflow-auto border border-border-color">
-          <table className="w-full border-collapse">
-            <thead className="bg-secondary">
-              <tr>
-                <th className="border border-border-color px-4 py-2">
-                  {t("allSignatures.budgetItem")}
-                </th>
-                <th className="border border-border-color px-4 py-2">
-                  {t("allSignatures.startDate")}
-                </th>
-                <th className="border border-border-color px-4 py-2">
-                  {t("allSignatures.endDate")}
-                </th>
-                <th className="border border-border-color px-4 py-2">
-                  {t("allSignatures.amount")}
-                </th>
-                <th className="border border-border-color px-4 py-2">
-                  {t("allSignatures.signers")}
-                </th>
-                <th className="border border-border-color px-4 py-2">
-                  {t("allSignatures.status")}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {budgetSignatures.length === 0 ? (
+        {/* Budget Signatures Table */}
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-primary">
+            {t("allSignatures.budgetSignatures")}
+          </h2>
+          <div className="max-h-[400px] overflow-auto border border-border-color rounded-lg">
+            <table className="w-full border-collapse">
+              <thead className="bg-secondary text-text sticky top-0">
                 <tr>
-                  <td
-                    colSpan="6"
-                    className="border border-border-color px-4 py-2 text-center text-gray-500"
-                  >
-                    {t("no_budget_signatures_found")}
-                  </td>
+                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                    {t("allSignatures.budgetItem")}
+                  </th>
+                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                    {t("allSignatures.startDate")}
+                  </th>
+                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                    {t("allSignatures.endDate")}
+                  </th>
+                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                    {t("allSignatures.amount")}
+                  </th>
+                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                    {t("allSignatures.signers")}
+                  </th>
+                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                    {t("allSignatures.status")}
+                  </th>
                 </tr>
-              ) : (
-                budgetSignatures.map((budgetItem, index) => (
-                  <tr key={index} className="hover:bg-secondary/50">
-                    <td className="border border-border-color px-4 py-2">
-                      {budgetItem.departmentOrProjectName ||
-                        t("allSignatures.n_a")}
-                    </td>
-                    <td className="border border-border-color px-4 py-2">
-                      {budgetItem.startDate
-                        ? new Date(budgetItem.startDate).toLocaleDateString()
-                        : t("allSignatures.n_a")}
-                    </td>
-                    <td className="border border-border-color px-4 py-2">
-                      {budgetItem.endDate
-                        ? new Date(budgetItem.endDate).toLocaleDateString()
-                        : t("allSignatures.n_a")}
-                    </td>
-                    <td className="border border-border-color px-4 py-2">
-                      {budgetItem.amount || t("allSignatures.n_a")}
-                    </td>
-                    <td className="border border-border-color px-4 py-2">
-                      <ul className="max-h-20 overflow-y-scroll space-y-4">
-                        {budgetItem.signers?.map((signer, i) => (
-                          <li
-                            key={i}
-                            className="flex items-center space-x-4 bg-bg p-3 rounded-lg shadow border border-border-color"
-                          >
-                            <div className="flex-shrink-0">
-                              {signer.signatureUrl ? (
-                                <img
-                                  src={signer.signatureUrl}
-                                  alt={t("allSignatures.signature")}
-                                  className="w-12 h-12 object-contain border border-border-color rounded-md cursor-pointer"
-                                  onClick={() =>
-                                    openModal(
-                                      <img
-                                        src={signer.signatureUrl}
-                                        alt={t("allSignatures.signature")}
-                                        className="w-full h-auto"
-                                      />
-                                    )
-                                  }
-                                />
-                              ) : (
-                                <div className="w-12 h-12 flex items-center justify-center bg-gray-200 text-gray-500 text-sm border border-border-color rounded-md">
-                                  {t("allSignatures.no_image")}
-                                </div>
-                              )}
-                            </div>
-                            <div>
-                              <p className="font-medium text-text">
-                                {signer.name || t("allSignatures.unknown")}
-                              </p>
-                              <p className="text-sm text-gray-500">
-                                {signer.hasSigned
-                                  ? t("allSignatures.signed")
-                                  : t("allSignatures.pending")}
-                              </p>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td className="border border-border-color px-4 py-2">
-                      {budgetItem.status || t("allSignatures.n_a")}
+              </thead>
+              <tbody>
+                {budgetSignatures.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan="6"
+                      className="border border-border-color px-4 py-3 text-center text-gray-500"
+                    >
+                      {t("allSignatures.no_budget_signatures_found")}
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  budgetSignatures.map((budgetItem, index) => (
+                    <tr
+                      key={index}
+                      className="hover:bg-secondary/20 transition-all duration-200"
+                    >
+                      <td className="border border-border-color px-4 py-3 text-text">
+                        {budgetItem.departmentOrProjectName ||
+                          t("allSignatures.n_a")}
+                      </td>
+                      <td className="border border-border-color px-4 py-3 text-text">
+                        {budgetItem.startDate
+                          ? new Date(budgetItem.startDate).toLocaleDateString()
+                          : t("allSignatures.n_a")}
+                      </td>
+                      <td className="border border-border-color px-4 py-3 text-text">
+                        {budgetItem.endDate
+                          ? new Date(budgetItem.endDate).toLocaleDateString()
+                          : t("allSignatures.n_a")}
+                      </td>
+                      <td className="border border-border-color px-4 py-3 text-text">
+                        {budgetItem.amount || t("allSignatures.n_a")}
+                      </td>
+                      <td className="border border-border-color px-4 py-3">
+                        <ul className="max-h-20 overflow-y-auto space-y-2">
+                          {budgetItem.signers?.map((signer, i) => (
+                            <li
+                              key={i}
+                              className="flex items-center space-x-3 bg-bg p-2 rounded-lg shadow-sm border border-border-color"
+                            >
+                              <div className="flex-shrink-0">
+                                {signer.signatureUrl ? (
+                                  <img
+                                    src={signer.signatureUrl}
+                                    alt={t("allSignatures.signature")}
+                                    className="w-10 h-10 object-contain border border-border-color rounded-md cursor-pointer hover:ring-2 hover:ring-primary transition-all duration-200"
+                                    onClick={() =>
+                                      openModal(
+                                        <img
+                                          src={signer.signatureUrl}
+                                          alt={t("allSignatures.signature")}
+                                          className="w-full h-auto"
+                                        />
+                                      )
+                                    }
+                                  />
+                                ) : (
+                                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 text-gray-500 text-xs border border-border-color rounded-md">
+                                    {t("allSignatures.no_image")}
+                                  </div>
+                                )}
+                              </div>
+                              <div>
+                                <p className="font-medium text-text text-sm">
+                                  {signer.name || t("allSignatures.unknown")}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {signer.hasSigned
+                                    ? t("allSignatures.signed")
+                                    : t("allSignatures.pending")}
+                                </p>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </td>
+                      <td className="border border-border-color px-4 py-3 text-text">
+                        {budgetItem.status || t("allSignatures.n_a")}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        {/* ===================== Modal ===================== */}
+        {/* Modal */}
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-bg rounded-lg p-6 max-w-3xl w-full relative">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
+            <div className="bg-bg rounded-2xl p-6 max-w-3xl w-full shadow-2xl border border-border-color relative transform transition-all duration-300">
               <button
                 onClick={closeModal}
-                className="absolute top-2 right-2 text-text hover:text-primary"
+                className="absolute top-4 right-4 text-text hover:text-primary text-xl font-bold focus:outline-none transition-all duration-200"
               >
                 ✖
               </button>

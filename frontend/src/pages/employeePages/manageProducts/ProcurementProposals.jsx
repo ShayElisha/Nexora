@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../../lib/axios";
 import { toast } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const ProcurementProposals = () => {
+  const { t } = useTranslation();
+
   // נניח ש-companyId ידוע; ניתן להחליף בערך דינמי מטוקן/מצב אחר
   const [newProposal, setNewProposal] = useState({
     companyId: "6759df2af3a4aa882f571bfa",
@@ -42,14 +45,14 @@ const ProcurementProposals = () => {
       } catch (error) {
         setProposals([]);
         setProducts([]);
-        toast.error("אירעה שגיאה בטעינת הנתונים");
+        toast.error(t("procurement.error_loading_data"));
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [t]);
 
   // עדכון שדה טקסט פשוט בטופס
   const handleInputChange = (e) => {
@@ -82,9 +85,10 @@ const ProcurementProposals = () => {
       updatedItems[index] = {
         ...updatedItems[index],
         productId: selectedProduct._id,
-        productName: selectedProduct.productName || "N/A",
-        sku: selectedProduct.sku || "N/A",
-        category: selectedProduct.category || "N/A",
+        productName:
+          selectedProduct.productName || t("procurement.not_available"),
+        sku: selectedProduct.sku || t("procurement.not_available"),
+        category: selectedProduct.category || t("procurement.not_available"),
         unitPrice: selectedProduct.unitPrice || 0,
         // נשאיר quantity כמו שהמשתמש הגדיר, או 1 כברירת מחדל
         quantity: updatedItems[index].quantity || 1,
@@ -97,8 +101,8 @@ const ProcurementProposals = () => {
         ...updatedItems[index],
         productId: null,
         productName: "",
-        sku: "N/A",
-        category: "N/A",
+        sku: t("procurement.not_available"),
+        category: t("procurement.not_available"),
         unitPrice: 0,
         isNew: true,
       };
@@ -116,8 +120,8 @@ const ProcurementProposals = () => {
         {
           productId: null,
           productName: "",
-          sku: "N/A",
-          category: "N/A",
+          sku: t("procurement.not_available"),
+          category: t("procurement.not_available"),
           unitPrice: 0,
           quantity: 1,
           isNew: true,
@@ -149,9 +153,9 @@ const ProcurementProposals = () => {
       ...newProposal,
       items: newProposal.items.map((item) => ({
         productId: item.productId || null,
-        productName: item.productName || "N/A",
-        sku: item.sku || "N/A",
-        category: item.category || "N/A",
+        productName: item.productName || t("procurement.not_available"),
+        sku: item.sku || t("procurement.not_available"),
+        category: item.category || t("procurement.not_available"),
         unitPrice: item.unitPrice || 0,
         quantity: item.quantity || 0,
         // חישוב total לפי כמות * מחיר
@@ -176,24 +180,30 @@ const ProcurementProposals = () => {
         notes: "",
         attachments: "",
       });
-      toast.success("ההצעה נוצרה בהצלחה");
+      toast.success(t("procurement.proposal_created_successfully"));
     } catch (error) {
-      toast.error("אירעה שגיאה ביצירת ההצעה");
+      toast.error(t("procurement.error_creating_proposal"));
     }
   };
 
   if (loading) {
-    return <div className="text-center text-gray-500">טוען הצעות...</div>;
+    return (
+      <div className="text-center text-gray-500">
+        {t("procurement.loading_proposals")}
+      </div>
+    );
   }
 
   return (
-    <div className="p-5 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">הצעות רכש</h1>
+    <div className="container mx-auto max-w-4xl p-8 bg-bg rounded-2xl shadow-2xl border border-border-color transform transition-all duration-500 hover:shadow-3xl">
+      <h1 className="text-3xl font-bold mb-6 text-gray-800">
+        {t("procurement.proposals")}
+      </h1>
 
       {/* טופס ליצירת הצעת רכש חדשה */}
       <section className="mb-10">
         <h2 className="text-2xl font-semibold mb-4 text-gray-700">
-          צור הצעת רכש חדשה
+          {t("procurement.create_new_proposal")}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -201,7 +211,7 @@ const ProcurementProposals = () => {
               htmlFor="title"
               className="block text-sm font-medium text-gray-700"
             >
-              כותרת:
+              {t("procurement.title")}:
             </label>
             <input
               id="title"
@@ -210,8 +220,7 @@ const ProcurementProposals = () => {
               value={newProposal.title}
               onChange={handleInputChange}
               required
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2
-                         focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
@@ -220,7 +229,7 @@ const ProcurementProposals = () => {
               htmlFor="description"
               className="block text-sm font-medium text-gray-700"
             >
-              תיאור:
+              {t("procurement.description")}:
             </label>
             <textarea
               id="description"
@@ -228,15 +237,14 @@ const ProcurementProposals = () => {
               value={newProposal.description}
               onChange={handleInputChange}
               required
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2
-                         focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
           {/* מערך הפריטים */}
           <div>
             <h3 className="text-lg font-medium text-gray-700 mb-2">
-              מוצרים לרכישה
+              {t("procurement.products_to_purchase")}
             </h3>
             {newProposal.items.map((item, index) => (
               <div
@@ -245,18 +253,20 @@ const ProcurementProposals = () => {
               >
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    בחר מוצר קיים (purchase/both) או השאר ליצירת חדש:
+                    {t("procurement.select_existing_product_or_create_new")}
                   </label>
                   <select
                     value={item.productId || ""}
                     onChange={(e) => handleProductSelect(index, e)}
-                    className="mt-1 block w-full border border-gray-300
-                               rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
                   >
-                    <option value="">-- מוצר חדש / לא מוגדר --</option>
+                    <option value="">
+                      {t("procurement.new_or_undefined_product")}
+                    </option>
                     {products.map((product) => (
                       <option key={product._id} value={product._id}>
-                        {product.productName} - SKU: {product.sku || "N/A"}
+                        {product.productName} - {t("procurement.sku")}:{" "}
+                        {product.sku || t("procurement.not_available")}
                       </option>
                     ))}
                   </select>
@@ -265,24 +275,22 @@ const ProcurementProposals = () => {
                 {/* עריכת שם המוצר רק אם הוא חדש */}
                 <div className="mt-2">
                   <label className="block text-sm font-medium text-gray-700">
-                    שם מוצר:
+                    {t("procurement.product_name")}:
                   </label>
                   <input
                     type="text"
                     name="productName"
                     value={item.productName}
                     onChange={(e) => handleItemChange(index, e)}
-                    disabled={!item.isNew} // לא ניתן לערוך אם נבחר מוצר קיים
-                    className="mt-1 block w-full border border-gray-300
-                               rounded-md p-2 focus:ring-blue-500 focus:border-blue-500
-                               disabled:bg-gray-100"
+                    disabled={!item.isNew}
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                   />
                 </div>
 
                 {/* עריכת SKU רק אם הוא חדש */}
                 <div className="mt-2">
                   <label className="block text-sm font-medium text-gray-700">
-                    SKU:
+                    {t("procurement.sku")}:
                   </label>
                   <input
                     type="text"
@@ -290,16 +298,14 @@ const ProcurementProposals = () => {
                     value={item.sku}
                     onChange={(e) => handleItemChange(index, e)}
                     disabled={!item.isNew}
-                    className="mt-1 block w-full border border-gray-300
-                               rounded-md p-2 focus:ring-blue-500 focus:border-blue-500
-                               disabled:bg-gray-100"
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                   />
                 </div>
 
                 {/* עריכת Category רק אם הוא חדש */}
                 <div className="mt-2">
                   <label className="block text-sm font-medium text-gray-700">
-                    קטגוריה:
+                    {t("procurement.category")}:
                   </label>
                   <input
                     type="text"
@@ -307,16 +313,14 @@ const ProcurementProposals = () => {
                     value={item.category}
                     onChange={(e) => handleItemChange(index, e)}
                     disabled={!item.isNew}
-                    className="mt-1 block w-full border border-gray-300
-                               rounded-md p-2 focus:ring-blue-500 focus:border-blue-500
-                               disabled:bg-gray-100"
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
                   />
                 </div>
 
                 {/* מחיר וכמות */}
                 <div className="mt-2">
                   <label className="block text-sm font-medium text-gray-700">
-                    מחיר יחידה:
+                    {t("procurement.unit_price")}:
                   </label>
                   <input
                     type="number"
@@ -324,13 +328,12 @@ const ProcurementProposals = () => {
                     value={item.unitPrice}
                     onChange={(e) => handleItemChange(index, e)}
                     min="0"
-                    className="mt-1 block w-full border border-gray-300
-                               rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 <div className="mt-2">
                   <label className="block text-sm font-medium text-gray-700">
-                    כמות:
+                    {t("procurement.quantity")}:
                   </label>
                   <input
                     type="number"
@@ -338,8 +341,7 @@ const ProcurementProposals = () => {
                     value={item.quantity}
                     onChange={(e) => handleItemChange(index, e)}
                     min="1"
-                    className="mt-1 block w-full border border-gray-300
-                               rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
 
@@ -348,7 +350,7 @@ const ProcurementProposals = () => {
                   onClick={() => removeItem(index)}
                   className="mt-2 text-red-600 hover:text-red-800"
                 >
-                  הסר מוצר
+                  {t("procurement.remove_product")}
                 </button>
               </div>
             ))}
@@ -358,7 +360,7 @@ const ProcurementProposals = () => {
               onClick={addItem}
               className="text-blue-600 hover:text-blue-800"
             >
-              הוסף מוצר לרכישה
+              {t("procurement.add_product_to_purchase")}
             </button>
           </div>
 
@@ -367,7 +369,7 @@ const ProcurementProposals = () => {
               htmlFor="expectedDeliveryDate"
               className="block text-sm font-medium text-gray-700"
             >
-              תאריך אספקה צפוי:
+              {t("procurement.expected_delivery_date")}:
             </label>
             <input
               id="expectedDeliveryDate"
@@ -375,8 +377,7 @@ const ProcurementProposals = () => {
               name="expectedDeliveryDate"
               value={newProposal.expectedDeliveryDate}
               onChange={handleInputChange}
-              className="mt-1 block w-full border border-gray-300
-                         rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
@@ -385,15 +386,14 @@ const ProcurementProposals = () => {
               htmlFor="notes"
               className="block text-sm font-medium text-gray-700"
             >
-              הערות:
+              {t("procurement.notes")}:
             </label>
             <textarea
               id="notes"
               name="notes"
               value={newProposal.notes}
               onChange={handleInputChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md p-2
-                         focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
@@ -402,7 +402,8 @@ const ProcurementProposals = () => {
               htmlFor="attachments"
               className="block text-sm font-medium text-gray-700"
             >
-              קבצים מצורפים (URL מפריד בפסיק):
+              {t("procurement.attachments")} (
+              {t("procurement.attachments_hint")}):
             </label>
             <input
               id="attachments"
@@ -410,8 +411,7 @@ const ProcurementProposals = () => {
               name="attachments"
               value={newProposal.attachments}
               onChange={handleInputChange}
-              className="mt-1 block w-full border border-gray-300
-                         rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
@@ -419,7 +419,7 @@ const ProcurementProposals = () => {
             type="submit"
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
           >
-            צור הצעה
+            {t("procurement.create_proposal")}
           </button>
         </form>
       </section>
@@ -427,10 +427,10 @@ const ProcurementProposals = () => {
       {/* הצגת הצעות קיימות */}
       <section>
         <h2 className="text-2xl font-semibold mb-4 text-gray-700">
-          הצעות קיימות
+          {t("procurement.existing_proposals")}
         </h2>
         {proposals.length === 0 ? (
-          <p className="text-gray-500">אין הצעות להצגה</p>
+          <p className="text-gray-500">{t("procurement.no_proposals")}</p>
         ) : (
           <ul className="space-y-6">
             {proposals.map((proposal) => (
@@ -439,34 +439,42 @@ const ProcurementProposals = () => {
                 className="p-4 border border-gray-200 rounded-md"
               >
                 <h3 className="text-xl font-medium text-gray-800">
-                  {proposal.title || "ללא כותרת"}
+                  {proposal.title || t("procurement.no_title")}
                 </h3>
                 <p className="text-gray-600">
-                  {proposal.description || "ללא תיאור"}
+                  {proposal.description || t("procurement.no_description")}
                 </p>
                 <p className="text-gray-700">
-                  <strong>סטטוס:</strong> {proposal.status || "לא מוגדר"}
+                  <strong>{t("procurement.status")}:</strong>{" "}
+                  {proposal.status || t("procurement.not_defined")}
                 </p>
                 <p className="text-gray-700">
-                  <strong>סכום משוער:</strong>{" "}
+                  <strong>{t("procurement.estimated_cost")}:</strong>{" "}
                   {proposal.totalEstimatedCost?.toLocaleString() || 0} ₪
                 </p>
 
                 {/* פריטים במערך */}
                 <div className="mt-2">
-                  <strong className="text-gray-700">מוצרים לרכישה:</strong>
+                  <strong className="text-gray-700">
+                    {t("procurement.products_to_purchase")}:
+                  </strong>
                   <ul className="list-disc pl-5 mt-1">
                     {Array.isArray(proposal.items) &&
                     proposal.items.length > 0 ? (
                       proposal.items.map((item, idx) => (
                         <li key={idx} className="text-gray-600">
-                          {item.productName} (SKU: {item.sku}) | קטגוריה:{" "}
-                          {item.category} | כמות: {item.quantity} | מחיר יחידה:{" "}
-                          {item.unitPrice} ₪ | סכום לפריט: {item.total} ₪
+                          {item.productName} ( {t("procurement.sku")}:{" "}
+                          {item.sku} ) | {t("procurement.category")}:{" "}
+                          {item.category} | {t("procurement.quantity")}:{" "}
+                          {item.quantity} | {t("procurement.unit_price")}:{" "}
+                          {item.unitPrice} ₪ | {t("procurement.item_total")}:{" "}
+                          {item.total} ₪
                         </li>
                       ))
                     ) : (
-                      <li className="text-gray-500">אין מוצרים לרכישה</li>
+                      <li className="text-gray-500">
+                        {t("procurement.no_products")}
+                      </li>
                     )}
                   </ul>
                 </div>
@@ -474,7 +482,9 @@ const ProcurementProposals = () => {
                 {proposal.expectedDeliveryDate &&
                   !isNaN(new Date(proposal.expectedDeliveryDate).getTime()) && (
                     <p className="text-gray-700">
-                      <strong>תאריך אספקה צפוי:</strong>{" "}
+                      <strong>
+                        {t("procurement.expected_delivery_date")}:
+                      </strong>{" "}
                       {new Date(
                         proposal.expectedDeliveryDate
                       ).toLocaleDateString()}
@@ -483,14 +493,16 @@ const ProcurementProposals = () => {
 
                 {proposal.notes && (
                   <p className="text-gray-700">
-                    <strong>הערות:</strong> {proposal.notes}
+                    <strong>{t("procurement.notes")}:</strong> {proposal.notes}
                   </p>
                 )}
 
                 {Array.isArray(proposal.attachments) &&
                   proposal.attachments.length > 0 && (
                     <div className="mt-2">
-                      <strong className="text-gray-700">קבצים מצורפים:</strong>
+                      <strong className="text-gray-700">
+                        {t("procurement.attachments")}:
+                      </strong>
                       <ul className="list-disc pl-5 mt-1">
                         {proposal.attachments.map((url, idx) => (
                           <li key={idx}>

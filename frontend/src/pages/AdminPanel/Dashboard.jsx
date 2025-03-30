@@ -44,6 +44,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [currentPage, setCurrentPage] = useState({});
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -56,6 +57,11 @@ const Dashboard = () => {
         );
         setDashboardData(response.data.data || {});
         setLoading(false);
+        const initialPages = {};
+        Object.keys(categoryTables).forEach((category) => {
+          initialPages[category] = 1;
+        });
+        setCurrentPage(initialPages);
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
         setError(
@@ -1324,7 +1330,64 @@ const Dashboard = () => {
         key !== "updatedAt" &&
         key !== "createdAt"
     );
-    return keys.slice(0, 3); // Limit to 3 key fields for simplicity
+    return keys.slice(0, 3);
+  };
+
+  const itemsPerPage = 5;
+
+  const getPaginatedData = (category) => {
+    const data = categoryTables[category];
+    if (!data || data.length === 0) return [];
+    const page = currentPage[category] || 1;
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return data.slice(startIndex, endIndex);
+  };
+
+  const getTotalPages = (category) => {
+    const data = categoryTables[category];
+    return data && data.length > 0
+      ? Math.ceil(data.length / itemsPerPage)
+      : 1;
+  };
+
+  const handlePageChange = (category, page) => {
+    setCurrentPage((prev) => ({ ...prev, [category]: page }));
+  };
+
+  const handlePrevPage = (category) => {
+    const current = currentPage[category] || 1;
+    if (current > 1) {
+      handlePageChange(category, current - 1);
+    }
+  };
+
+  const handleNextPage = (category) => {
+    const current = currentPage[category] || 1;
+    const total = getTotalPages(category);
+    if (current < total) {
+      handlePageChange(category, current + 1);
+    }
+  };
+
+  const getPaginationRange = (category) => {
+    const totalPages = getTotalPages(category);
+    const current = currentPage[category] || 1;
+    const maxButtons = 5;
+    let start = Math.max(1, current - Math.floor(maxButtons / 2));
+    let end = start + maxButtons - 1;
+
+    if (end > totalPages) {
+      end = totalPages;
+      start = Math.max(1, end - maxButtons + 1);
+    }
+
+    const pages = Array.from(
+      { length: end - start + 1 },
+      (_, i) => start + i
+    );
+
+    return { pages, showEllipsis: end < totalPages, totalPages };
   };
 
   if (loading) {
@@ -1407,7 +1470,6 @@ const Dashboard = () => {
                 {category}
               </h2>
 
-              {/* Charts */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
                 {categoryCharts[category].map((chart, index) => (
                   <motion.div
@@ -1434,7 +1496,6 @@ const Dashboard = () => {
                 ))}
               </div>
 
-              {/* Summary Table */}
               <motion.div
                 variants={cardVariant}
                 className="bg-bg bg-opacity-75 rounded-xl shadow-xl p-4 sm:p-6"
@@ -1454,8 +1515,8 @@ const Dashboard = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {categoryTables[category].length > 0 ? (
-                        categoryTables[category].map((item, index) => (
+                      {getPaginatedData(category).length > 0 ? (
+                        getPaginatedData(category).map((item, index) => (
                           <tr
                             key={index}
                             className="hover:bg-gray-100 border-b"
@@ -1485,12 +1546,69 @@ const Dashboard = () => {
                     </tbody>
                   </table>
                 </div>
+
+                {categoryTables[category].length > itemsPerPage && (
+                  <div className="flex justify-center items-center mt-4 space-x-2">
+                    <button
+                      onClick={() => handlePrevPage(category)}
+                      disabled={(currentPage[category] || 1) === 1}
+                      className="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+                    >
+                      &#9664; {/* Left Arrow */}
+                    </button>
+
+                    {getPaginationRange(category).pages.map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(category, page)}
+                        className={`px-3 py-1 rounded-md ${
+                          currentPage[category] === page
+                            ? "bg-primary text-white"
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+
+                    {getPaginationRange(category).showEllipsis && (
+                      <>
+                        <span className="px-3 py-1">...</span>
+                        <button
+                          onClick={() =>
+                            handlePageChange(
+                              category,
+                              getPaginationRange(category).totalPages
+                            )
+                          }
+                          className={`px-3 py-1 rounded-md ${
+                            currentPage[category] ===
+                            getPaginationRange(category).totalPages
+                              ? "bg-primary text-white"
+                              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          }`}
+                        >
+                          {getPaginationRange(category).totalPages}
+                        </button>
+                      </>
+                    )}
+
+                    <button
+                      onClick={() => handleNextPage(category)}
+                      disabled={
+                        (currentPage[category] || 1) ===
+                        getTotalPages(category)
+                      }
+                      className="px-3 py-1 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+                    >
+                      &#9654; {/* Right Arrow */}
+                    </button>
+                  </div>
+                )}
+
                 <button
                   onClick={() =>
-                    exportToExcel(
-                      categoryTables[category],
-                      `${category}_Summary`
-                    )
+                    exportToExcel(categoryTables[category], `${category}_Summary`)
                   }
                   className="mt-4 px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-80 transition"
                 >

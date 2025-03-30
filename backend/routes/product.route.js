@@ -5,6 +5,7 @@ import {
   getProductById,
   updateProduct,
   deleteProduct,
+  searchProductByName,
 } from "../controllers/product.controller.js";
 import upload from "../middleware/multer.middleware.js";
 
@@ -18,6 +19,8 @@ router.post(
   ]),
   createProduct
 );
+router.get("/search-by-name", searchProductByName);
+
 router.get("/", getProducts);
 router.get("/:id", getProductById);
 router.put(

@@ -6,6 +6,7 @@ import cloudinary, {
 import jwt from "jsonwebtoken";
 import Inventory from "../models/inventory.model.js";
 import ProductTree from "../models/productTree.model.js";
+import mongoose from "mongoose";
 
 export const getProducts = async (req, res) => {
   try {
@@ -29,10 +30,9 @@ export const getProducts = async (req, res) => {
 
 export const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).populate(
-      "supplierId",
-      "name"
-    );
+    console.log(req.params.id);
+    const product = await Product.findById(req.params.id);
+    console.log(product);
     if (!product) {
       return res
         .status(404)
@@ -40,7 +40,7 @@ export const getProductById = async (req, res) => {
     }
     res.status(200).json({ success: true, data: product });
   } catch (err) {
-    res.status(500).json({ success: false, error: "Invalid product ID" });
+    res.status(500).json({ success: false, error: "Server error" });
   }
 };
 export const createProduct = async (req, res) => {
@@ -335,5 +335,48 @@ export const deleteProduct = async (req, res) => {
       .json({ success: true, message: "Product deleted successfully" });
   } catch (err) {
     res.status(500).json({ success: false, error: "Invalid product ID" });
+  }
+};
+export const searchProductByName = async (req, res) => {
+  try {
+    const token = req.cookies["auth_token"];
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const companyId = decodedToken.companyId;
+    if (!companyId) {
+      return res.status(400).json({ success: false, message: "Invalid token" });
+    }
+
+    const { name } = req.query;
+    if (!name) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing 'name' query parameter." });
+    }
+
+    console.log("Searching for products with name:", name);
+
+    const products = await Product.find({
+      companyId,
+      productName: name,
+    });
+    console.log("Found products:", products);
+
+    if (!products || products.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No products found with given name" });
+    }
+
+    return res.status(200).json({ success: true, data: products });
+  } catch (err) {
+    console.error("Error searching product by name:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Error searching product by name",
+      error: err.message,
+    });
   }
 };

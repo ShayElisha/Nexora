@@ -1,6 +1,6 @@
-// src/pages/procurement/AddProcurement.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 import jsPDF from "jspdf";
@@ -28,8 +28,10 @@ import axiosInstance from "../../../lib/axios";
 const AddProcurement = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const location = useLocation();
   const { data: authData } = useQuery({ queryKey: ["authUser"] });
   const authUser = authData?.user;
+  const hasPreFilled = useRef(false);
 
   // ----------------- Form Data ----------------- //
   const [formData, setFormData] = useState({
@@ -79,6 +81,7 @@ const AddProcurement = () => {
   const [newSigners, setNewSigners] = useState([]);
   const [previousSupplierId, setPreviousSupplierId] = useState(null);
   const [error, setError] = useState("");
+  const [isPreFilled, setIsPreFilled] = useState(!!location.state);
 
   // ----------------- Zustand Stores ----------------- //
   const { suppliers, fetchSuppliers } = useSupplierStore((state) => state);
@@ -90,6 +93,109 @@ const AddProcurement = () => {
     createSignatureList,
   } = useSignatureStore((state) => state);
   const { fetchProductsBySupplier } = useProductStore((state) => state);
+
+  // ----------------- Pre-populate from Location State ----------------- //
+  const preFillForm = async (state) => {
+    if (!state || hasPreFilled.current) return;
+
+    const {
+      productId,
+      productName,
+      supplierId,
+      supplierName,
+      baseCurrency,
+      quantity,
+      unitPrice,
+      sku,
+      category,
+    } = state;
+
+    const newProduct = {
+      productId: productId || "",
+      productName: productName || "Unknown Product",
+      sku: sku || "",
+      category: category || "",
+      quantity: parseInt(quantity, 10) || 0,
+      unitPrice: parseFloat(unitPrice) || 0,
+      total: parseFloat((unitPrice * quantity).toFixed(2)) || 0,
+      baseUnitPrice: parseFloat(unitPrice) || 0,
+      supplierId: supplierId || "",
+    };
+
+    const supplier = suppliers.find((s) => s._id === supplierId);
+    const updatedFormData = {
+      ...formData,
+      companyId: authUser?.company || "",
+      supplierId: supplierId || "",
+      supplierName: supplierName || "",
+      currency: baseCurrency || "USD",
+      products: [newProduct],
+    };
+
+    setFormData(updatedFormData);
+    setProducts([newProduct]);
+    setTotalCost(newProduct.total);
+    setSelectedSupplier(
+      supplier || {
+        _id: supplierId || "",
+        SupplierName: supplierName || "Unknown Supplier",
+      }
+    );
+    setPreviousSupplierId(supplierId);
+
+    if (productId && /^[0-9a-fA-F]{24}$/.test(productId)) {
+      try {
+        const response = await axiosInstance.get(`/products/${productId}`);
+        const product = response.data.data;
+        const updatedProduct = {
+          ...newProduct,
+          productName: product.productName || newProduct.productName,
+          sku: product.SKU || product.sku || newProduct.sku,
+          category: product.category || newProduct.category,
+          unitPrice: parseFloat(product.unitPrice) || newProduct.unitPrice,
+          baseUnitPrice:
+            parseFloat(product.unitPrice) || newProduct.baseUnitPrice,
+          total:
+            parseFloat((product.unitPrice * quantity).toFixed(2)) ||
+            newProduct.total,
+          supplierId: product.supplierId || newProduct.supplierId,
+        };
+        setProducts([updatedProduct]);
+        setTotalCost(updatedProduct.total);
+        setFormData((prev) => ({
+          ...prev,
+          products: [updatedProduct],
+          supplierId: product.supplierId || prev.supplierId,
+          supplierName: product.supplierName || prev.supplierName,
+        }));
+        if (product.supplierId && !supplier) {
+          const supplierResponse = await axiosInstance.get(
+            `/suppliers/${product.supplierId}`
+          );
+          setSelectedSupplier(supplierResponse.data.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch product details:", err);
+        toast.error(t("procurement.failed_to_fetch_product_details"));
+      }
+    } else if (productId) {
+      console.warn("Invalid productId format, skipping fetch:", productId);
+    }
+    hasPreFilled.current = true;
+  };
+
+  useEffect(() => {
+    if (location.state && isPreFilled) {
+      preFillForm(location.state);
+    } else {
+      resetForm();
+      setSelectedSupplier(null);
+      setPreviousSupplierId(null);
+      setProducts([]);
+      setTotalCost(0);
+      hasPreFilled.current = false;
+    }
+  }, [location.state, isPreFilled, authUser]);
 
   // ----------------- useEffect ----------------- //
   useEffect(() => {
@@ -108,7 +214,7 @@ const AddProcurement = () => {
       }
     };
     fetchData();
-  }, [fetchSuppliers, fetchEmployees, fetchSignatureLists, t]);
+  }, [fetchSuppliers, fetchEmployees, fetchSignatureLists]);
 
   useEffect(() => {
     if (authUser) {
@@ -119,17 +225,14 @@ const AddProcurement = () => {
   useEffect(() => {
     if (!selectedSupplier || previousSupplierId === selectedSupplier._id)
       return;
-    setFormData({
-      companyId: authUser?.company || "",
+    setFormData((prev) => ({
+      ...prev,
       supplierId: selectedSupplier._id,
       supplierName: selectedSupplier.SupplierName,
-      PurchaseOrder: generatePurchaseOrderNumber(),
-      purchaseDate: new Date().toISOString().split("T")[0],
-    });
-    setProducts([]);
-    setTotalCost(0);
+      currency: selectedSupplier.baseCurrency || prev.currency,
+    }));
     setPreviousSupplierId(selectedSupplier._id);
-  }, [selectedSupplier, previousSupplierId, authUser?.company]);
+  }, [selectedSupplier, previousSupplierId]);
 
   // ----------------- Mutations ----------------- //
   const { mutate: addProcurementMutation } = useMutation({
@@ -137,7 +240,9 @@ const AddProcurement = () => {
       const response = await axiosInstance.post(
         "/procurement",
         procurementData,
-        { withCredentials: true }
+        {
+          withCredentials: true,
+        }
       );
       return response.data;
     },
@@ -191,7 +296,8 @@ const AddProcurement = () => {
       return;
     }
     try {
-      const supplierBaseCurrency = selectedSupplier.baseCurrency || "USD";
+      const supplierBaseCurrency =
+        selectedSupplier.baseCurrency || formData.currency || "USD";
       const supplierProducts = products.filter(
         (p) => p.supplierId === selectedSupplier._id
       );
@@ -223,6 +329,7 @@ const AddProcurement = () => {
       setTotalCost(
         parseFloat(calculateTotalCost(updatedProductList).toFixed(2))
       );
+      setFormData((prev) => ({ ...prev, products: updatedProductList }));
     } catch (error) {
       toast.error(t("procurement.failed_to_convert_currency"));
     }
@@ -301,11 +408,11 @@ const AddProcurement = () => {
     ];
     const rows = products.map((prod) => ({
       productName: prod.productName,
-      sku: prod.SKU,
+      sku: prod.sku || prod.SKU,
       category: prod.category,
       quantity: prod.quantity,
       unitPrice: `${prod.unitPrice} ${currencySymbol}`,
-      total: `${prod.unitPrice * prod.quantity} ${currencySymbol}`,
+      total: `${prod.total} ${currencySymbol}`,
     }));
     pdf.autoTable({
       startY: 40,
@@ -361,8 +468,12 @@ const AddProcurement = () => {
       ...prev,
       supplierId,
       supplierName: selected?.SupplierName || "",
-      currency: selected?.baseCurrency || "",
+      currency: selected?.baseCurrency || formData.currency,
     }));
+    if (supplierId && !isPreFilled) {
+      setProducts([]);
+      setTotalCost(0);
+    }
     if (supplierId) {
       fetchProductsBySupplier(supplierId).catch(() =>
         toast.error(t("procurement.failed_to_load_products"))
@@ -400,6 +511,7 @@ const AddProcurement = () => {
         updatedProducts[existingProductIndex].quantity *
         updatedProducts[existingProductIndex].unitPrice;
       setProducts(updatedProducts);
+      setFormData((prev) => ({ ...prev, products: updatedProducts }));
       toast.success(t("procurement.product_quantity_updated_successfully"));
     } else {
       const finalPrice = parseFloat(unitPrice);
@@ -414,7 +526,9 @@ const AddProcurement = () => {
         baseUnitPrice: parseFloat(baseUnitPrice),
         supplierId: formData.supplierId,
       };
-      setProducts([...products, newProduct]);
+      const updatedProducts = [...products, newProduct];
+      setProducts(updatedProducts);
+      setFormData((prev) => ({ ...prev, products: updatedProducts }));
       toast.success(t("procurement.product_added_successfully"));
     }
     setTotalCost(calculateTotalCost(products));
@@ -492,12 +606,32 @@ const AddProcurement = () => {
     setTotalCost(0);
   };
 
+  const handleSwitchToManual = () => {
+    setIsPreFilled(false);
+    resetForm();
+    setProducts([]);
+    setTotalCost(0);
+    setSelectedSupplier(null);
+    toast.success(t("procurement.switched_to_manual_entry"));
+  };
+
   // ----------------- Render ----------------- //
   return (
-    <div className="container mx-auto p-8  min-h-screen animate-fade-in">
+    <div className="container mx-auto p-8 min-h-screen animate-fade-in">
       <h1 className="text-4xl font-extrabold text-text mb-8 text-center tracking-tight drop-shadow-md">
         {t("procurement.add_procurement")}
       </h1>
+
+      {isPreFilled && (
+        <div className="mb-8 flex justify-end">
+          <button
+            onClick={handleSwitchToManual}
+            className="bg-yellow-500 text-white py-2 px-4 rounded-full font-semibold transition-all duration-300 hover:bg-yellow-600"
+          >
+            {t("procurement.switch_to_manual_entry")}
+          </button>
+        </div>
+      )}
 
       {error && (
         <div className="bg-red-100 border-l-4 border-red-600 text-red-800 p-4 mb-8 rounded-lg shadow-lg animate-slide-in">
@@ -516,25 +650,41 @@ const AddProcurement = () => {
           supplierId={formData.supplierId}
           onChange={handleSupplierSelect}
         />
-        {selectedSupplier && (
+        {(selectedSupplier || formData.supplierName) && (
           <div className="mt-4 p-4 bg-gray-50 rounded-lg shadow-inner animate-slide-up">
             <p className="text-text">
               <strong className="text-primary">
-                {t("procurement.phone")}:
+                {t("procurement.supplier")}:
               </strong>{" "}
-              {selectedSupplier.Phone || "N/A"}
+              {formData.supplierName}
             </p>
+            {selectedSupplier && (
+              <>
+                <p className="text-text">
+                  <strong className="text-primary">
+                    {t("procurement.phone")}:
+                  </strong>{" "}
+                  {selectedSupplier.Phone || "N/A"}
+                </p>
+                <p className="text-text">
+                  <strong className="text-primary">
+                    {t("procurement.email")}:
+                  </strong>{" "}
+                  {selectedSupplier.Email || "N/A"}
+                </p>
+                <p className="text-text">
+                  <strong className="text-primary">
+                    {t("procurement.address")}:
+                  </strong>{" "}
+                  {selectedSupplier.Address || "N/A"}
+                </p>
+              </>
+            )}
             <p className="text-text">
               <strong className="text-primary">
-                {t("procurement.email")}:
+                {t("procurement.currency")}:
               </strong>{" "}
-              {selectedSupplier.Email || "N/A"}
-            </p>
-            <p className="text-text">
-              <strong className="text-primary">
-                {t("procurement.address")}:
-              </strong>{" "}
-              {selectedSupplier.Address || "N/A"}
+              {formData.currency}
             </p>
           </div>
         )}
@@ -654,7 +804,7 @@ const AddProcurement = () => {
                       <td className="py-4 px-6 text-text font-medium">
                         {p.productName}
                       </td>
-                      <td className="py-4 px-6 text-text">{p.SKU}</td>
+                      <td className="py-4 px-6 text-text">{p.sku}</td>
                       <td className="py-4 px-6 text-text">{p.category}</td>
                       <td className="py-4 px-6 text-text">{p.quantity}</td>
                       <td className="py-4 px-6 text-text">
@@ -697,7 +847,7 @@ const AddProcurement = () => {
       />
 
       {/* Custom Animations */}
-      <style jsx global>{`
+      <style>{`
         @keyframes slideUp {
           from {
             opacity: 0;

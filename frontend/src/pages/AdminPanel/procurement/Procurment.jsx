@@ -28,6 +28,11 @@ const Procurement = () => {
   const [formData, setFormData] = useState({});
   const [supplierProducts, setSupplierProducts] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(""); // Search state
+  const [sortOption, setSortOption] = useState(""); // Sort state
+  const [filterStatus, setFilterStatus] = useState("all"); // Filter state
+  const [currentPage, setCurrentPage] = useState(1); // Pagination state
+  const procurementsPerPage = 12; // 12 procurements per page
 
   const [productData, setProductData] = useState({
     productName: "",
@@ -324,83 +329,334 @@ const Procurement = () => {
     }
   };
 
+  // Search, Sort, and Filter Logic
+  let filteredProcurements = procurements.filter((record) => {
+    const term = searchTerm.toLowerCase();
+    const purchaseDateStr = new Date(record.purchaseDate)
+      .toLocaleDateString()
+      .toLowerCase();
+    return (
+      record.PurchaseOrder?.toLowerCase().includes(term) ||
+      record.supplierName?.toLowerCase().includes(term) ||
+      record.totalCost?.toString().toLowerCase().includes(term) ||
+      record.currency?.toLowerCase().includes(term) ||
+      purchaseDateStr.includes(term) ||
+      record.status?.toLowerCase().includes(term)
+    );
+  });
+
+  if (filterStatus !== "all") {
+    filteredProcurements = filteredProcurements.filter(
+      (record) => record.status?.toLowerCase() === filterStatus
+    );
+  }
+
+  if (sortOption) {
+    filteredProcurements.sort((a, b) => {
+      switch (sortOption) {
+        case "PurchaseOrder_asc":
+          return a.PurchaseOrder.localeCompare(b.PurchaseOrder);
+        case "PurchaseOrder_desc":
+          return b.PurchaseOrder.localeCompare(a.PurchaseOrder);
+        case "supplierName_asc":
+          return a.supplierName.localeCompare(b.supplierName);
+        case "supplierName_desc":
+          return b.supplierName.localeCompare(a.supplierName);
+        case "totalCost_asc":
+          return a.totalCost - b.totalCost;
+        case "totalCost_desc":
+          return b.totalCost - a.totalCost;
+        case "currency_asc":
+          return a.currency.localeCompare(b.currency);
+        case "currency_desc":
+          return b.currency.localeCompare(a.currency);
+        case "purchaseDate_asc":
+          return new Date(a.purchaseDate) - new Date(b.purchaseDate);
+        case "purchaseDate_desc":
+          return new Date(b.purchaseDate) - new Date(a.purchaseDate);
+        case "status_asc":
+          return a.status.localeCompare(b.status);
+        case "status_desc":
+          return b.status.localeCompare(a.status);
+        default:
+          return 0;
+      }
+    });
+  }
+
+  // Pagination Logic
+  const totalPages = Math.ceil(
+    filteredProcurements.length / procurementsPerPage
+  );
+  const indexOfLastProcurement = currentPage * procurementsPerPage;
+  const indexOfFirstProcurement = indexOfLastProcurement - procurementsPerPage;
+  const currentProcurements = filteredProcurements.slice(
+    indexOfFirstProcurement,
+    indexOfLastProcurement
+  );
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    const maxPagesToShow = 5;
+
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(
+          <button
+            key={i}
+            onClick={() => paginate(i)}
+            className={`px-3 py-1 rounded-full mx-1 ${
+              currentPage === i
+                ? "bg-button-bg text-button-text"
+                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+            }`}
+          >
+            {i}
+          </button>
+        );
+      }
+    } else {
+      const startPage = Math.max(1, currentPage - 2);
+      const endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+      if (startPage > 1) {
+        pageNumbers.push(
+          <button
+            key={1}
+            onClick={() => paginate(1)}
+            className={`px-3 py-1 rounded-full mx-1 ${
+              currentPage === 1
+                ? "bg-button-bg text-button-text"
+                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+            }`}
+          >
+            1
+          </button>
+        );
+        if (startPage > 2) {
+          pageNumbers.push(
+            <span key="start-dots" className="mx-1">
+              ...
+            </span>
+          );
+        }
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pageNumbers.push(
+          <button
+            key={i}
+            onClick={() => paginate(i)}
+            className={`px-3 py-1 rounded-full mx-1 ${
+              currentPage === i
+                ? "bg-button-bg text-button-text"
+                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+            }`}
+          >
+            {i}
+          </button>
+        );
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          pageNumbers.push(
+            <span key="end-dots" className="mx-1">
+              ...
+            </span>
+          );
+        }
+        pageNumbers.push(
+          <button
+            key={totalPages}
+            onClick={() => paginate(totalPages)}
+            className={`px-3 py-1 rounded-full mx-1 ${
+              currentPage === totalPages
+                ? "bg-button-bg text-button-text"
+                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+            }`}
+          >
+            {totalPages}
+          </button>
+        );
+      }
+    }
+
+    return pageNumbers;
+  };
+
   const supplierId = formData.supplierId;
 
   return (
     <div className="flex min-h-screen  animate-fade-in">
-      <div className="container mx-auto max-w-6xl p-6 text-text">
+      <div className="container mx-auto bg-bg max-w-6xl p-6 text-text">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-center mb-6 text-text tracking-tight drop-shadow-md">
           {t("procurement.records_title")}
         </h1>
+
+        {/* Search, Sort, and Filter */}
+        <div className="mb-6 flex flex-col sm:flex-row gap-4">
+          <input
+            type="text"
+            placeholder={t("procurement.search_placeholder")}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full sm:w-1/3 p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary transition-all duration-200 shadow-sm placeholder-opacity-50"
+          />
+          <select
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
+            className="w-full sm:w-1/3 p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary transition-all duration-200 shadow-sm"
+          >
+            <option value="">{t("procurement.sort_by")}</option>
+            <option value="PurchaseOrder_asc">
+              {t("procurement.sort_po_asc")}
+            </option>
+            <option value="PurchaseOrder_desc">
+              {t("procurement.sort_po_desc")}
+            </option>
+            <option value="supplierName_asc">
+              {t("procurement.sort_supplier_asc")}
+            </option>
+            <option value="supplierName_desc">
+              {t("procurement.sort_supplier_desc")}
+            </option>
+            <option value="totalCost_asc">
+              {t("procurement.sort_total_cost_asc")}
+            </option>
+            <option value="totalCost_desc">
+              {t("procurement.sort_total_cost_desc")}
+            </option>
+            <option value="currency_asc">
+              {t("procurement.sort_currency_asc")}
+            </option>
+            <option value="currency_desc">
+              {t("procurement.sort_currency_desc")}
+            </option>
+            <option value="purchaseDate_asc">
+              {t("procurement.sort_date_asc")}
+            </option>
+            <option value="purchaseDate_desc">
+              {t("procurement.sort_date_desc")}
+            </option>
+            <option value="status_asc">
+              {t("procurement.sort_status_asc")}
+            </option>
+            <option value="status_desc">
+              {t("procurement.sort_status_desc")}
+            </option>
+          </select>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="w-full sm:w-1/3 p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary transition-all duration-200 shadow-sm"
+          >
+            <option value="all">{t("procurement.filter_status_all")}</option>
+            <option value="completed">{t("procurement.completed")}</option>
+            <option value="pending">{t("procurement.pending")}</option>
+            <option value="cancelled">{t("procurement.cancelled")}</option>
+          </select>
+        </div>
 
         {loading ? (
           <div className="flex items-center justify-center h-96">
             <div className="animate-spin rounded-full h-24 w-24 border-t-4 border-primary"></div>
           </div>
-        ) : procurements.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {procurements.map((record) => (
-              <div
-                key={record._id}
-                className="bg-accent rounded-xl p-6 shadow-lg border border-border-color"
-              >
-                <h2 className="text-lg font-bold text-primary mb-3 tracking-tight">
-                  {record.PurchaseOrder}
-                </h2>
-                <p className="text-sm">
-                  <strong>{t("procurement.supplier")}:</strong>{" "}
-                  {record.supplierName}
-                </p>
-                <p className="text-sm">
-                  <strong>{t("procurement.total_cost")}:</strong>{" "}
-                  {record.totalCost} {record.currency || "₪"}
-                </p>
-                <p className="text-sm">
-                  <strong>{t("procurement.purchase_date")}:</strong>{" "}
-                  {new Date(record.purchaseDate).toLocaleDateString()}
-                </p>
-                <p className="text-sm">
-                  <strong>{t("procurement.status")}:</strong>{" "}
-                  <span
-                    className={`font-medium ${
-                      record.status === "completed"
-                        ? "text-green-500"
-                        : record.status === "pending"
-                        ? "text-yellow-500"
-                        : "text-red-500"
-                    }`}
-                  >
-                    {record.status || "Pending"}
-                  </span>
-                </p>
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <button
-                    className="bg-button-bg text-button-text py-2 px-4 rounded-full shadow-md hover:bg-secondary transition-all duration-200"
-                    onClick={() => setSelectedPDF(record.summeryProcurement)}
-                  >
-                    {t("procurement.view_pdf")}
-                  </button>
-                  {record.statusUpdate === null &&
-                    record.orderStatus !== "Delivered" && (
-                      <>
-                        <button
-                          className="bg-primary text-button-text py-2 px-4 rounded-full shadow-md hover:bg-secondary transition-all duration-200"
-                          onClick={() => handleEditClick(record)}
-                        >
-                          {t("procurement.edit")}
-                        </button>
-                        <button
-                          className="bg-red-500 text-button-text py-2 px-4 rounded-full shadow-md hover:bg-red-600 transition-all duration-200"
-                          onClick={() => handleDeleteClick(record._id)}
-                        >
-                          {t("procurement.delete")}
-                        </button>
-                      </>
-                    )}
+        ) : filteredProcurements.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {currentProcurements.map((record) => (
+                <div
+                  key={record._id}
+                  className="bg-accent rounded-xl p-6 shadow-lg border border-border-color"
+                >
+                  <h2 className="text-lg font-bold text-primary mb-3 tracking-tight">
+                    {record.PurchaseOrder}
+                  </h2>
+                  <p className="text-sm">
+                    <strong>{t("procurement.supplier")}:</strong>{" "}
+                    {record.supplierName}
+                  </p>
+                  <p className="text-sm">
+                    <strong>{t("procurement.total_cost")}:</strong>{" "}
+                    {record.totalCost} {record.currency || "₪"}
+                  </p>
+                  <p className="text-sm">
+                    <strong>{t("procurement.purchase_date")}:</strong>{" "}
+                    {new Date(record.purchaseDate).toLocaleDateString()}
+                  </p>
+                  <p className="text-sm">
+                    <strong>{t("procurement.status")}:</strong>{" "}
+                    <span
+                      className={`font-medium ${
+                        record.status === "completed"
+                          ? "text-green-500"
+                          : record.status === "pending"
+                          ? "text-yellow-500"
+                          : "text-red-500"
+                      }`}
+                    >
+                      {record.status || "Pending"}
+                    </span>
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <button
+                      className="bg-button-bg text-button-text py-2 px-4 rounded-full shadow-md hover:bg-secondary transition-all duration-200"
+                      onClick={() => setSelectedPDF(record.summeryProcurement)}
+                    >
+                      {t("procurement.view_pdf")}
+                    </button>
+                    {record.statusUpdate === null &&
+                      record.orderStatus !== "Delivered" && (
+                        <>
+                          <button
+                            className="bg-primary text-button-text py-2 px-4 rounded-full shadow-md hover:bg-secondary transition-all duration-200"
+                            onClick={() => handleEditClick(record)}
+                          >
+                            {t("procurement.edit")}
+                          </button>
+                          <button
+                            className="bg-red-500 text-button-text py-2 px-4 rounded-full shadow-md hover:bg-red-600 transition-all duration-200"
+                            onClick={() => handleDeleteClick(record._id)}
+                          >
+                            {t("procurement.delete")}
+                          </button>
+                        </>
+                      )}
+                  </div>
                 </div>
+              ))}
+            </div>
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center mt-8 space-x-2">
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-1 rounded-full ${
+                    currentPage === 1
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-button-bg text-button-text hover:bg-secondary"
+                  }`}
+                >
+                  ←
+                </button>
+                {renderPageNumbers()}
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-1 rounded-full ${
+                    currentPage === totalPages
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-button-bg text-button-text hover:bg-secondary"
+                  }`}
+                >
+                  →
+                </button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         ) : (
           <p className="text-center text-text opacity-70 text-lg font-semibold">
             {t("procurement.no_records")}

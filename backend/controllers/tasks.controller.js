@@ -1,10 +1,8 @@
-// controllers/task.controller.js
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import Task from "../models/tasks.model.js";
 import Project from "../models/project.model.js";
 import CustomerOrder from "../models/CustomerOrder.model.js";
-import Employee from "../models/employees.model.js";
 
 export const createTask = async (req, res) => {
   try {
@@ -13,8 +11,12 @@ export const createTask = async (req, res) => {
     if (!token) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
+
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const companyId = decodedToken.companyId;
+
+    // זה עוזר לאבחן מה בדיוק מגיע מ-req.body
+    console.log("req.body:", req.body);
 
     // חילוץ שדות מהבקשה
     const {
@@ -30,24 +32,27 @@ export const createTask = async (req, res) => {
       orderItems = [],
     } = req.body;
 
-    console.log(req.body.projectId);
-    // בדיקת פרויקט
+    // בדיקת projectId (אם קיים)
     if (projectId) {
-      if (projectId && !mongoose.Types.ObjectId.isValid(projectId)) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid project ID format",
-        });
+      // בדיקה אם המזהה תקין
+      if (!mongoose.Types.ObjectId.isValid(projectId)) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid project ID format" });
       }
+
+      // חיפוש הפרויקט
       const selectedProject = await Project.findById(projectId);
       if (!selectedProject) {
         return res
           .status(404)
           .json({ success: false, message: "Project not found" });
       }
+
+      // בדיקת תאריך היעד מול תאריך סיום פרויקט
       if (dueDate) {
         const dueDateObj = new Date(dueDate);
-        if (selectedProject.endDate < dueDateObj) {
+        if (selectedProject.endDate && selectedProject.endDate < dueDateObj) {
           return res.status(400).json({
             success: false,
             message: "Due date must be before project end date",
@@ -56,49 +61,45 @@ export const createTask = async (req, res) => {
       }
     }
 
-    // אובייקט המשימה
+    // הרכבת אובייקט המשימה
     const newTaskData = {
       companyId,
-
       departmentId,
       title,
       description,
       status,
       priority,
       dueDate,
-      assignedTo,
+      assignedTo, // מערך מזהי עובדים
       orderId,
-      orderItems, // [{itemId, productId, productName, quantity}, ...]
-      ...(projectId && { projectId }),
+      orderItems, // [{ itemId, productId, productName, quantity }, ...]
+      ...(projectId && { projectId }), // רק אם קיים projectId
     };
 
     // יצירת משימה חדשה
     const task = await Task.create(newTaskData);
 
-    // לאחר יצירת המשימה, עדכן isAllocated = true בהזמנה עבור הפריטים הנבחרים
+    // אם יש orderId ו־orderItems, נשנה את מצב ה־items ב־CustomerOrder
     if (orderId && orderItems.length > 0) {
       const customerOrder = await CustomerOrder.findById(orderId);
       if (customerOrder) {
-        // שלוף את מזהי הפריטים שבחרנו
         const itemIdsSelected = orderItems.map((item) => item.itemId);
-        // עבור על הפריטים בהזמנה וסמן את הדרושים כ־true
         customerOrder.items.forEach((orderItem) => {
-          const orderItemIdStr = orderItem._id.toString();
-          if (itemIdsSelected.includes(orderItemIdStr)) {
+          if (itemIdsSelected.includes(orderItem._id.toString())) {
             orderItem.isAllocated = true;
           }
         });
-
-        // שמור את ההזמנה
         await customerOrder.save();
-      }
-      const OrderItemsCheck = await CustomerOrder.findById(orderId);
-      const allAllocated = OrderItemsCheck.items.every(
-        (item) => item.isAllocated === true
-      );
-      if (allAllocated) {
-        OrderItemsCheck.status = "Confirmed";
-        await OrderItemsCheck.save();
+
+        // בדיקה אם כל הפריטים הוקצו => עדכון סטטוס הזמנה
+        const OrderItemsCheck = await CustomerOrder.findById(orderId);
+        const allAllocated = OrderItemsCheck.items.every(
+          (item) => item.isAllocated === true
+        );
+        if (allAllocated) {
+          OrderItemsCheck.status = "Confirmed";
+          await OrderItemsCheck.save();
+        }
       }
     }
 
@@ -112,6 +113,7 @@ export const createTask = async (req, res) => {
     });
   }
 };
+
 /**
  * Get Tasks
  * מחזיר את כל המשימות של החברה.

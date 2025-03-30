@@ -11,7 +11,7 @@ import {
   getCompaniesWithOverdueInvoices,
   forceUpdateCompanyStatus,
   getCompanyStatistics,
-} from "../controllers/nexora.controller.js";
+} from "../controllers/Nexora.controller.js";
 
 const router = express.Router();
 

@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { generateLoginToken } from "../config/utils/generateToken.js";
 import cloudinary, { uploadToCloudinary } from "../config/lib/cloudinary.js";
+import Payment from "../models/payment.model.js";
 
 export const signUp = async (req, res) => {
   try {
@@ -12,13 +13,13 @@ export const signUp = async (req, res) => {
       lastName,
       email,
       password,
-      role,
       gender,
       identity,
       phone,
       department,
       address,
     } = req.body;
+    let role = req.body.role; // מוגדר בנפרד, עם let
 
     const profileImageFile = req.file;
 
@@ -83,6 +84,7 @@ export const signUp = async (req, res) => {
         req.cookies["email_approved_jwt"] || req.cookies["auth_token"];
 
       // אם אין טוקן – לא נוכל לשלוף מזהה חברה ונחזיר שגיאה
+      console.log("token:", token);
       if (!token) {
         return res.status(401).json({
           success: false,
@@ -138,6 +140,10 @@ export const signUp = async (req, res) => {
         success: false,
         message: "Email already exists under this company",
       });
+    }
+    const firstEmp = await Employee.find({ companyId });
+    if (firstEmp.length === 0) {
+      role = "Admin";
     }
 
     // Hashing לסיסמה
@@ -248,7 +254,8 @@ export const getCurrentUser = async (req, res) => {
   try {
     // User is already attached to req by protectRoute middleware
     const user = req.user;
-
+    const pack = await Payment.findOne({ companyId: user.companyId });
+    console.log(pack);
     if (!user) {
       return res
         .status(404)
@@ -265,6 +272,8 @@ export const getCurrentUser = async (req, res) => {
         role: user.role,
         company: user.companyId,
         profileImage: user.profileImage,
+        pack: pack.planName,
+        subscription: Payment.subscription || null, // Include subscription
       },
     });
   } catch (error) {

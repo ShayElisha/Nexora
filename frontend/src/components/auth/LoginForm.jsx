@@ -47,17 +47,14 @@ const LoginForm = () => {
   });
 
   return (
-    <form onSubmit={formik.handleSubmit} className="space-y-4">
+    <form onSubmit={formik.handleSubmit} className="space-y-6 animate-fadeIn">
       {/* Email Field */}
       <div>
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor="email" className="block text-sm font-medium text-text">
           {t("auth.email")}
         </label>
-        <div className="relative">
-          <FiMail className="absolute left-3 top-3 text-gray-400" />
+        <div className="relative mt-1">
+          <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary" />
           <input
             id="email"
             name="email"
@@ -67,15 +64,15 @@ const LoginForm = () => {
             onBlur={formik.handleBlur}
             value={formik.values.email}
             aria-invalid={formik.errors.email ? "true" : "false"}
-            className={`mt-1 pl-10 block w-full py-2 rounded-md shadow-sm ${
-              formik.errors.email
-                ? "border-red-500 focus:ring-red-500"
-                : "border-gray-300 focus:ring-blue-500"
+            className={`pl-10 block w-full py-2 rounded-md shadow-sm bg-bg border border-border-color text-text placeholder-secondary focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 ${
+              formik.errors.email && formik.touched.email
+                ? "border-red-500"
+                : ""
             }`}
           />
         </div>
         {formik.touched.email && formik.errors.email && (
-          <p className="mt-1 text-sm text-red-600">
+          <p className="mt-1 text-sm text-red-500">
             {t(`auth.errors.${formik.errors.email}`)}
           </p>
         )}
@@ -85,12 +82,12 @@ const LoginForm = () => {
       <div>
         <label
           htmlFor="password"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-sm font-medium text-text"
         >
           {t("auth.password")}
         </label>
-        <div className="relative">
-          <FiLock className="absolute left-3 top-3 text-gray-400" />
+        <div className="relative mt-1">
+          <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary" />
           <input
             id="password"
             name="password"
@@ -100,22 +97,22 @@ const LoginForm = () => {
             onBlur={formik.handleBlur}
             value={formik.values.password}
             aria-invalid={formik.errors.password ? "true" : "false"}
-            className={`mt-1 pl-10 pr-10 block w-full py-2 rounded-md shadow-sm ${
-              formik.errors.password
-                ? "border-red-500 focus:ring-red-500"
-                : "border-gray-300 focus:ring-blue-500"
+            className={`pl-10 pr-10 block w-full py-2 rounded-md shadow-sm bg-bg border border-border-color text-text placeholder-secondary focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 ${
+              formik.errors.password && formik.touched.password
+                ? "border-red-500"
+                : ""
             }`}
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary hover:text-accent transition-colors duration-200"
           >
             {showPassword ? <FiEyeOff /> : <FiEye />}
           </button>
         </div>
         {formik.touched.password && formik.errors.password && (
-          <p className="mt-1 text-sm text-red-600">
+          <p className="mt-1 text-sm text-red-500">
             {t(`auth.errors.${formik.errors.password}`)}
           </p>
         )}
@@ -126,7 +123,7 @@ const LoginForm = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full flex justify-center py-2 px-4 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:bg-blue-400 transition duration-300"
+          className="w-full flex justify-center py-2 px-4 bg-button-bg text-button-text font-semibold rounded-md shadow-md hover:bg-secondary focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-gray-400 transition-all duration-300"
         >
           {loading ? (
             <Loader className="size-5 animate-spin" />

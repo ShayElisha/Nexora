@@ -1,4 +1,4 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
@@ -35,20 +35,20 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
 
   const departmentId = watch("departmentId");
 
-  const { data: employees = [] } = useQuery({
+  const { data: employees = [], isLoading: employeesLoading } = useQuery({
     queryKey: ["employees"],
     queryFn: async () => {
       const res = await axiosInstance.get("/employees");
-      return res.data.data;
+      return res.data.data || [];
     },
     enabled: isOpen,
   });
 
-  const { data: departments = [] } = useQuery({
+  const { data: departments = [], isLoading: departmentsLoading } = useQuery({
     queryKey: ["departments"],
     queryFn: async () => {
       const res = await axiosInstance.get("/departments");
-      return res.data.data;
+      return res.data.data || [];
     },
     enabled: isOpen,
   });
@@ -56,7 +56,7 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
   useEffect(() => {
     if (project && isOpen && !isTeamModal) {
       const today = new Date();
-      const startDate = new Date(project.startDate);
+      const startDate = new Date(project.startDate || today);
       const status = startDate > today ? "On Hold" : "Active";
 
       reset({
@@ -77,14 +77,14 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
           project.projectManager?._id || project.projectManager || "",
         departmentId: project.departmentId?._id || project.departmentId || "",
         teamMembers:
-          project.teamMembers?.map((m) => m.employeeId._id || m.employeeId) ||
+          project.teamMembers?.map((m) => m.employeeId?._id || m.employeeId) ||
           [],
       });
     }
   }, [project, isOpen, isTeamModal, reset]);
 
   const updateProjectMutation = useMutation({
-    mutationFn: (data) => axiosInstance.put(`/projects/${project._id}`, data),
+    mutationFn: (data) => axiosInstance.put(`/projects/${project?._id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries(["projects"]);
       toast.success(t("projects.saved"));
@@ -102,7 +102,6 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
     const startDate = new Date(values.startDate);
     const endDate = new Date(values.endDate);
 
-    // Manual validation
     if (!values.name) {
       toast.error(t("project.name_required"));
       return;
@@ -143,11 +142,11 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
   const departmentEmployeeIds =
     selectedDepartment?.teamMembers?.map((member) =>
       typeof member.employeeId === "object"
-        ? member.employeeId._id.toString()
-        : member.employeeId.toString()
+        ? member.employeeId?._id?.toString()
+        : member.employeeId?.toString()
     ) || [];
   const departmentEmployees = employees.filter((emp) =>
-    departmentEmployeeIds.includes(emp._id.toString())
+    departmentEmployeeIds.includes(emp._id?.toString())
   );
   const projectManagers = departmentEmployees.filter(
     (emp) => emp.role && emp.role.toLowerCase() === "manager"
@@ -161,12 +160,24 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
     return selectedTeamMembers;
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !project) return null;
+
+  if (employeesLoading || departmentsLoading) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+        <div className="bg-accent rounded-xl p-6 w-full max-w-3xl shadow-xl">
+          <div className="flex justify-center items-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-primary"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-3xl max-h-[80vh] overflow-y-auto shadow-xl">
-        <h2 className="text-2xl font-bold text-primary mb-6">
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+      <div className="bg-accent rounded-xl p-6 w-full max-w-3xl max-h-[80vh] overflow-y-auto shadow-xl">
+        <h2 className="text-2xl font-semibold text-text mb-6 tracking-tight drop-shadow-sm">
           {isTeamModal
             ? t("projects.team_members")
             : t("projects.edit_project")}
@@ -178,20 +189,23 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
                 {project.teamMembers.map((member, idx) => (
                   <li
                     key={idx}
-                    className="flex justify-between items-center p-3 bg-gray-50 rounded-md"
+                    className="flex justify-between items-center p-3 bg-bg rounded-md shadow-sm"
                   >
-                    <span>
-                      {member.employeeId.name} {member.employeeId.lastName}
+                    <span className="text-text">
+                      {member.employeeId?.name || "N/A"}{" "}
+                      {member.employeeId?.lastName || ""}
                     </span>
                     <button
-                      onClick={() => {
+                      onClick={() =>
                         toast.success(
                           t("projects.member_removed", {
-                            name: `${member.employeeId.name} ${member.employeeId.lastName}`,
+                            name: `${member.employeeId?.name || "N/A"} ${
+                              member.employeeId?.lastName || ""
+                            }`,
                           })
-                        );
-                      }}
-                      className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                        )
+                      }
+                      className="px-3 py-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all duration-200"
                     >
                       {t("projects.remove")}
                     </button>
@@ -199,7 +213,9 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
                 ))}
               </ul>
             ) : (
-              <p className="text-gray-500">{t("projects.no_team_members")}</p>
+              <p className="text-text opacity-70">
+                {t("projects.no_team_members")}
+              </p>
             )}
           </div>
         ) : (
@@ -210,10 +226,10 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
               </label>
               <input
                 {...register("name", { required: true })}
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
+                className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
               />
               {errors.name && (
-                <div className="text-red-500 text-sm">
+                <div className="text-red-500 text-sm mt-1">
                   {t("project.name_required")}
                 </div>
               )}
@@ -224,7 +240,7 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
               </label>
               <textarea
                 {...register("description")}
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
+                className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
                 rows="3"
               />
             </div>
@@ -236,10 +252,10 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
                 <input
                   type="date"
                   {...register("startDate", { required: true })}
-                  className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
+                  className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
                 />
                 {errors.startDate && (
-                  <div className="text-red-500 text-sm">
+                  <div className="text-red-500 text-sm mt-1">
                     {t("project.start_date_required")}
                   </div>
                 )}
@@ -251,10 +267,10 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
                 <input
                   type="date"
                   {...register("endDate", { required: true })}
-                  className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
+                  className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
                 />
                 {errors.endDate && (
-                  <div className="text-red-500 text-sm">
+                  <div className="text-red-500 text-sm mt-1">
                     {t("project.end_date_required")}
                   </div>
                 )}
@@ -267,7 +283,7 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
               <input
                 type="number"
                 {...register("budget", { min: 0 })}
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
+                className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
               />
             </div>
             <div>
@@ -276,7 +292,7 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
               </label>
               <select
                 {...register("priority")}
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
+                className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
               >
                 <option value="Low">{t("project.priority_low")}</option>
                 <option value="Medium">{t("project.priority_medium")}</option>
@@ -290,7 +306,7 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
               <input
                 type="number"
                 {...register("progress", { min: 0, max: 100 })}
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
+                className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
               />
             </div>
             <div>
@@ -300,9 +316,9 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
               <input
                 {...register("tags")}
                 placeholder={t("projects.tags_placeholder")}
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
+                className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-text opacity-70 mt-1">
                 {t("projects.tags_hint")}
               </p>
             </div>
@@ -312,7 +328,7 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
               </label>
               <select
                 {...register("departmentId", { required: true })}
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
+                className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
               >
                 <option value="">{t("project.select_department")}</option>
                 {departments.map((dept) => (
@@ -322,7 +338,7 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
                 ))}
               </select>
               {errors.departmentId && (
-                <div className="text-red-500 text-sm">
+                <div className="text-red-500 text-sm mt-1">
                   {t("project.department_required")}
                 </div>
               )}
@@ -335,7 +351,7 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
                   </label>
                   <select
                     {...register("projectManager", { required: true })}
-                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
+                    className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200"
                   >
                     <option value="">
                       {t("project.select_project_manager")}
@@ -353,7 +369,7 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
                     )}
                   </select>
                   {errors.projectManager && (
-                    <div className="text-red-500 text-sm">
+                    <div className="text-red-500 text-sm mt-1">
                       {t("project.project_manager_required")}
                     </div>
                   )}
@@ -372,43 +388,46 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
                         onChange={(e) =>
                           field.onChange(handleTeamMembersChange(e))
                         }
-                        className="w-full p-2 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none h-32"
+                        className="w-full p-2 rounded-md bg-bg text-text shadow-sm focus:ring-2 focus:ring-primary transition-all duration-200 h-32"
                       >
                         {departmentEmployees.map((emp) => (
                           <option key={emp._id} value={emp._id}>
-                            {emp.name} {emp.lastName || ""} - {emp.role}
+                            {emp.name} {emp.lastName || ""} -{" "}
+                            {emp.role || "N/A"}
                           </option>
                         ))}
                       </select>
                     )}
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-text opacity-70 mt-1">
                     {t("projects.team_members_hint")}
                   </p>
                 </div>
               </>
             ) : (
-              <p className="text-gray-600">
+              <p className="text-text opacity-70">
                 {t("project.please_select_department")}
               </p>
             )}
             <div className="space-y-2">
-              <p className="text-sm">
-                <strong>{t("projects.company")}:</strong>{" "}
-                {project.companyId?.name || project.companyId}
+              <p className="text-sm text-text">
+                <strong className="font-semibold">
+                  {t("projects.company")}:
+                </strong>{" "}
+                {project.companyId?.name || project.companyId || "N/A"}
               </p>
             </div>
             <div className="mt-6 flex justify-end gap-4">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 bg-gray-300 text-black rounded-md hover:bg-gray-400"
+                className="px-5 py-2 bg-gray-500 text-white rounded-full shadow-md hover:bg-gray-600 transition-all duration-200"
               >
                 {t("projects.close")}
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-primary text-white rounded-md hover:bg-opacity-90"
+                className="px-5 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200"
               >
                 {t("projects.save")}
               </button>
@@ -435,7 +454,7 @@ const ProjectsList = () => {
       const res = await axiosInstance.get("/projects");
       return res.data.data.map((project) => {
         const today = new Date();
-        const startDate = new Date(project.startDate);
+        const startDate = new Date(project.startDate || today);
         return {
           ...project,
           status: startDate > today ? "On Hold" : "Active",
@@ -449,143 +468,171 @@ const ProjectsList = () => {
 
   if (isLoading)
     return (
-      <div className="text-center p-6 text-text animate-pulse">
-        {t("projects.loading")}
+      <div className="min-h-screen bg-bg flex justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-primary"></div>
       </div>
     );
   if (isError)
     return (
-      <div className="text-center p-6 text-red-500 font-medium">
-        {t("projects.error_loading")}
+      <div className="min-h-screen bg-bg flex justify-center items-center">
+        <div className="text-red-500 font-medium text-lg">
+          {t("projects.error_loading")}
+        </div>
       </div>
     );
 
   return (
-    <div className="max-w-7xl mx-auto p-6 bg-gradient-to-b from-gray-50 to-white text-gray-800">
-      <h1 className="text-4xl font-extrabold mb-8 text-center text-blue-600">
-        {t("projects.title")}
-      </h1>
-      {projects.length === 0 ? (
-        <p className="text-center text-gray-500 italic">
-          {t("projects.no_projects")}
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project) => (
-            <div
-              key={project._id}
-              className="rounded-xl shadow-md overflow-hidden flex flex-col border border-gray-200 bg-white transition-transform hover:scale-105 hover:shadow-lg"
-            >
-              <div className="p-5 border-b border-gray-200 bg-blue-50">
-                <h2 className="text-xl font-semibold text-blue-700">
-                  {project.name}
-                </h2>
-              </div>
-              <div className="p-5 flex-grow">
-                <p className="mb-3 text-gray-600 line-clamp-2">
-                  {project.description || t("projects.no_description")}
-                </p>
-                <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
-                  <div>
-                    <p>
-                      <strong>{t("projects.company")}:</strong>{" "}
-                      {project.companyId?.name || project.companyId}
-                    </p>
-                    <p>
-                      <strong>{t("projects.department")}:</strong>{" "}
-                      {project.departmentId?.name ||
-                        t("projects.not_available")}
-                    </p>
-                    <p>
-                      <strong>{t("projects.start")}:</strong>{" "}
-                      {project.startDate
-                        ? format(new Date(project.startDate), "MMM d, yyyy")
-                        : t("projects.not_available")}
-                    </p>
-                  </div>
-                  <div>
-                    <p>
-                      <strong>{t("projects.project_manager")}:</strong>{" "}
-                      {project.projectManager?.name
-                        ? `${project.projectManager.name} ${
-                            project.projectManager.lastName || ""
-                          }`
-                        : project.projectManager || t("projects.not_available")}
-                    </p>
-                    <p>
-                      <strong>{t("projects.status")}:</strong>{" "}
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs ${
-                          project.status === "Active"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
-                      >
-                        {project.status}
-                      </span>
-                    </p>
-                    <p>
-                      <strong>{t("projects.budget")}:</strong> ${project.budget}
-                    </p>
-                    <p>
-                      <strong>{t("projects.progress")}:</strong>{" "}
-                      <span className="relative inline-block w-full h-2 bg-gray-200 rounded">
+    <div className="min-h-screen bg-bg flex flex-col items-center py-10 animate-fade-in">
+      <div className="max-w-7xl mx-auto p-6 sm:p-8 w-full">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-text mb-8 tracking-tight drop-shadow-md text-center">
+          {t("projects.title")}
+        </h1>
+        {projects.length === 0 ? (
+          <p className="text-text opacity-70 text-center italic">
+            {t("projects.no_projects")}
+          </p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projects.map((project) => (
+              <div
+                key={project._id}
+                className="bg-accent rounded-xl shadow-md flex flex-col transition-transform hover:scale-105 hover:shadow-lg"
+              >
+                <div className="p-5 border-b border-border-color">
+                  <h2 className="text-xl font-semibold text-text truncate">
+                    {project.name || "Unnamed Project"}
+                  </h2>
+                </div>
+                <div className="p-5 flex-grow">
+                  <p className="mb-3 text-sm text-text opacity-80 line-clamp-2">
+                    {project.description || t("projects.no_description")}
+                  </p>
+                  <div className="grid grid-cols-2 gap-4 text-sm text-text">
+                    <div>
+                      <p>
+                        <strong className="font-semibold">
+                          {t("projects.company")}:
+                        </strong>{" "}
+                        {project.companyId?.name || project.companyId || "N/A"}
+                      </p>
+                      <p>
+                        <strong className="font-semibold">
+                          {t("projects.department")}:
+                        </strong>{" "}
+                        {project.departmentId?.name ||
+                          t("projects.not_available")}
+                      </p>
+                      <p>
+                        <strong className="font-semibold">
+                          {t("projects.start")}:
+                        </strong>{" "}
+                        {project.startDate
+                          ? format(new Date(project.startDate), "MMM d, yyyy")
+                          : t("projects.not_available")}
+                      </p>
+                    </div>
+                    <div>
+                      <p>
+                        <strong className="font-semibold">
+                          {t("projects.project_manager")}:
+                        </strong>{" "}
+                        {project.projectManager?.name
+                          ? `${project.projectManager.name} ${
+                              project.projectManager.lastName || ""
+                            }`
+                          : project.projectManager ||
+                            t("projects.not_available")}
+                      </p>
+                      <p>
+                        <strong className="font-semibold">
+                          {t("projects.status")}:
+                        </strong>{" "}
                         <span
-                          className="absolute h-full bg-blue-500 rounded"
-                          style={{ width: `${project.progress}%` }}
-                        />
-                      </span>
-                    </p>
+                          className={`px-2 py-1 rounded-full text-xs ${
+                            project.status === "Active"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
+                          {project.status}
+                        </span>
+                      </p>
+                      <p>
+                        <strong className="font-semibold">
+                          {t("projects.budget")}:
+                        </strong>{" "}
+                        ${project.budget || 0}
+                      </p>
+                      <p>
+                        <strong className="font-semibold">
+                          {t("projects.progress")}:
+                        </strong>{" "}
+                        <span className="relative inline-block w-full h-2 bg-bg rounded">
+                          <span
+                            className="absolute h-full bg-primary rounded"
+                            style={{ width: `${project.progress || 0}%` }}
+                          />
+                        </span>
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="p-5 border-t border-gray-200 flex justify-end gap-4">
-                <button
-                  onClick={() => {
-                    setSelectedProject(project);
-                    setShowTeamModal(true);
-                  }}
-                  className="p-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-                  title={t("projects.view_team")}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                <div className="p-5 border-t border-border-color flex justify-end gap-4">
+                  <button
+                    onClick={() => {
+                      setSelectedProject(project);
+                      setShowTeamModal(true);
+                    }}
+                    className="p-2 bg-bg text-text rounded-full hover:bg-gray-200 transition-all duration-200"
+                    title={t("projects.view_team")}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                    />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedProject(project);
-                    setShowTeamModal(false);
-                  }}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                >
-                  {t("projects.edit")}
-                </button>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedProject(project);
+                      setShowTeamModal(false);
+                    }}
+                    className="px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200"
+                  >
+                    {t("projects.edit")}
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-      <ProjectModal
-        project={selectedProject}
-        isOpen={!!selectedProject}
-        onClose={() => {
-          setSelectedProject(null);
-          setShowTeamModal(false);
-        }}
-        isTeamModal={showTeamModal}
-      />
+            ))}
+          </div>
+        )}
+        <ProjectModal
+          project={selectedProject}
+          isOpen={!!selectedProject}
+          onClose={() => {
+            setSelectedProject(null);
+            setShowTeamModal(false);
+          }}
+          isTeamModal={showTeamModal}
+        />
+      </div>
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+      `}</style>
     </div>
   );
 };

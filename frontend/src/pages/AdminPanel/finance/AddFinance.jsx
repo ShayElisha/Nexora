@@ -6,19 +6,40 @@ import currencyList from "./currency.json";
 import { useTranslation } from "react-i18next";
 import Select from "react-select";
 
-// Custom styles for react-select – עיצוב מינימליסטי ונקי
 const customSelectStyles = {
   control: (provided, state) => ({
     ...provided,
-    borderColor: state.isFocused ? "#4F46E5" : "#D1D5DB",
-    borderRadius: "0.375rem",
-    boxShadow: state.isFocused ? "0 0 0 1px #4F46E5" : "none",
-    "&:hover": { borderColor: "#4F46E5" },
+    borderColor: state.isFocused
+      ? "var(--color-primary)"
+      : "var(--border-color)",
+    borderRadius: "0.5rem",
+    boxShadow: state.isFocused ? "0 0 0 2px var(--color-primary)" : "none",
+    backgroundColor: "var(--bg-color)",
+    "&:hover": { borderColor: "var(--color-primary)" },
+    padding: "0.5rem",
   }),
   option: (provided, state) => ({
     ...provided,
-    backgroundColor: state.isFocused ? "#EEF2FF" : "white",
-    color: "#1F2937",
+    backgroundColor: state.isFocused
+      ? "var(--color-accent)"
+      : "var(--bg-color)",
+    color: "var(--text-color)",
+    "&:hover": { backgroundColor: "var(--color-accent)" },
+  }),
+  menu: (provided) => ({
+    ...provided,
+    borderRadius: "0.5rem",
+    border: "1px solid var(--border-color)",
+    boxShadow: "0 10px 15px rgba(0, 0, 0, 0.1)",
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    color: "var(--text-color)",
+  }),
+  placeholder: (provided) => ({
+    ...provided,
+    color: "var(--text-color)",
+    opacity: 0.5,
   }),
 };
 
@@ -26,12 +47,10 @@ const AddFinance = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
 
-  // שליפת נתוני המשתמש המאומת
   const { data: authData } = useQuery({ queryKey: ["authUser"] });
   const authUser = authData?.user;
   const isLoggedIn = !!authUser;
 
-  // שליפת נתוני ספקים
   const { data: suppliersData } = useQuery({
     queryKey: ["suppliers"],
     queryFn: async () => {
@@ -39,11 +58,10 @@ const AddFinance = () => {
       return response.data.data;
     },
     onError: (error) => {
-      toast.error(`Failed to fetch suppliers: ${error.message}`);
+      toast.error(`${t("finance.fetch_suppliers_failed")}: ${error.message}`);
     },
   });
 
-  // שליפת נתוני עובדים
   const { data: employeesData } = useQuery({
     queryKey: ["employees"],
     queryFn: async () => {
@@ -51,11 +69,10 @@ const AddFinance = () => {
       return response.data.data;
     },
     onError: (error) => {
-      toast.error(`Failed to fetch employees: ${error.message}`);
+      toast.error(`${t("finance.fetch_employees_failed")}: ${error.message}`);
     },
   });
 
-  // שליפת נתוני לקוחות
   const { data: customersData } = useQuery({
     queryKey: ["customers"],
     queryFn: async () => {
@@ -63,11 +80,10 @@ const AddFinance = () => {
       return response.data.data;
     },
     onError: (error) => {
-      toast.error(`Failed to fetch customers: ${error.message}`);
+      toast.error(`${t("finance.fetch_customers_failed")}: ${error.message}`);
     },
   });
 
-  // הכנת אפשרויות ל־react-select
   const suppliersOptions = suppliersData
     ? suppliersData.map((supplier) => ({
         value: supplier._id,
@@ -89,7 +105,6 @@ const AddFinance = () => {
       }))
     : [];
 
-  // אתחול מצב הטופס כולל שדות דינמיים לפי סוג הרשומה
   const [formData, setFormData] = useState({
     companyId: authUser?.companyId || "",
     transactionDate: "",
@@ -103,14 +118,13 @@ const AddFinance = () => {
     supplierId: "",
     invoiceNumber: "",
     attachment: null,
-    recordType: "supplier", // supplier, employee, customer, other
+    recordType: "supplier",
     employeeId: "",
     customerId: "",
     otherDetails: "",
   });
 
-  // Mutation ליצירת רשומת חשבונאות (שולח את הנתונים כ־FormData)
-  const { mutate: createFinanceMutation } = useMutation({
+  const { mutate: createFinanceMutation, isLoading } = useMutation({
     mutationFn: async (data) => {
       const response = await axiosInstance.post(
         "/finance/create-finance",
@@ -121,14 +135,31 @@ const AddFinance = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["finance"]);
-      toast.success("Finance record created successfully");
+      toast.success(t("finance.record_created"));
+      setFormData({
+        companyId: authUser?.companyId || "",
+        transactionDate: "",
+        transactionType: "Income",
+        transactionAmount: 0,
+        transactionCurrency: "USD",
+        transactionDescription: "",
+        category: "",
+        bankAccount: "",
+        transactionStatus: "Pending",
+        supplierId: "",
+        invoiceNumber: "",
+        attachment: null,
+        recordType: "supplier",
+        employeeId: "",
+        customerId: "",
+        otherDetails: "",
+      });
     },
     onError: (error) => {
-      toast.error("Error creating finance record");
+      toast.error(error.response?.data?.message || t("finance.create_failed"));
     },
   });
 
-  // Handler לשדות קלט רגילים
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
     if (type === "file") {
@@ -138,7 +169,6 @@ const AddFinance = () => {
     }
   };
 
-  // Handler לשדות של react-select
   const handleSelectChange = (name, selectedOption) => {
     setFormData({
       ...formData,
@@ -146,7 +176,6 @@ const AddFinance = () => {
     });
   };
 
-  // Handler לשליחת הטופס
   const handleSubmit = (e) => {
     e.preventDefault();
     const data = new FormData();
@@ -154,30 +183,33 @@ const AddFinance = () => {
       data.append(key, value);
     });
     createFinanceMutation(data);
-    console.log("Form data:", formData);
   };
 
   if (!isLoggedIn) {
-    return <div>...Loading</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-bg">
+        <div className="animate-spin rounded-full h-24 w-24 border-t-4 border-primary"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-xl">
-        <h1 className="text-2xl font-semibold text-center mb-6 border-b pb-4">
+    <div className="min-h-screen flex items-center justify-center  py-12 px-4 sm:px-6 lg:px-8 animate-fade-in">
+      <div className="bg-accent p-8 rounded-2xl shadow-2xl w-full max-w-2xl border bg-bg transform transition-all duration-500 hover:shadow-3xl">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-center mb-6 text-text tracking-tight drop-shadow-md">
           {t("finance.add_record")}
         </h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* בחירת סוג הרשומה */}
           <div className="flex flex-col">
-            <label className="mb-1 text-sm text-gray-700">
+            <label className="mb-1 text-sm font-semibold text-text tracking-wide">
               {t("finance.record_type")}
             </label>
             <select
               name="recordType"
               value={formData.recordType}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
               required
             >
               <option value="supplier">{t("finance.supplier")}</option>
@@ -187,10 +219,10 @@ const AddFinance = () => {
             </select>
           </div>
 
-          {/* שדות דינמיים בהתאם לסוג הרשומה */}
+          {/* שדות דינמיים */}
           {formData.recordType === "supplier" && (
             <div className="flex flex-col">
-              <label className="mb-1 text-sm text-gray-700">
+              <label className="mb-1 text-sm font-semibold text-text tracking-wide">
                 {t("finance.supplier")}
               </label>
               <Select
@@ -210,7 +242,7 @@ const AddFinance = () => {
 
           {formData.recordType === "employee" && (
             <div className="flex flex-col">
-              <label className="mb-1 text-sm text-gray-700">
+              <label className="mb-1 text-sm font-semibold text-text tracking-wide">
                 {t("finance.employee")}
               </label>
               <Select
@@ -230,7 +262,7 @@ const AddFinance = () => {
 
           {formData.recordType === "customer" && (
             <div className="flex flex-col">
-              <label className="mb-1 text-sm text-gray-700">
+              <label className="mb-1 text-sm font-semibold text-text tracking-wide">
                 {t("finance.customer")}
               </label>
               <Select
@@ -250,14 +282,14 @@ const AddFinance = () => {
 
           {formData.recordType === "other" && (
             <div className="flex flex-col">
-              <label className="mb-1 text-sm text-gray-700">
+              <label className="mb-1 text-sm font-semibold text-text tracking-wide">
                 {t("finance.other_details")}
               </label>
               <textarea
                 name="otherDetails"
                 value={formData.otherDetails}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                 rows="3"
                 required
               />
@@ -267,7 +299,7 @@ const AddFinance = () => {
           {/* שדות סטטיים */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col">
-              <label className="mb-1 text-sm text-gray-700">
+              <label className="mb-1 text-sm font-semibold text-text tracking-wide">
                 {t("finance.transaction_date")}
               </label>
               <input
@@ -275,19 +307,19 @@ const AddFinance = () => {
                 name="transactionDate"
                 value={formData.transactionDate}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                 required
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 text-sm text-gray-700">
+              <label className="mb-1 text-sm font-semibold text-text tracking-wide">
                 {t("finance.transaction_type")}
               </label>
               <select
                 name="transactionType"
                 value={formData.transactionType}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                 required
               >
                 <option value="Income">{t("finance.income")}</option>
@@ -299,7 +331,7 @@ const AddFinance = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col">
-              <label className="mb-1 text-sm text-gray-700">
+              <label className="mb-1 text-sm font-semibold text-text tracking-wide">
                 {t("finance.amount")}
               </label>
               <input
@@ -307,19 +339,19 @@ const AddFinance = () => {
                 name="transactionAmount"
                 value={formData.transactionAmount}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                 required
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 text-sm text-gray-700">
+              <label className="mb-1 text-sm font-semibold text-text tracking-wide">
                 {t("budget.currency")}
               </label>
               <select
                 name="transactionCurrency"
                 value={formData.transactionCurrency}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                 required
               >
                 {currencyList.map((currency) => (
@@ -336,7 +368,7 @@ const AddFinance = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col">
-              <label className="mb-1 text-sm text-gray-700">
+              <label className="mb-1 text-sm font-semibold text-text tracking-wide">
                 {t("finance.Category")}
               </label>
               <input
@@ -344,12 +376,13 @@ const AddFinance = () => {
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 placeholder-opacity-50"
+                placeholder={t("finance.enter_category")}
                 required
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 text-sm text-gray-700">
+              <label className="mb-1 text-sm font-semibold text-text tracking-wide">
                 {t("finance.Bank_Account")}
               </label>
               <input
@@ -357,7 +390,8 @@ const AddFinance = () => {
                 name="bankAccount"
                 value={formData.bankAccount}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 placeholder-opacity-50"
+                placeholder={t("finance.enter_bank_account")}
                 required
               />
             </div>
@@ -365,23 +399,23 @@ const AddFinance = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col">
-              <label className="mb-1 text-sm text-gray-700">
+              <label className="mb-1 text-sm font-semibold text-text tracking-wide">
                 {t("finance.Transaction_Status")}
               </label>
               <select
                 name="transactionStatus"
                 value={formData.transactionStatus}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                 required
               >
-                <option value="Pending">Pending</option>
-                <option value="Completed">Completed</option>
-                <option value="Cancelled">Cancelled</option>
+                <option value="Pending">{t("finance.pending")}</option>
+                <option value="Completed">{t("finance.completed")}</option>
+                <option value="Cancelled">{t("finance.cancelled")}</option>
               </select>
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 text-sm text-gray-700">
+              <label className="mb-1 text-sm font-semibold text-text tracking-wide">
                 {t("finance.Invoice_Number")}
               </label>
               <input
@@ -389,45 +423,45 @@ const AddFinance = () => {
                 name="invoiceNumber"
                 value={formData.invoiceNumber}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 placeholder-opacity-50"
+                placeholder={t("finance.enter_invoice_number")}
               />
             </div>
           </div>
 
           <div className="flex flex-col">
-            <label className="mb-1 text-sm text-gray-700">
+            <label className="mb-1 text-sm font-semibold text-text tracking-wide">
               {t("finance.Transaction_Description")}
             </label>
             <textarea
               name="transactionDescription"
               value={formData.transactionDescription}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 placeholder-opacity-50"
               rows="3"
+              placeholder={t("finance.enter_description")}
             />
           </div>
 
           <div className="flex flex-col">
-            <label className="mb-1 text-sm text-gray-700">
+            <label className="mb-1 text-sm font-semibold text-text tracking-wide">
               {t("finance.attachment")}
             </label>
             <input
               type="file"
               name="attachment"
               onChange={handleChange}
-              className="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+              className="w-full p-2 border border-border-color rounded-lg text-sm text-text file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-button-text hover:file:bg-secondary transition-all duration-200"
             />
           </div>
 
           <div>
             <button
               type="submit"
-              disabled={createFinanceMutation.isLoading}
-              className="w-full py-3 px-6 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors duration-200"
+              disabled={isLoading}
+              className="w-full py-3 px-6 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transform transition-all duration-300 hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {createFinanceMutation.isLoading
-                ? t("finance.submitting")
-                : t("finance.add_record")}
+              {isLoading ? t("finance.submitting") : t("finance.add_record")}
             </button>
           </div>
         </form>

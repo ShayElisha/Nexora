@@ -101,11 +101,11 @@ const CustomerSchema = new mongoose.Schema(
     // פרטים על מי יצר/עדכן את הרישום (ניתן להרחיב לפי הצורך)
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "employees",
     },
     updatedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "employees",
     },
   },
   {
@@ -113,5 +113,6 @@ const CustomerSchema = new mongoose.Schema(
   }
 );
 
-const Customer = mongoose.model("Customer", CustomerSchema);
+const Customer =
+  mongoose.models.Customer || mongoose.model("Customer", CustomerSchema);
 export default Customer;

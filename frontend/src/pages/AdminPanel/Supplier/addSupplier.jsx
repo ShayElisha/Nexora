@@ -1,4 +1,3 @@
-// src/components/procurement/AddSupplier.jsx
 import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -17,23 +16,19 @@ const AddSupplier = ({ authUser }) => {
     Phone: "",
     Email: "",
     baseCurrency: "USD",
-    // שדות כתובת נפרדים:
     City: "",
     Street: "",
     Apartment: "",
     Country: "",
-    // שדות חשבון בנק
     BankNumber: "",
     BranchNumber: "",
     AccountNumber: "",
     Rating: 1,
     IsActive: true,
-    // שדות קבצים
-    confirmationAccount: null, // שימו לב: שם השדה כאן הוא "confirmationAccount"
+    confirmationAccount: null,
     attachments: [],
   });
 
-  // Handler לשינוי שדות הטופס (תומך גם בקבצים)
   const handleInputChange = (e) => {
     const { name, value, type, checked, files } = e.target;
     if (files) {
@@ -50,7 +45,6 @@ const AddSupplier = ({ authUser }) => {
     }
   };
 
-  // Mutation להוספת ספק – שולח נתונים כ־FormData
   const addSupplierMutation = useMutation({
     mutationFn: async (newSupplier) => {
       const response = await axiosInstance.post("/suppliers", newSupplier, {
@@ -59,7 +53,7 @@ const AddSupplier = ({ authUser }) => {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("Supplier added successfully!");
+      toast.success(t("supplier.added_success"));
       queryClient.invalidateQueries(["suppliers"]);
       setSupplierData({
         companyId: authUser?.user?.companyId || "",
@@ -82,16 +76,12 @@ const AddSupplier = ({ authUser }) => {
       });
     },
     onError: (error) => {
-      toast.error(
-        error.response?.data?.message ||
-          "Failed to add supplier. Please try again."
-      );
+      toast.error(error.response?.data?.message || t("supplier.add_failed"));
     },
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // ניצור FormData ונאחד את השדות הנלווים
     const formData = new FormData();
     const {
       BankNumber,
@@ -106,25 +96,20 @@ const AddSupplier = ({ authUser }) => {
       ...rest
     } = supplierData;
 
-    // הוספת שדות טקסטיים
     Object.entries(rest).forEach(([key, value]) => {
       formData.append(key, value);
     });
 
-    // מחברים את שדות חשבון הבנק
     const bankAccountStr = `${BankNumber}-${BranchNumber}-${AccountNumber}`;
     formData.append("BankAccount", bankAccountStr);
 
-    // מאחדים את כתובת – בין עיר לרחוב יש מקף, בין רחוב לדירה יש רווח, ובין דירה למדינה יש מקף
     const addressStr = `${City}-${Street} ${Apartment}-${Country}`;
     formData.append("Address", addressStr);
 
-    // הוספת קובץ אישור חשבון אם קיים
     if (confirmationAccount) {
       formData.append("confirmationAccount", confirmationAccount);
     }
 
-    // הוספת קבצים נלווים (מספר קבצים)
     if (attachments && attachments.length > 0) {
       attachments.forEach((file) => {
         formData.append("attachments", file);
@@ -135,21 +120,21 @@ const AddSupplier = ({ authUser }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 animate-fadeIn">
+    <div className="min-h-screen  flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 animate-fade-in">
       <div className="max-w-3xl w-full space-y-8">
         <div>
-          <h2 className="text-center text-3xl font-extrabold text-gray-900 mb-8">
+          <h2 className="text-center text-3xl font-extrabold text-text mb-8 tracking-tight drop-shadow-md">
             {t("supplier.add_new_supplier")}
           </h2>
         </div>
         <form
           onSubmit={handleSubmit}
-          className="bg-white p-8 rounded-lg shadow-lg transform transition-all duration-500 hover:shadow-2xl"
+          className="bg-bg p-8 rounded-2xl shadow-2xl border border-border-color transform transition-all duration-500 hover:shadow-3xl"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* פרטי ספק */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-text tracking-wide">
                 {t("supplier.name")}
               </label>
               <input
@@ -158,12 +143,12 @@ const AddSupplier = ({ authUser }) => {
                 value={supplierData.SupplierName}
                 onChange={handleInputChange}
                 required
-                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
-                placeholder="Enter Supplier Name"
+                className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200 placeholder-opacity-50"
+                placeholder={t("supplier.enter_name")}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-text tracking-wide">
                 {t("supplier.contact")}
               </label>
               <input
@@ -171,12 +156,12 @@ const AddSupplier = ({ authUser }) => {
                 name="Contact"
                 value={supplierData.Contact}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
-                placeholder="Enter Contact Name"
+                className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200 placeholder-opacity-50"
+                placeholder={t("supplier.enter_contact")}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-text tracking-wide">
                 {t("supplier.phone")}
               </label>
               <input
@@ -184,12 +169,12 @@ const AddSupplier = ({ authUser }) => {
                 name="Phone"
                 value={supplierData.Phone}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
-                placeholder="Enter Phone Number"
+                className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200 placeholder-opacity-50"
+                placeholder={t("supplier.enter_phone")}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-text tracking-wide">
                 {t("supplier.email")}
               </label>
               <input
@@ -197,19 +182,19 @@ const AddSupplier = ({ authUser }) => {
                 name="Email"
                 value={supplierData.Email}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
-                placeholder="Enter Email"
+                className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200 placeholder-opacity-50"
+                placeholder={t("supplier.enter_email")}
               />
             </div>
 
             {/* שדות כתובת */}
             <div className="md:col-span-2">
-              <h3 className="text-lg font-medium text-gray-700 mb-2">
+              <h3 className="text-lg font-semibold text-text mb-2 tracking-tight drop-shadow-sm">
                 {t("supplier.address")}
               </h3>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-text tracking-wide">
                 {t("supplier.city")}
               </label>
               <input
@@ -217,12 +202,12 @@ const AddSupplier = ({ authUser }) => {
                 name="City"
                 value={supplierData.City}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
-                placeholder="Enter City"
+                className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200 placeholder-opacity-50"
+                placeholder={t("supplier.enter_city")}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-text tracking-wide">
                 {t("supplier.street")}
               </label>
               <input
@@ -230,12 +215,12 @@ const AddSupplier = ({ authUser }) => {
                 name="Street"
                 value={supplierData.Street}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
-                placeholder="Enter Street"
+                className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200 placeholder-opacity-50"
+                placeholder={t("supplier.enter_street")}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-text tracking-wide">
                 {t("supplier.apartment")}
               </label>
               <input
@@ -243,12 +228,12 @@ const AddSupplier = ({ authUser }) => {
                 name="Apartment"
                 value={supplierData.Apartment}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
-                placeholder="Enter Apartment"
+                className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200 placeholder-opacity-50"
+                placeholder={t("supplier.enter_apartment")}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-text tracking-wide">
                 {t("supplier.country")}
               </label>
               <input
@@ -256,19 +241,19 @@ const AddSupplier = ({ authUser }) => {
                 name="Country"
                 value={supplierData.Country}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
-                placeholder="Enter Country"
+                className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200 placeholder-opacity-50"
+                placeholder={t("supplier.enter_country")}
               />
             </div>
 
             {/* שדות חשבון בנק */}
             <div className="md:col-span-2">
-              <h3 className="text-lg font-medium text-gray-700 mb-2">
-                Bank Account
+              <h3 className="text-lg font-semibold text-text mb-2 tracking-tight drop-shadow-sm">
+                {t("supplier.bank_account")}
               </h3>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-text tracking-wide">
                 {t("supplier.bank_number")}
               </label>
               <input
@@ -276,12 +261,12 @@ const AddSupplier = ({ authUser }) => {
                 name="BankNumber"
                 value={supplierData.BankNumber}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
-                placeholder="Enter Bank Number"
+                className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200 placeholder-opacity-50"
+                placeholder={t("supplier.enter_bank_number")}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-text tracking-wide">
                 {t("supplier.branch_number")}
               </label>
               <input
@@ -289,12 +274,12 @@ const AddSupplier = ({ authUser }) => {
                 name="BranchNumber"
                 value={supplierData.BranchNumber}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
-                placeholder="Enter Branch Number"
+                className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200 placeholder-opacity-50"
+                placeholder={t("supplier.enter_branch_number")}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-text tracking-wide">
                 {t("supplier.account_number")}
               </label>
               <input
@@ -302,28 +287,27 @@ const AddSupplier = ({ authUser }) => {
                 name="AccountNumber"
                 value={supplierData.AccountNumber}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
-                placeholder="Enter Account Number"
+                className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200 placeholder-opacity-50"
+                placeholder={t("supplier.enter_account_number")}
               />
             </div>
 
             {/* שדה אישור חשבון */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-text tracking-wide">
                 {t("supplier.confirmation_account")}
               </label>
-              {/* שם השדה נמוך, כך שיתפוס ב־req.files.confirmationAccount */}
               <input
                 type="file"
                 name="confirmationAccount"
                 onChange={handleInputChange}
-                className="mt-1 block w-full text-gray-700"
+                className="mt-1 block w-full p-2 border border-border-color rounded-lg text-sm text-text file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-button-text hover:file:bg-secondary transition-all duration-200"
               />
             </div>
 
             {/* שדה מסמכים נלווים */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-text tracking-wide">
                 {t("supplier.attachments")}
               </label>
               <input
@@ -331,20 +315,20 @@ const AddSupplier = ({ authUser }) => {
                 name="attachments"
                 onChange={handleInputChange}
                 multiple
-                className="mt-1 block w-full text-gray-700"
+                className="mt-1 block w-full p-2 border border-border-color rounded-lg text-sm text-text file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-button-text hover:file:bg-secondary transition-all duration-200"
               />
             </div>
 
             {/* בחירת מטבע בסיס */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-text tracking-wide">
                 {t("supplier.currency")}
               </label>
               <select
                 name="baseCurrency"
                 value={supplierData.baseCurrency}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
+                className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
                 required
               >
                 {currencyList.map((currency) => (
@@ -360,7 +344,7 @@ const AddSupplier = ({ authUser }) => {
 
             {/* דירוג */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold text-text tracking-wide">
                 {t("supplier.rating")}
               </label>
               <input
@@ -370,29 +354,53 @@ const AddSupplier = ({ authUser }) => {
                 min="1"
                 max="5"
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-b border-gray-300 focus:ring-0 focus:border-gray-500 transition-all duration-300"
+                className="mt-1 block w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
               />
             </div>
 
             {/* סטטוס פעילות */}
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                name="IsActive"
-                checked={supplierData.IsActive}
-                onChange={handleInputChange}
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded transition-transform duration-300"
-              />
-              <label className="ml-2 text-sm text-gray-700">
-                {t("supplier.active")}
+            <div className="flex items-center md:col-span-2">
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="IsActive"
+                  checked={supplierData.IsActive}
+                  onChange={handleInputChange}
+                  className="sr-only"
+                />
+                <div
+                  className={`w-12 h-6 rounded-full shadow-inner transition-all duration-300 ease-in-out ${
+                    supplierData.IsActive
+                      ? "bg-green-500 hover:bg-green-600"
+                      : "bg-red-500 hover:bg-red-600"
+                  }`}
+                ></div>
+                <div
+                  className={`absolute top-0.5 left-6 right-8 w-5 h-5 bg-button-text rounded-full shadow-md transform transition-transform duration-300 ease-in-out ${
+                    supplierData.IsActive ? "translate-x-7" : "translate-x-2"
+                  }`}
+                ></div>
+                <span
+                  className={`ml-3 text-base font-bold ${
+                    supplierData.IsActive
+                      ? "text-green-500 hover:text-green-600"
+                      : "text-red-500 hover:text-red-600"
+                  } tracking-wide transition-colors duration-200`}
+                >
+                  {supplierData.IsActive
+                    ? t("supplier.active")
+                    : t("supplier.inactive")}
+                </span>
               </label>
             </div>
           </div>
-          <div>
+
+          {/* כפתור שליחה */}
+          <div className="mt-8">
             <button
               type="submit"
               disabled={addSupplierMutation.isLoading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-300 hover:scale-105"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-md text-base font-semibold text-button-text bg-button-bg hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transform transition-all duration-300 hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {addSupplierMutation.isLoading
                 ? t("supplier.adding")

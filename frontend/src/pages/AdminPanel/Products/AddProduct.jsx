@@ -37,24 +37,24 @@ const BOMBuilder = ({
   };
 
   return (
-    <div className="col-span-full mt-8 bg-gray-700 p-4 rounded">
-      <h2 className="text-xl font-semibold text-blue-300 mb-2">
+    <div className="col-span-full mt-8 bg-bg p-6 rounded-xl border border-border-color shadow-sm animate-fadeIn">
+      <h2 className="text-xl font-semibold text-text mb-4 tracking-tight">
         {t("product.bom.title")}
       </h2>
       <button
         type="button"
         onClick={handleAddComponent}
-        className="mb-4 px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+        className="mb-6 px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105"
       >
         {t("product.bom.add_component")}
       </button>
       {bomComponents.map((component, index) => (
         <div
           key={index}
-          className="grid grid-cols-1 md:grid-cols-5 gap-2 mb-2 bg-gray-800 p-2 rounded"
+          className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 bg-bg p-4 rounded-lg shadow-sm border border-border-color"
         >
           <div className="md:col-span-2">
-            <label className="block text-gray-400 text-sm mb-1">
+            <label className="block text-sm font-medium text-text">
               {t("product.bom.component")}
             </label>
             <select
@@ -62,7 +62,7 @@ const BOMBuilder = ({
               onChange={(e) =>
                 handleComponentChange(index, "componentId", e.target.value)
               }
-              className="w-full border border-gray-600 rounded p-2"
+              className="mt-1 w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200 disabled:bg-accent disabled:opacity-50"
               disabled={isLoadingProducts}
             >
               <option value="">{t("product.bom.select_product")}</option>
@@ -74,7 +74,7 @@ const BOMBuilder = ({
             </select>
           </div>
           <div>
-            <label className="block text-gray-400 text-sm mb-1">
+            <label className="block text-sm font-medium text-text">
               {t("product.bom.quantity")}
             </label>
             <input
@@ -87,12 +87,12 @@ const BOMBuilder = ({
                   parseFloat(e.target.value)
                 )
               }
-              className="w-full border border-gray-600 rounded p-2"
+              className="mt-1 w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
               min={1}
             />
           </div>
           <div>
-            <label className="block text-gray-400 text-sm mb-1">
+            <label className="block text-sm font-medium text-text">
               {t("product.bom.unit_cost")}
             </label>
             <input
@@ -105,14 +105,14 @@ const BOMBuilder = ({
                   parseFloat(e.target.value)
                 )
               }
-              className="w-full border border-gray-600 rounded p-2"
+              className="mt-1 w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
             />
           </div>
           <div className="flex items-end">
             <button
               type="button"
               onClick={() => handleRemoveComponent(index)}
-              className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              className="px-4 py-2 bg-red-500 text-white rounded-full shadow-md hover:bg-red-600 transition-all duration-200 transform hover:scale-105"
             >
               {t("product.bom.remove")}
             </button>
@@ -351,14 +351,14 @@ const AddProduct = () => {
   ];
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-r from-gray-900 via-gray-800 to-black">
-      <div className="container mx-auto max-w-full p-8 bg-bg rounded-lg shadow-xl text-text">
-        <h1 className="text-3xl font-bold text-primary mb-6 text-center">
+    <div className="flex min-h-screen  animate-fade-in">
+      <div className="container mx-auto max-w-4xl p-8 bg-bg rounded-2xl shadow-2xl border border-border-color transform transition-all duration-500 hover:shadow-3xl">
+        <h1 className="text-3xl font-extrabold text-text mb-6 text-center tracking-tight drop-shadow-md">
           {t("product.add_new_product")}
         </h1>
 
         {suppliersError && (
-          <div className="mb-4 text-red-500 text-center">
+          <div className="mb-6 text-red-500 text-center font-medium bg-bg p-4 rounded-lg shadow-sm border border-border-color">
             {t("product.errors.load_suppliers_failed")}: {suppliersError}
           </div>
         )}
@@ -375,11 +375,12 @@ const AddProduct = () => {
           isSale={formData.productType === "sale"}
         />
 
-        <div className="mt-6 text-center text-blue-300">
+        <div className="mt-6 text-center text-text font-medium bg-secondary p-4 rounded-lg shadow-sm border border-border-color">
           {t("product.fields.volume")}: {calculateVolume().toFixed(3)} m³
         </div>
 
-        {formData.productType === "sale" && (
+        {(formData.productType === "sale" ||
+          formData.productType === "both") && (
           <BOMBuilder
             bomComponents={bomComponents}
             setBomComponents={setBomComponents}

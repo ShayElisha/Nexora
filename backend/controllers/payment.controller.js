@@ -46,15 +46,11 @@ export const getAllPlans = (req, res) => {
   }
 };
 
-/**
- * Unified function to handle payment creation, saving details, and sending emails.
- */
-// Function to create a Stripe checkout session
 export const createPaymentSession = async (req, res) => {
   try {
     const { plan_name, duration } = req.body;
-    console.log("Received plan_name:", plan_name, "duration:", duration);
 
+    console.log(req.body);
     if (!plan_name || !duration) {
       return res
         .status(400)
@@ -113,25 +109,14 @@ export const createPaymentSession = async (req, res) => {
 
 export const savePayment = async (req, res) => {
   try {
-    console.log("Received request body:", req.body);
     const { sessionId } = req.body;
-
     if (!sessionId) {
       return res
         .status(400)
         .json({ success: false, message: "Session ID is required" });
     }
 
-    let session;
-    try {
-      session = await stripe.checkout.sessions.retrieve(sessionId);
-    } catch (error) {
-      console.error("Stripe session retrieval failed:", error.message);
-      return res
-        .status(404)
-        .json({ success: false, message: "Stripe session not found" });
-    }
-
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
     if (!session || !session.subscription) {
       return res
         .status(400)
@@ -141,19 +126,13 @@ export const savePayment = async (req, res) => {
     const subscription = await stripe.subscriptions.retrieve(
       session.subscription
     );
-    if (!session.metadata) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Session metadata is missing" });
-    }
-
-    const { companyId, planName, duration } = session.metadata;
-
-    if (!companyId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Company ID is missing in metadata" });
-    }
+    const {
+      companyId,
+      planName,
+      duration,
+      isUpgradeFlow,
+      originalSubscriptionId,
+    } = session.metadata;
 
     const company = await Company.findById(companyId);
     if (!company) {
@@ -168,52 +147,86 @@ export const savePayment = async (req, res) => {
         .json({ success: false, message: "Payment not completed yet" });
     }
 
-    // Save payment without stripeCustomerId
-    const payment = new Payment({
-      sessionId,
-      companyId,
-      amount: session.amount_total / 100,
-      currency: session.currency,
-      planName,
-      startDate: new Date(),
-      endDate: new Date(subscription.current_period_end * 1000),
-    });
+    if (isUpgradeFlow === "true" && originalSubscriptionId) {
+      // Handle subscription update
+      // Update the existing subscription in Stripe (if needed)
+      await stripe.subscriptions.update(originalSubscriptionId, {
+        items: [
+          {
+            id: subscription.items.data[0].id,
+            price: plans.find(
+              (p) => p.plan_name === planName && p.duration === duration
+            ).plan_id,
+          },
+        ],
+        proration_behavior: "create_prorations",
+      });
 
-    await payment.save();
-    console.log("Payment saved successfully:", payment);
+      // Update Company model
+      company.subscription.plan = planName;
+      company.subscription.duration = duration;
+      company.subscription.subscriptionId = originalSubscriptionId; // Keep the original subscription ID
+      await company.save();
 
-    company.subscription = {
-      plan: planName,
-      paymentStatus: "Paid",
-      subscriptionId: subscription.id,
-    };
-    await company.save();
+      // Create a new Payment record for the update
+      const payment = new Payment({
+        sessionId,
+        companyId,
+        amount: session.amount_total / 100,
+        currency: session.currency,
+        planName,
+        paymentDate: new Date(),
+        startDate: new Date(subscription.current_period_start * 1000),
+        endDate: new Date(subscription.current_period_end * 1000),
+        refunded: false,
+      });
 
-    const invoicePdfUrl = await stripe.invoices
-      .retrieve(subscription.latest_invoice)
-      .then((inv) => inv.invoice_pdf);
+      await payment.save();
 
-    await sendCombinedWelcomeInvoiceEmail(company.email, company.name, {
-      companyId,
-      planName,
-      amount: session.amount_total / 100,
-      currency: session.currency,
-      paymentDate: new Date(),
-      invoicePdfUrl,
-      invoiceId: subscription.latest_invoice,
-    });
+      return res.status(200).json({
+        success: true,
+        message: "Subscription updated and payment recorded successfully",
+        payment,
+        company,
+      });
+    } else {
+      // Handle new subscription (existing logic)
+      const payment = new Payment({
+        sessionId,
+        companyId,
+        amount: session.amount_total / 100,
+        currency: session.currency,
+        planName,
+        paymentDate: new Date(),
+        startDate: new Date(),
+        endDate: new Date(subscription.current_period_end * 1000),
+        refunded: false,
+      });
 
-    return res.status(200).json({
-      success: true,
-      message: "Payment saved successfully and email sent.",
-      payment,
-      company,
-    });
+      await payment.save();
+
+      company.subscription = {
+        plan: planName,
+        paymentStatus: "Paid",
+        subscriptionId: subscription.id,
+        duration,
+      };
+      await company.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "New subscription payment saved successfully",
+        payment,
+        company,
+      });
+    }
   } catch (err) {
     console.error("Error saving payment:", err.message);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: err.message,
+    });
   }
 };
 
@@ -245,17 +258,11 @@ export const getCompanyInvoices = async (req, res) => {
   }
 };
 
-/**
- * Update plan for a company (Stripe + MongoDB)
- * - This updates the subscription item to the new price on Stripe
- * - Then updates your DB accordingly
- */
 export const updateCompanyPlan = async (req, res) => {
   try {
     const { plan_name, duration } = req.body;
     const companyId = req.user.companyId;
 
-    // Check if the company exists
     const company = await Company.findById(companyId);
     if (!company) {
       return res
@@ -263,16 +270,13 @@ export const updateCompanyPlan = async (req, res) => {
         .json({ success: false, message: "Company not found" });
     }
 
-    // Retrieve the current plan for the company
-    const currentPlan = company.subscription.plan;
-    if (currentPlan === plan_name) {
+    if (!company.subscription.subscriptionId) {
       return res.status(400).json({
         success: false,
-        message: "You are already subscribed to this plan",
+        message: "No existing subscription found for this company",
       });
     }
 
-    // Find the corresponding plan details in your local 'plans' array
     const plan = plans.find(
       (_plan) => _plan.plan_name === plan_name && _plan.duration === duration
     );
@@ -282,52 +286,92 @@ export const updateCompanyPlan = async (req, res) => {
         .json({ success: false, message: "Plan not found" });
     }
 
-    // Retrieve the Stripe subscription
+    if (
+      company.subscription.plan === plan_name &&
+      company.subscription.duration === duration
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "You are already subscribed to this plan and duration",
+      });
+    }
+
     const subscription = await stripe.subscriptions.retrieve(
       company.subscription.subscriptionId
     );
-    if (!subscription) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Stripe subscription not found" });
+
+    if (!subscription.items.data || subscription.items.data.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No subscription items found to update",
+      });
     }
 
-    // Typically, there's one item in the subscription, so we grab the first item
-    const subscriptionItemId = subscription.items.data[0].id;
-
-    // Update the subscription item on Stripe
+    // Update the subscription directly
     const updatedSubscription = await stripe.subscriptions.update(
-      subscription.id,
+      company.subscription.subscriptionId,
       {
-        proration_behavior: "create_prorations", // or "none", or as you see fit
         items: [
           {
-            id: subscriptionItemId,
+            id: subscription.items.data[0].id,
             price: plan.plan_id,
           },
         ],
+        proration_behavior: "create_prorations",
+        metadata: {
+          companyId: companyId.toString(),
+          planName: plan_name,
+          duration: duration,
+          isUpgradeFlow: "true",
+        },
       }
     );
 
-    // Update the company record in MongoDB
+    // Update Company model
     company.subscription.plan = plan_name;
-    // Optionally also update subscription endDate if needed
+    company.subscription.duration = duration;
     await company.save();
+
+    // Calculate prorated amount (if any)
+    const latestInvoice = await stripe.invoices.retrieve(
+      updatedSubscription.latest_invoice
+    );
+    const amountPaid = latestInvoice.amount_paid / 100; // Convert cents to dollars
+
+    // Create a new Payment record
+    const payment = new Payment({
+      sessionId: `update_${updatedSubscription.id}_${Date.now()}`, // Unique ID since no Checkout session
+      companyId,
+      amount: amountPaid,
+      currency: latestInvoice.currency,
+      planName: plan_name,
+      paymentDate: new Date(),
+      startDate: new Date(updatedSubscription.current_period_start * 1000),
+      endDate: new Date(updatedSubscription.current_period_end * 1000),
+      refunded: false,
+    });
+
+    await payment.save();
 
     return res.status(200).json({
       success: true,
-      message: "Plan updated successfully",
+      message: "Subscription updated successfully",
+      data: {
+        planName: plan_name,
+        duration: duration,
+        subscriptionId: updatedSubscription.id,
+        payment,
+      },
     });
   } catch (error) {
-    console.log("Error in updateCompanyPlan controller:", error.message);
+    console.error("Error in updateCompanyPlan:", error);
     return res.status(500).json({
       success: false,
-      message: "Error updating company plan",
+      message: "Error updating subscription",
       error: error.message,
     });
   }
 };
-
 /**
  * Cancel subscription for a company
  * - If within 7 business days of creation => immediately cancel (and optionally refund)
@@ -616,3 +660,21 @@ const checkAndNotifySubscriptionsEndingSoon = async () => {
 cron.schedule("0 * * * *", async () => {
   await checkAndNotifySubscriptionsEndingSoon();
 });
+export const getLatestPayment = async (req, res) => {
+  try {
+    const { companyId } = req.params;
+    const payment = await Payment.findOne({ companyId })
+      .sort({ paymentDate: -1 }) // Latest payment first
+      .exec();
+    if (!payment) {
+      return res.status(200).json({ success: true, payment: null });
+    }
+    return res.status(200).json({ success: true, payment });
+  } catch (error) {
+    console.error("Error fetching latest payment:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};

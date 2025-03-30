@@ -1,4 +1,3 @@
-// src/pages/procurement/AddBudget.jsx
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
@@ -9,6 +8,7 @@ import currency from "./currency.json";
 
 // ---------- AddDepartmentModal Component ----------
 const AddDepartmentModal = ({ isOpen, onClose, onSuccess }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({ name: "", description: "" });
   const [loading, setLoading] = useState(false);
   if (!isOpen) return null;
@@ -23,13 +23,13 @@ const AddDepartmentModal = ({ isOpen, onClose, onSuccess }) => {
     setLoading(true);
     try {
       await axiosInstance.post("/departments", formData);
-      toast.success("Department created successfully!");
+      toast.success(t("budget.department_created"));
       setFormData({ name: "", description: "" });
       onSuccess();
       onClose();
     } catch (error) {
       console.error("Error creating department:", error);
-      toast.error("Error creating department");
+      toast.error(t("budget.error_creating_department"));
     } finally {
       setLoading(false);
     }
@@ -38,17 +38,17 @@ const AddDepartmentModal = ({ isOpen, onClose, onSuccess }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div
-        className="absolute inset-0 bg-black opacity-50"
+        className="absolute inset-0 bg-black bg-opacity-60 transition-opacity duration-300"
         onClick={onClose}
-      ></div>
-      <div className="relative bg-white rounded-xl p-8 w-full max-w-md z-10 shadow-2xl transform transition-all duration-300">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          Add New Department
+      />
+      <div className="relative bg-accent rounded-xl p-6 w-full max-w-md z-10 shadow-2xl transform transition-all duration-300">
+        <h2 className="text-2xl font-bold text-text mb-6 text-center tracking-tight drop-shadow-md">
+          {t("budget.add_department")}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-lg font-medium text-gray-700 mb-1">
-              Department Name:
+            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
+              {t("budget.department_name")}
             </label>
             <input
               type="text"
@@ -56,35 +56,35 @@ const AddDepartmentModal = ({ isOpen, onClose, onSuccess }) => {
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
             />
           </div>
           <div>
-            <label className="block text-lg font-medium text-gray-700 mb-1">
-              Description:
+            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
+              {t("budget.description")}
             </label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleChange}
               rows="3"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-            ></textarea>
+              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
+            />
           </div>
-          <div className="flex justify-end space-x-4">
+          <div className="flex justify-end gap-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition-transform transform hover:scale-105"
+              className="px-5 py-2 bg-bg border border-border-color text-text rounded-full shadow-md hover:bg-gray-200 transition-all duration-200"
             >
-              Cancel
+              {t("budget.cancel")}
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold shadow-lg hover:from-blue-700 hover:to-blue-800 transition-transform transform hover:scale-105 disabled:opacity-50"
+              className="px-6 py-2 bg-button-bg text-button-text rounded-full shadow-lg hover:bg-secondary transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              {loading ? "Creating..." : "Create Department"}
+              {loading ? t("budget.creating") : t("budget.create_department")}
             </button>
           </div>
         </form>
@@ -98,7 +98,6 @@ const AddBudget = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
-  // State declarations
   const [isCreatingNewList, setIsCreatingNewList] = useState(false);
   const [newRequirement, setNewRequirement] = useState("");
   const [newSigners, setNewSigners] = useState([]);
@@ -153,7 +152,7 @@ const AddBudget = () => {
     mutationFn: async (id) => await axiosInstance.delete(`/signatures/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["signatureLists"] });
-      toast.success("Signers list deleted successfully");
+      toast.success(t("budget.signers_deleted"));
     },
   });
 
@@ -162,7 +161,7 @@ const AddBudget = () => {
       await axiosInstance.post("/signatures/create", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["signatureLists"] });
-      toast.success("Signers list saved successfully");
+      toast.success(t("budget.signers_saved"));
     },
   });
 
@@ -182,7 +181,7 @@ const AddBudget = () => {
         setDepartmentOptions(options);
       } catch (error) {
         console.error("Error fetching department options:", error);
-        toast.error("Error loading department options");
+        toast.error(t("budget.error_loading_departments"));
       }
     };
     fetchDepartmentOptions();
@@ -210,7 +209,7 @@ const AddBudget = () => {
           setBudget(res.data.data);
         } catch (error) {
           console.error("Error fetching budget:", error);
-          toast.error("Error loading department budget: " + error.message);
+          toast.error(t("budget.error_loading_budget") + ": " + error.message);
         }
       };
       fetchBudget();
@@ -232,7 +231,7 @@ const AddBudget = () => {
         setEmployees(res.data.data);
       } catch (error) {
         console.error("Error fetching employees:", error);
-        toast.error("Error loading employees");
+        toast.error(t("budget.error_loading_employees"));
       }
     };
     fetchEmployees();
@@ -253,10 +252,8 @@ const AddBudget = () => {
           ? selectedSignatureList.signers
           : newSigners,
       };
-
       await axiosInstance.post("/budget", budgetData);
-      toast.success("Budget created successfully!");
-
+      toast.success(t("budget.created_successfully"));
       setFormData({
         departmentOrProjectName: "",
         departmentId: "",
@@ -276,14 +273,13 @@ const AddBudget = () => {
       const errorMsg =
         error.response && error.response.data && error.response.data.error
           ? error.response.data.error
-          : "Error creating budget";
+          : t("budget.error_creating_budget");
       toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
   };
 
-  // עדכון: סנכרון newSigners עם selectedSignatureList
   useEffect(() => {
     if (newSigners && newSigners.length > 0) {
       setSelectedSignatureList({ signers: newSigners });
@@ -291,9 +287,7 @@ const AddBudget = () => {
   }, [newSigners]);
 
   const onUseList = (list) => {
-    console.log("Selected list from modal:", list);
     if (list === undefined || list === null) {
-      console.warn("קיבלנו undefined או null מהמודל");
       setSelectedSignatureList(null);
     } else if (Array.isArray(list)) {
       setSelectedSignatureList({ signers: list });
@@ -302,29 +296,23 @@ const AddBudget = () => {
     } else if (typeof list === "object") {
       setSelectedSignatureList({ signers: [list] });
     } else {
-      console.error("פורמט לא תקין:", list);
+      console.error("Invalid format:", list);
       setSelectedSignatureList(null);
     }
     setShowSignatureModal(false);
     setIsCreatingNewList(false);
   };
 
-  // Debugging: Log selectedSignatureList whenever it changes
-  useEffect(() => {
-    console.log("selectedSignatureList updated to:", selectedSignatureList);
-  }, [selectedSignatureList]);
-
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-10">
-      <div className="w-full max-w-4xl p-10 bg-white rounded-xl shadow-2xl border border-gray-200">
-        <h1 className="text-4xl font-bold text-gray-800 mb-10 text-center">
+    <div className="min-h-screen  flex justify-center py-10 animate-fade-in">
+      <div className="w-full max-w-4xl p-8 bg-bg rounded-xl shadow-xl border border-border-color">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-text mb-8 text-center tracking-tight drop-shadow-md">
           {t("budget.create_budget")}
         </h1>
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Department Dropdown and Add Button */}
-          <div className="flex flex-col sm:flex-row sm:items-end space-y-6 sm:space-y-0 sm:space-x-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="flex flex-col sm:flex-row gap-4 items-end">
             <div className="flex-1">
-              <label className="block text-lg font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
                 {t("budget.department_project_name")}
               </label>
               <select
@@ -332,7 +320,7 @@ const AddBudget = () => {
                 value={formData.departmentId}
                 onChange={handleDepartmentSelect}
                 required
-                className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
               >
                 <option value="">
                   {t("budget.select_department_project")}
@@ -347,26 +335,31 @@ const AddBudget = () => {
             <button
               type="button"
               onClick={() => setShowAddDepartmentModal(true)}
-              className="px-6 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl shadow-lg hover:from-green-600 hover:to-green-700 transition-transform transform hover:scale-105"
+              className="px-6 py-3 bg-button-bg text-button-text rounded-full shadow-lg hover:bg-secondary transition-all duration-200"
             >
               {t("budget.add_department")}
             </button>
           </div>
 
           {budget && (
-            <div className="p-6 bg-gray-50 border border-gray-300 rounded-xl text-gray-700">
-              <h3 className="font-semibold mb-3 text-gray-800">
-                Department Budget
+            <div className="p-4 bg-bg border border-border-color rounded-lg shadow-md">
+              <h3 className="text-sm font-semibold text-text mb-2 drop-shadow-sm">
+                {t("budget.department_budget")}
               </h3>
-              <p className="mb-1">Allocated: {budget.amount}</p>
-              <p className="mb-1">Spent: {budget.spentAmount}</p>
-              <p>Remaining: {budget.amount - budget.spentAmount}</p>
+              <p className="text-sm text-text">
+                {t("budget.allocated")}: {budget.amount}
+              </p>
+              <p className="text-sm text-text">
+                {t("budget.spent")}: {budget.spentAmount}
+              </p>
+              <p className="text-sm text-text">
+                {t("budget.remaining")}: {budget.amount - budget.spentAmount}
+              </p>
             </div>
           )}
 
-          {/* Budget Amount */}
           <div>
-            <label className="block text-lg font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
               {t("budget.budget_amount")}
             </label>
             <input
@@ -375,13 +368,12 @@ const AddBudget = () => {
               value={formData.amount}
               onChange={handleChange}
               required
-              className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
             />
           </div>
 
-          {/* Currency */}
           <div>
-            <label className="block text-lg font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
               {t("budget.currency")}
             </label>
             <select
@@ -389,7 +381,7 @@ const AddBudget = () => {
               value={formData.currency}
               onChange={handleChange}
               required
-              className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
             >
               {currency.map((cur) => (
                 <option key={cur.currencyCode} value={cur.currencyCode}>
@@ -399,10 +391,9 @@ const AddBudget = () => {
             </select>
           </div>
 
-          {/* Dates */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-lg font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
                 {t("budget.start_date")}
               </label>
               <input
@@ -410,11 +401,11 @@ const AddBudget = () => {
                 name="startDate"
                 value={formData.startDate}
                 onChange={handleChange}
-                className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
               />
             </div>
             <div>
-              <label className="block text-lg font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
                 {t("budget.end_date")}
               </label>
               <input
@@ -422,14 +413,13 @@ const AddBudget = () => {
                 name="endDate"
                 value={formData.endDate}
                 onChange={handleChange}
-                className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
               />
             </div>
           </div>
 
-          {/* Notes */}
           <div>
-            <label className="block text-lg font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
               {t("budget.notes")}
             </label>
             <textarea
@@ -437,38 +427,42 @@ const AddBudget = () => {
               value={formData.notes}
               onChange={handleChange}
               rows="4"
-              className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-            ></textarea>
+              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
+            />
           </div>
 
-          {/* Signatures Section */}
-          <div className="flex flex-col">
+          <div className="space-y-4">
             <button
               type="button"
               onClick={() => setShowSignatureModal(true)}
-              className="px-6 py-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl shadow-lg hover:from-purple-600 hover:to-purple-700 transition-transform transform hover:scale-105 self-start"
+              className="px-6 py-3 bg-purple-500 text-white rounded-full shadow-lg hover:bg-purple-600 transition-all duration-200"
             >
               {t("budget.select_signers")}
             </button>
             {selectedSignatureList && (
-              <div className="mt-6 p-6 bg-gray-50 border border-gray-300 rounded-xl">
-                <p className="font-semibold text-gray-800 mb-3">
-                  חותמים נבחרים:
+              <div className="p-4 bg-bg border border-border-color rounded-lg shadow-md">
+                <p className="text-sm font-semibold text-text mb-2 drop-shadow-sm">
+                  {t("budget.selected_signers")}:
                 </p>
                 {selectedSignatureList.signers &&
                 selectedSignatureList.signers.length > 0 ? (
                   selectedSignatureList.signers.map((signer, index) => (
-                    <div key={index} className="flex items-center space-x-4">
-                      <span className="text-xl font-semibold text-gray-800">
-                        {signer.name || "שם לא ידוע"}
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 text-sm text-text"
+                    >
+                      <span className="font-semibold">
+                        {signer.name || t("budget.unknown_name")}
                       </span>
-                      <span className="text-lg text-gray-500">
-                        {signer.role || "ללא תפקיד"}
+                      <span className="opacity-70">
+                        {signer.role || t("budget.no_role")}
                       </span>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-600">רשימת החותמים ריקה.</p>
+                  <p className="text-sm text-text opacity-70">
+                    {t("budget.empty_signers_list")}
+                  </p>
                 )}
               </div>
             )}
@@ -477,9 +471,9 @@ const AddBudget = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl shadow-2xl hover:from-blue-700 hover:to-blue-800 transition-transform transform hover:scale-105 disabled:opacity-50"
+            className="w-full px-6 py-3 bg-button-bg text-button-text rounded-full shadow-lg hover:bg-secondary transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            {loading ? "Creating..." : t("budget.create_budget")}
+            {loading ? t("budget.creating") : t("budget.create_budget")}
           </button>
         </form>
       </div>
@@ -495,17 +489,17 @@ const AddBudget = () => {
                 name: dept.name,
               }));
               setDepartmentOptions(options);
-              toast.success("Department added successfully!");
+              toast.success(t("budget.department_added"));
             });
           }}
         />
       )}
 
       {showSignatureModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-8xl shadow-2xl transform transition-all duration-300">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">
-              Select Signers
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-accent rounded-xl p-6 w-full max-w-4xl shadow-2xl transform transition-all duration-300">
+            <h2 className="text-2xl font-bold text-text mb-6 text-center tracking-tight drop-shadow-md">
+              {t("budget.select_signers")}
             </h2>
             <SignaturesModal
               isOpen={showSignatureModal}
@@ -528,6 +522,14 @@ const AddBudget = () => {
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+      `}</style>
     </div>
   );
 };

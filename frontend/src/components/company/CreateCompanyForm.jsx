@@ -37,7 +37,11 @@ const CreateCompanyForm = () => {
     },
     onError: (error) => {
       console.log("Error details:", error.response?.data);
-      toast.error(error.response.data.message || t("company.error_message"));
+      // Extract the error message from the backend response
+      const errorMessage =
+        error.response?.data?.error || t("company.error_message");
+      // Display the specific error message in a toast
+      toast.error(errorMessage);
     },
   });
 
@@ -170,24 +174,79 @@ const CreateCompanyForm = () => {
             className="w-full bg-transparent outline-none text-text placeholder-secondary"
           >
             <option value="">{t("company.select_industry")}</option>
-            <option value="Technology">
-              {t("company.industries.technology")}
-            </option>
-            <option value="Retail">{t("company.industries.retail")}</option>
-            <option value="Finance">{t("company.industries.finance")}</option>
-            <option value="Healthcare">
-              {t("company.industries.healthcare")}
-            </option>
-            <option value="Education">
-              {t("company.industries.education")}
-            </option>
-            <option value="Real Estate">
-              {t("company.industries.real_estate")}
-            </option>
-            <option value="Manufacturing">
-              {t("company.industries.manufacturing")}
-            </option>
-            <option value="Other">{t("company.industries.other")}</option>
+            {[
+              "Technology",
+              "Retail",
+              "Finance",
+              "Healthcare",
+              "Education",
+              "Real Estate",
+              "Manufacturing",
+              "Hospitality",
+              "Transportation",
+              "Entertainment",
+              "Energy",
+              "Construction",
+              "Agriculture",
+              "Telecommunications",
+              "Aerospace",
+              "Nonprofit",
+              "Consulting",
+              "Government",
+              "Fashion",
+              "Food & Beverage",
+              "Sports",
+              "E-commerce",
+              "Media",
+              "Legal Services",
+              "Software Development",
+              "Hardware Development",
+              "Biotechnology",
+              "Pharmaceuticals",
+              "Automotive",
+              "Logistics",
+              "Gaming",
+              "Public Relations",
+              "Event Management",
+              "Advertising",
+              "Tourism",
+              "Mining",
+              "Chemical Industry",
+              "Art & Design",
+              "Publishing",
+              "Music & Performing Arts",
+              "Environmental Services",
+              "Security Services",
+              "Research & Development",
+              "Wholesale",
+              "Human Resources",
+              "Insurance",
+              "Digital Marketing",
+              "Data Analytics",
+              "Waste Management",
+              "Marine Industry",
+              "Electronics",
+              "Medical Devices",
+              "Architecture",
+              "Fitness & Wellness",
+              "Agritech",
+              "Fintech",
+              "Edtech",
+              "Healthtech",
+              "Proptech",
+              "SaaS",
+              "Cybersecurity",
+              "Nanotechnology",
+              "Blockchain",
+              "Artificial Intelligence",
+              "Other",
+            ].map((option) => (
+              <option key={option} value={option}>
+                {t(
+                  `company.industries.${option.toLowerCase().replace(" ", "_")}`
+                )}
+              </option>
+            ))}
           </select>
         </div>
       </div>

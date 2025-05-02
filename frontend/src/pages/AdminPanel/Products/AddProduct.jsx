@@ -351,7 +351,7 @@ const AddProduct = () => {
   ];
 
   return (
-    <div className="flex min-h-screen  animate-fade-in">
+    <div className="flex min-h-full  animate-fade-in">
       <div className="container mx-auto max-w-4xl p-8 bg-bg rounded-2xl shadow-2xl border border-border-color transform transition-all duration-500 hover:shadow-3xl">
         <h1 className="text-3xl font-extrabold text-text mb-6 text-center tracking-tight drop-shadow-md">
           {t("product.add_new_product")}

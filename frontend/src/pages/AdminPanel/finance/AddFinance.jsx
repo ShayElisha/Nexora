@@ -195,7 +195,7 @@ const AddFinance = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center  py-12 px-4 sm:px-6 lg:px-8 animate-fade-in">
-      <div className="bg-accent p-8 rounded-2xl shadow-2xl w-full max-w-2xl border bg-bg transform transition-all duration-500 hover:shadow-3xl">
+      <div className=" p-8 rounded-2xl shadow-2xl w-full max-w-full border bg-bg transform transition-all duration-500 hover:shadow-3xl">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-center mb-6 text-text tracking-tight drop-shadow-md">
           {t("finance.add_record")}
         </h1>

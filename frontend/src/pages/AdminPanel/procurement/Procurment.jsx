@@ -491,7 +491,7 @@ const Procurement = () => {
 
   return (
     <div className="flex min-h-screen  animate-fade-in">
-      <div className="container mx-auto bg-bg max-w-6xl p-6 text-text">
+      <div className="container mx-auto bg-bg border-radius-2xl max-w-7xl p-6 text-text">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-center mb-6 text-text tracking-tight drop-shadow-md">
           {t("procurement.records_title")}
         </h1>
@@ -570,7 +570,7 @@ const Procurement = () => {
               {currentProcurements.map((record) => (
                 <div
                   key={record._id}
-                  className="bg-accent rounded-xl p-6 shadow-lg border border-border-color"
+                  className="bg-bg rounded-xl p-6 shadow-lg border border-border-color"
                 >
                   <h2 className="text-lg font-bold text-primary mb-3 tracking-tight">
                     {record.PurchaseOrder}

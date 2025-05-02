@@ -496,7 +496,7 @@ const ProjectsList = () => {
             {projects.map((project) => (
               <div
                 key={project._id}
-                className="bg-accent rounded-xl shadow-md flex flex-col transition-transform hover:scale-105 hover:shadow-lg"
+                className="bg-bg rounded-xl shadow-md flex flex-col transition-transform hover:scale-105 hover:shadow-lg"
               >
                 <div className="p-5 border-b border-border-color">
                   <h2 className="text-xl font-semibold text-text truncate">

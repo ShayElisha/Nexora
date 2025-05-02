@@ -60,7 +60,13 @@ const ProductSelector = ({
   }, [supplierId]);
 
   useEffect(() => {
-    if (!productData || !selectedSupplier || !formData.currency) return;
+    // Only run if a product is selected (productId exists)
+    if (
+      !productData?.productId || // תנאי חדש: אין עדכון אם לא נבחר מוצר
+      !selectedSupplier ||
+      !formData.currency
+    )
+      return;
 
     const supplierBaseCurrency = selectedSupplier?.baseCurrency || "USD";
     const selectedCurrency = formData.currency;
@@ -94,9 +100,8 @@ const ProductSelector = ({
     formData.currency,
     selectedSupplier,
     productData?.baseUnitPrice,
+    productData?.productId, // תלות חדשה ספציפית למוצר שנבחר
     fetchExchangeRate,
-    setProductData,
-    productData,
     t,
   ]);
 

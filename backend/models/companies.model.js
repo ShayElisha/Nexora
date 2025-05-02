@@ -17,10 +17,7 @@ const companySchema = new mongoose.Schema(
     phone: {
       type: String,
       required: [true, "Phone is required"],
-      match: [
-        /^\+?[1-9]\d{1,14}$/,
-        "Please enter a valid phone number",
-      ],
+      match: [/^\+?[1-9]\d{1,14}$/, "Please enter a valid phone number"],
     },
     website: {
       type: String,
@@ -37,7 +34,11 @@ const companySchema = new mongoose.Schema(
       street: { type: String, required: [true, "Street is required"] },
       city: { type: String, required: [true, "City is required"] },
       state: { type: String, default: "" },
-      postalCode: { type: String, default: "" },
+      postalCode: {
+        type: String,
+        default: "",
+        required: [true, "Postal Code is required"],
+      },
       country: { type: String, required: [true, "Country is required"] },
     },
 

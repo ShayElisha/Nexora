@@ -4,6 +4,7 @@ import {
   updateCompany,
   getAllCompanies,
   sendSignUpLink,
+  getCompanyById
 } from "../controllers/companies.controller.js";
 import { validateCompany } from "../middleware/validateFields.js";
 import {
@@ -18,6 +19,7 @@ router.put("/update", protectRoute, validateCompany, updateCompany);
 // TODO: Add delete route and controller
 router.put("/delete", protectRoute, validateCompany, updateCompany);
 router.get("/get-companies", protectAdminsRoute, getAllCompanies);
+router.get("/get-company", getCompanyById);
 router.post("/sendSignUp", sendSignUpLink);
 
 export default router;

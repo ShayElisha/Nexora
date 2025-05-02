@@ -3,11 +3,18 @@ import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../../lib/axios";
 import toast from "react-hot-toast";
 import SignatureCanvas from "react-signature-canvas";
-import { FaBell, FaBars, FaTimes } from "react-icons/fa";
+import {
+  FaBell,
+  FaBars,
+  FaTimes,
+  FaUserEdit,
+  FaBuilding,
+  FaEdit,
+} from "react-icons/fa";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 
-const Navbar = ({ isRTL }) => {
+const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const signaturePadRef = useRef(null);
@@ -23,8 +30,44 @@ const Navbar = ({ isRTL }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [openSubDropdown, setOpenSubDropdown] = useState(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [avatarColorClass, setAvatarColorClass] = useState("");
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showPersonalModal, setShowPersonalModal] = useState(false);
+  const [showCompanyModal, setShowCompanyModal] = useState(false);
+  const [showPasswordFields, setShowPasswordFields] = useState(false);
+  const [personalForm, setPersonalForm] = useState({
+    name: "",
+    lastName: "",
+    email: "",
+    gender: "",
+    identity: "",
+    phone: "",
+    address: {
+      street: "",
+      city: "",
+      country: "",
+      postalCode: "",
+    },
+    currentPassword: "",
+    newPassword: "",
+    confirmNewPassword: "",
+  });
+  const [companyForm, setCompanyForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    website: "",
+    address: {
+      street: "",
+      city: "",
+      state: "",
+      postalCode: "",
+      country: "",
+    },
+    industry: "",
+    taxId: "",
+  });
+  const [editableFields, setEditableFields] = useState({});
 
   useEffect(() => {
     setAvatarColorClass(
@@ -33,6 +76,11 @@ const Navbar = ({ isRTL }) => {
       })]`
     );
   }, []);
+
+  // Notify Layout when modals open/close
+  useEffect(() => {
+    onModalStateChange(showPersonalModal || showCompanyModal);
+  }, [showPersonalModal, showCompanyModal, onModalStateChange]);
 
   // Query: Authenticated User
   const { data: authData } = useQuery({
@@ -43,11 +91,85 @@ const Navbar = ({ isRTL }) => {
     },
   });
 
+  // Query: Employee Details
+  const {
+    data: users,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["users"],
+    queryFn: async () => {
+      const response = await axiosInstance.get("/employees/me");
+      console.log("Employee details:", response.data); // Debug response
+      return response.data;
+    },
+  });
+
   const authUser = authData?.user;
   const firstName = authUser?.name || "Guest";
   const lastName = authUser?.lastName || "";
   const profileImage = authUser?.profileImage;
   const isLoggedIn = !!authUser;
+
+  // Initialize personal form with employee data
+  useEffect(() => {
+    if (users) {
+      // Handle potential nested data structure (e.g., users.data or users.employee)
+      const employeeData = users.data || users.employee || users;
+      setPersonalForm({
+        name: employeeData.name || "",
+        lastName: employeeData.lastName || "",
+        email: employeeData.email || "",
+        gender: employeeData.gender || "",
+        identity: employeeData.identity || "",
+        phone: employeeData.phone || "",
+        address: {
+          street: employeeData.address?.street || "",
+          city: employeeData.address?.city || "",
+          country: employeeData.address?.country || "",
+          postalCode: employeeData.address?.postalCode || "",
+        },
+        currentPassword: "",
+        newPassword: "",
+        confirmNewPassword: "",
+      });
+    }
+    if (isError) {
+      console.error("Error fetching employee details:", error);
+      toast.error(t("navbar.profile.employeeFetchError"));
+    }
+  }, [users, isError, error, t]);
+
+  // Query: Company Details (for Admins)
+  const { data: companyData } = useQuery({
+    queryKey: ["companyDetails"],
+    queryFn: async () => {
+      const response = await axiosInstance.get("/company/get-company");
+      return response.data.data;
+    },
+    enabled: isLoggedIn && authUser?.role === "Admin",
+  });
+
+  // Initialize company form with company data
+  useEffect(() => {
+    if (companyData) {
+      setCompanyForm({
+        name: companyData.name || "",
+        email: companyData.email || "",
+        phone: companyData.phone || "",
+        website: companyData.website || "",
+        address: {
+          street: companyData.address?.street || "",
+          city: companyData.address?.city || "",
+          state: companyData.address?.state || "",
+          postalCode: companyData.address?.postalCode || "",
+          country: companyData.address?.country || "",
+        },
+        industry: companyData.industry || "",
+        taxId: companyData.taxId || "",
+      });
+    }
+  }, [companyData]);
 
   // Mutation: Logout
   const { mutate: logout, isLoading: isLoggingOut } = useMutation({
@@ -62,6 +184,63 @@ const Navbar = ({ isRTL }) => {
     onError: (error) => {
       console.error("Logout failed:", error);
       toast.error(t("navbar.profile.logoutError"));
+    },
+  });
+
+  // Mutation: Update Personal Details
+  const { mutate: updatePersonalDetails } = useMutation({
+    mutationFn: async (data) => {
+      const {
+        currentPassword,
+        newPassword,
+        confirmNewPassword,
+        ...profileData
+      } = data;
+      const response = await axiosInstance.put(
+        "/auth/update-profile",
+        profileData
+      );
+      if (newPassword && currentPassword) {
+        await axiosInstance.post("/auth/change-password", {
+          currentPassword,
+          newPassword,
+          confirmNewPassword,
+        });
+      }
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["users"]);
+      setShowPersonalModal(false);
+      setEditableFields({});
+      setShowPasswordFields(false);
+      toast.success(t("navbar.profile.updateSuccess"));
+    },
+    onError: (error) => {
+      console.error("Update personal details failed:", error);
+      toast.error(
+        error.response?.data?.message || t("navbar.profile.updateError")
+      );
+    },
+  });
+
+  // Mutation: Update Company Details
+  const { mutate: updateCompanyDetails } = useMutation({
+    mutationFn: async (data) => {
+      const response = await axiosInstance.put("/company", data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["companyDetails"]);
+      setShowCompanyModal(false);
+      setEditableFields({});
+      toast.success(t("navbar.profile.companyUpdateSuccess"));
+    },
+    onError: (error) => {
+      console.error("Update company details failed:", error);
+      toast.error(
+        error.response?.data?.message || t("navbar.profile.companyUpdateError")
+      );
     },
   });
 
@@ -126,6 +305,7 @@ const Navbar = ({ isRTL }) => {
     setOpenDropdown(null);
     setOpenSubDropdown(null);
     setIsMenuOpen(false);
+    setShowProfileDropdown(false);
   };
 
   const handleSignature = () => {
@@ -145,6 +325,7 @@ const Navbar = ({ isRTL }) => {
     setShowPopup(false);
     setShowNotifications(false);
     setIsMenuOpen(false);
+    setShowProfileDropdown(false);
   };
 
   const handleCloseModal = () => {
@@ -192,6 +373,7 @@ const Navbar = ({ isRTL }) => {
     setOpenDropdown(null);
     setOpenSubDropdown(null);
     setIsMenuOpen(false);
+    setShowProfileDropdown(false);
     refetchAdminNotifications();
   };
 
@@ -240,9 +422,6 @@ const Navbar = ({ isRTL }) => {
       const notification = adminNotifications.find(
         (n) => n._id === notificationId
       );
-      console.log("תוכן ההתראה:", notification?.content);
-
-      // Extract product name from notification content
       const productNameMatch = notification?.content.match(
         /The quantity of the product "?([^"]*)"?(?= is below the minimum stock level)/
       );
@@ -250,16 +429,13 @@ const Navbar = ({ isRTL }) => {
       if (!productName) {
         throw new Error("לא ניתן לחלץ את שם המוצר מההתראה");
       }
-      console.log("שם המוצר שחולץ:", productName);
 
-      // Search for products by name
       const productSearchResp = await axiosInstance.get(
         `/product/search-by-name`,
         {
           params: { name: productName },
         }
       );
-      console.log("תגובת חיפוש מוצר:", productSearchResp.data);
       if (
         !productSearchResp.data.success ||
         !productSearchResp.data.data?.length
@@ -268,7 +444,6 @@ const Navbar = ({ isRTL }) => {
       }
       const products = productSearchResp.data.data;
 
-      // Find the product below minimum stock level
       let product = null;
       for (const p of products) {
         try {
@@ -284,8 +459,7 @@ const Navbar = ({ isRTL }) => {
           console.warn(`בדיקת מלאי נכשלה עבור מזהה ${p._id}:`, err.message);
         }
       }
-      product = product || products[0]; // Fallback to first product if none found below min stock
-      console.log("מוצר שנבחר:", product);
+      product = product || products[0];
 
       if (!product?._id) {
         throw new Error("מזהה המוצר חסר בתוצאת החיפוש");
@@ -298,26 +472,22 @@ const Navbar = ({ isRTL }) => {
         supplierId = "",
       } = product;
 
-      // Fetch reorder quantity
       let reorderQuantity = 0;
       try {
         const inventoryResponse = await axiosInstance.get(
           `/inventory/${product._id}`
         );
-        console.log("תגובת API מלאי:", inventoryResponse.data);
         reorderQuantity = inventoryResponse.data.data?.reorderQuantity || 0;
       } catch (err) {
         console.warn(`הבאת מלאי נכשלה עבור מזהה ${product._id}:`, err.message);
       }
 
-      // Fetch supplier details
       let supplier = {};
       if (supplierId) {
         try {
           const supplierResponse = await axiosInstance.get(
             `/suppliers/${supplierId}`
           );
-          console.log("תגובת API ספק:", supplierResponse.data);
           if (!supplierResponse.data.success) {
             throw new Error(
               supplierResponse.data.error || "נכשל בהבאת פרטי הספק"
@@ -333,16 +503,13 @@ const Navbar = ({ isRTL }) => {
           };
         }
       } else {
-        console.warn("לא סופק מזהה ספק ממידע המוצר");
         supplier = { SupplierName: "ספק לא ידוע", baseCurrency: "USD" };
       }
 
-      // Mark notification as read
       await axiosInstance.post(`/notifications/mark-as-read`, {
         notificationId,
       });
 
-      // Navigate with validated data
       const stateData = {
         productId: product._id,
         productName: product.productName || productName,
@@ -354,7 +521,6 @@ const Navbar = ({ isRTL }) => {
         sku: sku || "",
         category: category || "",
       };
-      console.log("מנווט עם נתונים:", stateData);
       navigate("/dashboard/add-procurement-record", { state: stateData });
 
       refetchAdminNotifications();
@@ -380,6 +546,141 @@ const Navbar = ({ isRTL }) => {
     setShowNotifications(false);
     setOpenDropdown(null);
     setOpenSubDropdown(null);
+    setShowProfileDropdown(false);
+  };
+
+  // Handlers: Profile Dropdown
+  const handleProfileClick = () => {
+    setShowProfileDropdown((prev) => !prev);
+    setShowPopup(false);
+    setShowNotifications(false);
+    setOpenDropdown(null);
+    setOpenSubDropdown(null);
+    setIsMenuOpen(false);
+  };
+
+  // Handlers: Personal Details Modal
+  const handleOpenPersonalModal = () => {
+    setShowCompanyModal(false);
+    setShowPersonalModal(true);
+    setShowProfileDropdown(false);
+  };
+
+  const handleClosePersonalModal = () => {
+    setShowPersonalModal(false);
+    setShowPasswordFields(false);
+    setPersonalForm({
+      name: users?.data?.name || users?.employee?.name || users?.name || "",
+      lastName:
+        users?.data?.lastName ||
+        users?.employee?.lastName ||
+        users?.lastName ||
+        "",
+      email: users?.data?.email || users?.employee?.email || users?.email || "",
+      gender:
+        users?.data?.gender || users?.employee?.gender || users?.gender || "",
+      identity:
+        users?.data?.identity ||
+        users?.employee?.identity ||
+        users?.identity ||
+        "",
+      phone: users?.data?.phone || users?.employee?.phone || users?.phone || "",
+      address: {
+        street:
+          users?.data?.address?.street ||
+          users?.employee?.address?.street ||
+          users?.address?.street ||
+          "",
+        city:
+          users?.data?.address?.city ||
+          users?.employee?.address?.city ||
+          users?.address?.city ||
+          "",
+        country:
+          users?.data?.address?.country ||
+          users?.employee?.address?.country ||
+          users?.address?.country ||
+          "",
+        postalCode:
+          users?.data?.address?.postalCode ||
+          users?.employee?.address?.postalCode ||
+          users?.address?.postalCode ||
+          "",
+      },
+      currentPassword: "",
+      newPassword: "",
+      confirmNewPassword: "",
+    });
+    setEditableFields({});
+  };
+
+  const handlePersonalFormChange = (e) => {
+    const { name, value } = e.target;
+    if (name.includes("address.")) {
+      const field = name.split(".")[1];
+      setPersonalForm((prev) => ({
+        ...prev,
+        address: { ...prev.address, [field]: value },
+      }));
+    } else {
+      setPersonalForm((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handlePersonalFormSubmit = () => {
+    updatePersonalDetails(personalForm);
+  };
+
+  // Handlers: Company Details Modal
+  const handleOpenCompanyModal = () => {
+    setShowPersonalModal(false); // סגור את מודל הפרטים האישיים
+    setShowCompanyModal(true);
+    setShowProfileDropdown(false);
+  };
+
+  const handleCloseCompanyModal = () => {
+    setShowCompanyModal(false);
+    setCompanyForm({
+      name: companyData?.name || "",
+      email: companyData?.email || "",
+      phone: companyData?.phone || "",
+      website: companyData?.website || "",
+      address: {
+        street: companyData?.address?.street || "",
+        city: companyData?.address?.city || "",
+        state: companyData?.address?.state || "",
+        postalCode: companyData?.address?.postalCode || "",
+        country: companyData?.address?.country || "",
+      },
+      industry: companyData?.industry || "",
+      taxId: companyData?.taxId || "",
+    });
+    setEditableFields({});
+  };
+
+  const handleCompanyFormChange = (e) => {
+    const { name, value } = e.target;
+    if (name.includes("address.")) {
+      const field = name.split(".")[1];
+      setCompanyForm((prev) => ({
+        ...prev,
+        address: { ...prev.address, [field]: value },
+      }));
+    } else {
+      setCompanyForm((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleCompanyFormSubmit = () => {
+    updateCompanyDetails(companyForm);
+  };
+
+  // Toggle field editability
+  const toggleFieldEdit = (field) => {
+    setEditableFields((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
   };
 
   const adminLinks = [
@@ -387,7 +688,7 @@ const Navbar = ({ isRTL }) => {
     {
       label: t("navbar.products"),
       subMenu: [
-        { to: "/dashboard/products", text: t(" Policies.all_products") },
+        { to: "/dashboard/products", text: t("Policies.all_products") },
         { to: "/dashboard/add-product", text: t("navbar.add_product") },
       ],
     },
@@ -399,12 +700,23 @@ const Navbar = ({ isRTL }) => {
       ],
     },
     {
+      label: t("navbar.shifts"),
+      subMenu: [
+        { to: "/dashboard/Shifts-List", text: t("navbar.Shifts-List") },
+        { to: "/dashboard/My-Shifts", text: t("navbar.My-Shifts") },
+      ],
+    },
+    {
       label: t("navbar.finance"),
       subMenu: [
         { to: "/dashboard/finance", text: t("navbar.finance_records") },
         {
           to: "/dashboard/add-finance-record",
           text: t("navbar.create_finance_record"),
+        },
+        {
+          to: "/dashboard/salary",
+          text: t("navbar.salary"),
         },
         {
           label: t("navbar.budget"),
@@ -550,7 +862,7 @@ const Navbar = ({ isRTL }) => {
         },
         {
           to: "/employee/ProcurementProposalsList",
-          text: t("navbar.ProcurementProposalsList"),
+          text: t("navbar.ProcurementProposals updating...List"),
         },
       ],
     },
@@ -596,7 +908,7 @@ const Navbar = ({ isRTL }) => {
   // Render SubMenu
   const renderSubMenu = (subMenu, parentIndex) => {
     return (
-      <ul className="mt-2 space-y-1 pl-4 text-sm lg:text-base">
+      <ul className="mt-2 space-y-1 pl-4 flex flex-col items-center text-sm lg:text-base">
         {subMenu.map((item, subIndex) => {
           const uniqueSubIndex = `${parentIndex}-${subIndex}`;
           if (item.subMenu) {
@@ -637,6 +949,7 @@ const Navbar = ({ isRTL }) => {
                     setShowPopup(false);
                     setShowNotifications(false);
                     setIsMenuOpen(false);
+                    setShowProfileDropdown(false);
                   }}
                   className={`block py-1 text-[var(--color-primary)] font-medium hover:text-[var(--color-accent)] transition-all duration-300 ease-in-out relative group ${
                     isRTL ? "text-right" : "text-left"
@@ -654,8 +967,8 @@ const Navbar = ({ isRTL }) => {
   };
 
   return (
-    <nav className="bg-[var(--color-primary)] text-white px-2 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 shadow-2xl sticky w-screen animate-fade-in z-50">
-      <div className="w-full flex items-center justify-between">
+    <nav className="bg-[var(--color-primary)] text-white px-2 sm:px-4 lg:px-4 py-2 sm:py-3 lg:py-4 shadow-2xl sticky w-screen animate-fade-in z-50">
+      <div className="w-full pl-6 2xl:pl-0 xl:pl-10 lg:pl-8 sm:pl-8 xs:pl-5 flex items-center justify-between relative">
         {/* Logo */}
         <Link
           to="/"
@@ -668,8 +981,10 @@ const Navbar = ({ isRTL }) => {
         {isLoggedIn && (
           <button
             onClick={toggleMenu}
-            className="2xl:hidden text-white focus:outline-none flex-shrink-0 hover:text-[var(--color-accent)] transition-colors duration-200"
-            aria-label="Toggle menu"
+            className={`2xl:hidden text-white focus:outline-none flex-shrink-0 hover:text-[var(--color-accent)] transition-colors duration-200 absolute ${
+              isRTL ? "left-2" : "right-2"
+            } top-1/2 transform -translate-y-1/2`}
+            aria-label="Toggle innowenu"
           >
             {isMenuOpen ? (
               <FaTimes className="w-5 h-5 sm:w-6 sm:h-6 2xl:w-7 2xl:h-7" />
@@ -697,6 +1012,7 @@ const Navbar = ({ isRTL }) => {
                         }
                         setShowPopup(false);
                         setShowNotifications(false);
+                        setShowProfileDropdown(false);
                       }}
                       className={`py-1 text-white font-medium hover:text-[var(--color-accent)] transition-all duration-300 ease-in-out relative group ${
                         index === 0 && isRTL ? "pr-6" : ""
@@ -732,6 +1048,7 @@ const Navbar = ({ isRTL }) => {
                       setOpenSubDropdown(null);
                       setShowPopup(false);
                       setShowNotifications(false);
+                      setShowProfileDropdown(false);
                     }}
                   >
                     {navItem.label}
@@ -743,7 +1060,7 @@ const Navbar = ({ isRTL }) => {
           </div>
         )}
 
-        {/* Right Side: Profile, Signatures, Notifications, Logout */}
+        {/* Right Side: Profile, Signatures, Notifications */}
         <div className="flex items-center space-x-2 lg:space-x-3 flex-shrink-0">
           {isLoggedIn ? (
             <>
@@ -993,20 +1310,80 @@ const Navbar = ({ isRTL }) => {
                 </div>
               )}
 
-              <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-full border-2 border-[var(--color-accent)] overflow-hidden flex-shrink-0 shadow-sm">
-                {profileImage ? (
-                  <img
-                    src={profileImage}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
+              <div className="relative">
+                <button
+                  onClick={handleProfileClick}
+                  className="w-7 h-7 lg:w-8 lg:h-8 rounded-full border-2 border-[var(--color-accent)] overflow-hidden flex-shrink-0 shadow-sm hover:scale-105 transition-transform duration-200"
+                >
+                  {profileImage ? (
+                    <img
+                      src={profileImage}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div
+                      className={`w-full h-full flex items-center justify-center ${avatarColorClass}`}
+                    >
+                      <span className="text-white text-base lg:text-lg font-bold">
+                        {authUser?.name?.charAt(0)?.toUpperCase() || "U"}
+                      </span>
+                    </div>
+                  )}
+                </button>
+                {showProfileDropdown && (
                   <div
-                    className={`w-full h-full flex items-center justify-center ${avatarColorClass}`}
+                    className={`absolute ${
+                      isRTL ? "left-0" : "right-0"
+                    } mt-2 bg-white text-[var(--color-primary)] rounded-xl shadow-2xl p-4 w-72 z-50 border border-[var(--color-accent)] animate-profile-dropdown bg-gradient-to-b from-white to-gray-50`}
                   >
-                    <span className="text-white text-base lg:text-lg font-bold">
-                      {authUser?.name?.charAt(0)?.toUpperCase() || "U"}
-                    </span>
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="w-12 h-12 rounded-full border-2 border-[var(--color-accent)] overflow-hidden shadow-sm">
+                        {profileImage ? (
+                          <img
+                            src={profileImage}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div
+                            className={`w-full h-full flex items-center justify-center ${avatarColorClass}`}
+                          >
+                            <span className="text-white text-xl font-bold">
+                              {authUser?.name?.charAt(0)?.toUpperCase() || "U"}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-base font-bold text-[var(--color-primary)] tracking-tight">
+                          {firstName} {lastName}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate max-w-[150px]">
+                          {authUser?.email}
+                        </p>
+                        <p className="text-xs font-medium text-[var(--color-accent)]">
+                          {t(`navbar.profile.roles.${authUser?.role}`)}
+                        </p>
+                      </div>
+                    </div>
+                    <hr className="border-gray-200 mb-3" />
+                    <button
+                      onClick={handleOpenPersonalModal}
+                      className="w-full py-2 px-3 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-secondary)] transition-all duration-300 shadow-md flex items-center justify-center space-x-2 group"
+                    >
+                      <FaUserEdit className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
+                      <span>{t("navbar.profile.updatePersonal")}</span>
+                    </button>
+                    {authUser?.role === "Admin" && (
+                      <button
+                        onClick={handleOpenCompanyModal}
+                        className="w-full mt-2 py-2 px-3 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-secondary)] transition-all duration-300 shadow-md flex items-center justify-center space-x-2 group"
+                      >
+                        <FaBuilding className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
+                        <span>{t("navbar.profile.updateCompany")}</span>
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -1014,15 +1391,19 @@ const Navbar = ({ isRTL }) => {
               <span className="hidden 2xl:block text-sm lg:text-base font-semibold truncate max-w-[150px] text-white">
                 {t("navbar.profile.hello", { firstName, lastName })}
               </span>
-              <button
-                onClick={() => logout()}
-                className="px-2 py-1 bg-red-600 text-white rounded-full hover:bg-red-700 text-sm lg:text-base transition-all duration-300 shadow-sm disabled:opacity-50"
-                disabled={isLoggingOut}
-              >
-                {isLoggingOut
-                  ? t("navbar.profile.logging_out")
-                  : t("navbar.profile.logout")}
-              </button>
+
+              {/* Logout Button – Visible outside hamburger at 2xl and above */}
+              <div className="hidden 2xl:block">
+                <button
+                  onClick={() => logout()}
+                  className="px-2 py-1 bg-red-600 text-white rounded-full hover:bg-red-700 text-sm lg:text-base transition-all duration-300 shadow-sm disabled:opacity-50"
+                  disabled={isLoggingOut}
+                >
+                  {isLoggingOut
+                    ? t("navbar.profile.logging_out")
+                    : t("navbar.profile.logout")}
+                </button>
+              </div>
             </>
           ) : (
             <Link
@@ -1072,9 +1453,10 @@ const Navbar = ({ isRTL }) => {
                     setOpenDropdown(null);
                     setOpenSubDropdown(null);
                     setIsMenuOpen(false);
+                    setShowProfileDropdown(false);
                   }}
-                  className={`block py-1 text-[var(--color-primary)] font-medium hover:text-[var(--color-accent)] transition-all duration-300 ease-in-out relative group ${
-                    index === 0 && isRTL ? "pr-8" : ""
+                  className={`block py-1 text-[var(--color-primary)] text-center font-medium hover:text-[var(--color-accent)] transition-all duration-300 ease-in-out relative group ${
+                    index === 0 && isRTL ? "pr-0" : ""
                   }`}
                 >
                   {navItem.label}
@@ -1083,18 +1465,36 @@ const Navbar = ({ isRTL }) => {
               )}
             </div>
           ))}
+          {/* Logout Item in Hamburger Menu */}
+          <div className="mt-2 border-t flex justify-center pt-2">
+            <button
+              onClick={() => {
+                logout();
+                setIsMenuOpen(false);
+              }}
+              className={`block py-1 text-red-600 font-medium hover:text-red-800 transition-all duration-300 ease-in-out relative group ${
+                isRTL ? "text-right" : "text-left"
+              }`}
+              disabled={isLoggingOut}
+            >
+              {isLoggingOut
+                ? t("navbar.profile.logging_out")
+                : t("navbar.profile.logout")}
+              <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-red-800 transition-all duration-300 ease-in-out group-hover:w-full group-hover:left-0"></span>
+            </button>
+          </div>
         </div>
       )}
 
       {/* Signature Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center z-50 px-2 sm:px-4 animate-fade-in">
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-start justify-center z-50 px-2 sm:px-4 animate-fade-in">
           <div className="bg-white rounded-2xl shadow-2xl p-3 sm:p-4 lg:p-6 w-full max-w-xs sm:max-w-md lg:max-w-2xl relative border border-[var(--color-accent)] transform transition-all duration-300 scale-95 hover:scale-100">
             <h2 className="text-sm sm:text-lg lg:text-xl font-bold text-[var(--color-primary)] mb-2 sm:mb-4 text-center tracking-tight drop-shadow-sm">
               {selectedDocumentType === "budget"
                 ? t("navbar.Signatures.budgetDocument")
                 : t("navbar.Signatures.procurementDocument")}{" "}
-              {t("navbar.Signatures.digitalSignature")}
+              {t("navbar.Signatures.digital-Signature")}
             </h2>
             {selectedDocumentType === "budget" && selectedBudget && (
               <div className="mb-2 sm:mb-4 p-1 sm:p-2 lg:p-3 border rounded-xl bg-gray-50 text-sm lg:text-base shadow-sm">
@@ -1161,40 +1561,535 @@ const Navbar = ({ isRTL }) => {
         </div>
       )}
 
+      {/* Personal Details Modal */}
+      {showPersonalModal && (
+        <div className="fixed inset-0 bg-gray-700 top-[550px] bg-opacity-70 flex items-center justify-center z-50 px-2 sm:px-4 animate-fade-in">
+          <div className="bg-white p-4 sm:p-6 text-text rounded-2xl shadow-xl w-full max-w-3xl max-h-[80vh] overflow-y-auto relative border-2 border-gray-800 transform transition-all duration-300 scale-95 hover:scale-100">
+            <h2 className="text-lg sm:text-xl font-bold text-[var(--color-primary)] mb-4 text-center">
+              {t("navbar.profile.updatePersonal")}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Personal Information Section */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                  {t("navbar.profile.personalInfo")}
+                </h3>
+                <div className="space-y-3">
+                  {[
+                    {
+                      label: t("navbar.profile.firstName"),
+                      name: "name",
+                      type: "text",
+                    },
+                    {
+                      label: t("navbar.profile.lastName"),
+                      name: "lastName",
+                      type: "text",
+                    },
+                    {
+                      label: t("navbar.profile.email"),
+                      name: "email",
+                      type: "email",
+                    },
+                    {
+                      label: t("navbar.profile.gender"),
+                      name: "gender",
+                      type: "select",
+                      options: [
+                        { value: "", label: t("navbar.profile.selectGender") },
+                        { value: "Male", label: t("navbar.profile.male") },
+                        { value: "Female", label: t("navbar.profile.female") },
+                        { value: "Other", label: t("navbar.profile.other") },
+                      ],
+                    },
+                    {
+                      label: t("navbar.profile.identity"),
+                      name: "identity",
+                      type: "text",
+                    },
+                    {
+                      label: t("navbar.profile.phone"),
+                      name: "phone",
+                      type: "text",
+                    },
+                  ].map((field) => (
+                    <div
+                      key={field.name}
+                      className="flex items-center space-x-2"
+                    >
+                      <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {field.label}
+                        </label>
+                        {field.type === "select" ? (
+                          <select
+                            name={field.name}
+                            value={personalForm[field.name]}
+                            onChange={handlePersonalFormChange}
+                            disabled={!editableFields[field.name]}
+                            aria-label={field.label}
+                            tabIndex={0}
+                            className={`block w-full px-3 py-2 border-2 ${
+                              editableFields[field.name]
+                                ? "border-gray-800 bg-white"
+                                : "border-gray-400 bg-gray-100"
+                            } rounded-lg shadow-lg focus:outline-none focus:ring-[var(--color-accent)] focus:border-gray-800 transition-all duration-200 text-sm`}
+                          >
+                            {field.options.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type={field.type}
+                            name={field.name}
+                            value={personalForm[field.name]}
+                            onChange={handlePersonalFormChange}
+                            disabled={!editableFields[field.name]}
+                            aria-label={field.label}
+                            tabIndex={0}
+                            className={`block w-full px-3 py-2 border-2 ${
+                              editableFields[field.name]
+                                ? "border-gray-800 bg-white"
+                                : "border-gray-400 bg-gray-100"
+                            } rounded-lg shadow-lg focus:outline-none focus:ring-[var(--color-accent)] focus:border-gray-800 transition-all duration-200 text-sm`}
+                          />
+                        )}
+                      </div>
+                      <button
+                        onClick={() => toggleFieldEdit(field.name)}
+                        className="p-2 pt-8 text-[var(--color-primary)] rounded-full transition-all duration-200 shadow-sm"
+                        title={
+                          editableFields[field.name]
+                            ? t("navbar.profile.lock")
+                            : t("navbar.profile.edit")
+                        }
+                      >
+                        <FaEdit className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Address and Password Sections */}
+              <div>
+                {/* Address Section */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                    {t("navbar.profile.addressInfo")}
+                  </h3>
+                  <div className="space-y-3">
+                    {[
+                      {
+                        label: t("navbar.profile.address.street"),
+                        name: "address.street",
+                        type: "text",
+                      },
+                      {
+                        label: t("navbar.profile.address.city"),
+                        name: "address.city",
+                        type: "text",
+                      },
+                      {
+                        label: t("navbar.profile.address.country"),
+                        name: "address.country",
+                        type: "text",
+                      },
+                      {
+                        label: t("navbar.profile.address.postalCode"),
+                        name: "address.postalCode",
+                        type: "text",
+                      },
+                    ].map((field) => (
+                      <div
+                        key={field.name}
+                        className="flex items-center space-x-2"
+                      >
+                        <div className="flex-1">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {field.label}
+                          </label>
+                          <input
+                            type={field.type}
+                            name={field.name}
+                            value={
+                              personalForm.address[field.name.split(".")[1]]
+                            }
+                            onChange={handlePersonalFormChange}
+                            disabled={!editableFields[field.name]}
+                            aria-label={field.label}
+                            tabIndex={0}
+                            className={`block w-full px-3 py-2 border-2 ${
+                              editableFields[field.name]
+                                ? "border-gray-800 bg-white"
+                                : "border-gray-400 bg-gray-100"
+                            } rounded-lg shadow-lg focus:outline-none focus:ring-[var(--color-accent)] focus:border-gray-800 transition-all duration-200 text-sm`}
+                          />
+                        </div>
+                        <button
+                          onClick={() => toggleFieldEdit(field.name)}
+                          className="p-2 pt-8 text-[var(--color-primary)] rounded-full transition-all duration-200 shadow-sm"
+                          title={
+                            editableFields[field.name]
+                              ? t("navbar.profile.lock")
+                              : t("navbar.profile.edit")
+                          }
+                        >
+                          <FaEdit className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Password Section */}
+                <div className="mt-6">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                    {t("navbar.profile.passwordInfo")}
+                  </h3>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => setShowPasswordFields(!showPasswordFields)}
+                      className="w-full py-2 px-3 bg-[var(--color-primary)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-secondary)] transition-all duration-300 shadow-md flex items-center justify-center"
+                    >
+                      {t("navbar.profile.updatePassword")}
+                    </button>
+                  </div>
+                  {showPasswordFields && (
+                    <div className="space-y-3 mt-3">
+                      {[
+                        {
+                          label: t("navbar.profile.currentPassword"),
+                          name: "currentPassword",
+                          type: "password",
+                        },
+                        {
+                          label: t("navbar.profile.newPassword"),
+                          name: "newPassword",
+                          type: "password",
+                        },
+                        {
+                          label: t("navbar.profile.confirmNewPassword"),
+                          name: "confirmNewPassword",
+                          type: "password",
+                        },
+                      ].map((field) => (
+                        <div
+                          key={field.name}
+                          className="flex items-center space-x-2"
+                        >
+                          <div className="flex-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              {field.label}
+                            </label>
+                            <input
+                              type={field.type}
+                              name={field.name}
+                              value={personalForm[field.name]}
+                              onChange={handlePersonalFormChange}
+                              aria-label={field.label}
+                              aria-describedby={`${field.name}-error`}
+                              tabIndex={0}
+                              className="block w-full px-3 py-2 border-2 border-gray-800 bg-white rounded-lg shadow-lg focus:outline-none focus:ring-[var(--color-accent)] focus:border-gray-800 transition-all duration-200 text-sm"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end mt-6 space-x-2">
+              <button
+                onClick={handleClosePersonalModal}
+                className="px-4 py-2 bg-red-600 text-white rounded-full text-sm hover:bg-red-700 transition-all duration-300 shadow-sm"
+              >
+                {t("events.cancel")}
+              </button>
+              <button
+                onClick={handlePersonalFormSubmit}
+                className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-full text-sm hover:bg-[var(--color-secondary)] transition-all duration-300 shadow-sm"
+              >
+                {t("navbar.profile.save")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Company Details Modal */}
+      {showCompanyModal && (
+        <div className="fixed inset-0 bg-gray-700 top-[550px] bg-opacity-70 flex items-center justify-center z-50 px-2 sm:px-4 animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 w-full max-w-xs sm:max-w-md lg:max-w-lg relative border-2 border-gray-800 transform transition-all duration-300 scale-95 hover:scale-100">
+            <h2 className="text-lg sm:text-xl font-bold text-[var(--color-primary)] mb-4 text-center">
+              {t("navbar.profile.updateCompany")}
+            </h2>
+            <div className="space-y-4">
+              {[
+                {
+                  label: t("navbar.profile.companyName"),
+                  name: "name",
+                  type: "text",
+                },
+                {
+                  label: t("navbar.profile.email"),
+                  name: "email",
+                  type: "email",
+                },
+                {
+                  label: t("navbar.profile.phone"),
+                  name: "phone",
+                  type: "text",
+                },
+                {
+                  label: t("navbar.profile.website"),
+                  name: "website",
+                  type: "text",
+                },
+                {
+                  label: t("navbar.profile.address.street"),
+                  name: "address.street",
+                  type: "text",
+                },
+                {
+                  label: t("navbar.profile.address.city"),
+                  name: "address.city",
+                  type: "text",
+                },
+                {
+                  label: t("navbar.profile.address.state"),
+                  name: "address.state",
+                  type: "text",
+                },
+                {
+                  label: t("navbar.profile.address.postalCode"),
+                  name: "address.postalCode",
+                  type: "text",
+                },
+                {
+                  label: t("navbar.profile.address.country"),
+                  name: "address.country",
+                  type: "text",
+                },
+                {
+                  label: t("navbar.profile.industry"),
+                  name: "industry",
+                  type: "select",
+                  options: [
+                    { value: "", label: t("navbar.profile.selectIndustry") },
+                    ...[
+                      "Technology",
+                      "Retail",
+                      "Finance",
+                      "Healthcare",
+                      "Education",
+                      "Real Estate",
+                      "Manufacturing",
+                      "Hospitality",
+                      "Transportation",
+                      "Entertainment",
+                      "Energy",
+                      "Construction",
+                      "Agriculture",
+                      "Telecommunications",
+                      "Aerospace",
+                      "Nonprofit",
+                      "Consulting",
+                      "Government",
+                      "Fashion",
+                      "Food & Beverage",
+                      "Sports",
+                      "E-commerce",
+                      "Media",
+                      "Legal Services",
+                      "Software Development",
+                      "Hardware Development",
+                      "Biotechnology",
+                      "Pharmaceuticals",
+                      "Automotive",
+                      "Logistics",
+                      "Gaming",
+                      "Public Relations",
+                      "Event Management",
+                      "Advertising",
+                      "Tourism",
+                      "Mining",
+                      "Chemical Industry",
+                      "Art & Design",
+                      "Publishing",
+                      "Music & Performing Arts",
+                      "Environmental Services",
+                      "Security Services",
+                      "Research & Development",
+                      "Wholesale",
+                      "Human Resources",
+                      "Insurance",
+                      "Digital Marketing",
+                      "Data Analytics",
+                      "Waste Management",
+                      "Marine Industry",
+                      "Electronics",
+                      "Medical Devices",
+                      "Architecture",
+                      "Fitness & Wellness",
+                      "Agritech",
+                      "Fintech",
+                      "Edtech",
+                      "Healthtech",
+                      "Proptech",
+                      "SaaS",
+                      "Cybersecurity",
+                      "Nanotechnology",
+                      "Blockchain",
+                      "Artificial Intelligence",
+                      "Other",
+                    ].map((industry) => ({
+                      value: industry,
+                      label: t(`navbar.profile.industries.${industry}`),
+                    })),
+                  ],
+                },
+                {
+                  label: t("navbar.profile.taxId"),
+                  name: "taxId",
+                  type: "text",
+                },
+              ].map((field) => (
+                <div key={field.name} className="flex items-center space-x-2">
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {field.label}
+                    </label>
+                    {field.type === "select" ? (
+                      <select
+                        name={field.name}
+                        value={
+                          field.name.includes("address.")
+                            ? companyForm.address[field.name.split(".")[1]]
+                            : companyForm[field.name]
+                        }
+                        onChange={handleCompanyFormChange}
+                        disabled={!editableFields[field.name]}
+                        aria-label={field.label}
+                        tabIndex={0}
+                        className={`block w-full px-3 py-2 border-2 ${
+                          editableFields[field.name]
+                            ? "border-gray-800 bg-white"
+                            : "border-gray-400 bg-gray-100"
+                        } rounded-lg shadow-lg focus:outline-none focus:ring-[var(--color-accent)] focus:border-gray-800 transition-all duration-200 text-sm`}
+                      >
+                        {field.options.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type={field.type}
+                        name={field.name}
+                        value={
+                          field.name.includes("address.")
+                            ? companyForm.address[field.name.split(".")[1]]
+                            : companyForm[field.name]
+                        }
+                        onChange={handleCompanyFormChange}
+                        disabled={!editableFields[field.name]}
+                        aria-label={field.label}
+                        tabIndex={0}
+                        className={`block w-full px-3 py-2 border-2 ${
+                          editableFields[field.name]
+                            ? "border-gray-800 bg-white"
+                            : "border-gray-400 bg-gray-100"
+                        } rounded-lg shadow-lg focus:outline-none focus:ring-[var(--color-accent)] focus:border-gray-800 transition-all duration-200 text-sm`}
+                      />
+                    )}
+                  </div>
+                  <button
+                    onClick={() => toggleFieldEdit(field.name)}
+                    className="p-2 pt-8 flex text-white rounded-full hover:bg-[var(--color-secondary)] transition-all duration-200 shadow-sm border-none"
+                    title={
+                      editableFields[field.name]
+                        ? t("navbar.profile.lock")
+                        : t("navbar.profile.edit")
+                    }
+                  >
+                    <FaEdit className="w-6 h-6 text-[var(--color-accent)]" />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-end mt-6 space-x-2">
+              <button
+                onClick={handleCloseCompanyModal}
+                className="px-4 py-2 bg-red-600 text-white rounded-full text-sm hover:bg-red-700 transition-all duration-300 shadow-sm"
+              >
+                {t("events.cancel")}
+              </button>
+              <button
+                onClick={handleCompanyFormSubmit}
+                className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-full text-sm hover:bg-[var(--color-secondary)] transition-all duration-300 shadow-sm disabled:opacity-50"
+                disabled={Object.keys(editableFields).length === 0}
+              >
+                {t("navbar.profile.save")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Custom Animations */}
       <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;
             transform: translateY(20px);
-                     to {
-              opacity: 1;
-              transform: translateY(0);
-            }
           }
-          @keyframes slideDown {
-            from {
-              opacity: 0;
-              transform: translateY(-10px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
+          to {
+            opacity: 1;
+            transform: translateY(0);
           }
-          .animate-fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
           }
-          .animate-slide-down {
-            animation: slideDown 0.3s ease-out forwards;
+          to {
+            opacity: 1;
+            transform: translateY(0);
           }
-          .group:hover .group-hover\\:w-full {
-            width: 100%;
+        }
+        @keyframes profileDropdown {
+          0% {
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
           }
-          .group:hover .group-hover\\:left-0 {
-            left: 0;
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
           }
-        `}</style>
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease-out forwards;
+        }
+        .animate-slide-down {
+          animation: slideDown 0.3s ease-out forwards;
+        }
+        .animate-profile-dropdown {
+          animation: profileDropdown 0.3s ease-out forwards;
+        }
+        .group:hover .group-hover\\:w-full {
+          width: 100%;
+        }
+        .group:hover .group-hover\\:left-0 {
+          left: 0;
+        }
+      `}</style>
     </nav>
   );
 };

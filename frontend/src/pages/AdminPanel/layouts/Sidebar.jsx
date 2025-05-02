@@ -295,9 +295,10 @@ const Sidebar = () => {
 
   return (
     <div
-      className={`hidden md:block w-56 lg:w-64 bg-primary text-white  shadow-xl fixed top-16 ${
-        isRTL ? "right-0" : "left-0"
-      } z-50 animate-fade-in`}
+      className={`hidden md:block w-56 lg:w-64  bg-primary 
+        h-[80vh] overflow-y-auto text-white  shadow-xl fixed top-16 ${
+          isRTL ? "right-0" : "left-0"
+        } z-50 animate-fade-in`}
     >
       {/* Header */}
       <div className="p-4 text-xl font-bold border-b  border-secondary text-center drop-shadow-md">

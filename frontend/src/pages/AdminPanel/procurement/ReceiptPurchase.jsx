@@ -158,7 +158,7 @@ const ReceiptPurchase = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-primary"></div>
           </div>
         ) : filteredData && filteredData.length > 0 ? (
-          <div className="bg-accent rounded-xl shadow-md overflow-x-auto">
+          <div className="bg-bg rounded-xl shadow-md overflow-x-auto">
             <table className="min-w-full text-text">
               <thead className="bg-button-bg text-button-text">
                 <tr>
@@ -228,7 +228,7 @@ const ReceiptPurchase = () => {
                         </td>
                       </tr>
                       {isExpanded && (
-                        <tr className="bg-accent">
+                        <tr className="bg-bg">
                           <td
                             colSpan={7}
                             className="py-3 px-4 text-sm text-text"

@@ -31,6 +31,9 @@ import CustomerOrderRoutes from "./routes/CustomerOrder.route.js";
 import ProcurementProposalRoutes from "./routes/ProcurementProposal.route.js";
 import PerformanceReviewRoutes from "./routes/performanceReview.route.js";
 import chatRoutes from "./routes/chat.route.js";
+import shiftsRoutes from "./routes/Shifts.route.js";
+import payRateRoute from "./routes/payRate.route.js";
+import salaryRoute from "./routes/salary.route.js";
 
 dotenv.config();
 
@@ -73,6 +76,9 @@ app.use("/api/CustomerOrder", CustomerOrderRoutes);
 app.use("/api/proposals", ProcurementProposalRoutes);
 app.use("/api/PerformanceReview", PerformanceReviewRoutes);
 app.use("/api/chatAi", chatRoutes);
+app.use("/api/shifts", shiftsRoutes);
+app.use("/api/payRate", payRateRoute);
+app.use("/api/salary", salaryRoute);
 
 app.post("/save-pdf", (req, res) => {
   const { pdfData, fileName } = req.body;

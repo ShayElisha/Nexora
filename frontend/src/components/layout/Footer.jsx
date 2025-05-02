@@ -5,11 +5,11 @@ const Footer = () => {
   const { t } = useTranslation();
 
   return (
-    <footer className="bg-primary text-text py-6">
+    <footer className="bg-primary text-white py-6">
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
         {/* Section 1: Logo and Description */}
         <div className="mb-4 md:mb-0">
-          <h1 className="text-primary text-xl font-bold">
+          <h1 className="text-accent text-xl font-bold">
             {t("footer.company_name")}
           </h1>
           <p className="text-sm mt-2">{t("footer.description")}</p>

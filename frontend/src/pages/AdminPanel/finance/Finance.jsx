@@ -216,8 +216,8 @@ const Finance = () => {
   };
 
   return (
-    <div className="flex min-h-screen animate-fade-in">
-      <div className="flex-1 container mx-auto max-w-full p-4 sm:p-6 lg:p-8">
+    <div className="flex min-h-screen  animate-fade-in">
+      <div className="flex-1 container bg-bg mx-auto max-w-full p-4 sm:p-6 lg:p-8">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-center mb-4 sm:mb-6 text-text tracking-tight drop-shadow-md">
           {t("finance.title")}
         </h1>

@@ -1105,7 +1105,7 @@ const ProductList = () => {
                   <React.Fragment key={item._id}>
                     <tr
                       className={`border-b border-border-color transition-all duration-300 ${
-                        index % 2 === 0 ? "bg-bg" : "bg-accent"
+                        index % 2 === 0 ? "bg-bg" : "bg-bg"
                       } hover:bg-secondary hover:shadow-inner cursor-pointer`}
                       onClick={() => handleToggleRow(item._id)}
                     >
@@ -1308,7 +1308,7 @@ const ProductList = () => {
 
   return (
     <div className="min-h-screen  p-6 animate-fade-in">
-      <div className="container mx-auto max-w-screen-xl">
+      <div className="container mx-auto max-w-full">
         <div className="bg-bg rounded-2xl shadow-2xl p-6 sm:p-8 border border-border-color transform transition-all duration-500 hover:shadow-3xl">
           <h1 className="text-3xl font-extrabold text-text mb-6 text-center tracking-tight drop-shadow-md">
             {t("inventory.Product_Inventory_List")}

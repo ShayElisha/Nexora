@@ -38,6 +38,41 @@ export const createCompany = async (req, res) => {
   }
 };
 
+export const getCompanyById = async (req, res) => {
+  try {
+    const token= req.cookies["auth_token"];
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const id = decodedToken.companyId;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Company ID is required" });
+    }
+
+    // Check if the company exists
+    const company = await Companies.findById(id);
+    if (!company) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Company not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: company,
+    });
+  } catch (error) {
+    console.error("Error retrieving company:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error retrieving company",
+      error: error.message,
+    });
+  }
+};
 // update a company
 export const updateCompany = async (req, res) => {
   try {

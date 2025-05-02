@@ -53,6 +53,10 @@ import ProcurementProposals from "./pages/employeePages/manageProducts/Procureme
 import ProcurementProposalsList from "./pages/AdminPanel/procurement/ProcurementProposals.jsx";
 import AddPerformanceReview from "./pages/AdminPanel/performanceReview/AddPerformanceReview.jsx";
 import PerformanceReview from "./pages/AdminPanel/performanceReview/PerformanceReview.jsx";
+import JobPercentages from "./pages/AdminPanel/shifts/JobPercentages.jsx";
+import ShiftsList from "./pages/AdminPanel/shifts/ShiftsList.jsx";
+import MyShifts from "./pages/AdminPanel/shifts/MyShifts.jsx";
+import Salary from "./pages/AdminPanel/Salary/Salary.jsx";
 
 const App = () => {
   const { data: authUser, isLoading } = useQuery({
@@ -170,6 +174,10 @@ const App = () => {
             <Route path="products" element={<ProductList />} />
             <Route path="Events" element={<Events />} />
             <Route path="add-product" element={<AddProduct />} />
+            <Route path="job-percentages" element={<JobPercentages />} />
+            <Route path="Shifts-List" element={<ShiftsList />} />
+            <Route path="My-Shifts" element={<MyShifts />} />
+            <Route path="salary" element={<Salary />} />
             <Route
               path="add-supplier"
               element={<AddSupplier authUser={authUser} />}

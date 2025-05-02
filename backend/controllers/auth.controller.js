@@ -18,12 +18,17 @@ export const signUp = async (req, res) => {
       phone,
       department,
       address,
+      role,
+      paymentType,
+      hourlySalary,
+      globalSalary,
+      expectedHours,
     } = req.body;
-    let role = req.body.role; // מוגדר בנפרד, עם let
 
     const profileImageFile = req.file;
+    const profileImageUrl = req.body.profileImageUrl || "";
 
-    // בדיקה בסיסית שכל השדות ההכרחיים מולאו
+    // Basic validation for required fields
     if (
       !name ||
       !lastName ||
@@ -32,11 +37,12 @@ export const signUp = async (req, res) => {
       !identity ||
       !password ||
       !phone ||
-      !address
+      !address ||
+      !paymentType
     ) {
       return res.status(400).json({
         success: false,
-        message: "All fields are required ",
+        message: "All required fields must be provided",
       });
     }
 
@@ -48,16 +54,49 @@ export const signUp = async (req, res) => {
     ) {
       return res.status(400).json({
         success: false,
-        message: "Address must include street, city, postal code and country",
+        message: "Address must include street, city, country, and postal code",
       });
     }
 
-    // העלאת התמונה לענן (Cloudinary למשל) אם נשלחה
-    let profileImageURL = "";
+    // Validate paymentType and salary fields
+    if (!["Hourly", "Global", "Commission-Based"].includes(paymentType)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid payment type",
+      });
+    }
+
+    if (paymentType === "Hourly") {
+      if (hourlySalary == null || hourlySalary < 0) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "hourlySalary is required and must be non-negative for Hourly payment type",
+        });
+      }
+    } else if (paymentType === "Global") {
+      if (globalSalary == null || globalSalary < 0) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "globalSalary is required and must be non-negative for Global payment type",
+        });
+      }
+      if (expectedHours == null || expectedHours < 0) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "expectedHours is required and must be non-negative for Global payment type",
+        });
+      }
+    }
+
+    // Handle profile image upload
+    let finalProfileImageUrl = profileImageUrl;
     if (profileImageFile) {
       try {
         const imageResult = await uploadToCloudinary(profileImageFile);
-        profileImageURL = imageResult.url;
+        finalProfileImageUrl = imageResult.url;
       } catch (error) {
         console.error("Error uploading image to Cloudinary:", error);
         return res.status(500).json({
@@ -67,24 +106,13 @@ export const signUp = async (req, res) => {
       }
     }
 
-    // ========================
-    // שליפת מזהה החברה (companyId)
-    // ========================
-    let companyId;
-
-    // 1) קודם כל בודקים אם הוא מגיע דרך ה־Query Param / Param
-    //    למשל /sign-up/:companyId או /sign-up?companyId=xxx
-    companyId =
+    // Resolve companyId
+    let companyId =
       req.params.companyId || req.query.companyId || req.body.companyId;
-    console.log("companyId:", companyId);
 
-    // 2) אם לא הגיע companyId בפרמטרים, נבדוק אם יש Token עם companyId
     if (!companyId) {
       const token =
         req.cookies["email_approved_jwt"] || req.cookies["auth_token"];
-
-      // אם אין טוקן – לא נוכל לשלוף מזהה חברה ונחזיר שגיאה
-      console.log("token:", token);
       if (!token) {
         return res.status(401).json({
           success: false,
@@ -96,35 +124,38 @@ export const signUp = async (req, res) => {
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
         companyId = decodedToken.companyId;
       } catch (error) {
-        return res
-          .status(401)
-          .json({ success: false, message: "Invalid token" });
+        return res.status(401).json({
+          success: false,
+          message: "Invalid token",
+        });
       }
     }
 
-    // עכשיו companyId אמור להיות מוגדר אם הגיע מטוקן או מהלינק
     if (!companyId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "No company ID provided" });
+      return res.status(400).json({
+        success: false,
+        message: "No company ID provided",
+      });
     }
 
-    // שליפת החברה מה־DB לבדיקה
+    // Verify company exists
     const company = await Company.findById(companyId);
     if (!company) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Company not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Company not found",
+      });
     }
 
-    // בדיקת סטטוס חברה, במידה ורלוונטי
+    // Check company status
     if (company.status !== "Active") {
-      return res
-        .status(403)
-        .json({ success: false, message: "Company is not approved yet" });
+      return res.status(403).json({
+        success: false,
+        message: "Company is not approved yet",
+      });
     }
 
-    // בדיקה אם כבר קיים מנהל (Admin) תחת החברה הזו
+    // Check for existing admin
     const existingAdmin = await Employee.findOne({ companyId, role: "Admin" });
     if (existingAdmin && role === "Admin") {
       return res.status(403).json({
@@ -133,24 +164,27 @@ export const signUp = async (req, res) => {
       });
     }
 
-    // בדיקה האם המייל הזה כבר תפוס תחת אותה חברה
+    // Check for duplicate email or identity
     const existingUser = await Employee.findOne({ companyId, email, identity });
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: "Email already exists under this company",
+        message: "Email or identity already exists under this company",
       });
     }
+
+    // Set role to Admin for the first employee
+    let finalRole = role || "";
     const firstEmp = await Employee.find({ companyId });
     if (firstEmp.length === 0) {
-      role = "Admin";
+      finalRole = "Admin";
     }
 
-    // Hashing לסיסמה
+    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // יצירת עובד חדש
+    // Create new employee
     const newEmployee = new Employee({
       companyId,
       name,
@@ -159,16 +193,21 @@ export const signUp = async (req, res) => {
       gender,
       identity,
       password: hashedPassword,
-      department,
-      role,
+      department: department || null,
+      role: finalRole,
       phone,
       address,
-      profileImage: profileImageURL,
+      profileImage: finalProfileImageUrl,
+      paymentType,
+      hourlySalary: paymentType === "Hourly" ? hourlySalary : null,
+      globalSalary: paymentType === "Global" ? globalSalary : null,
+      expectedHours: paymentType === "Global" ? expectedHours : null,
+      status: "active",
     });
 
     await newEmployee.save();
 
-    // ניקוי הטוקן (אם קיים) של אימות המייל
+    // Clear email approval token if present
     if (req.cookies["email_approved_jwt"]) {
       res.clearCookie("email_approved_jwt");
     }
@@ -182,11 +221,16 @@ export const signUp = async (req, res) => {
         email: newEmployee.email,
         role: newEmployee.role,
         companyId: newEmployee.companyId,
+        paymentType: newEmployee.paymentType,
       },
     });
   } catch (error) {
     console.error("Error in signup controller:", error.message);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 };
 
@@ -273,7 +317,6 @@ export const getCurrentUser = async (req, res) => {
         company: user.companyId,
         profileImage: user.profileImage,
         pack: pack.planName,
-        subscription: Payment.subscription || null, // Include subscription
       },
     });
   } catch (error) {

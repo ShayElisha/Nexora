@@ -74,6 +74,9 @@ const SignUpForm = () => {
         t("signUpForm.validation.gender_required")
       )
       .required(t("signUpForm.validation.gender_required")),
+    identity: Yup.string().required(
+      t("signUpForm.validation.identity_required")
+    ),
     address: Yup.object({
       street: Yup.string().required(t("signUpForm.validation.street_required")),
       city: Yup.string().required(t("signUpForm.validation.city_required")),
@@ -86,6 +89,42 @@ const SignUpForm = () => {
     }),
     department: Yup.string().notRequired(),
     role: Yup.string().notRequired(),
+    paymentType: Yup.string()
+      .oneOf(
+        ["Hourly", "Global", "Commission-Based"],
+        t("signUpForm.validation.payment_type_invalid")
+      )
+      .required(t("signUpForm.validation.payment_type_required")),
+    hourlySalary: Yup.number()
+      .when("paymentType", {
+        is: "Hourly",
+        then: (schema) =>
+          schema
+            .min(0, t("signUpForm.validation.hourly_salary_min"))
+            .required(t("signUpForm.validation.hourly_salary_required")),
+        otherwise: (schema) => schema.notRequired(),
+      })
+      .nullable(),
+    globalSalary: Yup.number()
+      .when("paymentType", {
+        is: "Global",
+        then: (schema) =>
+          schema
+            .min(0, t("signUpForm.validation.global_salary_min"))
+            .required(t("signUpForm.validation.global_salary_required")),
+        otherwise: (schema) => schema.notRequired(),
+      })
+      .nullable(),
+    expectedHours: Yup.number()
+      .when("paymentType", {
+        is: "Global",
+        then: (schema) =>
+          schema
+            .min(0, t("signUpForm.validation.expected_hours_min"))
+            .required(t("signUpForm.validation.expected_hours_required")),
+        otherwise: (schema) => schema.notRequired(),
+      })
+      .nullable(),
   });
 
   const formik = useFormik({
@@ -100,6 +139,10 @@ const SignUpForm = () => {
       department: "",
       role: "",
       address: { street: "", city: "", country: "", postalCode: "" },
+      paymentType: "Global",
+      hourlySalary: "",
+      globalSalary: "",
+      expectedHours: "",
     },
     validationSchema,
     onSubmit: async (values) => {
@@ -111,7 +154,7 @@ const SignUpForm = () => {
       formData.append("password", values.password);
       formData.append("phone", values.phone);
       formData.append("gender", values.gender);
-      formData.append("identity", values.identity || "");
+      formData.append("identity", values.identity);
       if (!authUser && companyIdFromQuery)
         formData.append("companyId", companyIdFromQuery);
       if (authUser) {
@@ -122,6 +165,13 @@ const SignUpForm = () => {
       formData.append("address[city]", values.address.city);
       formData.append("address[country]", values.address.country);
       formData.append("address[postalCode]", values.address.postalCode);
+      formData.append("paymentType", values.paymentType);
+      if (values.hourlySalary)
+        formData.append("hourlySalary", values.hourlySalary);
+      if (values.globalSalary)
+        formData.append("globalSalary", values.globalSalary);
+      if (values.expectedHours)
+        formData.append("expectedHours", values.expectedHours);
       if (profileImageFile) formData.append("profileImage", profileImageFile);
       else if (profileImageUrl)
         formData.append("profileImageUrl", profileImageUrl);
@@ -163,6 +213,7 @@ const SignUpForm = () => {
             name="name"
             placeholder={t("signUpForm.placeholders.first_name")}
             formik={formik}
+            ariaRequired="true"
           />
           <InputField
             label={t("signUpForm.form.last_name")}
@@ -170,6 +221,7 @@ const SignUpForm = () => {
             name="lastName"
             placeholder={t("signUpForm.placeholders.last_name")}
             formik={formik}
+            ariaRequired="true"
           />
         </div>
 
@@ -179,8 +231,10 @@ const SignUpForm = () => {
             label={t("signUpForm.form.email")}
             icon={<Mail />}
             name="email"
+            type="email"
             placeholder={t("signUpForm.placeholders.email")}
             formik={formik}
+            ariaRequired="true"
           />
           <PasswordField
             label={t("signUpForm.form.password")}
@@ -190,6 +244,8 @@ const SignUpForm = () => {
             formik={formik}
             showPassword={showPassword}
             setShowPassword={setShowPassword}
+            ariaRequired="true"
+            t={t}
           />
         </div>
 
@@ -201,10 +257,11 @@ const SignUpForm = () => {
             name="identity"
             placeholder={t("signUpForm.placeholders.identity")}
             formik={formik}
+            ariaRequired="true"
           />
           <div className="flex-1">
             <label className="block text-sm font-medium text-text mb-1">
-              {t("signUpForm.form.gender")}
+              {t("signUpForm.form.gender")} <span aria-hidden="true">*</span>
             </label>
             <div className="flex items-center space-x-4">
               {["Male", "Female", "Other"].map((gender) => (
@@ -215,7 +272,9 @@ const SignUpForm = () => {
                     value={gender}
                     checked={formik.values.gender === gender}
                     onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
                     className="form-radio text-primary focus:ring-primary"
+                    aria-label={t(`signUpForm.options.${gender.toLowerCase()}`)}
                   />
                   <span className="ml-2 text-text">
                     {t(`signUpForm.options.${gender.toLowerCase()}`)}
@@ -234,7 +293,7 @@ const SignUpForm = () => {
         {/* Row 4: Phone */}
         <div className="flex-1">
           <label className="block text-sm font-medium text-text mb-1">
-            {t("signUpForm.form.phone")}
+            {t("signUpForm.form.phone")} <span aria-hidden="true">*</span>
           </label>
           <PhoneInput
             country={"us"}
@@ -247,9 +306,20 @@ const SignUpForm = () => {
             placeholder={t("signUpForm.placeholders.enter_phone")}
             value={formik.values.phone}
             onChange={(phone) => formik.setFieldValue("phone", phone)}
+            onBlur={() => formik.setFieldTouched("phone", true)}
+            inputProps={{
+              "aria-required": "true",
+              "aria-invalid": formik.touched.phone && !!formik.errors.phone,
+              "aria-describedby":
+                formik.touched.phone && formik.errors.phone
+                  ? "phone-error"
+                  : undefined,
+            }}
           />
           {formik.touched.phone && formik.errors.phone && (
-            <p className="text-sm text-red-500 mt-1">{formik.errors.phone}</p>
+            <p id="phone-error" className="text-sm text-red-500 mt-1">
+              {formik.errors.phone}
+            </p>
           )}
         </div>
 
@@ -261,6 +331,7 @@ const SignUpForm = () => {
             name="address.street"
             placeholder={t("signUpForm.placeholders.street")}
             formik={formik}
+            ariaRequired="true"
           />
           <InputField
             label={t("signUpForm.form.city")}
@@ -268,15 +339,36 @@ const SignUpForm = () => {
             name="address.city"
             placeholder={t("signUpForm.placeholders.city")}
             formik={formik}
+            ariaRequired="true"
           />
         </div>
 
-        {/* Row 6: Department & Role (only if authUser) */}
+        {/* Row 6: Address (Country & Postal Code) */}
+        <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+          <InputField
+            label={t("signUpForm.form.country")}
+            icon={<MapPin />}
+            name="address.country"
+            placeholder={t("signUpForm.placeholders.country")}
+            formik={formik}
+            ariaRequired="true"
+          />
+          <InputField
+            label={t("signUpForm.form.postal_code")}
+            icon={<MapPin />}
+            name="address.postalCode"
+            placeholder={t("signUpForm.placeholders.postal_code")}
+            formik={formik}
+            ariaRequired="true"
+          />
+        </div>
+
+        {/* Row 7: Department & Role (only if authUser) */}
         {authUser && (
           <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
             <div className="flex-1">
               <label className="block text-sm font-medium text-text mb-1">
-                {t("signUpForm.form.department") || "בחר מחלקה"}
+                {t("signUpForm.form.department")}
               </label>
               <div className="flex items-center space-x-2">
                 <div className="relative flex-1">
@@ -284,11 +376,12 @@ const SignUpForm = () => {
                     name="department"
                     value={formik.values.department}
                     onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
                     className="w-full py-2 pl-3 pr-8 rounded-md border border-border-color bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                    aria-label={t("signUpForm.form.department")}
                   >
                     <option value="">
-                      {t("signUpForm.placeholders.department_select") ||
-                        "בחר מחלקה..."}
+                      {t("signUpForm.placeholders.department_select")}
                     </option>
                     {isLoadingDepts ? (
                       <option disabled>{t("loading")}</option>
@@ -305,6 +398,7 @@ const SignUpForm = () => {
                   type="button"
                   onClick={() => setIsAddDeptModalOpen(true)}
                   className="inline-flex items-center p-2 bg-secondary text-button-text rounded-md hover:bg-accent transition-all duration-200"
+                  aria-label={t("signUpForm.buttons.add_department")}
                 >
                   <Plus className="w-4 h-4" />
                 </button>
@@ -316,36 +410,85 @@ const SignUpForm = () => {
               )}
             </div>
             <InputField
-              label={t("signUpForm.form.role") || "Role"}
-              icon={<MapPin />}
+              label={t("signUpForm.form.role")}
+              icon={<User />}
               name="role"
-              placeholder={
-                t("signUpForm.placeholders.role") || "Enter your role"
-              }
+              placeholder={t("signUpForm.placeholders.role")}
               formik={formik}
             />
           </div>
         )}
 
-        {/* Row 7: Address (Country & Postal Code) */}
+        {/* Row 8: Payment Type & Salary Fields */}
         <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-          <InputField
-            label={t("signUpForm.form.country")}
-            icon={<MapPin />}
-            name="address.country"
-            placeholder={t("signUpForm.placeholders.country")}
-            formik={formik}
-          />
-          <InputField
-            label={t("signUpForm.form.postal_code")}
-            icon={<MapPin />}
-            name="address.postalCode"
-            placeholder={t("signUpForm.placeholders.postal_code")}
-            formik={formik}
-          />
+          <div className="flex-1">
+            <label className="block text-sm font-medium text-text mb-1">
+              {t("signUpForm.form.payment_type")}{" "}
+              <span aria-hidden="true">*</span>
+            </label>
+            <select
+              name="paymentType"
+              value={formik.values.paymentType}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className="w-full py-2 pl-3 pr-8 rounded-md border border-border-color bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+              aria-required="true"
+              aria-label={t("signUpForm.form.payment_type")}
+            >
+              <option value="Global">{t("signUpForm.options.global")}</option>
+              <option value="Hourly">{t("signUpForm.options.hourly")}</option>
+              <option value="Commission-Based">
+                {t("signUpForm.options.commission_based")}
+              </option>
+            </select>
+            {formik.touched.paymentType && formik.errors.paymentType && (
+              <p className="text-sm text-red-500 mt-1">
+                {formik.errors.paymentType}
+              </p>
+            )}
+          </div>
+          {formik.values.paymentType === "Hourly" && (
+            <InputField
+              label={t("signUpForm.form.hourly_salary")}
+              icon={<User />}
+              name="hourlySalary"
+              type="number"
+              placeholder={t("signUpForm.placeholders.hourly_salary")}
+              formik={formik}
+              ariaRequired="true"
+              min="0"
+              step="0.01"
+            />
+          )}
+          {formik.values.paymentType === "Global" && (
+            <>
+              <InputField
+                label={t("signUpForm.form.global_salary")}
+                icon={<User />}
+                name="globalSalary"
+                type="number"
+                placeholder={t("signUpForm.placeholders.global_salary")}
+                formik={formik}
+                ariaRequired="true"
+                min="0"
+                step="0.01"
+              />
+              <InputField
+                label={t("signUpForm.form.expected_hours")}
+                icon={<User />}
+                name="expectedHours"
+                type="number"
+                placeholder={t("signUpForm.placeholders.expected_hours")}
+                formik={formik}
+                ariaRequired="true"
+                min="0"
+                step="0.1"
+              />
+            </>
+          )}
         </div>
 
-        {/* Profile Image (Optional) */}
+        {/* Row 9: Profile Image (Optional) */}
         <div className="flex-1">
           <label className="block text-sm font-medium text-text mb-1">
             {t("signUpForm.form.profile_image")} ({t("optional")})
@@ -355,6 +498,7 @@ const SignUpForm = () => {
               type="button"
               className="p-2 bg-secondary rounded-md hover:bg-accent transition-all duration-200"
               onClick={() => document.getElementById("fileInput").click()}
+              aria-label={t("signUpForm.buttons.upload_image")}
             >
               <Send className="text-button-text" />
             </button>
@@ -371,6 +515,7 @@ const SignUpForm = () => {
               value={profileImageUrl}
               onChange={(e) => setProfileImageUrl(e.target.value)}
               className="w-full py-2 px-3 border border-border-color rounded-md bg-bg text-text placeholder-secondary focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+              aria-label={t("signUpForm.form.profile_image_url")}
             />
           </div>
           {(profileImageFile || profileImageUrl) && (
@@ -388,6 +533,7 @@ const SignUpForm = () => {
                 type="button"
                 onClick={removeProfileImage}
                 className="absolute -top-2 -right-2 bg-button-bg text-button-text hover:bg-secondary rounded-full p-1 shadow transition-all duration-200"
+                aria-label={t("signUpForm.buttons.remove_image")}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -422,31 +568,64 @@ const SignUpForm = () => {
 };
 
 // InputField Component
-const InputField = ({ label, icon, name, placeholder, formik }) => (
+const InputField = ({
+  label,
+  icon,
+  name,
+  placeholder,
+  formik,
+  type = "text",
+  ariaRequired,
+  min,
+  step,
+}) => (
   <div className="flex-1">
-    <label className="block text-sm font-medium text-text mb-1">{label}</label>
+    <label className="block text-sm font-medium text-text mb-1">
+      {label}
+      {ariaRequired && <span aria-hidden="true">*</span>}
+    </label>
     <div className="relative">
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary">
-        {icon}
-      </div>
+      {icon && (
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary">
+          {icon}
+        </div>
+      )}
       <input
-        type="text"
+        type={type}
         name={name}
         placeholder={placeholder}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
         value={formik.getFieldProps(name).value}
-        className={`pl-10 w-full py-2 rounded-md border border-border-color bg-bg text-text placeholder-secondary focus:ring-2 focus:ring-primary focus:border-primary shadow-sm transition-all duration-200 ${
+        min={min}
+        step={step}
+        className={`w-full py-2 rounded-md border border-border-color bg-bg text-text placeholder-secondary focus:ring-2 focus:ring-primary focus:border-primary shadow-sm transition-all duration-200 ${
+          icon ? "pl-10" : "pl-3"
+        } ${
           formik.touched[name.split(".")[0]] &&
           formik.errors[name.split(".")[0]]
             ? "border-red-500"
             : ""
         }`}
+        aria-required={ariaRequired}
+        aria-invalid={
+          formik.touched[name.split(".")[0]] &&
+          !!formik.errors[name.split(".")[0]]
+        }
+        aria-describedby={
+          formik.touched[name.split(".")[0]] &&
+          formik.errors[name.split(".")[0]]
+            ? `${name.replace(".", "-")}-error`
+            : undefined
+        }
       />
     </div>
     {formik.touched[name.split(".")[0]] &&
       formik.errors[name.split(".")[0]] && (
-        <p className="text-sm text-red-500 mt-1">
+        <p
+          id={`${name.replace(".", "-")}-error`}
+          className="text-sm text-red-500 mt-1"
+        >
           {formik.errors[name.split(".")[0]]}
         </p>
       )}
@@ -462,9 +641,14 @@ const PasswordField = ({
   formik,
   showPassword,
   setShowPassword,
+  ariaRequired,
+  t,
 }) => (
   <div className="flex-1">
-    <label className="block text-sm font-medium text-text mb-1">{label}</label>
+    <label className="block text-sm font-medium text-text mb-1">
+      {label}
+      {ariaRequired && <span aria-hidden="true">*</span>}
+    </label>
     <div className="relative">
       <div className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary">
         {icon}
@@ -479,17 +663,31 @@ const PasswordField = ({
         className={`pl-10 pr-10 w-full py-2 rounded-md border border-border-color bg-bg text-text placeholder-secondary focus:ring-2 focus:ring-primary focus:border-primary shadow-sm transition-all duration-200 ${
           formik.touched[name] && formik.errors[name] ? "border-red-500" : ""
         }`}
+        aria-required={ariaRequired}
+        aria-invalid={formik.touched[name] && !!formik.errors[name]}
+        aria-describedby={
+          formik.touched[name] && formik.errors[name]
+            ? `${name}-error`
+            : undefined
+        }
       />
       <button
         type="button"
         onClick={() => setShowPassword(!showPassword)}
         className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-accent transition-colors duration-200"
+        aria-label={
+          showPassword
+            ? t("signUpForm.aria.hide_password")
+            : t("signUpForm.aria.show_password")
+        }
       >
         {showPassword ? <EyeOff /> : <Eye />}
       </button>
     </div>
     {formik.touched[name] && formik.errors[name] && (
-      <p className="text-sm text-red-500 mt-1">{formik.errors[name]}</p>
+      <p id={`${name}-error`} className="text-sm text-red-500 mt-1">
+        {formik.errors[name]}
+      </p>
     )}
   </div>
 );

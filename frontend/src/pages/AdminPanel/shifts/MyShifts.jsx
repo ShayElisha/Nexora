@@ -1,39 +1,35 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import axiosInstance from "../../../lib/axios";
+import toast from "react-hot-toast";
 
 const MyShifts = () => {
+  const { t } = useTranslation();
   const [shifts, setShifts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [expandedRow, setExpandedRow] = useState(null); // Track which row is expanded
+  const [expandedRow, setExpandedRow] = useState(null);
 
-  // Fetch user's shifts
   const fetchMyShifts = async () => {
     setLoading(true);
     try {
       const response = await axiosInstance.get("/shifts/my");
       setShifts(response.data.data);
     } catch (err) {
-      setError(
-        err.response?.data?.message || "שגיאה בשליפת המשמרות. אנא נסה שוב."
-      );
+      toast.error(t("myShifts.errorFetchingShifts") + " " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Load shifts on component mount
   useEffect(() => {
     fetchMyShifts();
   }, []);
 
-  // Calculate job percentage
   const calculateJobPercentage = (hoursWorked, fullTimeHours = 42) => {
     if (!hoursWorked || !fullTimeHours) return "0.0";
     return ((hoursWorked / fullTimeHours) * 100).toFixed(1);
   };
 
-  // Format date and time
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("he-IL", {
       year: "numeric",
@@ -50,59 +46,60 @@ const MyShifts = () => {
     });
   };
 
-  // Toggle row expansion
   const toggleRow = (shiftId) => {
     setExpandedRow(expandedRow === shiftId ? null : shiftId);
   };
 
-  // Map rateType to Hebrew
   const getRateTypeLabel = (rateType) => {
-    switch (rateType) {
-      case "Regular":
-        return "רגיל";
-      case "Overtime125":
-        return "נוספות 125%";
-      case "Overtime150":
-        return "נוספות 150%";
-      case "Night":
-        return "לילה";
-      case "Holiday":
-        return "חג";
-      case "Rest":
-        return "מנוחה";
-      default:
-        return rateType;
-    }
+    return t(`myShifts.rateTypes.${rateType}`);
   };
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6 text-center">המשמרות שלי</h2>
-
-      {error && (
-        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>
-      )}
+      <h2 className="text-2xl font-bold mb-6 text-center">
+        {t("myShifts.myShifts")}
+      </h2>
 
       {loading ? (
-        <div className="text-center text-gray-500">טוען...</div>
+        <div className="text-center text-gray-500">{t("myShifts.loading")}</div>
       ) : shifts.length === 0 ? (
-        <div className="text-center text-gray-500">לא נמצאו משמרות.</div>
+        <div className="text-center text-gray-500">
+          {t("myShifts.noShiftsFound")}
+        </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white shadow-md rounded-lg">
             <thead>
               <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                <th className="py-3 px-6 text-right">תאריך</th>
-                <th className="py-3 px-6 text-right">שעת התחלה</th>
-                <th className="py-3 px-6 text-right">שעת סיום</th>
-                <th className="py-3 px-6 text-right">שעות עבודה</th>
-                <th className="py-3 px-6 text-right">סוג משמרת</th>
-                <th className="py-3 px-6 text-right">סוג יום</th>
-                <th className="py-3 px-6 text-right">חלוקת שעות</th>
-                <th className="py-3 px-6 text-right">שכר שעתי</th>
-                <th className="py-3 px-6 text-right">שכר כולל</th>
-                <th className="py-3 px-6 text-right">אחוזי משרה</th>
-                <th className="py-3 px-6 text-right">הערות</th>
+                <th className="py-3 px-6 text-right">{t("myShifts.date")}</th>
+                <th className="py-3 px-6 text-right">
+                  {t("myShifts.startTime")}
+                </th>
+                <th className="py-3 px-6 text-right">
+                  {t("myShifts.endTime")}
+                </th>
+                <th className="py-3 px-6 text-right">
+                  {t("myShifts.hoursWorked")}
+                </th>
+                <th className="py-3 px-6 text-right">
+                  {t("myShifts.shiftType")}
+                </th>
+                <th className="py-3 px-6 text-right">
+                  {t("myShifts.dayType")}
+                </th>
+                <th className="py-3 px-6 text-right">
+                  {t("myShifts.shiftBreakdown")}
+                </th>
+                <th className="py-3 px-6 text-right">
+                  {t("myShifts.hourlySalary")}
+                </th>
+                <th className="py-3 px-6 text-right">
+                  {t("myShifts.totalPay")}
+                </th>
+                <th className="py-3 px-6 text-right">
+                  {t("myShifts.jobPercentage")}
+                </th>
+                <th className="py-3 px-6 text-right">{t("myShifts.notes")}</th>
               </tr>
             </thead>
             <tbody className="text-gray-600 text-sm font-light">
@@ -125,18 +122,14 @@ const MyShifts = () => {
                       {shift.hoursWorked.toFixed(2)}
                     </td>
                     <td className="py-3 px-6 text-right">
-                      {shift.shiftType === "Day" ? "יום" : "לילה"}
+                      {t(`myShifts.shiftTypes.${shift.shiftType}`)}
                     </td>
                     <td className="py-3 px-6 text-right">
-                      {shift.dayType === "Regular"
-                        ? "רגיל"
-                        : shift.dayType === "Holiday"
-                        ? "חג"
-                        : "מנוחה"}
+                      {t(`myShifts.dayTypes.${shift.dayType}`)}
                     </td>
                     <td className="py-3 px-6 text-right">
                       {shift.shiftBreakdown && shift.shiftBreakdown.length > 0
-                        ? "לחץ לפירוט"
+                        ? t("myShifts.clickForDetails")
                         : "-"}
                     </td>
                     <td className="py-3 px-6 text-right">
@@ -159,16 +152,20 @@ const MyShifts = () => {
                         <td colSpan="11" className="bg-gray-50 p-4">
                           <div className="border rounded-lg p-4 bg-white shadow-sm">
                             <h3 className="text-lg font-semibold mb-2">
-                              פירוט חלוקת שעות
+                              {t("myShifts.breakdownDetails")}
                             </h3>
                             <table className="w-full text-sm">
                               <thead>
                                 <tr className="bg-gray-100">
                                   <th className="py-2 px-4 text-right">
-                                    סוג שעות
+                                    {t("myShifts.rateType")}
                                   </th>
-                                  <th className="py-2 px-4 text-right">שעות</th>
-                                  <th className="py-2 px-4 text-right">מקדם</th>
+                                  <th className="py-2 px-4 text-right">
+                                    {t("myShifts.hours")}
+                                  </th>
+                                  <th className="py-2 px-4 text-right">
+                                    {t("myShifts.multiplier")}
+                                  </th>
                                 </tr>
                               </thead>
                               <tbody>

@@ -1,17 +1,25 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import axiosInstance from "../../../lib/axios";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaFilePdf } from "react-icons/fa";
+import { jsPDF } from "jspdf";
+import toast from "react-hot-toast";
 
 const Salary = () => {
+  const { t } = useTranslation();
   const [salaries, setSalaries] = useState([]);
+  const [taxConfigs, setTaxConfigs] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [expandedRow, setExpandedRow] = useState(null);
   const [editingSalary, setEditingSalary] = useState(null);
-  const [newTax, setNewTax] = useState({ description: "", percentage: "" });
-  const [showTaxForm, setShowTaxForm] = useState(null);
+  const [taxCalcInput, setTaxCalcInput] = useState({
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+    taxConfigId: "",
+  });
+  const [showPayslipModal, setShowPayslipModal] = useState(false);
+  const [payslipUrl, setPayslipUrl] = useState("");
 
-  // Fetch salaries grouped by employee
   const fetchSalaries = async () => {
     setLoading(true);
     try {
@@ -32,69 +40,64 @@ const Salary = () => {
           ...deduction,
           amount: Number(deduction.amount).toFixed(2),
         })),
+        currency: salary.currency || "ILS",
       }));
       setSalaries(formattedSalaries);
     } catch (err) {
-      setError(
-        err.response?.data?.message || "שגיאה בשליפת המשכורות. אנא נסה שוב."
-      );
+      toast.error(t("salary.errorFetchingSalaries") + " " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Load salaries on component mount
+  const fetchTaxConfigs = async () => {
+    try {
+      const response = await axiosInstance.get("/tax-config");
+      setTaxConfigs(response.data.data.filter((config) => config.isActive));
+    } catch (err) {
+      toast.error(t("salary.errorFetchingTaxConfigs") + " " + err.message);
+    }
+  };
+
   useEffect(() => {
     fetchSalaries();
+    fetchTaxConfigs();
   }, []);
 
-  // Format date
   const formatDate = (date) => {
-    return new Date(date).toLocaleDateString("he-IL", {
+    return new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
     });
   };
 
-  // Format status
   const formatStatus = (status) => {
-    switch (status) {
-      case "Draft":
-        return "טיוטה";
-      case "Approved":
-        return "מאושר";
-      case "Paid":
-        return "שולם";
-      case "Canceled":
-        return "בוטל";
-      default:
-        return status;
-    }
+    return t(`salary.status.${status}`);
   };
 
-  // Toggle row expansion
+  const formatCurrency = (currency) => {
+    return t(`salary.currencies.${currency}`);
+  };
+
   const toggleRow = (salaryId) => {
     setExpandedRow(expandedRow === salaryId ? null : salaryId);
   };
 
-  // Handle edit button click
   const handleEdit = (salary) => {
     setEditingSalary({ ...salary });
+    toast(t("salary.editMode"));
   };
 
-  // Handle input change for editing
   const handleInputChange = (e, field) => {
     const value = field === "status" ? e.target.value : e.target.value;
     setEditingSalary({ ...editingSalary, [field]: value });
   };
 
-  // Handle tax input change
-  const handleTaxInputChange = (e, field) => {
-    setNewTax({ ...newTax, [field]: e.target.value });
+  const handleTaxCalcInputChange = (e, field) => {
+    setTaxCalcInput({ ...taxCalcInput, [field]: e.target.value });
   };
 
-  // Save edited salary
   const saveEdit = async () => {
     try {
       await axiosInstance.put(`/salary/${editingSalary._id}`, editingSalary);
@@ -104,96 +107,390 @@ const Salary = () => {
         )
       );
       setEditingSalary(null);
+      fetchSalaries();
+      toast.success(t("salary.updatedSuccess"));
     } catch (err) {
-      setError("שגיאה בעדכון המשכורת. אנא נסה שוב.");
+      toast.error(t("salary.errorUpdatingSalary") + " " + err.message);
     }
   };
 
-  // Cancel editing
   const cancelEdit = () => {
     setEditingSalary(null);
+    toast(t("salary.cancelled"));
   };
 
-  // Add new tax deduction
-  const addTaxDeduction = async (salaryId) => {
-    if (!newTax.description || !newTax.percentage || newTax.percentage <= 0) {
-      setError("אנא מלא תיאור ואחוז תקין עבור המס.");
-      return;
-    }
+  const calculateTaxesForMonth = async (e) => {
+    e.preventDefault();
+
+    setLoading(true);
 
     try {
-      const salary = salaries.find((s) => s._id === salaryId);
-      const taxPercentage = Number(newTax.percentage);
-      const taxAmount = (
-        (taxPercentage / 100) *
-        Number(salary.totalPay)
-      ).toFixed(2);
-      const newDeduction = {
-        description: newTax.description,
-        amount: taxAmount,
-      };
-      const updatedDeductions = [...salary.otherDeductions, newDeduction];
-      const totalDeductions = updatedDeductions.reduce(
-        (sum, d) => sum + Number(d.amount),
-        0
-      );
-      const updatedTaxDeduction = Number(salary.taxDeduction || 0);
-      const updatedNetPay = (
-        Number(salary.totalPay) -
-        (updatedTaxDeduction + totalDeductions)
-      ).toFixed(2);
-
-      const updatedSalary = {
-        ...salary,
-        otherDeductions: updatedDeductions,
-        netPay: updatedNetPay,
+      const payload = {
+        year: Number(taxCalcInput.year),
+        month: Number(taxCalcInput.month),
+        taxConfigId: taxCalcInput.taxConfigId,
       };
 
-      await axiosInstance.put(`/salary/${salaryId}`, updatedSalary);
-      setSalaries(
-        salaries.map((s) => (s._id === salaryId ? updatedSalary : s))
+      if (!payload.taxConfigId) {
+        throw new Error(t("salary.selectTaxConfig"));
+      }
+
+      const response = await axiosInstance.post(
+        "/salary/calculate-taxes-for-month",
+        payload
       );
-      setNewTax({ description: "", percentage: "" });
-      setShowTaxForm(null);
+      toast.success(response.data.message);
+      fetchSalaries();
     } catch (err) {
-      setError("שגיאה בהוספת המס. אנא נסה שוב.");
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        t("salary.errorCalculatingTax");
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Cancel adding tax
-  const cancelAddTax = () => {
-    setNewTax({ description: "", percentage: "" });
-    setShowTaxForm(null);
+  const generatePayslip = (salary) => {
+    try {
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      doc.setFont("Helvetica");
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+
+      const textLeft = (text, x, y, maxWidth = 180) => {
+        doc.text(text, x, y, { align: "left", maxWidth });
+      };
+
+      const textRight = (text, x, y, maxWidth = 180) => {
+        doc.text(text, x, y, { align: "right", maxWidth });
+      };
+
+      const addTableRow = (
+        x,
+        y,
+        col1,
+        col2,
+        col3,
+        col4,
+        col5,
+        isHeader = false
+      ) => {
+        if (isHeader) {
+          doc.setFillColor(200, 200, 200);
+          doc.rect(x, y - 4, 170, 8, "F");
+        }
+        textLeft(col1, x, y);
+        textLeft(col2, x + 40, y);
+        textLeft(col3, x + 80, y);
+        textLeft(col4, x + 110, y);
+        textLeft(col5, x + 140, y);
+      };
+
+      doc.setFontSize(14);
+      textLeft(t("salary.payslip"), 20, 10);
+      doc.setFontSize(10);
+      textLeft(t("salary.companyName"), 20, 18);
+      textLeft(t("salary.companyId"), 20, 24);
+      textLeft(`${t("salary.date")}: ${formatDate(new Date())}`, 20, 30);
+      textLeft(
+        `${t("salary.payPeriod")}: ${formatDate(
+          salary.periodStart
+        )} - ${formatDate(salary.periodEnd)}`,
+        20,
+        36
+      );
+      textRight(`${t("salary.employee")}: ${salary.employeeName}`, 190, 18);
+      textRight(
+        `${t("salary.id")}: ${salary.employeeId?.idNumber || "N/A"}`,
+        190,
+        24
+      );
+      textRight(
+        `${t("salary.address")}: ${salary.employeeId?.address || "N/A"}`,
+        190,
+        30
+      );
+      textRight(
+        `${t("salary.startDate")}: ${salary.employeeId?.startDate || "N/A"}`,
+        190,
+        36
+      );
+
+      let yPos = 50;
+      textLeft(t("salary.earnings"), 20, yPos);
+      yPos += 8;
+      addTableRow(
+        20,
+        yPos,
+        t("salary.code"),
+        t("salary.description"),
+        t("salary.hours"),
+        t("salary.value"),
+        t("salary.total"),
+        true
+      );
+      yPos += 8;
+      addTableRow(
+        20,
+        yPos,
+        "001",
+        t("salary.baseSalary"),
+        salary.totalHours,
+        salary.totalPay,
+        salary.totalPay
+      );
+      if (salary.bonus && Number(salary.bonus) > 0) {
+        addTableRow(
+          20,
+          yPos + 8,
+          "006",
+          t("salary.bonus"),
+          "",
+          salary.bonus,
+          salary.bonus
+        );
+        yPos += 8;
+      }
+      yPos += 8;
+      addTableRow(
+        20,
+        yPos,
+        "103",
+        t("salary.totalPayments"),
+        "",
+        "",
+        (Number(salary.totalPay) + Number(salary.bonus)).toFixed(2)
+      );
+
+      yPos += 16;
+      textLeft(t("salary.deductions"), 20, yPos);
+      yPos += 8;
+      addTableRow(
+        20,
+        yPos,
+        t("salary.code"),
+        t("salary.description"),
+        t("salary.rate"),
+        t("salary.value"),
+        t("salary.total"),
+        true
+      );
+      yPos += 8;
+      if (salary.taxDeduction && Number(salary.taxDeduction) > 0) {
+        addTableRow(
+          20,
+          yPos,
+          "107",
+          t("salary.incomeTax"),
+          "",
+          salary.taxDeduction,
+          salary.taxDeduction
+        );
+        yPos += 8;
+      }
+      salary.otherDeductions.forEach((deduction, index) => {
+        addTableRow(
+          20,
+          yPos,
+          `10${8 + index}`,
+          deduction.description,
+          "",
+          deduction.amount,
+          deduction.amount
+        );
+        yPos += 8;
+      });
+      yPos += 8;
+      const totalDeductions = (
+        Number(salary.taxDeduction) +
+        salary.otherDeductions.reduce((sum, d) => sum + Number(d.amount), 0)
+      ).toFixed(2);
+      addTableRow(
+        20,
+        yPos,
+        "",
+        t("salary.totalDeductions"),
+        "",
+        "",
+        totalDeductions
+      );
+
+      yPos += 16;
+      textLeft(t("salary.netPay"), 20, yPos);
+      yPos += 8;
+      addTableRow(
+        20,
+        yPos,
+        "",
+        t("salary.netAmountPayable"),
+        "",
+        "",
+        salary.netPay
+      );
+
+      yPos += 16;
+      textLeft(t("salary.signature"), 20, yPos);
+      textRight(`${t("salary.date")}: ${formatDate(new Date())}`, 190, yPos);
+
+      const pdfBlob = doc.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      setPayslipUrl(pdfUrl);
+      setShowPayslipModal(true);
+
+      doc.save(`payslip_${salary.employeeName.replace(/\s+/g, "_")}.pdf`);
+      toast.success(t("salary.payslipGenerated"));
+    } catch (err) {
+      toast.error(t("salary.errorGeneratingPayslip") + err.message);
+    }
+  };
+
+  const closePayslipModal = () => {
+    setShowPayslipModal(false);
+    setPayslipUrl("");
+    toast(t("salary.modalClosed"));
   };
 
   return (
     <div className="max-w-full mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6 text-center">רשימת משכורות</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center">
+        {t("salary.salaryList")}
+      </h2>
 
-      {error && (
-        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>
+      <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+        <h3 className="text-lg font-semibold mb-4">
+          {t("salary.calculateTaxForMonth")}
+        </h3>
+        <div className="flex gap-4 mb-4">
+          <div className="flex-1">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              {t("salary.year")}
+            </label>
+            <input
+              type="number"
+              value={taxCalcInput.year}
+              onChange={(e) => handleTaxCalcInputChange(e, "year")}
+              className="border p-2 rounded w-full"
+              placeholder={t("salary.yearPlaceholder")}
+              required
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              {t("salary.month")}
+            </label>
+            <select
+              value={taxCalcInput.month}
+              onChange={(e) => handleTaxCalcInputChange(e, "month")}
+              className="border p-2 rounded w-full"
+              required
+            >
+              <option value="">{t("salary.selectMonth")}</option>
+              {[...Array(12)].map((_, i) => (
+                <option key={i + 1} value={i + 1}>
+                  {t(`salary.months.${i + 1}`)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex-1">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              {t("salary.taxConfig")}
+            </label>
+            <select
+              value={taxCalcInput.taxConfigId}
+              onChange={(e) => handleTaxCalcInputChange(e, "taxConfigId")}
+              className="border p-2 rounded w-full"
+              required
+            >
+              <option value="">{t("salary.selectTaxConfig")}</option>
+              {taxConfigs.map((config) => (
+                <option key={config._id} value={config._id}>
+                  {`${config.taxName} (${config.countryCode}, ${config.currency})`}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <button
+          onClick={calculateTaxesForMonth}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          disabled={loading}
+        >
+          {loading ? t("salary.calculating") : t("salary.calculateTaxForMonth")}
+        </button>
+      </div>
+
+      {showPayslipModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl">
+            <h3 className="text-lg font-semibold mb-4">
+              {t("salary.payslip")}
+            </h3>
+            <iframe
+              src={payslipUrl}
+              className="w-full h-[600px] border rounded"
+              title={t("salary.payslipPreview")}
+            ></iframe>
+            <div className="flex justify-end gap-4 mt-4">
+              <a
+                href={payslipUrl}
+                download={`payslip_${
+                  salaries
+                    .find(
+                      (s) => s._id === (editingSalary?._id || salaries[0]?._id)
+                    )
+                    ?.employeeName.replace(/\s+/g, "_") || "payslip"
+                }.pdf`}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              >
+                {t("salary.downloadPDF")}
+              </a>
+              <button
+                onClick={closePayslipModal}
+                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              >
+                {t("salary.close")}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {loading ? (
-        <div className="text-center text-gray-500">טוען...</div>
+        <div className="text-center text-gray-500">{t("salary.loading")}</div>
       ) : salaries.length === 0 ? (
-        <div className="text-center text-gray-500">לא נמצאו משכורות.</div>
+        <div className="text-center text-gray-500">
+          {t("salary.noSalariesFound")}
+        </div>
       ) : (
         <div className="overflow-x-auto ml-[100px]">
           <table className="min-w-full bg-white shadow-md rounded-lg">
             <thead>
               <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                <th className="py-3 px-6 text-right">עובד</th>
-                <th className="py-3 px-6 text-right">תקופה</th>
-                <th className="py-3 px-6 text-right">שעות עבודה</th>
-                <th className="py-3 px-6 text-right">שכר ברוטו</th>
-                <th className="py-3 px-6 text-right">בונוס</th>
-                <th className="py-3 px-6 text-right">מס הכנסה</th>
-                <th className="py-3 px-6 text-right">ניכויים נוספים</th>
-                <th className="py-3 px-6 text-right">שכר נטו</th>
-                <th className="py-3 px-6 text-right">סטטוס</th>
-                <th className="py-3 px-6 text-right">הערות</th>
-                <th className="py-3 px-6 text-right">פעולות</th>
+                <th className="py-3 px-6 text-left">{t("salary.employee")}</th>
+                <th className="py-3 px-6 text-left">{t("salary.period")}</th>
+                <th className="py-3 px-6 text-left">
+                  {t("salary.totalHours")}
+                </th>
+                <th className="py-3 px-6 text-left">{t("salary.totalPay")}</th>
+                <th className="py-3 px-6 text-left">{t("salary.bonus")}</th>
+                <th className="py-3 px-6 text-left">
+                  {t("salary.taxDeduction")}
+                </th>
+                <th className="py-3 px-6 text-left">
+                  {t("salary.otherDeductions")}
+                </th>
+                <th className="py-3 px-6 text-left">{t("salary.netPay")}</th>
+                <th className="py-3 px-6 text-left">{t("salary.Status")}</th>
+                <th className="py-3 px-6 text-left">{t("salary.notes")}</th>
+                <th className="py-3 px-6 text-left">{t("salary.actions")}</th>
               </tr>
             </thead>
             <tbody className="text-gray-600 text-sm font-light">
@@ -203,15 +500,13 @@ const Salary = () => {
                     onClick={() => toggleRow(salary._id)}
                     className="border-b border-gray-200 hover:bg-gray-100 cursor-pointer"
                   >
-                    <td className="py-3 px-6 text-right">
+                    <td className="py-3 px-6 text-left">
                       {salary.employeeName}
                     </td>
-                    <td className="py-3 px-6 text-right">
-                      {`${formatDate(salary.periodStart)} - ${formatDate(
-                        salary.periodEnd
-                      )}`}
-                    </td>
-                    <td className="py-3 px-6 text-right">
+                    <td className="py-3 px-6 text-left">{`${formatDate(
+                      salary.periodStart
+                    )} - ${formatDate(salary.periodEnd)}`}</td>
+                    <td className="py-3 px-6 text-left">
                       {editingSalary && editingSalary._id === salary._id ? (
                         <input
                           type="number"
@@ -224,7 +519,7 @@ const Salary = () => {
                         salary.totalHours
                       )}
                     </td>
-                    <td className="py-3 px-6 text-right">
+                    <td className="py-3 px-6 text-left">
                       {editingSalary && editingSalary._id === salary._id ? (
                         <input
                           type="number"
@@ -234,10 +529,10 @@ const Salary = () => {
                           className="border p-1 rounded"
                         />
                       ) : (
-                        `₪${salary.totalPay}`
+                        `${formatCurrency(salary.currency)}${salary.totalPay}`
                       )}
                     </td>
-                    <td className="py-3 px-6 text-right">
+                    <td className="py-3 px-6 text-left">
                       {editingSalary && editingSalary._id === salary._id ? (
                         <input
                           type="number"
@@ -247,10 +542,10 @@ const Salary = () => {
                           className="border p-1 rounded"
                         />
                       ) : (
-                        `₪${salary.bonus}`
+                        `${formatCurrency(salary.currency)}${salary.bonus}`
                       )}
                     </td>
-                    <td className="py-3 px-6 text-right">
+                    <td className="py-3 px-6 text-left">
                       {editingSalary && editingSalary._id === salary._id ? (
                         <input
                           type="number"
@@ -260,16 +555,18 @@ const Salary = () => {
                           className="border p-1 rounded"
                         />
                       ) : (
-                        `₪${salary.taxDeduction}`
+                        `${formatCurrency(salary.currency)}${
+                          salary.taxDeduction
+                        }`
                       )}
                     </td>
-                    <td className="py-3 px-6 text-right">
+                    <td className="py-3 px-6 text-left">
                       {salary.otherDeductions &&
                       salary.otherDeductions.length > 0
-                        ? "לחץ לפירוט"
+                        ? t("salary.clickForDetails")
                         : "-"}
                     </td>
-                    <td className="py-3 px-6 text-right">
+                    <td className="py-3 px-6 text-left">
                       {editingSalary && editingSalary._id === salary._id ? (
                         <input
                           type="number"
@@ -279,26 +576,34 @@ const Salary = () => {
                           className="border p-1 rounded"
                         />
                       ) : (
-                        `₪${salary.netPay}`
+                        `${formatCurrency(salary.currency)}${salary.netPay}`
                       )}
                     </td>
-                    <td className="py-3 px-6 text-right">
+                    <td className="py-3 px-6 text-left">
                       {editingSalary && editingSalary._id === salary._id ? (
                         <select
                           value={editingSalary.status}
                           onChange={(e) => handleInputChange(e, "status")}
                           className="border p-1 rounded"
                         >
-                          <option value="Draft">טיוטה</option>
-                          <option value="Approved">מאושר</option>
-                          <option value="Paid">שולם</option>
-                          <option value="Canceled">בוטל</option>
+                          <option value="Draft">
+                            {t("salary.status.Draft")}
+                          </option>
+                          <option value="Approved">
+                            {t("salary.status.Approved")}
+                          </option>
+                          <option value="Paid">
+                            {t("salary.status.Paid")}
+                          </option>
+                          <option value="Canceled">
+                            {t("salary.status.Canceled")}
+                          </option>
                         </select>
                       ) : (
                         formatStatus(salary.status)
                       )}
                     </td>
-                    <td className="py-3 px-6 text-right">
+                    <td className="py-3 px-6 text-left">
                       {editingSalary && editingSalary._id === salary._id ? (
                         <input
                           type="text"
@@ -310,85 +615,48 @@ const Salary = () => {
                         salary.notes || "-"
                       )}
                     </td>
-                    <td className="py-3 px-6 text-right">
-                      {editingSalary && editingSalary._id === salary._id ? (
-                        <div>
-                          <button
-                            onClick={saveEdit}
-                            className="bg-green-500 text-white px-2 py-1 rounded mr-2"
-                          >
-                            שמור
-                          </button>
-                          <button
-                            onClick={cancelEdit}
-                            className="bg-red-500 text-white px-2 py-1 rounded"
-                          >
-                            בטל
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <FaEdit
-                            className="text-blue-500 cursor-pointer"
-                            onClick={() => handleEdit(salary)}
-                          />
-                          <button
-                            onClick={() => setShowTaxForm(salary._id)}
-                            className="bg-blue-500 text-white px-2 py-1 rounded"
-                          >
-                            הוסף מס
-                          </button>
-                        </div>
-                      )}
+                    <td className="py-3 px-6 text-left">
+                      <div className="flex items-center gap-2">
+                        {editingSalary && editingSalary._id === salary._id ? (
+                          <>
+                            <button
+                              onClick={saveEdit}
+                              className="bg-green-500 text-white px-2 py-1 rounded"
+                            >
+                              {t("salary.save")}
+                            </button>
+                            <button
+                              onClick={cancelEdit}
+                              className="bg-red-500 text-white px-2 py-1 rounded"
+                            >
+                              {t("salary.cancel")}
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <FaEdit
+                              className="text-blue-500 cursor-pointer"
+                              onClick={() => handleEdit(salary)}
+                            />
+                            <FaFilePdf
+                              className={`text-red-500 cursor-pointer ${
+                                !salary.taxDeduction ||
+                                !salary.otherDeductions.length
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : ""
+                              }`}
+                              onClick={() =>
+                                salary.taxDeduction &&
+                                salary.otherDeductions.length
+                                  ? generatePayslip(salary)
+                                  : null
+                              }
+                            />
+                          </>
+                        )}
+                      </div>
                     </td>
                   </tr>
-                  {showTaxForm === salary._id && (
-                    <tr>
-                      <td colSpan="11" className="bg-gray-50 p-4">
-                        <div className="border rounded-lg p-4 bg-white shadow-sm">
-                          <h3 className="text-lg font-semibold mb-2">
-                            הוספת מס
-                          </h3>
-                          <div className="flex gap-4 mb-4">
-                            <input
-                              type="text"
-                              placeholder="תיאור המס"
-                              value={newTax.description}
-                              onChange={(e) =>
-                                handleTaxInputChange(e, "description")
-                              }
-                              className="border p-2 rounded w-full"
-                            />
-                            <input
-                              type="number"
-                              step="0.01"
-                              placeholder="אחוז המס (%)"
-                              value={newTax.percentage}
-                              onChange={(e) =>
-                                handleTaxInputChange(e, "percentage")
-                              }
-                              className="border p-2 rounded w-full"
-                            />
-                          </div>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => addTaxDeduction(salary._id)}
-                              className="bg-green-500 text-white px-4 py-2 rounded"
-                            >
-                              הוסף
-                            </button>
-                            <button
-                              onClick={cancelAddTax}
-                              className="bg-red-500 text-white px-4 py-2 rounded"
-                            >
-                              בטל
-                            </button>
-                            Parque Nacional de Komodo
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
                   {expandedRow === salary._id &&
                     salary.otherDeductions &&
                     salary.otherDeductions.length > 0 && (
@@ -396,15 +664,17 @@ const Salary = () => {
                         <td colSpan="11" className="bg-gray-50 p-4">
                           <div className="border rounded-lg p-4 bg-white shadow-sm">
                             <h3 className="text-lg font-semibold mb-2">
-                              פירוט ניכויים
+                              {t("salary.deductionDetails")}
                             </h3>
                             <table className="w-full text-sm">
                               <thead>
                                 <tr className="bg-gray-100">
-                                  <th className="py-2 px-4 text-right">
-                                    תיאור
+                                  <th className="py-2 px-4 text-left">
+                                    {t("salary.description")}
                                   </th>
-                                  <th className="py-2 px-4 text-right">סכום</th>
+                                  <th className="py-2 px-4 text-left">
+                                    {t("salary.amount")}
+                                  </th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -414,11 +684,12 @@ const Salary = () => {
                                       key={index}
                                       className="border-b border-gray-200"
                                     >
-                                      <td className="py-2 px-4 text-right">
+                                      <td className="py-2 px-4 text-left">
                                         {deduction.description}
                                       </td>
-                                      <td className="py-2 px-4 text-right">
-                                        ₪{deduction.amount}
+                                      <td className="py-2 px-4 text-left">
+                                        {formatCurrency(salary.currency)}
+                                        {deduction.amount}
                                       </td>
                                     </tr>
                                   )

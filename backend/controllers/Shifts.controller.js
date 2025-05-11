@@ -292,7 +292,6 @@ export const createShift = async (req, res) => {
         bonus: 0,
         taxDeduction: 0,
         otherDeductions: [],
-        netPay: totalPay,
         shifts: [shift._id],
         status: "Draft",
         notes: "",
@@ -308,10 +307,6 @@ export const createShift = async (req, res) => {
         (sum, d) => sum + Number(d.amount),
         0
       );
-      salary.netPay = (
-        Number(salary.totalPay) -
-        (Number(salary.taxDeduction || 0) + totalDeductions)
-      ).toFixed(2);
     }
 
     await salary.save();
@@ -398,12 +393,10 @@ export const updateShift = async (req, res) => {
       updates.hoursWorked !== undefined &&
       (isNaN(updates.hoursWorked) || updates.hoursWorked < 0)
     ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "שעות עבודה חייבות להיות מספר חיובי",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "שעות עבודה חייבות להיות מספר חיובי",
+      });
     }
     if (
       updates.hourlySalary !== undefined &&
@@ -414,35 +407,29 @@ export const updateShift = async (req, res) => {
         .json({ success: false, message: "שכר שעתי חייב להיות מספר חיובי" });
     }
     if (updates.shiftType && !["Day", "Night"].includes(updates.shiftType)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "סוג משמרת לא תקין. מותר: Day, Night",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "סוג משמרת לא תקין. מותר: Day, Night",
+      });
     }
     if (
       updates.dayType &&
       !["Regular", "Holiday", "RestDay"].includes(updates.dayType)
     ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "סוג יום לא תקין. מותר: Regular, Holiday, RestDay",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "סוג יום לא תקין. מותר: Regular, Holiday, RestDay",
+      });
     }
     if (
       updates.startTime &&
       updates.endTime &&
       new Date(updates.endTime) <= new Date(updates.startTime)
     ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "שעת הסיום חייבת להיות מאוחרת משעת ההתחלה",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "שעת הסיום חייבת להיות מאוחרת משעת ההתחלה",
+      });
     }
 
     // Find shift
@@ -751,10 +738,7 @@ export const updateShift = async (req, res) => {
           (sum, d) => sum + Number(d.amount),
           0
         );
-        oldSalary.netPay = (
-          Number(oldSalary.totalPay) -
-          (Number(oldSalary.taxDeduction || 0) + totalDeductions)
-        ).toFixed(2);
+
         if (oldSalary.shifts.length === 0) {
           await oldSalary.deleteOne();
         } else {
@@ -780,7 +764,6 @@ export const updateShift = async (req, res) => {
           bonus: 0,
           taxDeduction: 0,
           otherDeductions: [],
-          netPay: totalPay.toFixed(2),
           shifts: [shift._id],
           status: "Draft",
           notes: "",
@@ -798,10 +781,6 @@ export const updateShift = async (req, res) => {
           (sum, d) => sum + Number(d.amount),
           0
         );
-        newSalary.netPay = (
-          Number(newSalary.totalPay) -
-          (Number(newSalary.taxDeduction || 0) + totalDeductions)
-        ).toFixed(2);
       }
 
       await newSalary.save();
@@ -824,7 +803,6 @@ export const updateShift = async (req, res) => {
           bonus: 0,
           taxDeduction: 0,
           otherDeductions: [],
-          netPay: totalPay.toFixed(2),
           shifts: [shift._id],
           status: "Draft",
           notes: "",
@@ -848,10 +826,6 @@ export const updateShift = async (req, res) => {
           (sum, d) => sum + Number(d.amount),
           0
         );
-        salary.netPay = (
-          Number(salary.totalPay) -
-          (Number(salary.taxDeduction || 0) + totalDeductions)
-        ).toFixed(2);
       }
 
       await salary.save();
@@ -1033,8 +1007,6 @@ export const deleteShift = async (req, res) => {
       salary.shifts = salary.shifts.filter(
         (shiftId) => shiftId.toString() !== id
       );
-      salary.netPay = salary.totalPay;
-
       if (salary.shifts.length === 0) {
         await salary.deleteOne();
       } else {

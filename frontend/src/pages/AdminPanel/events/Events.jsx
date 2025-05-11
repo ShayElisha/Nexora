@@ -43,11 +43,7 @@ const Events = () => {
   });
 
   // שימוש ב-React Query לטעינת האירועים
-  const {
-    data: eventsData,
-    isLoading: isEventsLoading,
-    error: eventsError,
-  } = useQuery({
+  const { data: eventsData } = useQuery({
     queryKey: ["events"],
     queryFn: async () => {
       const response = await axiosInstance.get("/events");
@@ -57,11 +53,7 @@ const Events = () => {
   const events = eventsData || [];
 
   // שימוש ב-React Query לטעינת רשימת העובדים עבור משתתפים פנימיים
-  const {
-    data: employeesData,
-    isLoading: isEmployeesLoading,
-    error: employeesError,
-  } = useQuery({
+  const { data: employeesData } = useQuery({
     queryKey: ["employees"],
     queryFn: async () => {
       const response = await axiosInstance.get("/employees");

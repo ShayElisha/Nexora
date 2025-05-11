@@ -29,7 +29,7 @@
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
     "lucide-react": "^0.468.0",
-    "pdfmake": "^0.2.18",
+    "pdfmake": "^0.2.19",
     "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
     "react-calendar": "^5.1.0",

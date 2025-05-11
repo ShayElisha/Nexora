@@ -51,6 +51,8 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
     currentPassword: "",
     newPassword: "",
     confirmNewPassword: "",
+    profileImage: "",
+    profileImageFile: null,
   });
   const [companyForm, setCompanyForm] = useState({
     name: "",
@@ -100,7 +102,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
     queryKey: ["users"],
     queryFn: async () => {
       const response = await axiosInstance.get("/employees/me");
-      console.log("Employee details:", response.data); // Debug response
+      console.log("Employee details:", response.data);
       return response.data;
     },
   });
@@ -114,7 +116,6 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
   // Initialize personal form with employee data
   useEffect(() => {
     if (users) {
-      // Handle potential nested data structure (e.g., users.data or users.employee)
       const employeeData = users.data || users.employee || users;
       setPersonalForm({
         name: employeeData.name || "",
@@ -132,6 +133,8 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
         currentPassword: "",
         newPassword: "",
         confirmNewPassword: "",
+        profileImage: employeeData.profileImage || "",
+        profileImageFile: null,
       });
     }
     if (isError) {
@@ -194,14 +197,40 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
         currentPassword,
         newPassword,
         confirmNewPassword,
+        profileImageFile,
+        profileImage,
         ...profileData
       } = data;
+      const formData = new FormData();
+
+      // Append profile data to FormData
+      Object.keys(profileData).forEach((key) => {
+        if (key === "address") {
+          Object.keys(profileData.address).forEach((subKey) => {
+            formData.append(`address.${subKey}`, profileData.address[subKey]);
+          });
+        } else {
+          formData.append(key, profileData[key]);
+        }
+      });
+
+      // Append profile image file if it exists
+      if (profileImageFile) {
+        formData.append("profileImage", profileImageFile);
+      }
+
       const response = await axiosInstance.put(
-        "/auth/update-profile",
-        profileData
+        `/employees/${users.data._id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
+
       if (newPassword && currentPassword) {
-        await axiosInstance.post("/auth/change-password", {
+        await axiosInstance.post("/employees/change-password", {
           currentPassword,
           newPassword,
           confirmNewPassword,
@@ -254,7 +283,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
     enabled: isLoggedIn,
   });
 
-  const { data: badgerData = [] } = useQuery({
+  const { data: budgetData = [] } = useQuery({
     queryKey: ["budget"],
     queryFn: async () => {
       const response = await axiosInstance.get("/budget");
@@ -289,7 +318,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
       )
   );
 
-  const budgetRequiringSignature = badgerData.filter(
+  const budgetRequiringSignature = budgetData.filter(
     (item) =>
       item.status === "Draft" &&
       item.signers?.some(
@@ -564,6 +593,19 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
     setShowCompanyModal(false);
     setShowPersonalModal(true);
     setShowProfileDropdown(false);
+    // Enable editing for all fields when opening the modal
+    setEditableFields({
+      name: true,
+      lastName: true,
+      email: true,
+      gender: true,
+      identity: true,
+      phone: true,
+      "address.street": true,
+      "address.city": true,
+      "address.country": true,
+      "address.postalCode": true,
+    });
   };
 
   const handleClosePersonalModal = () => {
@@ -610,6 +652,12 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
       currentPassword: "",
       newPassword: "",
       confirmNewPassword: "",
+      profileImage:
+        users?.data?.profileImage ||
+        users?.employee?.profileImage ||
+        users?.profileImage ||
+        "",
+      profileImageFile: null,
     });
     setEditableFields({});
   };
@@ -633,7 +681,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
 
   // Handlers: Company Details Modal
   const handleOpenCompanyModal = () => {
-    setShowPersonalModal(false); // סגור את מודל הפרטים האישיים
+    setShowPersonalModal(false);
     setShowCompanyModal(true);
     setShowProfileDropdown(false);
   };
@@ -688,7 +736,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
     {
       label: t("navbar.products"),
       subMenu: [
-        { to: "/dashboard/products", text: t("Policies.all_products") },
+        { to: "/dashboard/products", text: t("navbar.all_products") },
         { to: "/dashboard/add-product", text: t("navbar.add_product") },
       ],
     },
@@ -704,6 +752,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
       subMenu: [
         { to: "/dashboard/Shifts-List", text: t("navbar.Shifts-List") },
         { to: "/dashboard/My-Shifts", text: t("navbar.My-Shifts") },
+        { to: "/dashboard/job-percentages", text: t("navbar.job-percentages") },
       ],
     },
     {
@@ -719,7 +768,45 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
           text: t("navbar.salary"),
         },
         {
-          label: t("navbar.budget"),
+          to: "/dashboard/TaxConfig",
+          text: t("navbar.TaxConfig"),
+        },
+        {
+          to: "/dashboard/Vacation",
+          text: t("navbar.Vacation"),
+        },
+        {
+          label: t("navbar.Vacation"),
+          subMenu: [
+            {
+              to: "/dashboard/Vacation",
+              text: t("navbar.Vacation"),
+            },
+            {
+              to: "/dashboard/use-vacationdays",
+              text: t("navbar.use-vacationdays"),
+            },
+          ],
+        },
+        {
+          label: t("navbar.SickDays"),
+          subMenu: [
+            {
+              to: "/dashboard/sick-days",
+              text: t("navbar.SickDays"),
+            },
+            {
+              to: "/dashboard/add-sickdays",
+              text: t("navbar.add-sickdays"),
+            },
+            {
+              to: "/dashboard/use-sickdays",
+              text: t("navbar.use-sickdays"),
+            },
+          ],
+        },
+        {
+          label: t("navbar.Budget"),
           subMenu: [
             {
               to: "/dashboard/finance/budgets",
@@ -908,12 +995,12 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
   // Render SubMenu
   const renderSubMenu = (subMenu, parentIndex) => {
     return (
-      <ul className="mt-2 space-y-1 pl-4 flex flex-col items-center text-sm lg:text-base">
+      <ul className="mt-2 space-y-1 ps-4 flex flex-col items-start text-sm lg:text-base">
         {subMenu.map((item, subIndex) => {
           const uniqueSubIndex = `${parentIndex}-${subIndex}`;
           if (item.subMenu) {
             return (
-              <li key={uniqueSubIndex} className="relative">
+              <li key={uniqueSubIndex} className="relative w-full">
                 <button
                   type="button"
                   onClick={() => {
@@ -921,18 +1008,18 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                       openSubDropdown === uniqueSubIndex ? null : uniqueSubIndex
                     );
                   }}
-                  className={`w-full py-1 text-[var(--color-primary)] font-medium hover:text-[var(--color-accent)] transition-all duration-300 ease-in-out relative ${
-                    isRTL ? "text-right" : "text-left"
+                  className={`w-full py-1.5 text-[var(--color-primary)] font-medium hover:text-[var(--color-accent)] transition-all duration-300 ease-in-out relative flex items-center justify-between group ${
+                    isRTL ? "text-right " : "text-left"
                   }`}
                 >
                   <span>{item.label}</span>
-                  <span className="absolute top-1/2 left-0 transform -translate-y-1/2 text-xs">
+                  <span className="text-xs transition-transform duration-300">
                     {openSubDropdown === uniqueSubIndex ? "▲" : "▼"}
                   </span>
-                  <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-[var(--color-accent)] transition-all duration-300 ease-in-out group-hover:w-full group-hover:left-0"></span>
+                  <span className="absolute bottom-0 inset-x-0 h-[2px] bg-[var(--color-accent)] scale-x-0 origin-center transition-transform duration-300 ease-in-out group-hover:scale-x-100"></span>
                 </button>
                 {openSubDropdown === uniqueSubIndex && (
-                  <div className="ml-2">
+                  <div className="ps-4">
                     {renderSubMenu(item.subMenu, uniqueSubIndex)}
                   </div>
                 )}
@@ -940,7 +1027,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
             );
           } else {
             return (
-              <li key={uniqueSubIndex}>
+              <li key={uniqueSubIndex} className="w-full">
                 <Link
                   to={item.to}
                   onClick={() => {
@@ -951,12 +1038,12 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                     setIsMenuOpen(false);
                     setShowProfileDropdown(false);
                   }}
-                  className={`block py-1 text-[var(--color-primary)] font-medium hover:text-[var(--color-accent)] transition-all duration-300 ease-in-out relative group ${
+                  className={`block py-1.5 text-[var(--color-primary)] font-medium hover:text-[var(--color-accent)] transition-all duration-300 ease-in-out relative group ${
                     isRTL ? "text-right" : "text-left"
                   }`}
                 >
                   {item.text || item.label}
-                  <span className="absolute bottom-0 left-1/2 w-0 h-[2px] bg-[var(--color-accent)] transition-all duration-300 ease-in-out group-hover:w-full group-hover:left-0"></span>
+                  <span className="absolute bottom-0 inset-x-0 h-[2px] bg-[var(--color-accent)] scale-x-0 origin-center transition-transform duration-300 ease-in-out group-hover:scale-x-100"></span>
                 </Link>
               </li>
             );
@@ -1563,12 +1650,65 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
 
       {/* Personal Details Modal */}
       {showPersonalModal && (
-        <div className="fixed inset-0 bg-gray-700 top-[550px] bg-opacity-70 flex items-center justify-center z-50 px-2 sm:px-4 animate-fade-in">
+        <div className="fixed inset-0 bg-gray-700 top-[500px] bg-opacity-70 flex items-center justify-center z-50 px-2 sm:px-4 animate-fade-in">
           <div className="bg-white p-4 sm:p-6 text-text rounded-2xl shadow-xl w-full max-w-3xl max-h-[80vh] overflow-y-auto relative border-2 border-gray-800 transform transition-all duration-300 scale-95 hover:scale-100">
             <h2 className="text-lg sm:text-xl font-bold text-[var(--color-primary)] mb-4 text-center">
               {t("navbar.profile.updatePersonal")}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Profile Picture Section */}
+              <div className="col-span-1 md:col-span-2 flex justify-center mb-4">
+                <div className="flex flex-col items-center">
+                  <div className="w-24 h-24 rounded-full border-2 border-[var(--color-accent)] overflow-hidden shadow-sm mb-2">
+                    {personalForm.profileImage || authUser?.profileImage ? (
+                      <img
+                        src={
+                          personalForm.profileImage || authUser?.profileImage
+                        }
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div
+                        className={`w-full h-full flex items-center justify-center ${avatarColorClass}`}
+                      >
+                        <span className="text-white text-2xl font-bold">
+                          {authUser?.name?.charAt(0)?.toUpperCase() || "U"}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id="profileImage"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setPersonalForm((prev) => ({
+                          ...prev,
+                          profileImageFile: file,
+                        }));
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          setPersonalForm((prev) => ({
+                            ...prev,
+                            profileImage: reader.result,
+                          }));
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="profileImage"
+                    className="cursor-pointer px-4 py-2 bg-[var(--color-primary)] text-white rounded-full text-sm hover:bg-[var(--color-secondary)] transition-all duration-300 shadow-sm"
+                  >
+                    {t("navbar.profile.uploadImage")}
+                  </label>
+                </div>
+              </div>
               {/* Personal Information Section */}
               <div>
                 <h3 className="text-sm font-semibold text-gray-700 mb-2">
@@ -1580,21 +1720,25 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                       label: t("navbar.profile.firstName"),
                       name: "name",
                       type: "text",
+                      required: true,
                     },
                     {
                       label: t("navbar.profile.lastName"),
                       name: "lastName",
                       type: "text",
+                      required: true,
                     },
                     {
                       label: t("navbar.profile.email"),
                       name: "email",
                       type: "email",
+                      required: true,
                     },
                     {
                       label: t("navbar.profile.gender"),
                       name: "gender",
                       type: "select",
+                      required: true,
                       options: [
                         { value: "", label: t("navbar.profile.selectGender") },
                         { value: "Male", label: t("navbar.profile.male") },
@@ -1606,11 +1750,13 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                       label: t("navbar.profile.identity"),
                       name: "identity",
                       type: "text",
+                      required: true,
                     },
                     {
                       label: t("navbar.profile.phone"),
                       name: "phone",
                       type: "text",
+                      required: true,
                     },
                   ].map((field) => (
                     <div
@@ -1619,7 +1765,10 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                     >
                       <div className="flex-1">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {field.label}
+                          {field.label}{" "}
+                          {field.required && (
+                            <span className="text-red-500">*</span>
+                          )}
                         </label>
                         {field.type === "select" ? (
                           <select
@@ -1627,6 +1776,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                             value={personalForm[field.name]}
                             onChange={handlePersonalFormChange}
                             disabled={!editableFields[field.name]}
+                            required={field.required}
                             aria-label={field.label}
                             tabIndex={0}
                             className={`block w-full px-3 py-2 border-2 ${
@@ -1648,6 +1798,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                             value={personalForm[field.name]}
                             onChange={handlePersonalFormChange}
                             disabled={!editableFields[field.name]}
+                            required={field.required}
                             aria-label={field.label}
                             tabIndex={0}
                             className={`block w-full px-3 py-2 border-2 ${
@@ -1658,22 +1809,10 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                           />
                         )}
                       </div>
-                      <button
-                        onClick={() => toggleFieldEdit(field.name)}
-                        className="p-2 pt-8 text-[var(--color-primary)] rounded-full transition-all duration-200 shadow-sm"
-                        title={
-                          editableFields[field.name]
-                            ? t("navbar.profile.lock")
-                            : t("navbar.profile.edit")
-                        }
-                      >
-                        <FaEdit className="w-4 h-4" />
-                      </button>
                     </div>
                   ))}
                 </div>
               </div>
-
               {/* Address and Password Sections */}
               <div>
                 {/* Address Section */}
@@ -1687,21 +1826,25 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                         label: t("navbar.profile.address.street"),
                         name: "address.street",
                         type: "text",
+                        required: true,
                       },
                       {
                         label: t("navbar.profile.address.city"),
                         name: "address.city",
                         type: "text",
+                        required: true,
                       },
                       {
                         label: t("navbar.profile.address.country"),
                         name: "address.country",
                         type: "text",
+                        required: true,
                       },
                       {
                         label: t("navbar.profile.address.postalCode"),
                         name: "address.postalCode",
                         type: "text",
+                        required: true,
                       },
                     ].map((field) => (
                       <div
@@ -1710,7 +1853,10 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                       >
                         <div className="flex-1">
                           <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {field.label}
+                            {field.label}{" "}
+                            {field.required && (
+                              <span className="text-red-500">*</span>
+                            )}
                           </label>
                           <input
                             type={field.type}
@@ -1720,6 +1866,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                             }
                             onChange={handlePersonalFormChange}
                             disabled={!editableFields[field.name]}
+                            required={field.required}
                             aria-label={field.label}
                             tabIndex={0}
                             className={`block w-full px-3 py-2 border-2 ${
@@ -1729,22 +1876,10 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                             } rounded-lg shadow-lg focus:outline-none focus:ring-[var(--color-accent)] focus:border-gray-800 transition-all duration-200 text-sm`}
                           />
                         </div>
-                        <button
-                          onClick={() => toggleFieldEdit(field.name)}
-                          className="p-2 pt-8 text-[var(--color-primary)] rounded-full transition-all duration-200 shadow-sm"
-                          title={
-                            editableFields[field.name]
-                              ? t("navbar.profile.lock")
-                              : t("navbar.profile.edit")
-                          }
-                        >
-                          <FaEdit className="w-4 h-4" />
-                        </button>
                       </div>
                     ))}
                   </div>
                 </div>
-
                 {/* Password Section */}
                 <div className="mt-6">
                   <h3 className="text-sm font-semibold text-gray-700 mb-2">
@@ -1765,16 +1900,19 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                           label: t("navbar.profile.currentPassword"),
                           name: "currentPassword",
                           type: "password",
+                          required: true,
                         },
                         {
                           label: t("navbar.profile.newPassword"),
                           name: "newPassword",
                           type: "password",
+                          required: true,
                         },
                         {
                           label: t("navbar.profile.confirmNewPassword"),
                           name: "confirmNewPassword",
                           type: "password",
+                          required: true,
                         },
                       ].map((field) => (
                         <div
@@ -1783,13 +1921,17 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                         >
                           <div className="flex-1">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              {field.label}
+                              {field.label}{" "}
+                              {field.required && (
+                                <span className="text-red-500">*</span>
+                              )}
                             </label>
                             <input
                               type={field.type}
                               name={field.name}
                               value={personalForm[field.name]}
                               onChange={handlePersonalFormChange}
+                              required={field.required}
                               aria-label={field.label}
                               aria-describedby={`${field.name}-error`}
                               tabIndex={0}
@@ -1820,7 +1962,6 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
           </div>
         </div>
       )}
-
       {/* Company Details Modal */}
       {showCompanyModal && (
         <div className="fixed inset-0 bg-gray-700 top-[550px] bg-opacity-70 flex items-center justify-center z-50 px-2 sm:px-4 animate-fade-in">

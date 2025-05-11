@@ -17,9 +17,16 @@ import {
   Send,
   X,
   Plus,
+  Calendar,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import AddDepartmentModal from "../../pages/AdminPanel/departments/Add_Department.jsx";
+
+// Utility functions for nested form handling
+const getNestedError = (errors, name) =>
+  name.split(".").reduce((obj, key) => obj && obj[key], errors);
+const getNestedValue = (values, name) =>
+  name.split(".").reduce((obj, key) => obj && obj[key], values) || "";
 
 const SignUpForm = () => {
   const queryClient = useQueryClient();
@@ -77,6 +84,22 @@ const SignUpForm = () => {
     identity: Yup.string().required(
       t("signUpForm.validation.identity_required")
     ),
+    dateOfBirth: Yup.date()
+      .required(t("signUpForm.validation.date_of_birth_required"))
+      .max(new Date(), t("signUpForm.validation.date_of_birth_future"))
+      .test("age", t("signUpForm.validation.date_of_birth_age"), (value) => {
+        const today = new Date();
+        const birthDate = new Date(value);
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (
+          monthDiff < 0 ||
+          (monthDiff === 0 && today.getDate() < birthDate.getDate())
+        ) {
+          return age - 1 >= 16; // Minimum age of 16
+        }
+        return age >= 16;
+      }),
     address: Yup.object({
       street: Yup.string().required(t("signUpForm.validation.street_required")),
       city: Yup.string().required(t("signUpForm.validation.city_required")),
@@ -136,6 +159,7 @@ const SignUpForm = () => {
       phone: "",
       gender: "",
       identity: "",
+      dateOfBirth: "",
       department: "",
       role: "",
       address: { street: "", city: "", country: "", postalCode: "" },
@@ -155,6 +179,7 @@ const SignUpForm = () => {
       formData.append("phone", values.phone);
       formData.append("gender", values.gender);
       formData.append("identity", values.identity);
+      formData.append("dateOfBirth", values.dateOfBirth);
       if (!authUser && companyIdFromQuery)
         formData.append("companyId", companyIdFromQuery);
       if (authUser) {
@@ -181,13 +206,20 @@ const SignUpForm = () => {
           headers: { "Content-Type": "multipart/form-data" },
         });
         if (response.data.success) {
-          toast.success(t("messages.signup_success"));
+          toast.success(t("messages.signup_success"), {
+            position: "top-center",
+          });
           navigate("/login");
         } else {
-          toast.error(response.data.message || t("messages.signup_failed"));
+          toast.error(response.data.message || t("messages.signup_failed"), {
+            position: "top-center",
+          });
         }
       } catch (error) {
-        toast.error(error.response?.data?.message || t("errors.general_error"));
+        toast.error(
+          error.response?.data?.message || t("errors.general_error"),
+          { position: "top-center" }
+        );
       } finally {
         setLoading(false);
       }
@@ -197,19 +229,23 @@ const SignUpForm = () => {
   const removeProfileImage = () => {
     setProfileImageFile(null);
     setProfileImageUrl("");
+    toast.success(t("signUpForm.messages.image_removed"), {
+      position: "top-center",
+    });
   };
 
   return (
     <>
       <form
         onSubmit={formik.handleSubmit}
-        className="space-y-6 text-text animate-fadeIn"
+        className="space-y-8 bg-bg/95 backdrop-blur-lg rounded-2xl shadow-xl p-8 sm:p-6 max-w-full mx-auto"
       >
-        {/* Row 1: First Name & Last Name */}
-        <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+        {/* Personal Information */}
+        <SectionHeader title={t("signUpForm.sections.personal_info")} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <InputField
             label={t("signUpForm.form.first_name")}
-            icon={<User />}
+            icon={<User className="w-5 h-5 text-secondary" />}
             name="name"
             placeholder={t("signUpForm.placeholders.first_name")}
             formik={formik}
@@ -217,19 +253,15 @@ const SignUpForm = () => {
           />
           <InputField
             label={t("signUpForm.form.last_name")}
-            icon={<User />}
+            icon={<User className="w-5 h-5 text-secondary" />}
             name="lastName"
             placeholder={t("signUpForm.placeholders.last_name")}
             formik={formik}
             ariaRequired="true"
           />
-        </div>
-
-        {/* Row 2: Email & Password */}
-        <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
           <InputField
             label={t("signUpForm.form.email")}
-            icon={<Mail />}
+            icon={<Mail className="w-5 h-5 text-secondary" />}
             name="email"
             type="email"
             placeholder={t("signUpForm.placeholders.email")}
@@ -238,7 +270,7 @@ const SignUpForm = () => {
           />
           <PasswordField
             label={t("signUpForm.form.password")}
-            icon={<Lock />}
+            icon={<Lock className="w-5 h-5 text-secondary" />}
             name="password"
             placeholder={t("signUpForm.placeholders.password")}
             formik={formik}
@@ -247,25 +279,33 @@ const SignUpForm = () => {
             ariaRequired="true"
             t={t}
           />
-        </div>
-
-        {/* Row 3: Identity & Gender */}
-        <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
           <InputField
             label={t("signUpForm.form.identity")}
-            icon={<User />}
+            icon={<User className="w-5 h-5 text-secondary" />}
             name="identity"
             placeholder={t("signUpForm.placeholders.identity")}
             formik={formik}
             ariaRequired="true"
           />
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-text mb-1">
+          <InputField
+            label={t("signUpForm.form.date_of_birth")}
+            icon={<Calendar className="w-5 h-5 text-secondary" />}
+            name="dateOfBirth"
+            type="date"
+            placeholder={t("signUpForm.placeholders.date_of_birth")}
+            formik={formik}
+            ariaRequired="true"
+          />
+          <div className="space-y-2 animate-slideIn">
+            <label className="block text-sm font-medium text-text">
               {t("signUpForm.form.gender")} <span aria-hidden="true">*</span>
             </label>
-            <div className="flex items-center space-x-4">
+            <div className="flex space-x-4">
               {["Male", "Female", "Other"].map((gender) => (
-                <label key={gender} className="flex items-center">
+                <label
+                  key={gender}
+                  className="flex items-center space-x-2 group"
+                >
                   <input
                     type="radio"
                     name="gender"
@@ -273,61 +313,63 @@ const SignUpForm = () => {
                     checked={formik.values.gender === gender}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className="form-radio text-primary focus:ring-primary"
+                    className="h-4 w-4 text-primary focus:ring-primary border-secondary/50 transition-colors duration-300"
                     aria-label={t(`signUpForm.options.${gender.toLowerCase()}`)}
                   />
-                  <span className="ml-2 text-text">
+                  <span className="text-secondary group-hover:text-text transition-colors duration-300">
                     {t(`signUpForm.options.${gender.toLowerCase()}`)}
                   </span>
                 </label>
               ))}
             </div>
             {formik.touched.gender && formik.errors.gender && (
-              <p className="text-sm text-red-500 mt-1">
+              <p className="text-sm text-red-500 animate-fadeIn">
                 {formik.errors.gender}
+              </p>
+            )}
+          </div>
+          <div className="col-span-1 sm:col-span-2 animate-slideIn">
+            <label className="block text-sm font-medium text-text">
+              {t("signUpForm.form.phone")} <span aria-hidden="true">*</span>
+            </label>
+            <PhoneInput
+              country={"us"}
+              enableSearch
+              searchPlaceholder={t("signUpForm.placeholders.search_country")}
+              containerClass="mt-2 w-full"
+              inputClass="w-full h-12 pl-12 border border-border-color rounded-lg text-text placeholder-secondary/50 focus:ring-2 focus:ring-primary focus:border-primary bg-bg/50 transition-all duration-300"
+              buttonClass="bg-bg/50 hover:bg-bg border-r border-border-color rounded-l-lg"
+              searchClass="w-full border border-border-color rounded-lg px-3 py-2 text-text bg-bg/80"
+              placeholder={t("signUpForm.placeholders.enter_phone")}
+              value={formik.values.phone}
+              onChange={(phone) => formik.setFieldValue("phone", phone)}
+              onBlur={() => formik.setFieldTouched("phone", true)}
+              inputProps={{
+                "aria-required": "true",
+                "aria-invalid": formik.touched.phone && !!formik.errors.phone,
+                "aria-describedby":
+                  formik.touched.phone && formik.errors.phone
+                    ? "phone-error"
+                    : undefined,
+              }}
+            />
+            {formik.touched.phone && formik.errors.phone && (
+              <p
+                id="phone-error"
+                className="text-sm text-red-500 mt-1 animate-fadeIn"
+              >
+                {formik.errors.phone}
               </p>
             )}
           </div>
         </div>
 
-        {/* Row 4: Phone */}
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-text mb-1">
-            {t("signUpForm.form.phone")} <span aria-hidden="true">*</span>
-          </label>
-          <PhoneInput
-            country={"us"}
-            enableSearch
-            searchPlaceholder={t("signUpForm.placeholders.search_country")}
-            containerClass="react-tel-input w-full"
-            inputClass="!w-full !h-10 !pl-10 !border !border-border-color !rounded-md !bg-bg !text-text !placeholder-secondary focus:!ring-2 focus:!ring-primary focus:!border-primary"
-            buttonClass="!bg-secondary hover:!bg-accent !border !border-border-color"
-            searchClass="!w-full !border !border-border-color !rounded-md px-2 py-1 !text-text !bg-bg"
-            placeholder={t("signUpForm.placeholders.enter_phone")}
-            value={formik.values.phone}
-            onChange={(phone) => formik.setFieldValue("phone", phone)}
-            onBlur={() => formik.setFieldTouched("phone", true)}
-            inputProps={{
-              "aria-required": "true",
-              "aria-invalid": formik.touched.phone && !!formik.errors.phone,
-              "aria-describedby":
-                formik.touched.phone && formik.errors.phone
-                  ? "phone-error"
-                  : undefined,
-            }}
-          />
-          {formik.touched.phone && formik.errors.phone && (
-            <p id="phone-error" className="text-sm text-red-500 mt-1">
-              {formik.errors.phone}
-            </p>
-          )}
-        </div>
-
-        {/* Row 5: Address (Street & City) */}
-        <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+        {/* Address */}
+        <SectionHeader title={t("signUpForm.sections.address")} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <InputField
             label={t("signUpForm.form.street")}
-            icon={<MapPin />}
+            icon={<MapPin className="w-5 h-5 text-secondary" />}
             name="address.street"
             placeholder={t("signUpForm.placeholders.street")}
             formik={formik}
@@ -335,19 +377,15 @@ const SignUpForm = () => {
           />
           <InputField
             label={t("signUpForm.form.city")}
-            icon={<MapPin />}
+            icon={<MapPin className="w-5 h-5 text-secondary" />}
             name="address.city"
             placeholder={t("signUpForm.placeholders.city")}
             formik={formik}
             ariaRequired="true"
           />
-        </div>
-
-        {/* Row 6: Address (Country & Postal Code) */}
-        <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
           <InputField
             label={t("signUpForm.form.country")}
-            icon={<MapPin />}
+            icon={<MapPin className="w-5 h-5 text-secondary" />}
             name="address.country"
             placeholder={t("signUpForm.placeholders.country")}
             formik={formik}
@@ -355,7 +393,7 @@ const SignUpForm = () => {
           />
           <InputField
             label={t("signUpForm.form.postal_code")}
-            icon={<MapPin />}
+            icon={<MapPin className="w-5 h-5 text-secondary" />}
             name="address.postalCode"
             placeholder={t("signUpForm.placeholders.postal_code")}
             formik={formik}
@@ -363,21 +401,24 @@ const SignUpForm = () => {
           />
         </div>
 
-        {/* Row 7: Department & Role (only if authUser) */}
+        {/* Employment Details */}
         {authUser && (
-          <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-text mb-1">
-                {t("signUpForm.form.department")}
-              </label>
-              <div className="flex items-center space-x-2">
-                <div className="relative flex-1">
+          <>
+            <SectionHeader
+              title={t("signUpForm.sections.employment_details")}
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="animate-slideIn">
+                <label className="block text-sm font-medium text-text">
+                  {t("signUpForm.form.department")}
+                </label>
+                <div className="flex items-center space-x-3 mt-2">
                   <select
                     name="department"
                     value={formik.values.department}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className="w-full py-2 pl-3 pr-8 rounded-md border border-border-color bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                    className="w-full h-12 border border-border-color rounded-lg text-text placeholder-secondary/50 focus:ring-2 focus:ring-primary focus:border-primary bg-bg/50 transition-all duration-300"
                     aria-label={t("signUpForm.form.department")}
                   >
                     <option value="">
@@ -393,36 +434,37 @@ const SignUpForm = () => {
                       ))
                     )}
                   </select>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddDeptModalOpen(true)}
+                    className="p-2 bg-primary text-button-text rounded-lg hover:bg-accent focus:ring-2 focus:ring-primary transition-all duration-300 transform hover:scale-110"
+                    aria-label={t("signUpForm.buttons.add_department")}
+                  >
+                    <Plus className="w-5 h-5" />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsAddDeptModalOpen(true)}
-                  className="inline-flex items-center p-2 bg-secondary text-button-text rounded-md hover:bg-accent transition-all duration-200"
-                  aria-label={t("signUpForm.buttons.add_department")}
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
+                {formik.touched.department && formik.errors.department && (
+                  <p className="text-sm text-red-500 mt-1 animate-fadeIn">
+                    {formik.errors.department}
+                  </p>
+                )}
               </div>
-              {formik.touched.department && formik.errors.department && (
-                <p className="text-sm text-red-500 mt-1">
-                  {formik.errors.department}
-                </p>
-              )}
+              <InputField
+                label={t("signUpForm.form.role")}
+                icon={<User className="w-5 h-5 text-secondary" />}
+                name="role"
+                placeholder={t("signUpForm.placeholders.role")}
+                formik={formik}
+              />
             </div>
-            <InputField
-              label={t("signUpForm.form.role")}
-              icon={<User />}
-              name="role"
-              placeholder={t("signUpForm.placeholders.role")}
-              formik={formik}
-            />
-          </div>
+          </>
         )}
 
-        {/* Row 8: Payment Type & Salary Fields */}
-        <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-text mb-1">
+        {/* Payment Details */}
+        <SectionHeader title={t("signUpForm.sections.payment_details")} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="animate-slideIn">
+            <label className="block text-sm font-medium text-text">
               {t("signUpForm.form.payment_type")}{" "}
               <span aria-hidden="true">*</span>
             </label>
@@ -431,7 +473,7 @@ const SignUpForm = () => {
               value={formik.values.paymentType}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className="w-full py-2 pl-3 pr-8 rounded-md border border-border-color bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+              className="w-full h-12 mt-2 border border-border-color rounded-lg text-text placeholder-secondary/50 focus:ring-2 focus:ring-primary focus:border-primary bg-bg/50 transition-all duration-300"
               aria-required="true"
               aria-label={t("signUpForm.form.payment_type")}
             >
@@ -442,7 +484,7 @@ const SignUpForm = () => {
               </option>
             </select>
             {formik.touched.paymentType && formik.errors.paymentType && (
-              <p className="text-sm text-red-500 mt-1">
+              <p className="text-sm text-red-500 mt-1 animate-fadeIn">
                 {formik.errors.paymentType}
               </p>
             )}
@@ -450,7 +492,7 @@ const SignUpForm = () => {
           {formik.values.paymentType === "Hourly" && (
             <InputField
               label={t("signUpForm.form.hourly_salary")}
-              icon={<User />}
+              icon={<User className="w-5 h-5 text-secondary" />}
               name="hourlySalary"
               type="number"
               placeholder={t("signUpForm.placeholders.hourly_salary")}
@@ -464,7 +506,7 @@ const SignUpForm = () => {
             <>
               <InputField
                 label={t("signUpForm.form.global_salary")}
-                icon={<User />}
+                icon={<User className="w-5 h-5 text-secondary" />}
                 name="globalSalary"
                 type="number"
                 placeholder={t("signUpForm.placeholders.global_salary")}
@@ -475,7 +517,7 @@ const SignUpForm = () => {
               />
               <InputField
                 label={t("signUpForm.form.expected_hours")}
-                icon={<User />}
+                icon={<User className="w-5 h-5 text-secondary" />}
                 name="expectedHours"
                 type="number"
                 placeholder={t("signUpForm.placeholders.expected_hours")}
@@ -488,19 +530,20 @@ const SignUpForm = () => {
           )}
         </div>
 
-        {/* Row 9: Profile Image (Optional) */}
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-text mb-1">
+        {/* Profile Image */}
+        <SectionHeader title={t("signUpForm.sections.profile_image")} />
+        <div className="animate-slideIn">
+          <label className="block text-sm font-medium text-text">
             {t("signUpForm.form.profile_image")} ({t("optional")})
           </label>
-          <div className="relative flex items-center gap-2">
+          <div className="flex items-center gap-4 mt-2">
             <button
               type="button"
-              className="p-2 bg-secondary rounded-md hover:bg-accent transition-all duration-200"
+              className="p-3 bg-primary text-button-text rounded-lg hover:bg-accent focus:ring-2 focus:ring-primary transition-all duration-300 transform hover:scale-110"
               onClick={() => document.getElementById("fileInput").click()}
               aria-label={t("signUpForm.buttons.upload_image")}
             >
-              <Send className="text-button-text" />
+              <Send className="w-5 h-5" />
             </button>
             <input
               id="fileInput"
@@ -514,12 +557,12 @@ const SignUpForm = () => {
               placeholder={t("signUpForm.placeholders.upload_image_or_url")}
               value={profileImageUrl}
               onChange={(e) => setProfileImageUrl(e.target.value)}
-              className="w-full py-2 px-3 border border-border-color rounded-md bg-bg text-text placeholder-secondary focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+              className="flex-1 h-12 border border-border-color rounded-lg text-text placeholder-secondary/50 focus:ring-2 focus:ring-primary focus:border-primary bg-bg/50 transition-all duration-300"
               aria-label={t("signUpForm.form.profile_image_url")}
             />
           </div>
           {(profileImageFile || profileImageUrl) && (
-            <div className="relative inline-block mt-4">
+            <div className="relative inline-block mt-4 animate-fadeIn">
               <img
                 src={
                   profileImageFile
@@ -527,12 +570,12 @@ const SignUpForm = () => {
                     : profileImageUrl
                 }
                 alt={t("signUpForm.form.image_preview")}
-                className="w-16 h-16 rounded-full object-cover border-2 border-border-color"
+                className="w-16 h-16 rounded-full object-cover border-2 border-button-text shadow-md transform hover:scale-110 transition-transform duration-300"
               />
               <button
                 type="button"
                 onClick={removeProfileImage}
-                className="absolute -top-2 -right-2 bg-button-bg text-button-text hover:bg-secondary rounded-full p-1 shadow transition-all duration-200"
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 focus:ring-2 focus:ring-red-500 transition-all duration-300"
                 aria-label={t("signUpForm.buttons.remove_image")}
               >
                 <X className="w-4 h-4" />
@@ -545,11 +588,16 @@ const SignUpForm = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2 mt-6 bg-button-bg text-button-text font-medium rounded-md shadow-md hover:bg-secondary focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-gray-400 transition-all duration-300"
+          className="w-full py-3 mt-8 bg-button-bg text-button-text font-semibold rounded-lg shadow-lg hover:bg-accent focus:ring-4 focus:ring-primary/50 disabled:bg-secondary/50 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-300 transform hover:scale-105"
         >
-          {loading
-            ? t("signUpForm.buttons.signing_up")
-            : t("signUpForm.buttons.sign_up")}
+          {loading ? (
+            <>
+              <span className="inline-block w-6 h-6 border-2 border-button-text border-t-transparent rounded-full animate-spin mr-3"></span>
+              {t("signUpForm.buttons.signing")}
+            </>
+          ) : (
+            t("signUpForm.buttons.sign_up")
+          )}
         </button>
       </form>
 
@@ -560,6 +608,9 @@ const SignUpForm = () => {
           onSuccess={() => {
             setIsAddDeptModalOpen(false);
             refetchDepartments();
+            toast.success(t("signUpForm.messages.department_added"), {
+              position: "top-center",
+            });
           }}
         />
       )}
@@ -579,14 +630,14 @@ const InputField = ({
   min,
   step,
 }) => (
-  <div className="flex-1">
-    <label className="block text-sm font-medium text-text mb-1">
+  <div className="animate-slideIn">
+    <label className="block text-sm font-medium text-text">
       {label}
       {ariaRequired && <span aria-hidden="true">*</span>}
     </label>
-    <div className="relative">
+    <div className="relative mt-2">
       {icon && (
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary">
           {icon}
         </div>
       )}
@@ -596,37 +647,37 @@ const InputField = ({
         placeholder={placeholder}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
-        value={formik.getFieldProps(name).value}
+        value={getNestedValue(formik.values, name)}
         min={min}
         step={step}
-        className={`w-full py-2 rounded-md border border-border-color bg-bg text-text placeholder-secondary focus:ring-2 focus:ring-primary focus:border-primary shadow-sm transition-all duration-200 ${
-          icon ? "pl-10" : "pl-3"
+        className={`w-full h-12 border border-border-color rounded-lg text-text placeholder-secondary/50 focus:ring-2 focus:ring-primary focus:border-primary bg-bg/50 transition-all duration-300 ${
+          icon ? "pl-12" : "pl-4"
         } ${
-          formik.touched[name.split(".")[0]] &&
-          formik.errors[name.split(".")[0]]
-            ? "border-red-500"
+          getNestedError(formik.touched, name) &&
+          getNestedError(formik.errors, name)
+            ? "border-red-500 focus:ring-red-500 focus:border-red-500"
             : ""
         }`}
         aria-required={ariaRequired}
         aria-invalid={
-          formik.touched[name.split(".")[0]] &&
-          !!formik.errors[name.split(".")[0]]
+          getNestedError(formik.touched, name) &&
+          !!getNestedError(formik.errors, name)
         }
         aria-describedby={
-          formik.touched[name.split(".")[0]] &&
-          formik.errors[name.split(".")[0]]
+          getNestedError(formik.touched, name) &&
+          getNestedError(formik.errors, name)
             ? `${name.replace(".", "-")}-error`
             : undefined
         }
       />
     </div>
-    {formik.touched[name.split(".")[0]] &&
-      formik.errors[name.split(".")[0]] && (
+    {getNestedError(formik.touched, name) &&
+      getNestedError(formik.errors, name) && (
         <p
           id={`${name.replace(".", "-")}-error`}
-          className="text-sm text-red-500 mt-1"
+          className="text-sm text-red-500 mt-1 animate-fadeIn"
         >
-          {formik.errors[name.split(".")[0]]}
+          {getNestedError(formik.errors, name)}
         </p>
       )}
   </div>
@@ -644,13 +695,13 @@ const PasswordField = ({
   ariaRequired,
   t,
 }) => (
-  <div className="flex-1">
-    <label className="block text-sm font-medium text-text mb-1">
+  <div className="animate-slideIn">
+    <label className="block text-sm font-medium text-text">
       {label}
       {ariaRequired && <span aria-hidden="true">*</span>}
     </label>
-    <div className="relative">
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary">
+    <div className="relative mt-2">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary">
         {icon}
       </div>
       <input
@@ -660,8 +711,10 @@ const PasswordField = ({
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
         value={formik.values[name]}
-        className={`pl-10 pr-10 w-full py-2 rounded-md border border-border-color bg-bg text-text placeholder-secondary focus:ring-2 focus:ring-primary focus:border-primary shadow-sm transition-all duration-200 ${
-          formik.touched[name] && formik.errors[name] ? "border-red-500" : ""
+        className={`w-full h-12 pl-12 pr-12 border border-border-color rounded-lg text-text placeholder-secondary/50 focus:ring-2 focus:ring-primary focus:border-primary bg-bg/50 transition-all duration-300 ${
+          formik.touched[name] && formik.errors[name]
+            ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+            : ""
         }`}
         aria-required={ariaRequired}
         aria-invalid={formik.touched[name] && !!formik.errors[name]}
@@ -674,22 +727,37 @@ const PasswordField = ({
       <button
         type="button"
         onClick={() => setShowPassword(!showPassword)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-accent transition-colors duration-200"
+        className="absolute right-4 top-1/2 -translate-y-1/2 text-secondary hover:text-text focus:outline-none transition-colors duration-300"
         aria-label={
           showPassword
             ? t("signUpForm.aria.hide_password")
             : t("signUpForm.aria.show_password")
         }
       >
-        {showPassword ? <EyeOff /> : <Eye />}
+        {showPassword ? (
+          <EyeOff className="w-5 h-5" />
+        ) : (
+          <Eye className="w-5 h-5" />
+        )}
       </button>
     </div>
     {formik.touched[name] && formik.errors[name] && (
-      <p id={`${name}-error`} className="text-sm text-red-500 mt-1">
+      <p
+        id={`${name}-error`}
+        className="text-sm text-red-500 mt-1 animate-fadeIn"
+      >
         {formik.errors[name]}
       </p>
     )}
   </div>
+);
+
+// SectionHeader Component
+const SectionHeader = ({ title }) => (
+  <h3 className="text-xl font-semibold text-text mt-6 mb-4 relative animate-fadeIn">
+    {title}
+    <span className="absolute -bottom-1 left-0 w-16 h-1 bg-gradient-to-r from-primary to-accent rounded-full animate-pulse" />
+  </h3>
 );
 
 export default SignUpForm;

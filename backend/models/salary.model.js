@@ -73,5 +73,5 @@ const SalarySchema = new mongoose.Schema(
 // Index for efficient queries by employee and period
 SalarySchema.index({ employeeId: 1, periodStart: 1 });
 
-const Salary = mongoose.model("Salary", SalarySchema);
+const Salary = mongoose.models.Salary || mongoose.model("Salary", SalarySchema);
 export default Salary;

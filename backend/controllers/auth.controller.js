@@ -17,6 +17,7 @@ export const signUp = async (req, res) => {
       identity,
       phone,
       department,
+      dateOfBirth,
       address,
       role,
       paymentType,
@@ -35,6 +36,7 @@ export const signUp = async (req, res) => {
       !email ||
       !gender ||
       !identity ||
+      !dateOfBirth ||
       !password ||
       !phone ||
       !address ||
@@ -196,6 +198,7 @@ export const signUp = async (req, res) => {
       department: department || null,
       role: finalRole,
       phone,
+      dateOfBirth,
       address,
       profileImage: finalProfileImageUrl,
       paymentType,

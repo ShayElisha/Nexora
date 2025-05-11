@@ -20,6 +20,10 @@ const employeeSchema = new mongoose.Schema(
       enum: ["Male", "Female", "Other"],
       required: true,
     },
+    dateOfBirth: {
+      type: Date,
+      required: false,
+    },
     identity: {
       type: String,
       required: true,
@@ -115,7 +119,37 @@ const employeeSchema = new mongoose.Schema(
       default: "Global", // Default to Global for existing employees
       required: true,
     },
+
+    vacationBalance: {
+      type: Number,
+      default: 0, // יתרת ימי חופשה
+      min: 0,
+    },
+    vacationHistory: [
+      {
+        month: { type: String }, // פורמט: MM/YYYY
+        daysAdded: { type: Number },
+        newBalance: { type: Number },
+        country: { type: String },
+        timestamp: { type: Date, default: Date.now },
+      },
+    ],
+    sickBalance: {
+      type: Number,
+      default: 0, // יתרת ימי חופשה
+      min: 0,
+    },
+    sickHistory: [
+      {
+        month: { type: String }, // פורמט: MM/YYYY
+        daysAdded: { type: Number },
+        newBalance: { type: Number },
+        country: { type: String },
+        timestamp: { type: Date, default: Date.now },
+      },
+    ],
   },
+
   { timestamps: true }
 );
 

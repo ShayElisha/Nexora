@@ -66,7 +66,7 @@ const shiftSchema = new mongoose.Schema(
     },
     dayType: {
       type: String,
-      enum: ["Regular", "Holiday", "RestDay"],
+      enum: ["Regular", "Holiday", "RestDay", "Sickday", "Vacation"],
       default: "Regular",
     },
     payRateId: {
@@ -109,7 +109,8 @@ const shiftSchema = new mongoose.Schema(
         },
         multiplier: {
           type: Number,
-          min: 1,
+          min: 0.5,
+          max: 2,
           required: true,
           validate: {
             validator: Number.isFinite,
@@ -172,6 +173,6 @@ shiftSchema.pre("save", async function (next) {
   next();
 });
 
-const Shift = mongoose.model("Shift", shiftSchema);
+const Shift = mongoose.models.Shift || mongoose.model("Shift", shiftSchema);
 
 export default Shift;

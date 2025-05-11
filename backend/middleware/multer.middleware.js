@@ -1,50 +1,47 @@
 import multer from "multer";
 
-// Memory storage for Cloudinary upload
+// סיווג סוגי קבצים מותרים לפי שדות
+const imageMimeTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+
+const fileFilter = (req, file, cb) => {
+  const { fieldname, mimetype } = file;
+
+  if (["profileImage", "productImage"].includes(fieldname)) {
+    // רק תמונות מותרות
+    if (imageMimeTypes.includes(mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        new Error(
+          `Invalid file type for ${fieldname}. Only JPEG, PNG, GIF, and WEBP are allowed.`
+        ),
+        false
+      );
+    }
+  } else if (fieldname === "attachments") {
+    // לכל קובץ אחר – מותר הכל
+    cb(null, true);
+  } else {
+    // ברירת מחדל – נאפשר רק תמונות
+    if (imageMimeTypes.includes(mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        new Error(
+          `Invalid file type for ${fieldname}. Only JPEG, PNG, GIF, and WEBP are allowed.`
+        ),
+        false
+      );
+    }
+  }
+};
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB file size limit
+    fileSize: 5 * 1024 * 1024, // עד 5MB
   },
-  fileFilter: (req, file, cb) => {
-    if (file.fieldname === "productImage") {
-      // עבור תמונה – רק סוגי תמונות מורשים
-      const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/gif",
-        "image/webp",
-      ];
-      if (allowedTypes.includes(file.mimetype)) {
-        cb(null, true);
-      } else {
-        cb(
-          new Error(
-            "Invalid file type for product image. Only JPEG, PNG, GIF, and WEBP are allowed."
-          ),
-          false
-        );
-      }
-    } else if (file.fieldname === "attachments") {
-      // עבור קבצים מצורפים – אפשר לאפשר כל סוג קובץ
-      cb(null, true);
-    } else {
-      const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/gif",
-        "image/webp",
-      ];
-      if (allowedTypes.includes(file.mimetype)) {
-        cb(null, true);
-      } else {
-        cb(
-          new Error("Invalid file type. Only JPEG, PNG, and GIF are allowed."),
-          false
-        );
-      }
-    }
-  },
+  fileFilter,
 });
 
 export default upload;

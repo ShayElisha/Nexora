@@ -50,7 +50,6 @@ app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(express.json({ limit: "50mb" })); // הגדל את הגבול לפי הצורך
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
-app.use(helmet({ contentSecurityPolicy: false }));
 // API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/company", companyRoutes);

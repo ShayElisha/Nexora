@@ -13,14 +13,425 @@ const getRandomColor = () => {
   return color;
 };
 
+const EmployeeForm = ({ employee, onSave, onCancel }) => {
+  const { t } = useTranslation();
+  const [formData, setFormData] = useState(
+    employee || {
+      name: "",
+      lastName: "",
+      gender: "",
+      dateOfBirth: "",
+      identity: "",
+      email: "",
+      password: "",
+      profileImage: "",
+      role: "",
+      phone: "",
+      employeeId: "",
+      department: "",
+      benefits: [],
+      status: "active",
+      address: { city: "", street: "", country: "", postalCode: "" },
+      paymentType: "Global",
+      hourlySalary: null,
+      globalSalary: null,
+      expectedHours: null,
+      vacationBalance: 0,
+      sickBalance: 0,
+    }
+  );
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name.includes("address.")) {
+      const field = name.split(".")[1];
+      setFormData({
+        ...formData,
+        address: { ...formData.address, [field]: value },
+      });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 p-6 bg-bg rounded-xl shadow-lg border border-border-color"
+    >
+      <h2 className="text-2xl font-bold text-text mb-4">
+        {t("users.edit_employee")}
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.name")}
+          </label>
+          <input
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder={t("users.name")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.last_name")}
+          </label>
+          <input
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            placeholder={t("users.last_name")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.gender")}
+          </label>
+          <select
+            name="gender"
+            value={formData.gender}
+            onChange={handleChange}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          >
+            <option value="">{t("users.select_gender")}</option>
+            <option value="Male">{t("users.male")}</option>
+            <option value="Female">{t("users.female")}</option>
+            <option value="Other">{t("users.other")}</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.date_of_birth")}
+          </label>
+          <input
+            name="dateOfBirth"
+            type="date"
+            value={formData.dateOfBirth}
+            onChange={handleChange}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.identity")}
+          </label>
+          <input
+            name="identity"
+            value={formData.identity}
+            onChange={handleChange}
+            placeholder={t("users.identity")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.email")}
+          </label>
+          <input
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder={t("users.email")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.password")}
+          </label>
+          <input
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder={t("users.password")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.profile_image")}
+          </label>
+          <input
+            name="profileImage"
+            value={formData.profileImage}
+            onChange={handleChange}
+            placeholder={t("users.profile_image_url")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.role")}
+          </label>
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          >
+            <option value="">{t("users.select_role")}</option>
+            <option value="Admin">{t("users.admin")}</option>
+            <option value="Manager">{t("users.manager")}</option>
+            <option value="Employee">{t("users.employee")}</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.phone")}
+          </label>
+          <input
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder={t("users.phone")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.employee_id")}
+          </label>
+          <input
+            name="employeeId"
+            value={formData.employeeId}
+            onChange={handleChange}
+            placeholder={t("users.employee_id")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.department")}
+          </label>
+          <input
+            name="department"
+            value={formData.department}
+            onChange={handleChange}
+            placeholder={t("users.department")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.benefits")}
+          </label>
+          <input
+            name="benefits"
+            value={formData.benefits.join(",")}
+            onChange={(e) =>
+              setFormData({ ...formData, benefits: e.target.value.split(",") })
+            }
+            placeholder={t("users.benefits_placeholder")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.status")}
+          </label>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          >
+            <option value="active">{t("users.active")}</option>
+            <option value="inactive">{t("users.inactive")}</option>
+            <option value="suspended">{t("users.suspended")}</option>
+            <option value="deleted">{t("users.deleted")}</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.city")}
+          </label>
+          <input
+            name="address.city"
+            value={formData.address.city}
+            onChange={handleChange}
+            placeholder={t("users.city")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.street")}
+          </label>
+          <input
+            name="address.street"
+            value={formData.address.street}
+            onChange={handleChange}
+            placeholder={t("users.street")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.country")}
+          </label>
+          <input
+            name="address.country"
+            value={formData.address.country}
+            onChange={handleChange}
+            placeholder={t("users.country")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.postal_code")}
+          </label>
+          <input
+            name="address.postalCode"
+            value={formData.address.postalCode}
+            onChange={handleChange}
+            placeholder={t("users.postal_code")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.payment_type")}
+          </label>
+          <select
+            name="paymentType"
+            value={formData.paymentType}
+            onChange={handleChange}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          >
+            <option value="Hourly">{t("users.hourly")}</option>
+            <option value="Global">{t("users.global")}</option>
+            <option value="Commission-Based">
+              {t("users.commission_based")}
+            </option>
+          </select>
+        </div>
+        {formData.paymentType === "Hourly" && (
+          <div>
+            <label className="block text-sm font-medium text-text mb-1">
+              {t("users.hourly_salary")}
+            </label>
+            <input
+              name="hourlySalary"
+              type="number"
+              value={formData.hourlySalary || ""}
+              onChange={handleChange}
+              placeholder={t("users.hourly_salary")}
+              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+              required
+            />
+          </div>
+        )}
+        {formData.paymentType === "Global" && (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-text mb-1">
+                {t("users.global_salary")}
+              </label>
+              <input
+                name="globalSalary"
+                type="number"
+                value={formData.globalSalary || ""}
+                onChange={handleChange}
+                placeholder={t("users.global_salary")}
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-text mb-1">
+                {t("users.expected_hours")}
+              </label>
+              <input
+                name="expectedHours"
+                type="number"
+                value={formData.expectedHours || ""}
+                onChange={handleChange}
+                placeholder={t("users.expected_hours")}
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                required
+              />
+            </div>
+          </>
+        )}
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.vacation_balance")}
+          </label>
+          <input
+            name="vacationBalance"
+            type="number"
+            value={formData.vacationBalance}
+            onChange={handleChange}
+            placeholder={t("users.vacation_balance")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.sick_balance")}
+          </label>
+          <input
+            name="sickBalance"
+            type="number"
+            value={formData.sickBalance}
+            onChange={handleChange}
+            placeholder={t("users.sick_balance")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          />
+        </div>
+      </div>
+      <div className="flex justify-end space-x-4 mt-6">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-6 py-2 bg-gray-300 text-text rounded-full hover:bg-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+        >
+          {t("users.cancel")}
+        </button>
+        <button
+          type="submit"
+          className="px-6 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-primary transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        >
+          {t("users.save")}
+        </button>
+      </div>
+    </form>
+  );
+};
+
 const Users = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [imageErrors, setImageErrors] = useState({});
   const [selectedRow, setSelectedRow] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1); // Pagination state
-  const usersPerPage = 12; // 12 users per page
+  const [currentPage, setCurrentPage] = useState(1);
+  const [editingEmployee, setEditingEmployee] = useState(null);
+  const usersPerPage = 12;
 
   const {
     data: users = [],
@@ -57,6 +468,19 @@ const Users = () => {
     },
   });
 
+  const updateEmployeeMutation = useMutation({
+    mutationFn: (employee) =>
+      axiosInstance.put(`/employees/${employee._id}`, employee),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["employees"]);
+      toast.success(t("users.updated"));
+      setEditingEmployee(null);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || t("users.error_updating"));
+    },
+  });
+
   const updateEmployeeStatusMutation = useMutation({
     mutationFn: ({ employeeId, status }) =>
       axiosInstance.put(`/employees/${employeeId}`, { status }),
@@ -73,7 +497,6 @@ const Users = () => {
 
   const filteredUsers = users.filter((user) => {
     if (!searchTerm.trim()) return true;
-
     const searchLower = searchTerm.toLowerCase().trim();
     const searchableString = [
       user.name || "",
@@ -91,14 +514,18 @@ const Users = () => {
       user.performanceReviews?.length > 0
         ? `${user.performanceReviews.length} ${t("users.reviews")}`
         : t("users.no_reviews"),
+      user.paymentType || "",
+      user.hourlySalary ? user.hourlySalary.toString() : "",
+      user.globalSalary ? user.globalSalary.toString() : "",
+      user.expectedHours ? user.expectedHours.toString() : "",
+      user.vacationBalance ? user.vacationBalance.toString() : "",
+      user.sickBalance ? user.sickBalance.toString() : "",
     ]
       .join(" ")
       .toLowerCase();
-
     return searchableString.includes(searchLower);
   });
 
-  // Pagination Logic
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
@@ -116,7 +543,7 @@ const Users = () => {
           <button
             key={i}
             onClick={() => paginate(i)}
-            className={`px-3 py-1 rounded-full mx-1 ${
+            className={`px-4 py-2 rounded-full mx-1 text-sm font-medium transition-all duration-200 ${
               currentPage === i
                 ? "bg-button-bg text-button-text"
                 : "bg-accent text-text hover:bg-secondary hover:text-button-text"
@@ -135,7 +562,7 @@ const Users = () => {
           <button
             key={1}
             onClick={() => paginate(1)}
-            className={`px-3 py-1 rounded-full mx-1 ${
+            className={`px-4 py-2 rounded-full mx-1 text-sm font-medium transition-all duration-200 ${
               currentPage === 1
                 ? "bg-button-bg text-button-text"
                 : "bg-accent text-text hover:bg-secondary hover:text-button-text"
@@ -146,7 +573,7 @@ const Users = () => {
         );
         if (startPage > 2) {
           pageNumbers.push(
-            <span key="start-dots" className="mx-1">
+            <span key="start-dots" className="mx-2 text-text">
               ...
             </span>
           );
@@ -158,7 +585,7 @@ const Users = () => {
           <button
             key={i}
             onClick={() => paginate(i)}
-            className={`px-3 py-1 rounded-full mx-1 ${
+            className={`px-4 py-2 rounded-full mx-1 text-sm font-medium transition-all duration-200 ${
               currentPage === i
                 ? "bg-button-bg text-button-text"
                 : "bg-accent text-text hover:bg-secondary hover:text-button-text"
@@ -172,7 +599,7 @@ const Users = () => {
       if (endPage < totalPages) {
         if (endPage < totalPages - 1) {
           pageNumbers.push(
-            <span key="end-dots" className="mx-1">
+            <span key="end-dots" className="mx-2 text-text">
               ...
             </span>
           );
@@ -181,7 +608,7 @@ const Users = () => {
           <button
             key={totalPages}
             onClick={() => paginate(totalPages)}
-            className={`px-3 py-1 rounded-full mx-1 ${
+            className={`px-4 py-2 rounded-full mx-1 text-sm font-medium transition-all duration-200 ${
               currentPage === totalPages
                 ? "bg-button-bg text-button-text"
                 : "bg-accent text-text hover:bg-secondary hover:text-button-text"
@@ -192,7 +619,6 @@ const Users = () => {
         );
       }
     }
-
     return pageNumbers;
   };
 
@@ -210,6 +636,14 @@ const Users = () => {
     }
   };
 
+  const handleEdit = (employee) => {
+    setEditingEmployee(employee);
+  };
+
+  const handleSave = (employee) => {
+    updateEmployeeMutation.mutate(employee);
+  };
+
   const handleStatusChange = (employeeId, status) => {
     updateEmployeeStatusMutation.mutate({ employeeId, status });
   };
@@ -222,21 +656,29 @@ const Users = () => {
       : "-";
 
   return (
-    <div className="min-h-screen  flex justify-center items-start py-8 animate-fade-in">
-      <div className="w-11/12 sm:w-4/5 p-6 rounded-xl shadow-lg border border-border-color bg-bg">
-        <h1 className="text-3xl sm:text-4xl font-extrabold mb-8 text-center text-text tracking-tight drop-shadow-md">
+    <div className="max-h-screen flex justify-center items-start py-12 bg-bg animate-fade-in">
+      <div className="w-full max-w-full px-4 sm:px-6 lg:px-8 mp-8 rounded-xl shadow-xl border border-border-color bg-bg">
+        <h1 className="text-4xl font-extrabold mb-10 text-center text-text tracking-tight drop-shadow-md">
           {t("users.users_list")}
         </h1>
 
-        <div className="mb-6">
+        <div className="mb-8">
           <input
             type="text"
             placeholder={t("users.search_placeholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 placeholder-opacity-50"
+            className="w-full p-4 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 placeholder-opacity-50 text-sm"
           />
         </div>
+
+        {editingEmployee && (
+          <EmployeeForm
+            employee={editingEmployee}
+            onSave={handleSave}
+            onCancel={() => setEditingEmployee(null)}
+          />
+        )}
 
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
@@ -248,35 +690,38 @@ const Users = () => {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-text rounded-xl shadow-md border border-border-color">
+            <div className="overflow-x-auto rounded-xl shadow-md border border-border-color">
+              <table className="min-w-full text-text">
                 <thead>
                   <tr className="bg-button-bg text-button-text">
-                    <th className="py-3 px-4 text-sm font-semibold tracking-wide">
+                    <th className="py-4 px-6 text-sm font-semibold tracking-wide">
                       {t("users.profile_image")}
                     </th>
-                    <th className="py-3 px-4 text-sm font-semibold tracking-wide">
+                    <th className="py-4 px-6 text-sm font-semibold tracking-wide">
                       {t("users.name")}
                     </th>
-                    <th className="py-3 px-4 text-sm font-semibold tracking-wide">
+                    <th className="py-4 px-6 text-sm font-semibold tracking-wide">
                       {t("users.last_name")}
                     </th>
-                    <th className="py-3 px-4 text-sm font-semibold tracking-wide">
+                    <th className="py-4 px-6 text-sm font-semibold tracking-wide">
                       {t("users.email")}
                     </th>
-                    <th className="py-3 px-4 text-sm font-semibold tracking-wide">
+                    <th className="py-4 px-6 text-sm font-semibold tracking-wide">
                       {t("users.phone")}
                     </th>
-                    <th className="py-3 px-4 text-sm font-semibold tracking-wide">
+                    <th className="py-4 px-6 text-sm font-semibold tracking-wide">
                       {t("users.role")}
                     </th>
-                    <th className="py-3 px-4 text-sm font-semibold tracking-wide">
+                    <th className="py-4 px-6 text-sm font-semibold tracking-wide">
                       {t("users.address")}
                     </th>
-                    <th className="py-3 px-4 text-sm font-semibold tracking-wide">
+                    <th className="py-4 px-6 text-sm font-semibold tracking-wide">
+                      {t("users.payment_type")}
+                    </th>
+                    <th className="py-4 px-6 text-sm font-semibold tracking-wide">
                       {t("users.status")}
                     </th>
-                    <th className="py-3 px-4 text-sm font-semibold tracking-wide">
+                    <th className="py-4 px-6 text-sm font-semibold tracking-wide">
                       {t("users.actions")}
                     </th>
                   </tr>
@@ -285,8 +730,8 @@ const Users = () => {
                   {filteredUsers.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={9}
-                        className="py-6 px-4 text-center text-text opacity-70 italic text-lg"
+                        colSpan={10}
+                        className="py-8 px-6 text-center text-text opacity-70 italic text-lg"
                       >
                         {searchTerm
                           ? t("users.no_users_match")
@@ -308,10 +753,10 @@ const Users = () => {
                         <>
                           <tr
                             key={user._id || `${user.email}-${index}`}
-                            className="border-b border-border-color hover:bg-secondary cursor-pointer"
+                            className="border-b border-border-color hover:bg-secondary cursor-pointer transition-all duration-200"
                             onClick={() => handleRowClick(user)}
                           >
-                            <td className="py-3 px-4">
+                            <td className="py-4 px-6">
                               {shouldShowInitial ? (
                                 <div
                                   className="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-white text-xl font-bold"
@@ -335,32 +780,35 @@ const Users = () => {
                                 />
                               )}
                             </td>
-                            <td className="py-3 px-4 text-sm">
+                            <td className="py-4 px-6 text-sm">
                               {user.name || "-"}
                             </td>
-                            <td className="py-3 px-4 text-sm">
+                            <td className="py-4 px-6 text-sm">
                               {user.lastName || "-"}
                             </td>
-                            <td className="py-3 px-4 text-sm">
+                            <td className="py-4 px-6 text-sm">
                               {user.email || "-"}
                             </td>
-                            <td className="py-3 px-4 text-sm">
+                            <td className="py-4 px-6 text-sm">
                               {user.phone || "-"}
                             </td>
-                            <td className="py-3 px-4 text-sm">
+                            <td className="py-4 px-6 text-sm">
                               {user.role || "-"}
                             </td>
-                            <td className="py-3 px-4 text-sm">
+                            <td className="py-4 px-6 text-sm">
                               {formatAddress(user.address)}
                             </td>
-                            <td className="py-3 px-4">
+                            <td className="py-4 px-6 text-sm">
+                              {user.paymentType || "-"}
+                            </td>
+                            <td className="py-4 px-6">
                               <select
                                 value={user.status || "active"}
                                 onChange={(e) =>
                                   handleStatusChange(user._id, e.target.value)
                                 }
                                 onClick={(e) => e.stopPropagation()}
-                                className="p-2 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary transition-all duration-200"
+                                className="p-2 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary transition-all duration-200 w-full text-sm"
                               >
                                 <option value="active">
                                   {t("users.active")}
@@ -376,13 +824,22 @@ const Users = () => {
                                 </option>
                               </select>
                             </td>
-                            <td className="py-3 px-4">
+                            <td className="py-4 px-6 flex space-x-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEdit(user);
+                                }}
+                                className="px-4 py-2 bg-blue-500 text-button-text rounded-full shadow-md hover:bg-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm"
+                              >
+                                {t("users.edit")}
+                              </button>
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleDelete(user._id);
                                 }}
-                                className="px-4 py-2 bg-red-500 text-button-text rounded-full shadow-md hover:bg-red-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                                className="px-4 py-2 bg-red-500 text-button-text rounded-full shadow-md hover:bg-red-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 text-sm"
                               >
                                 {t("users.delete")}
                               </button>
@@ -390,15 +847,15 @@ const Users = () => {
                           </tr>
                           {selectedRow === user._id && (
                             <tr className="bg-bg border-b border-border-color">
-                              <td colSpan={9} className="py-4 px-6">
-                                <div className="flex flex-col gap-3">
+                              <td colSpan={10} className="py-6 px-8">
+                                <div className="flex flex-col gap-4">
                                   <div>
-                                    <strong className="text-sm font-semibold">
+                                    <strong className="text-sm font-semibold text-text">
                                       {t("users.projects")}:
                                     </strong>{" "}
                                     {user.projects &&
                                     user.projects.length > 0 ? (
-                                      <ul className="list-disc list-inside text-sm">
+                                      <ul className="list-disc list-inside text-sm text-text">
                                         {user.projects.map((proj, idx) => (
                                           <li key={idx}>
                                             {proj.projectId?.name || "-"}
@@ -406,18 +863,18 @@ const Users = () => {
                                         ))}
                                       </ul>
                                     ) : (
-                                      <span className="text-sm opacity-70">
+                                      <span className="text-sm text-text opacity-70">
                                         {t("users.no_projects")}
                                       </span>
                                     )}
                                   </div>
                                   <div>
-                                    <strong className="text-sm font-semibold">
+                                    <strong className="text-sm font-semibold text-text">
                                       {t("users.performance_reviews")}:
                                     </strong>{" "}
                                     {user.performanceReviews &&
                                     user.performanceReviews.length > 0 ? (
-                                      <ul className="list-disc list-inside text-sm">
+                                      <ul className="list-disc list-inside text-sm text-text">
                                         {user.performanceReviews.map(
                                           (review, idx) => (
                                             <li key={idx}>
@@ -432,10 +889,56 @@ const Users = () => {
                                         )}
                                       </ul>
                                     ) : (
-                                      <span className="text-sm opacity-70">
+                                      <span className="text-sm text-text opacity-70">
                                         {t("users.no_reviews")}
                                       </span>
                                     )}
+                                  </div>
+                                  {user.paymentType === "Hourly" && (
+                                    <div>
+                                      <strong className="text-sm font-semibold text-text">
+                                        {t("users.hourly_salary")}:
+                                      </strong>{" "}
+                                      <span className="text-sm text-text">
+                                        {user.hourlySalary || "-"}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {user.paymentType === "Global" && (
+                                    <>
+                                      <div>
+                                        <strong className="text-sm font-semibold text-text">
+                                          {t("users.global_salary")}:
+                                        </strong>{" "}
+                                        <span className="text-sm text-text">
+                                          {user.globalSalary || "-"}
+                                        </span>
+                                      </div>
+                                      <div>
+                                        <strong className="text-sm font-semibold text-text">
+                                          {t("users.expected_hours")}:
+                                        </strong>{" "}
+                                        <span className="text-sm text-text">
+                                          {user.expectedHours || "-"}
+                                        </span>
+                                      </div>
+                                    </>
+                                  )}
+                                  <div>
+                                    <strong className="text-sm font-semibold text-text">
+                                      {t("users.vacation_balance")}:
+                                    </strong>{" "}
+                                    <span className="text-sm text-text">
+                                      {user.vacationBalance || 0}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <strong className="text-sm font-semibold text-text">
+                                      {t("users.sick_balance")}:
+                                    </strong>{" "}
+                                    <span className="text-sm text-text">
+                                      {user.sickBalance || 0}
+                                    </span>
                                   </div>
                                 </div>
                               </td>
@@ -449,13 +952,13 @@ const Users = () => {
               </table>
             </div>
             {filteredUsers.length > 0 && totalPages > 1 && (
-              <div className="flex justify-center items-center mt-8 space-x-2">
+              <div className="flex justify-center items-center mt-10 space-x-2">
                 <button
                   onClick={() => paginate(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-full ${
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                     currentPage === 1
-                      ? "bg-gray-300 cursor-not-allowed"
+                      ? "bg-gray-300 cursor-not-allowed text-text"
                       : "bg-button-bg text-button-text hover:bg-secondary"
                   }`}
                 >
@@ -465,9 +968,9 @@ const Users = () => {
                 <button
                   onClick={() => paginate(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className={`px-3 py-1 rounded-full ${
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                     currentPage === totalPages
-                      ? "bg-gray-300 cursor-not-allowed"
+                      ? "bg-gray-300 cursor-not-allowed text-text"
                       : "bg-button-bg text-button-text hover:bg-secondary"
                   }`}
                 >

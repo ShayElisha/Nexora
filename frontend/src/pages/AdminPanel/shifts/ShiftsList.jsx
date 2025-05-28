@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
 
 const ShiftsList = () => {
+  const { t } = useTranslation();
   const [shifts, setShifts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [expandedRow, setExpandedRow] = useState(null);
   const [editingRow, setEditingRow] = useState(null);
   const [editFormData, setEditFormData] = useState({});
 
-  // Fetch shifts with date filtering
   const fetchShifts = async () => {
     setLoading(true);
     try {
@@ -26,26 +26,21 @@ const ShiftsList = () => {
       const response = await axiosInstance.get("/shifts", { params });
       setShifts(response.data.data);
     } catch (err) {
-      setError(
-        err.response?.data?.message || "שגיאה בשליפת המשמרות. אנא נסה שוב."
-      );
+      toast.error(t("shifts.errorFetchingShifts"));
     } finally {
       setLoading(false);
     }
   };
 
-  // Load shifts on component mount or date change
   useEffect(() => {
     fetchShifts();
   }, [startDate, endDate]);
 
-  // Calculate job percentage
   const calculateJobPercentage = (hoursWorked, fullTimeHours = 42) => {
     if (!hoursWorked || !fullTimeHours) return "0.0";
     return ((hoursWorked / fullTimeHours) * 100).toFixed(1);
   };
 
-  // Format date and time
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString("he-IL", {
       year: "numeric",
@@ -62,39 +57,20 @@ const ShiftsList = () => {
     });
   };
 
-  // Clear filter
   const clearFilter = () => {
     setStartDate("");
     setEndDate("");
-    setError("");
+    toast(t("shifts.filterCleared"));
   };
 
-  // Toggle row expansion
   const toggleRow = (shiftId) => {
     setExpandedRow(expandedRow === shiftId ? null : shiftId);
   };
 
-  // Map rateType to Hebrew
   const getRateTypeLabel = (rateType) => {
-    switch (rateType) {
-      case "Regular":
-        return "רגיל";
-      case "Overtime125":
-        return "נוספות 125%";
-      case "Overtime150":
-        return "נוספות 150%";
-      case "Night":
-        return "לילה";
-      case "Holiday":
-        return "חג";
-      case "Rest":
-        return "מנוחה";
-      default:
-        return rateType;
-    }
+    return t(`shifts.rateTypes.${rateType}`);
   };
 
-  // Start editing a row
   const startEditing = (shift) => {
     setEditingRow(shift._id);
     setEditFormData({
@@ -121,27 +97,26 @@ const ShiftsList = () => {
         new Date(shift.endTime).getDate() !==
           new Date(shift.shiftDate).getDate(),
     });
+    toast(t("shifts.editMode"));
   };
 
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Validate form data
   const validateFormData = (formData) => {
     if (!formData.shiftDate || isNaN(Date.parse(formData.shiftDate))) {
-      return "תאריך המשמרת חובה וחייב להיות תקין";
+      return t("shifts.invalidShiftDate");
     }
     if (!formData.startTime) {
-      return "שעת התחלה היא שדה חובה";
+      return t("shifts.startTimeRequired");
     }
     if (formData.hoursWorked && isNaN(parseFloat(formData.hoursWorked))) {
-      return "שעות עבודה חייבות להיות מספר תקין";
+      return t("shifts.invalidHoursWorked");
     }
     if (formData.hourlySalary && isNaN(parseFloat(formData.hourlySalary))) {
-      return "שכר שעתי חייב להיות מספר תקין";
+      return t("shifts.invalidHourlySalary");
     }
     if (formData.startTime && formData.endTime) {
       const startDateTime = new Date(
@@ -151,27 +126,21 @@ const ShiftsList = () => {
         `${formData.shiftDate}T${formData.endTime}:00`
       );
 
-      // אם המשמרת חוצה חצות, הוסף יום ל-endDateTime
       if (formData.isNextDay || formData.endTime < formData.startTime) {
         endDateTime.setDate(endDateTime.getDate() + 1);
       }
 
       if (endDateTime <= startDateTime) {
-        return "שעת הסיום חייבת להיות מאוחרת משעת ההתחלה";
+        return t("shifts.invalidEndTime");
       }
     }
     return null;
   };
 
-  // Save changes
   const saveChanges = async (shiftId) => {
-    // Validate form data
     const validationError = validateFormData(editFormData);
     if (validationError) {
-      toast.error(validationError, {
-        position: "top-right",
-        duration: 3000,
-      });
+      toast.error(validationError);
       return;
     }
 
@@ -195,7 +164,6 @@ const ShiftsList = () => {
         notes: editFormData.notes || "",
       };
 
-      // Adjust endTime if it crosses midnight
       if (
         editFormData.isNextDay ||
         (editFormData.endTime && editFormData.endTime < editFormData.startTime)
@@ -217,37 +185,29 @@ const ShiftsList = () => {
         )
       );
       setEditingRow(null);
-      toast.success("המשמרת עודכנה בהצלחה", {
-        position: "top-right",
-        duration: 3000,
-      });
+      toast.success(t("shifts.shiftUpdatedSuccess"));
     } catch (err) {
-      toast.error(
-        err.response?.data?.message || "שגיאה בעדכון המשמרת. אנא נסה שוב.",
-        {
-          position: "top-right",
-          duration: 3000,
-        }
-      );
+      toast.error(t("shifts.errorUpdatingShift"));
     }
   };
 
-  // Cancel editing
   const cancelEditing = () => {
     setEditingRow(null);
     setEditFormData({});
+    toast(t("shifts.cancelled"));
   };
 
   return (
     <div className="max-w-full mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6 text-center">רשימת משמרות</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center">
+        {t("shifts.shiftsList")}
+      </h2>
 
-      {/* Date filter form */}
       <div className="mb-6 bg-white p-4 rounded-lg shadow-md">
         <div className="flex flex-col sm:flex-row gap-4 items-end">
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700">
-              תאריך התחלה
+              {t("shifts.startDate")}
             </label>
             <input
               type="date"
@@ -258,7 +218,7 @@ const ShiftsList = () => {
           </div>
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700">
-              תאריך סיום
+              {t("shifts.endDate")}
             </label>
             <input
               type="date"
@@ -271,39 +231,47 @@ const ShiftsList = () => {
             onClick={clearFilter}
             className="bg-gray-300 text-gray-700 p-2 rounded-md hover:bg-gray-400 mt-4 sm:mt-0"
           >
-            נקה סינון
+            {t("shifts.clearFilter")}
           </button>
         </div>
       </div>
 
-      {error && (
-        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>
-      )}
-
       {loading ? (
-        <div className="text-center text-gray-500">טוען...</div>
+        <div className="text-center text-gray-500">{t("shifts.loading")}</div>
       ) : shifts.length === 0 ? (
         <div className="text-center text-gray-500">
-          לא נמצאו משמרות עבור חברה זו.
+          {t("shifts.noShiftsFound")}
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white shadow-md rounded-lg">
             <thead>
               <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                <th className="py-3 px-6 text-right">עובד</th>
-                <th className="py-3 px-6 text-right">תאריך</th>
-                <th className="py-3 px-6 text-right">שעת התחלה</th>
-                <th className="py-3 px-6 text-right">שעת סיום</th>
-                <th className="py-3 px-6 text-right">שעות עבודה</th>
-                <th className="py-3 px-6 text-right">סוג משמרת</th>
-                <th className="py-3 px-6 text-right">סוג יום</th>
-                <th className="py-3 px-6 text-right">חלוקת שעות</th>
-                <th className="py-3 px-6 text-right">שכר שעתי</th>
-                <th className="py-3 px-6 text-right">שכר כולל</th>
-                <th className="py-3 px-6 text-right">אחוזי משרה</th>
-                <th className="py-3 px-6 text-right">הערות</th>
-                <th className="py-3 px-6 text-right">פעולות</th>
+                <th className="py-3 px-6 text-right">{t("shifts.employee")}</th>
+                <th className="py-3 px-6 text-right">{t("shifts.date")}</th>
+                <th className="py-3 px-6 text-right">
+                  {t("shifts.startTime")}
+                </th>
+                <th className="py-3 px-6 text-right">{t("shifts.endTime")}</th>
+                <th className="py-3 px-6 text-right">
+                  {t("shifts.hoursWorked")}
+                </th>
+                <th className="py-3 px-6 text-right">
+                  {t("shifts.shiftType")}
+                </th>
+                <th className="py-3 px-6 text-right">{t("shifts.dayType")}</th>
+                <th className="py-3 px-6 text-right">
+                  {t("shifts.shiftBreakdown")}
+                </th>
+                <th className="py-3 px-6 text-right">
+                  {t("shifts.hourlySalary")}
+                </th>
+                <th className="py-3 px-6 text-right">{t("shifts.totalPay")}</th>
+                <th className="py-3 px-6 text-right">
+                  {t("shifts.jobPercentage")}
+                </th>
+                <th className="py-3 px-6 text-right">{t("shifts.notes")}</th>
+                <th className="py-3 px-6 text-right">{t("shifts.actions")}</th>
               </tr>
             </thead>
             <tbody className="text-gray-600 text-sm font-light">
@@ -376,18 +344,14 @@ const ShiftsList = () => {
                       )}
                     </td>
                     <td className="py-3 px-6 text-right">
-                      {shift.shiftType === "Day" ? "יום" : "לילה"}
+                      {t(`shifts.shiftTypes.${shift.shiftType}`)}
                     </td>
                     <td className="py-3 px-6 text-right">
-                      {shift.dayType === "Regular"
-                        ? "רגיל"
-                        : shift.dayType === "Holiday"
-                        ? "חג"
-                        : "מנוחה"}
+                      {t(`shifts.dayTypes.${shift.dayType}`)}
                     </td>
                     <td className="py-3 px-6 text-right">
                       {shift.shiftBreakdown && shift.shiftBreakdown.length > 0
-                        ? "לחץ לפירוט"
+                        ? t("shifts.clickForDetails")
                         : "-"}
                     </td>
                     <td className="py-3 px-6 text-right">
@@ -443,7 +407,7 @@ const ShiftsList = () => {
                             }}
                             className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-green-600"
                           >
-                            שמור
+                            {t("shifts.save")}
                           </button>
                           <button
                             onClick={(e) => {
@@ -452,7 +416,7 @@ const ShiftsList = () => {
                             }}
                             className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
                           >
-                            בטל
+                            {t("shifts.cancel")}
                           </button>
                         </div>
                       ) : (
@@ -463,7 +427,7 @@ const ShiftsList = () => {
                           }}
                           className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600"
                         >
-                          ערוך
+                          {t("shifts.edit")}
                         </button>
                       )}
                     </td>
@@ -475,16 +439,20 @@ const ShiftsList = () => {
                         <td colSpan="13" className="bg-gray-50 p-4">
                           <div className="border rounded-lg p-4 bg-white shadow-sm">
                             <h3 className="text-lg font-semibold mb-2">
-                              פירוט חלוקת שעות
+                              {t("shifts.breakdownDetails")}
                             </h3>
                             <table className="w-full text-sm">
                               <thead>
                                 <tr className="bg-gray-100">
                                   <th className="py-2 px-4 text-right">
-                                    סוג שעות
+                                    {t("shifts.rateType")}
                                   </th>
-                                  <th className="py-2 px-4 text-right">שעות</th>
-                                  <th className="py-2 px-4 text-right">מקדם</th>
+                                  <th className="py-2 px-4 text-right">
+                                    {t("shifts.hours")}
+                                  </th>
+                                  <th className="py-2 px-4 text-right">
+                                    {t("shifts.multiplier")}
+                                  </th>
                                 </tr>
                               </thead>
                               <tbody>

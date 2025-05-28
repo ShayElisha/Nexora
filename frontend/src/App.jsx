@@ -57,6 +57,12 @@ import JobPercentages from "./pages/AdminPanel/shifts/JobPercentages.jsx";
 import ShiftsList from "./pages/AdminPanel/shifts/ShiftsList.jsx";
 import MyShifts from "./pages/AdminPanel/shifts/MyShifts.jsx";
 import Salary from "./pages/AdminPanel/Salary/Salary.jsx";
+import TaxConfig from "./pages/AdminPanel/Salary/TaxConfig.jsx";
+import GlobalVacationCalculator from "./pages/AdminPanel/Salary/GlobalVacationCalculator.jsx";
+import SickDays from "./pages/AdminPanel/Salary/sickDays.jsx";
+import AddSickDay from "./pages/AdminPanel/Salary/AddSickDay.jsx";
+import UseSickDay from "./pages/AdminPanel/Salary/UseSickDay.jsx";
+import UseVacationDay from "./pages/AdminPanel/Salary/UseVocationDay.jsx";
 
 const App = () => {
   const { data: authUser, isLoading } = useQuery({
@@ -178,6 +184,12 @@ const App = () => {
             <Route path="Shifts-List" element={<ShiftsList />} />
             <Route path="My-Shifts" element={<MyShifts />} />
             <Route path="salary" element={<Salary />} />
+            <Route path="TaxConfig" element={<TaxConfig />} />
+            <Route path="Vacation" element={<GlobalVacationCalculator />} />
+            <Route path="sick-days" element={<SickDays />} />
+            <Route path="add-sickdays" element={<AddSickDay />} />
+            <Route path="use-sickdays" element={<UseSickDay />} />
+            <Route path="use-vacationdays" element={<UseVacationDay />} />
             <Route
               path="add-supplier"
               element={<AddSupplier authUser={authUser} />}

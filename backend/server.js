@@ -34,6 +34,8 @@ import chatRoutes from "./routes/chat.route.js";
 import shiftsRoutes from "./routes/Shifts.route.js";
 import payRateRoute from "./routes/payRate.route.js";
 import salaryRoute from "./routes/salary.route.js";
+import taxConfigRoutes from "./routes/TaxConfig.route.js";
+import sickDaysRoutes from "./routes/SickDays.route.js";
 
 dotenv.config();
 
@@ -79,6 +81,8 @@ app.use("/api/chatAi", chatRoutes);
 app.use("/api/shifts", shiftsRoutes);
 app.use("/api/payRate", payRateRoute);
 app.use("/api/salary", salaryRoute);
+app.use("/api/tax-config", taxConfigRoutes);
+app.use("/api/sickDays", sickDaysRoutes);
 
 app.post("/save-pdf", (req, res) => {
   const { pdfData, fileName } = req.body;

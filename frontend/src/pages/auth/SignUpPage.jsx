@@ -1,14 +1,19 @@
 import { Link } from "react-router-dom";
 import SignUpForm from "../../components/auth/SignUpForm";
 import { useTranslation } from "react-i18next";
+import { useQuery } from "@tanstack/react-query";
 
 const SignUpPage = () => {
-  const { t } = useTranslation();
+  const { data: authData } = useQuery({ queryKey: ["authUser"] });
+  const authUser = authData?.user;
+  const { t } = useTranslation(); // Get logged-in user from context
+
+  const isLoggedIn = !!authUser; // Check if user is logged in
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center py-12 sm:px-6 lg:px-8 bg-bg relative overflow-hidden">
+    <div className="max-h-full flex flex-col items-center justify-center py-12 bg-bg relative overflow-hidden">
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-primary via-secondary to-accent opacity-10 animate-fadeIn"></div>
-      <div className="w-full max-w-xl p-8 space-y-6 bg-bg rounded-lg shadow-lg border border-border-color animate-fadeIn">
+      <div className="w-full max-w-full space-y-6 bg-bg rounded-lg shadow-lg border animate-fadeIn">
         <div className="text-center">
           <img
             className="mx-auto h-20 w-auto rounded-full border-2 border-button-text shadow-md"
@@ -16,22 +21,26 @@ const SignUpPage = () => {
             alt={t("signupEmployee.signUpPage.logo_alt")}
           />
           <h2 className="mt-4 text-3xl font-extrabold text-text sm:text-4xl">
-            {t("signupEmployee.signUpPage.create_account")}
+            {isLoggedIn
+              ? t("signupEmployee.signUpPage.add_new_employee")
+              : t("signupEmployee.signUpPage.create_account")}
           </h2>
           <p className="text-secondary">
             {t("signupEmployee.signUpPage.fill_details")}
           </p>
         </div>
         <SignUpForm />
-        <p className="mt-4 text-sm text-center text-secondary">
-          {t("signupEmployee.signUpPage.already_have_account")}{" "}
-          <Link
-            to="/login"
-            className="font-medium text-primary hover:text-accent transition-colors duration-200"
-          >
-            {t("signupEmployee.signUpPage.log_in_here")}
-          </Link>
-        </p>
+        {!isLoggedIn && (
+          <p className="mt-4 text-sm text-center text-secondary">
+            {t("signupEmployee.signUpPage.already_have_account")}{" "}
+            <Link
+              to="/login"
+              className="font-medium text-primary hover:text-accent transition-colors duration-200"
+            >
+              {t("signupEmployee.signUpPage.log_in_here")}
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   );

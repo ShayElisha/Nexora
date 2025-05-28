@@ -27,3 +27,4 @@ node_modules/
 .qodo
 server/venv/
 venv/
+venv/

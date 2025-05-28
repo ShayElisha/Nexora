@@ -148,6 +148,11 @@ const employeeSchema = new mongoose.Schema(
         timestamp: { type: Date, default: Date.now },
       },
     ],
+    bankDetails: {
+      accountNumber: { type: String },
+      bankNumber: { type: String },
+      branchCode: { type: String },
+    },
   },
 
   { timestamps: true }

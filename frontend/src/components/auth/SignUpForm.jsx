@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-hot-toast";
@@ -29,7 +29,6 @@ const getNestedValue = (values, name) =>
   name.split(".").reduce((obj, key) => obj && obj[key], values) || "";
 
 const SignUpForm = () => {
-  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();

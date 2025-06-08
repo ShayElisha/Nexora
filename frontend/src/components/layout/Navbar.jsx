@@ -198,7 +198,6 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
         newPassword,
         confirmNewPassword,
         profileImageFile,
-        profileImage,
         ...profileData
       } = data;
       const formData = new FormData();
@@ -1340,6 +1339,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                             isInventoryNotification && productIdMatch
                               ? productIdMatch[1]
                               : null;
+                          console.log(productId);
                           // Extract employee ID from content (e.g., "מזהה: 507f1f77bcf86cd799439011")
                           const employeeIdMatch = notification.content.match(
                             /מזהה: ([a-fA-F0-9]{24})/

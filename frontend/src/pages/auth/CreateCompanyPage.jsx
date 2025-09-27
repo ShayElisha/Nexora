@@ -15,6 +15,7 @@ const CreateCompanyPage = () => {
         <img
           className="mx-auto size-36 border-4 border-button-text rounded-full shadow-lg hover:shadow-xl transition-shadow duration-300"
           src="../../../public/assets/logo.png"
+
           alt={t("company.logo_alt")}
         />
         <h2 className="mt-6 text-3xl font-extrabold text-text sm:text-4xl">

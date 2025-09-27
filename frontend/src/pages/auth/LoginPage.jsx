@@ -13,6 +13,7 @@ const LoginPage = () => {
           <img
             className="mx-auto h-20 w-auto rounded-full border-2 border-button-text shadow-md"
             src="../../../public/assets/logo.png"
+
             alt={t("auth.logo_alt")}
           />
           <h2 className="mt-4 text-2xl font-extrabold text-text sm:text-3xl">

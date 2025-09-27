@@ -2672,6 +2672,9 @@
         "success_create_finance": "הרישום הפיננסי נוצר בהצלחה"
       },
       "users": {
+        "delete": "מחק",
+        "search_placeholder": "חפש משתמשים...",
+        "confirm_delete": "אשר מחיקה",
         "users_list": "רשימת משתמשים",
         "search_placeholder": "חפש משתמשים...",
         "profile_image": "תמונת פרופיל",
@@ -2953,6 +2956,7 @@
           "personal_info": "מידע אישי",
           "address": "כתובת",
           "bank_details": "פרטי בנק",
+
           "employment_details": "פרטי העסקה",
           "payment_details": "פרטי תשלום",
           "profile_image": "תמונת פרופיל"
@@ -2966,6 +2970,7 @@
           "gender": "מין",
           "identity": "תעודת זהות",
           "date_of_birth": "תאריך לידה",
+
           "street": "רחוב",
           "city": "עיר",
           "country": "מדינה",
@@ -2973,6 +2978,7 @@
           "account_number": "מספר חשבון בנק",
           "bank_number": "מספר בנק",
           "branch_code": "קוד סניף",
+
           "department": "מחלקה",
           "role": "תפקיד",
           "payment_type": "סוג תשלום",
@@ -2981,6 +2987,7 @@
           "expected_hours": "שעות צפויות",
           "profile_image": "תמונת פרופיל",
           "profile_image_url": "כתובת URL של תמונת פרופיל"
+
         },
         "placeholders": {
           "first_name": "הזן שם פרטי",
@@ -3012,12 +3019,14 @@
           "global": "גלובלי",
           "hourly": "שעתי",
           "commission_based": "מבוסס עמלה"
+
         },
         "validation": {
           "first_name_required": "שם פרטי נדרש",
           "last_name_required": "שם משפחה נדרש",
           "invalid_email_format": "פורמט דוא\"ל לא תקין",
           "email_required": "דוא\"ל נדרש",
+
           "password_required": "סיסמה נדרשת",
           "password_min": "הסיסמה חייבת להיות באורך של לפחות {count} תווים",
           "password_uppercase": "הסיסמה חייבת לכלול לפחות אות גדולה אחת",
@@ -3029,6 +3038,7 @@
           "date_of_birth_required": "תאריך לידה נדרש",
           "date_of_birth_future": "תאריך הלידה לא יכול להיות בעתיד",
           "date_of_birth_age": "הגיל המינימלי הוא 16",
+
           "street_required": "רחוב נדרש",
           "city_required": "עיר נדרשת",
           "country_required": "מדינה נדרשת",
@@ -3055,6 +3065,7 @@
         "messages": {
           "image_removed": "התמונה הוסרה בהצלחה",
           "department_added": "המחלקה נוספה בהצלחה"
+
         },
         "aria": {
           "show_password": "הצג סיסמה",
@@ -3068,6 +3079,7 @@
       },
       "errors1": {
         "general_error": "אירעה שגיאה, אנא נסה שוב מאוחר יותר"
+
       },
       "signupEmployee": {
         "signUpPage": {

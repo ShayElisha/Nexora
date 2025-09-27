@@ -152,6 +152,7 @@ const employeeSchema = new mongoose.Schema(
       bankNumber: { type: String },
       branchCode: { type: String },
     },
+
   },
 
   { timestamps: true }

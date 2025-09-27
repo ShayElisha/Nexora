@@ -5,6 +5,7 @@ import PayRate from "../models/PayRates.model.js";
 import Salary from "../models/Salary.model.js";
 import Notification from "../models/notification.model.js";
 
+
 import cron from "node-cron";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -63,6 +64,7 @@ export const createEmployee = async (req, res) => {
       bankNumber: data.bankDetails?.bankNumber || "",
       branchCode: data.bankDetails?.branchCode || "",
     },
+
     role: data.role || "",
     department: data.department || null,
     paymentType: data.paymentType,
@@ -75,6 +77,7 @@ export const createEmployee = async (req, res) => {
     vacationHistory: [],
     sickBalance: 0,
     sickHistory: [],
+
   };
 
   // Validate salary fields based on paymentType
@@ -83,6 +86,7 @@ export const createEmployee = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "hourlySalary is required and must be non-negative for Hourly payment type",
+
       });
     }
     employeeData.globalSalary = null;
@@ -92,12 +96,14 @@ export const createEmployee = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "globalSalary is required and must be non-negative for Global payment type",
+
       });
     }
     if (employeeData.expectedHours == null || employeeData.expectedHours < 0) {
       return res.status(400).json({
         success: false,
         message: "expectedHours is required and must be non-negative for Global payment type",
+
       });
     }
     employeeData.hourlySalary = null;
@@ -224,6 +230,7 @@ export const updateEmployee = async (req, res) => {
     ];
 
     // פריסת שדות address ו-bankDetails אם יש
+
     const flattened = {};
     for (const key of Object.keys(req.body)) {
       if (key === "address" && typeof req.body.address === "object") {
@@ -234,6 +241,7 @@ export const updateEmployee = async (req, res) => {
         for (const sub of Object.keys(req.body.bankDetails)) {
           flattened[`bankDetails.${sub}`] = req.body.bankDetails[sub];
         }
+
       } else {
         flattened[key] = req.body[key];
       }
@@ -254,6 +262,7 @@ export const updateEmployee = async (req, res) => {
       const uploadResult = await uploadToCloudinary(req.file.buffer, {
         folder: "profile_images",
         resource_type: "image",
+
       });
       flattened.profileImage = uploadResult.secure_url;
     }
@@ -261,11 +270,13 @@ export const updateEmployee = async (req, res) => {
     // אימות מפתחות מותרות
     const keys = Object.keys(flattened);
     const valid = keys.every((k) => k.startsWith("address.") || k.startsWith("bankDetails.") || allowedUpdates.includes(k));
+
     if (!valid) {
       return res.status(400).json({ success: false, message: "Invalid update fields" });
     }
 
     // עדכון סיסמה אם קיים
+
     if (flattened.password) {
       flattened.password = await bcrypt.hash(flattened.password, 10);
     }
@@ -280,6 +291,7 @@ export const updateEmployee = async (req, res) => {
       .populate("projects.projectId", "name")
       .populate("department", "name");
 
+
     if (!updated) {
       return res.status(404).json({ success: false, message: "Employee not found" });
     }
@@ -293,6 +305,7 @@ export const updateEmployee = async (req, res) => {
 
 export const addSickDay = async (req, res) => {
   try {
+
     const employeeId = req.params.id;
     console.log("employeeId:", employeeId);
     const { monthYear, days, country } = req.body;
@@ -309,6 +322,7 @@ export const addSickDay = async (req, res) => {
 
     // בדיקת כפילות לחודש הזה
     if (employee.sickHistory.some((entry) => entry.month === monthYear)) {
+
       return res.status(400).json({ success: false, message: "Sick day for this month already exists" });
     }
 
@@ -331,6 +345,7 @@ export const addSickDay = async (req, res) => {
       _id: employee._id,
       sickBalance: employee.sickBalance,
       lastHistoryEntry: employee.sickHistory.slice(-1)[0],
+
     });
     await employee.save();
     return res.status(200).json({ success: true, data: employee });
@@ -429,6 +444,7 @@ export const updateEmployeeVacation = async (req, res) => {
       }
     }
 
+
     const employee = await Employee.findByIdAndUpdate(
       req.params.id,
       {
@@ -438,6 +454,7 @@ export const updateEmployeeVacation = async (req, res) => {
       { new: true, runValidators: true }
     )
       .select("name lastName address.country expectedHours vacationBalance vacationHistory createdAt")
+
       .populate("companyId", "name")
       .populate("projects.projectId", "name")
       .populate("department", "name");
@@ -445,6 +462,7 @@ export const updateEmployeeVacation = async (req, res) => {
     if (!employee) {
       console.error("Employee not found for ID:", req.params.id);
       return res.status(404).json({ success: false, message: "Employee not found" });
+
     }
 
     console.log("Updated employee:", employee);
@@ -458,6 +476,7 @@ export const updateEmployeeVacation = async (req, res) => {
     });
   }
 };
+
 
 // Soft delete employee by ID
 export const deleteEmployee = async (req, res) => {
@@ -476,6 +495,7 @@ export const deleteEmployee = async (req, res) => {
       return res.status(404).json({ success: false, message: "Employee not found" });
     }
 
+
     employee.status = "deleted";
     employee.deletedAt = new Date();
     await employee.save();
@@ -485,6 +505,7 @@ export const deleteEmployee = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error soft deleting employee",
+
       error: error.message,
     });
   }
@@ -639,6 +660,7 @@ export const triggerMonthlyVacationUpdate = async (req, res) => {
   }
 };
 
+
 export const updateSickDays = async (req, res) => {
   try {
     const employees = await Employee.find(); // Only active employees
@@ -650,6 +672,7 @@ export const updateSickDays = async (req, res) => {
     for (const employee of employees) {
       const policy = await SickDays.findOne({ country: employee.address.country });
       if (!policy) continue;
+
 
       // Parse accrual_rate (e.g., "1.5 לחודש")
       const accrualRateMatch = policy.accrual_rate.match(/(\d+\.?\d*)/);
@@ -670,6 +693,7 @@ export const updateSickDays = async (req, res) => {
         newBalance: newSickDays,
         country: employee.address.country,
         timestamp: currentDate,
+
       });
 
       // Update sickBalance
@@ -687,6 +711,7 @@ export const updateSickDays = async (req, res) => {
     }
   } catch (error) {
     const errorMessage = "שגיאה בעדכון ימי מחלה: " + error.message;
+
     if (res) {
       res.status(500).json({ message: errorMessage });
     } else {
@@ -704,6 +729,7 @@ cron.schedule("0 0 1 * *", async () => {
     console.error("שגיאה בעדכון ימי מחלה:", error.message);
   }
 });
+
 
 export const useSickDay = async (req, res) => {
   try {
@@ -747,6 +773,7 @@ export const useSickDay = async (req, res) => {
           message: `לא ניתן להשתמש ביום מחלה בתאריך ${checkDate.toLocaleDateString()} עקב ${
             existingShift.dayType || "משמרת"
           } קיימת`,
+
         });
       }
     }
@@ -784,6 +811,7 @@ export const useSickDay = async (req, res) => {
 
     // 9. פרשנות paid_percentage ו-waiting_period
     const parts = policy.paid_percentage.split(",").map((p) => p.trim());
+
     const waitDays = parseInt((policy.waiting_period.match(/(\d+)/) || [0, 0])[1], 10);
     const rules = [];
     for (const part of parts) {
@@ -801,6 +829,7 @@ export const useSickDay = async (req, res) => {
     for (let i = 1; i <= usedDays; i++) {
       if (i <= waitDays) continue;
       const rule = rules.find((r) => i >= r.from && i <= r.to);
+
       const pct = rule?.pct || 0;
       if (pct <= 0) continue;
       const multiplier = pct / 100;
@@ -867,6 +896,7 @@ export const useVacationDay = async (req, res) => {
 
     const employeeId = req.params.id;
     const { startDate, endDate, days } = req.body;
+
     // 2. ולידציה בסיסית
     if (!startDate || isNaN(Date.parse(startDate)) || !endDate || isNaN(Date.parse(endDate)))
       return res.status(400).json({ success: false, message: "תאריכים חסרים או לא תקינים" });
@@ -874,6 +904,7 @@ export const useVacationDay = async (req, res) => {
     const usedDays = Number(days);
     if (isNaN(usedDays) || usedDays <= 0)
     return res.status(400).json({ success: false, message: "מספר ימים לא תקין" });
+
 
     // 3. שליפת העובד
     const employee = await Employee.findById(employeeId);
@@ -898,6 +929,7 @@ export const useVacationDay = async (req, res) => {
           message: `לא ניתן להשתמש ביום חופשה בתאריך ${checkDate.toLocaleDateString()} עקב ${
             existingShift.dayType || "משמרת"
           } קיימת`,
+
         });
       }
     }
@@ -911,6 +943,7 @@ export const useVacationDay = async (req, res) => {
     const monthYear = `${String(new Date(startDate).getMonth() + 1).padStart(2, "0")}/${new Date(
       startDate
     ).getFullYear()}`;
+
     employee.vacationHistory.push({
       month: monthYear,
       daysAdded: -usedDays,
@@ -1113,4 +1146,5 @@ export const triggerEmployeeDetailsCheck = async (req, res) => {
       error: error.message,
     });
   }
+
 };

@@ -29,6 +29,7 @@ const getNestedValue = (values, name) =>
   name.split(".").reduce((obj, key) => obj && obj[key], values) || "";
 
 const SignUpForm = () => {
+
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -174,6 +175,7 @@ const SignUpForm = () => {
       role: "",
       address: { street: "", city: "", country: "", postalCode: "" },
       bankDetails: { accountNumber: "", bankNumber: "", branchCode: "" },
+
       paymentType: "Global",
       hourlySalary: "",
       globalSalary: "",
@@ -207,6 +209,7 @@ const SignUpForm = () => {
       );
       formData.append("bankDetails[bankNumber]", values.bankDetails.bankNumber);
       formData.append("bankDetails[branchCode]", values.bankDetails.branchCode);
+
       formData.append("paymentType", values.paymentType);
       if (values.hourlySalary)
         formData.append("hourlySalary", values.hourlySalary);
@@ -313,6 +316,7 @@ const SignUpForm = () => {
             formik={formik}
             ariaRequired="true"
           />
+
           <div className="space-y-2 animate-slideIn">
             <label className="block text-sm font-medium text-text">
               {t("signUpForm.form.gender")} <span aria-hidden="true">*</span>
@@ -351,6 +355,7 @@ const SignUpForm = () => {
             </label>
             <PhoneInput
               country={"auto"}
+
               enableSearch
               searchPlaceholder={t("signUpForm.placeholders.search_country")}
               containerClass="mt-2 w-full"
@@ -446,6 +451,7 @@ const SignUpForm = () => {
             ariaRequired="true"
           />
         </div>
+
 
         {/* Employment Details */}
         {authUser && (

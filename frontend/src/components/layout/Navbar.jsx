@@ -198,6 +198,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
         newPassword,
         confirmNewPassword,
         profileImageFile,
+
         ...profileData
       } = data;
       const formData = new FormData();
@@ -1332,6 +1333,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                             notification.PurchaseOrder === "Inventory";
                           const isDetailsNotification =
                             notification.PurchaseOrder === "details";
+
                           const productIdMatch = notification.content.match(
                             /product (.*) is below/
                           );
@@ -1349,6 +1351,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                               ? employeeIdMatch[1]
                               : null;
 
+
                           return (
                             <div
                               key={notification._id}
@@ -1356,6 +1359,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                                 !notification.isRead &&
                                 !isInventoryNotification &&
                                 !isDetailsNotification &&
+
                                 markNotificationAsRead(notification._id)
                               }
                               className={`relative border-b mb-1 pb-1 pl-2 pr-4 rounded-lg ${
@@ -1420,6 +1424,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                                     {t("notifications.invalidEmployeeId")}
                                   </p>
                                 )}
+
                             </div>
                           );
                         })

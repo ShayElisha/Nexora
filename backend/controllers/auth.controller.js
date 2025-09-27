@@ -324,6 +324,7 @@ export const getCurrentUser = async (req, res) => {
         company: user.companyId || null,
         profileImage: user.profileImage,
         pack: pack?.planName || null,
+
       },
     });
   } catch (error) {

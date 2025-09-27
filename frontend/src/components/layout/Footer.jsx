@@ -13,6 +13,7 @@ const Footer = () => {
             style={{ width: "90px", height: "90px" }}
             alt={t("footer.logo_alt")}
           />
+
           <p className="text-sm mt-2">{t("footer.description")}</p>
         </div>
 

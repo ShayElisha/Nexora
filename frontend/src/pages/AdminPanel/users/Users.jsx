@@ -15,6 +15,416 @@ const getRandomColor = () => {
   return color;
 };
 
+const EmployeeForm = ({ employee, onSave, onCancel }) => {
+  const { t } = useTranslation();
+  const [formData, setFormData] = useState(
+    employee || {
+      name: "",
+      lastName: "",
+      gender: "",
+      dateOfBirth: "",
+      identity: "",
+      email: "",
+      password: "",
+      profileImage: "",
+      role: "",
+      phone: "",
+      employeeId: "",
+      department: "",
+      benefits: [],
+      status: "active",
+      address: { city: "", street: "", country: "", postalCode: "" },
+      paymentType: "Global",
+      hourlySalary: null,
+      globalSalary: null,
+      expectedHours: null,
+      vacationBalance: 0,
+      sickBalance: 0,
+    }
+  );
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name.includes("address.")) {
+      const field = name.split(".")[1];
+      setFormData({
+        ...formData,
+        address: { ...formData.address, [field]: value },
+      });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 p-6 bg-bg rounded-xl shadow-lg border border-border-color"
+    >
+      <h2 className="text-2xl font-bold text-text mb-4">
+        {t("users.edit_employee")}
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.name")}
+          </label>
+          <input
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder={t("users.name")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.last_name")}
+          </label>
+          <input
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            placeholder={t("users.last_name")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.gender")}
+          </label>
+          <select
+            name="gender"
+            value={formData.gender}
+            onChange={handleChange}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          >
+            <option value="">{t("users.select_gender")}</option>
+            <option value="Male">{t("users.male")}</option>
+            <option value="Female">{t("users.female")}</option>
+            <option value="Other">{t("users.other")}</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.date_of_birth")}
+          </label>
+          <input
+            name="dateOfBirth"
+            type="date"
+            value={formData.dateOfBirth}
+            onChange={handleChange}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.identity")}
+          </label>
+          <input
+            name="identity"
+            value={formData.identity}
+            onChange={handleChange}
+            placeholder={t("users.identity")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.email")}
+          </label>
+          <input
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder={t("users.email")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.password")}
+          </label>
+          <input
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder={t("users.password")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.profile_image")}
+          </label>
+          <input
+            name="profileImage"
+            value={formData.profileImage}
+            onChange={handleChange}
+            placeholder={t("users.profile_image_url")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.role")}
+          </label>
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          >
+            <option value="">{t("users.select_role")}</option>
+            <option value="Admin">{t("users.admin")}</option>
+            <option value="Manager">{t("users.manager")}</option>
+            <option value="Employee">{t("users.employee")}</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.phone")}
+          </label>
+          <input
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder={t("users.phone")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.employee_id")}
+          </label>
+          <input
+            name="employeeId"
+            value={formData.employeeId}
+            onChange={handleChange}
+            placeholder={t("users.employee_id")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.department")}
+          </label>
+          <input
+            name="department"
+            value={formData.department}
+            onChange={handleChange}
+            placeholder={t("users.department")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.benefits")}
+          </label>
+          <input
+            name="benefits"
+            value={formData.benefits.join(",")}
+            onChange={(e) =>
+              setFormData({ ...formData, benefits: e.target.value.split(",") })
+            }
+            placeholder={t("users.benefits_placeholder")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.status")}
+          </label>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          >
+            <option value="active">{t("users.active")}</option>
+            <option value="inactive">{t("users.inactive")}</option>
+            <option value="suspended">{t("users.suspended")}</option>
+            <option value="deleted">{t("users.deleted")}</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.city")}
+          </label>
+          <input
+            name="address.city"
+            value={formData.address.city}
+            onChange={handleChange}
+            placeholder={t("users.city")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.street")}
+          </label>
+          <input
+            name="address.street"
+            value={formData.address.street}
+            onChange={handleChange}
+            placeholder={t("users.street")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.country")}
+          </label>
+          <input
+            name="address.country"
+            value={formData.address.country}
+            onChange={handleChange}
+            placeholder={t("users.country")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.postal_code")}
+          </label>
+          <input
+            name="address.postalCode"
+            value={formData.address.postalCode}
+            onChange={handleChange}
+            placeholder={t("users.postal_code")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.payment_type")}
+          </label>
+          <select
+            name="paymentType"
+            value={formData.paymentType}
+            onChange={handleChange}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+            required
+          >
+            <option value="Hourly">{t("users.hourly")}</option>
+            <option value="Global">{t("users.global")}</option>
+            <option value="Commission-Based">
+              {t("users.commission_based")}
+            </option>
+          </select>
+        </div>
+        {formData.paymentType === "Hourly" && (
+          <div>
+            <label className="block text-sm font-medium text-text mb-1">
+              {t("users.hourly_salary")}
+            </label>
+            <input
+              name="hourlySalary"
+              type="number"
+              value={formData.hourlySalary || ""}
+              onChange={handleChange}
+              placeholder={t("users.hourly_salary")}
+              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+              required
+            />
+          </div>
+        )}
+        {formData.paymentType === "Global" && (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-text mb-1">
+                {t("users.global_salary")}
+              </label>
+              <input
+                name="globalSalary"
+                type="number"
+                value={formData.globalSalary || ""}
+                onChange={handleChange}
+                placeholder={t("users.global_salary")}
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-text mb-1">
+                {t("users.expected_hours")}
+              </label>
+              <input
+                name="expectedHours"
+                type="number"
+                value={formData.expectedHours || ""}
+                onChange={handleChange}
+                placeholder={t("users.expected_hours")}
+                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+                required
+              />
+            </div>
+          </>
+        )}
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.vacation_balance")}
+          </label>
+          <input
+            name="vacationBalance"
+            type="number"
+            value={formData.vacationBalance}
+            onChange={handleChange}
+            placeholder={t("users.vacation_balance")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-text mb-1">
+            {t("users.sick_balance")}
+          </label>
+          <input
+            name="sickBalance"
+            type="number"
+            value={formData.sickBalance}
+            onChange={handleChange}
+            placeholder={t("users.sick_balance")}
+            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
+          />
+        </div>
+      </div>
+      <div className="flex justify-end space-x-4 mt-6">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-6 py-2 bg-gray-300 text-text rounded-full hover:bg-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+        >
+          {t("users.cancel")}
+        </button>
+        <button
+          type="submit"
+          className="px-6 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-primary transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+        >
+          {t("users.save")}
+        </button>
+      </div>
+    </form>
+  );
+};
+
 const Users = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -29,6 +439,7 @@ const Users = () => {
   const usersPerPage = 12;
   const location = useLocation();
   const navigate = useNavigate();
+
 
   const {
     data: users = [],
@@ -75,6 +486,19 @@ const Users = () => {
     },
   });
 
+  const updateEmployeeMutation = useMutation({
+    mutationFn: (employee) =>
+      axiosInstance.put(`/employees/${employee._id}`, employee),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["employees"]);
+      toast.success(t("users.updated"));
+      setEditingEmployee(null);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || t("users.error_updating"));
+    },
+  });
+
   const updateEmployeeStatusMutation = useMutation({
     mutationFn: ({ employeeId, status }) =>
       axiosInstance.put(`/employees/${employeeId}`, { status }),
@@ -105,7 +529,6 @@ const Users = () => {
 
   const filteredUsers = users.filter((user) => {
     if (!searchTerm.trim()) return true;
-
     const searchLower = searchTerm.toLowerCase().trim();
     const searchableString = [
       user.name || "",
@@ -134,10 +557,10 @@ const Users = () => {
         ? `${user.vacationBalance} ${t("users.vacation_days")}`
         : "",
       user.sickBalance ? `${user.sickBalance} ${t("users.sick_days")}` : "",
+
     ]
       .join(" ")
       .toLowerCase();
-
     return searchableString.includes(searchLower);
   });
 
@@ -159,6 +582,7 @@ const Users = () => {
             key={i}
             onClick={() => paginate(i)}
             className={`px-3 py-1 rounded-full mx-1 ${
+
               currentPage === i
                 ? "bg-button-bg text-button-text"
                 : "bg-accent text-text hover:bg-secondary hover:text-button-text"
@@ -178,6 +602,7 @@ const Users = () => {
             key={1}
             onClick={() => paginate(1)}
             className={`px-3 py-1 rounded-full mx-1 ${
+
               currentPage === 1
                 ? "bg-button-bg text-button-text"
                 : "bg-accent text-text hover:bg-secondary hover:text-button-text"
@@ -189,6 +614,7 @@ const Users = () => {
         if (startPage > 2) {
           pageNumbers.push(
             <span key="start-dots" className="mx-1">
+
               ...
             </span>
           );
@@ -201,6 +627,7 @@ const Users = () => {
             key={i}
             onClick={() => paginate(i)}
             className={`px-3 py-1 rounded-full mx-1 ${
+
               currentPage === i
                 ? "bg-button-bg text-button-text"
                 : "bg-accent text-text hover:bg-secondary hover:text-button-text"
@@ -215,6 +642,7 @@ const Users = () => {
         if (endPage < totalPages - 1) {
           pageNumbers.push(
             <span key="end-dots" className="mx-1">
+
               ...
             </span>
           );
@@ -224,6 +652,7 @@ const Users = () => {
             key={totalPages}
             onClick={() => paginate(totalPages)}
             className={`px-3 py-1 rounded-full mx-1 ${
+
               currentPage === totalPages
                 ? "bg-button-bg text-button-text"
                 : "bg-accent text-text hover:bg-secondary hover:text-button-text"
@@ -250,6 +679,14 @@ const Users = () => {
     if (window.confirm(t("users.confirm_delete"))) {
       deleteEmployeeMutation.mutate(employeeId);
     }
+  };
+
+  const handleEdit = (employee) => {
+    setEditingEmployee(employee);
+  };
+
+  const handleSave = (employee) => {
+    updateEmployeeMutation.mutate(employee);
   };
 
   const handleStatusChange = (employeeId, status) => {
@@ -399,18 +836,27 @@ const Users = () => {
     <div className="max-h-full flex justify-center items-start py-8 animate-fade-in">
       <div className="w-full max-w-full pb-[40vh] rounded-xl shadow-lg border border-border-color bg-bg">
         <h1 className="text-3xl sm:text-4xl font-extrabold mb-8 text-center text-text tracking-tight drop-shadow-md">
+
           {t("users.users_list")}
         </h1>
 
-        <div className="mb-6">
+        <div className="mb-8">
           <input
             type="text"
             placeholder={t("users.search_placeholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-3 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 placeholder-opacity-50"
+            className="w-full p-4 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 placeholder-opacity-50 text-sm"
           />
         </div>
+
+        {editingEmployee && (
+          <EmployeeForm
+            employee={editingEmployee}
+            onSave={handleSave}
+            onCancel={() => setEditingEmployee(null)}
+          />
+        )}
 
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
@@ -457,6 +903,7 @@ const Users = () => {
                       {t("users.status")}
                     </th>
                     <th className="py-3 px-4 text-sm font-semibold tracking-wide">
+
                       {t("users.actions")}
                     </th>
                   </tr>
@@ -467,6 +914,7 @@ const Users = () => {
                       <td
                         colSpan={11}
                         className="py-6 px-4 text-center text-text opacity-70 italic text-lg"
+
                       >
                         {searchTerm
                           ? t("users.no_users_match")
@@ -485,6 +933,7 @@ const Users = () => {
                         !user.profileImage || hasImageError;
                       const userId = user._id || `${user.email}-${index}`;
 
+
                       return (
                         <>
                           <tr
@@ -493,6 +942,7 @@ const Users = () => {
                             onClick={() => handleRowClick(user)}
                           >
                             <td className="py-3 px-4">
+
                               {shouldShowInitial ? (
                                 <div
                                   className="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-white text-xl font-bold"
@@ -508,6 +958,7 @@ const Users = () => {
                                   }`}
                                   className="w-12 h-12 rounded-full object-cover mx-auto"
                                   onError={() => handleImageError(userId)}
+
                                   loading="lazy"
                                 />
                               )}
@@ -543,6 +994,7 @@ const Users = () => {
                               {user.sickBalance ?? "-"}
                             </td>
                             <td className="py-3 px-4">
+
                               <select
                                 value={user.status || "active"}
                                 onChange={(e) =>
@@ -552,6 +1004,7 @@ const Users = () => {
                                 className="p-2 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary transition-all duration-200"
                               >
                                 <option value="active">{t("users.active")}</option>
+
                                 <option value="inactive">
                                   {t("users.inactive")}
                                 </option>
@@ -570,6 +1023,7 @@ const Users = () => {
                                   openEditModal(user);
                                 }}
                                 className="px-4 py-2 bg-primary text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+
                               >
                                 {t("users.edit")}
                               </button>
@@ -579,6 +1033,7 @@ const Users = () => {
                                   handleDelete(user._id);
                                 }}
                                 className="px-4 py-2 bg-red-500 text-button-text rounded-full shadow-md hover:bg-red-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+
                               >
                                 {t("users.delete")}
                               </button>
@@ -751,6 +1206,7 @@ const Users = () => {
                                         </button>
                                       </li>
                                     </ul>
+
                                   </div>
                                 </div>
                               </td>
@@ -771,6 +1227,7 @@ const Users = () => {
                   className={`px-3 py-1 rounded-full ${
                     currentPage === 1
                       ? "bg-gray-300 cursor-not-allowed"
+
                       : "bg-button-bg text-button-text hover:bg-secondary"
                   }`}
                 >
@@ -783,6 +1240,7 @@ const Users = () => {
                   className={`px-3 py-1 rounded-full ${
                     currentPage === totalPages
                       ? "bg-gray-300 cursor-not-allowed"
+
                       : "bg-button-bg text-button-text hover:bg-secondary"
                   }`}
                 >
@@ -1120,6 +1578,7 @@ const Users = () => {
               </form>
             </div>
           </div>
+
         )}
       </div>
     </div>

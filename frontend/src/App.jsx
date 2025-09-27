@@ -65,6 +65,7 @@ import UseSickDay from "./pages/AdminPanel/Salary/UseSickDay.jsx";
 import UseVacationDay from "./pages/AdminPanel/Salary/UseVocationDay.jsx";
 import SignupSuper from "./components/auth/SignupSuper.jsx";
 
+
 const App = () => {
   const { data: authUser, isLoading } = useQuery({
     queryKey: ["authUser"],
@@ -130,6 +131,7 @@ const App = () => {
               authUser?.user?.role === "SuperAdmin" ? (
                 <Navigate to="/nexora" replace />
               ) : authUser?.user?.role === "Admin" ? (
+
                 <Navigate to="/dashboard" replace />
               ) : authUser?.user?.role === "Employee" ||
                 authUser?.user?.role === "Manager" ? (
@@ -155,6 +157,7 @@ const App = () => {
           <Route path="/signupSuperAdmin" element={<SignupSuper />} />
 
           <Route
+
             path="/employee"
             element={<EmployeeRoute authUser={authUser} />}
           >

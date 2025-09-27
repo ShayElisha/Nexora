@@ -992,6 +992,8 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
     navigationLinks = employeeLinks;
   }
 
+
+  
   // Render SubMenu
   const renderSubMenu = (subMenu, parentIndex) => {
     return (

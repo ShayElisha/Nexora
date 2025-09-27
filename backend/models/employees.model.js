@@ -5,7 +5,6 @@ const employeeSchema = new mongoose.Schema(
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
-      required: true,
     },
     name: {
       type: String,
@@ -46,7 +45,7 @@ const employeeSchema = new mongoose.Schema(
     role: {
       type: String,
       required: false,
-      enum: ["Admin", "Manager", "Employee", ""],
+      enum: ["Admin", "Manager", "Employee", "SuperAdmin"],
     },
     phone: {
       type: String,

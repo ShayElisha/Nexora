@@ -1,4 +1,3 @@
-// src/components/Footer.jsx
 import { useTranslation } from "react-i18next";
 
 const Footer = () => {
@@ -8,10 +7,12 @@ const Footer = () => {
     <footer className="bg-primary text-white py-6">
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
         {/* Section 1: Logo and Description */}
-        <div className="mb-4 md:mb-0">
-          <h1 className="text-accent text-xl font-bold">
-            {t("footer.company_name")}
-          </h1>
+        <div className="mb-0 md:mb-0">
+          <img
+            src="../../../public/assets/logo.png"
+            style={{ width: "90px", height: "90px" }}
+            alt={t("footer.logo_alt")}
+          />
           <p className="text-sm mt-2">{t("footer.description")}</p>
         </div>
 

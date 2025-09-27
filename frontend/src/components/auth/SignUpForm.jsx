@@ -350,7 +350,7 @@ const SignUpForm = () => {
               {t("signUpForm.form.phone")} <span aria-hidden="true">*</span>
             </label>
             <PhoneInput
-              country={"us"}
+              country={"auto"}
               enableSearch
               searchPlaceholder={t("signUpForm.placeholders.search_country")}
               containerClass="mt-2 w-full"

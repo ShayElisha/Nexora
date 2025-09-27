@@ -280,11 +280,11 @@ export const login = async (req, res) => {
       user: {
         name: user.name,
         employeeId: user._Id,
-        lastName: user.lastName,
+        lastName: user.lastName || null,
         email: user.email,
         role: user.role,
-        companyId: user.companyId,
-        profileImage: user.profileImage,
+        companyId: user.companyId || null,
+        profileImage: user.profileImage || null,
       },
     });
   } catch (error) {
@@ -299,27 +299,31 @@ export const logout = (req, res) => {
 
 export const getCurrentUser = async (req, res) => {
   try {
-    // User is already attached to req by protectRoute middleware
     const user = req.user;
-    const pack = await Payment.findOne({ companyId: user.companyId });
-    console.log(pack);
     if (!user) {
       return res
         .status(404)
         .json({ success: false, message: "User not found" });
     }
 
+    // בדוק אם יש companyId לפני חיפוש ב-Payment
+    const pack = user.companyId
+      ? await Payment.findOne({ companyId: user.companyId })
+      : null;
+    console.log("User:", user);
+    console.log("Payment:", pack);
+
     res.status(200).json({
       success: true,
       user: {
         name: user.name,
         employeeId: user._id,
-        lastName: user.lastName,
+        lastName: user.lastName || null,
         email: user.email,
         role: user.role,
-        company: user.companyId,
+        company: user.companyId || null,
         profileImage: user.profileImage,
-        pack: pack.planName,
+        pack: pack?.planName || null,
       },
     });
   } catch (error) {
@@ -327,7 +331,6 @@ export const getCurrentUser = async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
-
 export const switchCompany = async (req, res) => {
   try {
     const { newCompanyId } = req.body; // מזהה החברה החדשה

@@ -211,6 +211,7 @@ export const updateEmployee = async (req, res) => {
       "identity",
       "phone",
       "role",
+      "department",
       "paymentType",
       "hourlySalary",
       "globalSalary",
@@ -1080,8 +1081,8 @@ export const checkEmployeeDetails = async () => {
   }
 };
 
-// Schedule the check every 7 hours
-cron.schedule("*/1 * * * *", async () => {
+// Schedule the check every hours
+cron.schedule("0 * * * *", async () => {
   console.log("Running scheduled employee details check...");
   try {
     await checkEmployeeDetails();

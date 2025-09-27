@@ -63,8 +63,6 @@ import SickDays from "./pages/AdminPanel/Salary/sickDays.jsx";
 import AddSickDay from "./pages/AdminPanel/Salary/AddSickDay.jsx";
 import UseSickDay from "./pages/AdminPanel/Salary/UseSickDay.jsx";
 import UseVacationDay from "./pages/AdminPanel/Salary/UseVocationDay.jsx";
-import SignupSuper from "./components/auth/SignupSuper.jsx";
-
 
 const App = () => {
   const { data: authUser, isLoading } = useQuery({
@@ -87,13 +85,6 @@ const App = () => {
 
   const AdminRoute = ({ authUser }) => {
     return authUser?.user?.role === "Admin" ? (
-      <Outlet />
-    ) : (
-      <Navigate to="/" replace />
-    );
-  };
-  const SuperAdminRoute = ({ authUser }) => {
-    authUser?.user?.role === "SuperAdmin" ? (
       <Outlet />
     ) : (
       <Navigate to="/" replace />
@@ -122,16 +113,9 @@ const App = () => {
       <Layout>
         <Routes>
           <Route
-            path="/nexora"
-            element={<SuperAdminRoute authUser={authUser} />}
-          ></Route>
-          <Route
             path="/"
             element={
-              authUser?.user?.role === "SuperAdmin" ? (
-                <Navigate to="/nexora" replace />
-              ) : authUser?.user?.role === "Admin" ? (
-
+              authUser?.user?.role === "Admin" ? (
                 <Navigate to="/dashboard" replace />
               ) : authUser?.user?.role === "Employee" ||
                 authUser?.user?.role === "Manager" ? (
@@ -152,12 +136,10 @@ const App = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/payment/completed" element={<Success />} />
           <Route path="/payment/cancelled" element={<Fail />} />
-          <Route path="/nexora1" element={<NexoraAdmin />} />
+          <Route path="/nexora" element={<NexoraAdmin />} />
           <Route path="/signup" element={<SignUpPage />} />
-          <Route path="/signupSuperAdmin" element={<SignupSuper />} />
 
           <Route
-
             path="/employee"
             element={<EmployeeRoute authUser={authUser} />}
           >

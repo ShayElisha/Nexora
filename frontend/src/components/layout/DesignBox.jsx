@@ -27,8 +27,7 @@ const DesignBox = ({ setIsLanguageOpen, isRTL }) => {
     },
     opulent: {
       "--color-primary": "#800020",
-      "--color-secondary": "#FFEB62",
-
+      "--color-secondary": "#D4AF37",
       "--color-accent": "#556B2F",
       "--bg-color": "#FFF8E1",
       "--text-color": "#3E2723",

@@ -8,7 +8,6 @@ import cors from "cors";
 import companyRoutes from "./routes/companies.route.js";
 import nexoraRoutes from "./routes/nexora.route.js";
 import authRoutes from "./routes/auth.route.js";
-import superAdminRoutes from "./routes/superAdmin.route.js";
 import paymentRoutes from "./routes/payment.route.js";
 import productRoutes from "./routes/procurement.route.js";
 import inventoryRoutes from "./routes/inventory.route.js";
@@ -51,9 +50,9 @@ app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(express.json({ limit: "50mb" })); // הגדל את הגבול לפי הצורך
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
+
 // API routes
 app.use("/api/auth", authRoutes);
-app.use("/api/superAdmin", superAdminRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/companies", nexoraRoutes);
 app.use("/api/employees", employeeRoutes);

@@ -198,7 +198,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
         newPassword,
         confirmNewPassword,
         profileImageFile,
-
+        profileImage,
         ...profileData
       } = data;
       const formData = new FormData();
@@ -992,8 +992,6 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
     navigationLinks = employeeLinks;
   }
 
-
-  
   // Render SubMenu
   const renderSubMenu = (subMenu, parentIndex) => {
     return (
@@ -1333,9 +1331,6 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                         adminNotifications.map((notification) => {
                           const isInventoryNotification =
                             notification.PurchaseOrder === "Inventory";
-                          const isDetailsNotification =
-                            notification.PurchaseOrder === "details";
-
                           const productIdMatch = notification.content.match(
                             /product (.*) is below/
                           );
@@ -1343,16 +1338,6 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                             isInventoryNotification && productIdMatch
                               ? productIdMatch[1]
                               : null;
-                          console.log(productId);
-                          // Extract employee ID from content (e.g., "מזהה: 507f1f77bcf86cd799439011")
-                          const employeeIdMatch = notification.content.match(
-                            /מזהה: ([a-fA-F0-9]{24})/
-                          );
-                          const employeeId =
-                            isDetailsNotification && employeeIdMatch
-                              ? employeeIdMatch[1]
-                              : null;
-
 
                           return (
                             <div
@@ -1360,8 +1345,6 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                               onClick={() =>
                                 !notification.isRead &&
                                 !isInventoryNotification &&
-                                !isDetailsNotification &&
-
                                 markNotificationAsRead(notification._id)
                               }
                               className={`relative border-b mb-1 pb-1 pl-2 pr-4 rounded-lg ${
@@ -1401,32 +1384,6 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                                     </button>
                                   </div>
                                 )}
-                              {isDetailsNotification &&
-                                !notification.isRead &&
-                                employeeId && (
-                                  <div className="mt-2 flex justify-end space-x-2">
-                                    <a
-                                      href={`/dashboard/employees?editEmployee=${employeeId}`}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        markNotificationAsRead(
-                                          notification._id
-                                        );
-                                      }}
-                                      className="px-2 py-1 bg-[var(--color-primary)] text-white rounded-full hover:bg-[var(--color-secondary)] text-xs transition-all duration-300"
-                                    >
-                                      {t("notifications.fillDetails")}
-                                    </a>
-                                  </div>
-                                )}
-                              {isDetailsNotification &&
-                                !notification.isRead &&
-                                !employeeId && (
-                                  <p className="text-xs text-red-500 mt-1">
-                                    {t("notifications.invalidEmployeeId")}
-                                  </p>
-                                )}
-
                             </div>
                           );
                         })

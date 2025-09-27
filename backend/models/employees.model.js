@@ -5,6 +5,7 @@ const employeeSchema = new mongoose.Schema(
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
+      required: true,
     },
     name: {
       type: String,
@@ -45,7 +46,7 @@ const employeeSchema = new mongoose.Schema(
     role: {
       type: String,
       required: false,
-      enum: ["Admin", "Manager", "Employee", "SuperAdmin"],
+      enum: ["Admin", "Manager", "Employee", ""],
     },
     phone: {
       type: String,
@@ -147,12 +148,6 @@ const employeeSchema = new mongoose.Schema(
         timestamp: { type: Date, default: Date.now },
       },
     ],
-    bankDetails: {
-      accountNumber: { type: String },
-      bankNumber: { type: String },
-      branchCode: { type: String },
-    },
-
   },
 
   { timestamps: true }

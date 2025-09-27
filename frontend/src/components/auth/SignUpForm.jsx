@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-hot-toast";
@@ -29,7 +29,7 @@ const getNestedValue = (values, name) =>
   name.split(".").reduce((obj, key) => obj && obj[key], values) || "";
 
 const SignUpForm = () => {
-  const queryClient = useQueryClient();
+
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -110,6 +110,17 @@ const SignUpForm = () => {
         t("signUpForm.validation.postal_code_required")
       ),
     }),
+    bankDetails: Yup.object({
+      accountNumber: Yup.string().required(
+        t("signUpForm.validation.account_number_required")
+      ),
+      bankNumber: Yup.string().required(
+        t("signUpForm.validation.bank_number_required")
+      ),
+      branchCode: Yup.string().required(
+        t("signUpForm.validation.branch_code_required")
+      ),
+    }),
     department: Yup.string().notRequired(),
     role: Yup.string().notRequired(),
     paymentType: Yup.string()
@@ -163,6 +174,8 @@ const SignUpForm = () => {
       department: "",
       role: "",
       address: { street: "", city: "", country: "", postalCode: "" },
+      bankDetails: { accountNumber: "", bankNumber: "", branchCode: "" },
+
       paymentType: "Global",
       hourlySalary: "",
       globalSalary: "",
@@ -190,6 +203,13 @@ const SignUpForm = () => {
       formData.append("address[city]", values.address.city);
       formData.append("address[country]", values.address.country);
       formData.append("address[postalCode]", values.address.postalCode);
+      formData.append(
+        "bankDetails[accountNumber]",
+        values.bankDetails.accountNumber
+      );
+      formData.append("bankDetails[bankNumber]", values.bankDetails.bankNumber);
+      formData.append("bankDetails[branchCode]", values.bankDetails.branchCode);
+
       formData.append("paymentType", values.paymentType);
       if (values.hourlySalary)
         formData.append("hourlySalary", values.hourlySalary);
@@ -296,6 +316,7 @@ const SignUpForm = () => {
             formik={formik}
             ariaRequired="true"
           />
+
           <div className="space-y-2 animate-slideIn">
             <label className="block text-sm font-medium text-text">
               {t("signUpForm.form.gender")} <span aria-hidden="true">*</span>
@@ -333,7 +354,8 @@ const SignUpForm = () => {
               {t("signUpForm.form.phone")} <span aria-hidden="true">*</span>
             </label>
             <PhoneInput
-              country={"us"}
+              country={"auto"}
+
               enableSearch
               searchPlaceholder={t("signUpForm.placeholders.search_country")}
               containerClass="mt-2 w-full"
@@ -400,6 +422,36 @@ const SignUpForm = () => {
             ariaRequired="true"
           />
         </div>
+
+        {/* Bank Details */}
+        <SectionHeader title={t("signUpForm.sections.bank_details")} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <InputField
+            label={t("signUpForm.form.account_number")}
+            icon={<User className="w-5 h-5 text-secondary" />}
+            name="bankDetails.accountNumber"
+            placeholder={t("signUpForm.placeholders.account_number")}
+            formik={formik}
+            ariaRequired="true"
+          />
+          <InputField
+            label={t("signUpForm.form.bank_number")}
+            icon={<User className="w-5 h-5 text-secondary" />}
+            name="bankDetails.bankNumber"
+            placeholder={t("signUpForm.placeholders.bank_number")}
+            formik={formik}
+            ariaRequired="true"
+          />
+          <InputField
+            label={t("signUpForm.form.branch_code")}
+            icon={<User className="w-5 h-5 text-secondary" />}
+            name="bankDetails.branchCode"
+            placeholder={t("signUpForm.placeholders.branch_code")}
+            formik={formik}
+            ariaRequired="true"
+          />
+        </div>
+
 
         {/* Employment Details */}
         {authUser && (

@@ -25,3 +25,8 @@ node_modules/
 *.sln
 *.sw?
 .qodo
+server/venv/
+venv/
+venv/
+venv/
+venv/

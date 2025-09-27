@@ -1,8 +1,9 @@
 import Employee from "../models/employees.model.js";
 import SickDays from "../models/SickDays.models.js";
-import Shift from "../models/shifts.model.js"; 
-import PayRate from "../models/PayRates.model.js"; 
+import Shift from "../models/shifts.model.js";
+import PayRate from "../models/PayRates.model.js";
 import Salary from "../models/Salary.model.js";
+import Notification from "../models/notification.model.js";
 
 
 import cron from "node-cron";
@@ -10,6 +11,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import cloudinary, { uploadToCloudinary } from "../config/lib/cloudinary.js";
 import vacationRules from "../config/vacation.json" with { type: "json" };
+
 // Helper function to extract Cloudinary public ID from URL
 export const extractPublicId = (url) => {
   const start = url.indexOf("/upload/") + 8;
@@ -57,6 +59,12 @@ export const createEmployee = async (req, res) => {
       country: data.address?.country,
       postalCode: data.address?.postalCode,
     },
+    bankDetails: {
+      accountNumber: data.bankDetails?.accountNumber || "",
+      bankNumber: data.bankDetails?.bankNumber || "",
+      branchCode: data.bankDetails?.branchCode || "",
+    },
+
     role: data.role || "",
     department: data.department || null,
     paymentType: data.paymentType,
@@ -67,8 +75,9 @@ export const createEmployee = async (req, res) => {
     status: "active",
     vacationBalance: 0,
     vacationHistory: [],
-    sickBalance:0,
-    sickHistory:[],
+    sickBalance: 0,
+    sickHistory: [],
+
   };
 
   // Validate salary fields based on paymentType
@@ -76,8 +85,8 @@ export const createEmployee = async (req, res) => {
     if (employeeData.hourlySalary == null || employeeData.hourlySalary < 0) {
       return res.status(400).json({
         success: false,
-        message:
-          "hourlySalary is required and must be non-negative for Hourly payment type",
+        message: "hourlySalary is required and must be non-negative for Hourly payment type",
+
       });
     }
     employeeData.globalSalary = null;
@@ -86,15 +95,15 @@ export const createEmployee = async (req, res) => {
     if (employeeData.globalSalary == null || employeeData.globalSalary < 0) {
       return res.status(400).json({
         success: false,
-        message:
-          "globalSalary is required and must be non-negative for Global payment type",
+        message: "globalSalary is required and must be non-negative for Global payment type",
+
       });
     }
     if (employeeData.expectedHours == null || employeeData.expectedHours < 0) {
       return res.status(400).json({
         success: false,
-        message:
-          "expectedHours is required and must be non-negative for Global payment type",
+        message: "expectedHours is required and must be non-negative for Global payment type",
+
       });
     }
     employeeData.hourlySalary = null;
@@ -201,18 +210,38 @@ export const updateEmployee = async (req, res) => {
     }
 
     const allowedUpdates = [
-      "name","lastName","email","gender","identity","phone",
-      "role","paymentType","hourlySalary","globalSalary","expectedHours","status",
-      "profileImage" // נוספה הרשאה לעדכון תמונה
+      "name",
+      "lastName",
+      "email",
+      "gender",
+      "identity",
+      "phone",
+      "role",
+      "department",
+      "paymentType",
+      "hourlySalary",
+      "globalSalary",
+      "expectedHours",
+      "status",
+      "profileImage",
+      "bankDetails.accountNumber",
+      "bankDetails.bankNumber",
+      "bankDetails.branchCode",
     ];
 
-    // פריסת שדות address אם יש
+    // פריסת שדות address ו-bankDetails אם יש
+
     const flattened = {};
     for (const key of Object.keys(req.body)) {
       if (key === "address" && typeof req.body.address === "object") {
         for (const sub of Object.keys(req.body.address)) {
           flattened[`address.${sub}`] = req.body.address[sub];
         }
+      } else if (key === "bankDetails" && typeof req.body.bankDetails === "object") {
+        for (const sub of Object.keys(req.body.bankDetails)) {
+          flattened[`bankDetails.${sub}`] = req.body.bankDetails[sub];
+        }
+
       } else {
         flattened[key] = req.body[key];
       }
@@ -232,19 +261,22 @@ export const updateEmployee = async (req, res) => {
       // העלאת Buffer לתוך Cloudinary
       const uploadResult = await uploadToCloudinary(req.file.buffer, {
         folder: "profile_images",
-        resource_type: "image"
+        resource_type: "image",
+
       });
       flattened.profileImage = uploadResult.secure_url;
     }
 
     // אימות מפתחות מותרות
     const keys = Object.keys(flattened);
-    const valid = keys.every(k => k.startsWith("address.") || allowedUpdates.includes(k));
+    const valid = keys.every((k) => k.startsWith("address.") || k.startsWith("bankDetails.") || allowedUpdates.includes(k));
+
     if (!valid) {
       return res.status(400).json({ success: false, message: "Invalid update fields" });
     }
 
-    // עידכון סיסמה אם קיים
+    // עדכון סיסמה אם קיים
+
     if (flattened.password) {
       flattened.password = await bcrypt.hash(flattened.password, 10);
     }
@@ -255,9 +287,10 @@ export const updateEmployee = async (req, res) => {
       { $set: flattened },
       { new: true, runValidators: true }
     )
-    .populate("companyId","name")
-    .populate("projects.projectId","name")
-    .populate("department","name");
+      .populate("companyId", "name")
+      .populate("projects.projectId", "name")
+      .populate("department", "name");
+
 
     if (!updated) {
       return res.status(404).json({ success: false, message: "Employee not found" });
@@ -288,7 +321,8 @@ export const addSickDay = async (req, res) => {
     }
 
     // בדיקת כפילות לחודש הזה
-    if (employee.sickHistory.some(entry => entry.month === monthYear)) {
+    if (employee.sickHistory.some((entry) => entry.month === monthYear)) {
+
       return res.status(400).json({ success: false, message: "Sick day for this month already exists" });
     }
 
@@ -310,7 +344,8 @@ export const addSickDay = async (req, res) => {
     console.log("About to save:", {
       _id: employee._id,
       sickBalance: employee.sickBalance,
-      lastHistoryEntry: employee.sickHistory.slice(-1)[0]
+      lastHistoryEntry: employee.sickHistory.slice(-1)[0],
+
     });
     await employee.save();
     return res.status(200).json({ success: true, data: employee });
@@ -319,6 +354,7 @@ export const addSickDay = async (req, res) => {
     return res.status(500).json({ success: false, message: "Error adding sick day", error: err.message });
   }
 };
+
 export const changePassword = async (req, res) => {
   try {
     const token = req.cookies["auth_token"];
@@ -394,7 +430,12 @@ export const updateEmployeeVacation = async (req, res) => {
 
     // Validate vacationHistory entries
     for (const entry of vacationHistory) {
-      if (!entry.month || typeof entry.daysAdded !== "number" || typeof entry.newBalance !== "number" || !entry.country) {
+      if (
+        !entry.month ||
+        typeof entry.daysAdded !== "number" ||
+        typeof entry.newBalance !== "number" ||
+        !entry.country
+      ) {
         console.error("Invalid vacationHistory entry:", entry);
         return res.status(400).json({
           success: false,
@@ -402,6 +443,7 @@ export const updateEmployeeVacation = async (req, res) => {
         });
       }
     }
+
 
     const employee = await Employee.findByIdAndUpdate(
       req.params.id,
@@ -411,18 +453,16 @@ export const updateEmployeeVacation = async (req, res) => {
       },
       { new: true, runValidators: true }
     )
-      .select(
-        "name lastName address.country expectedHours vacationBalance vacationHistory createdAt"
-      )
+      .select("name lastName address.country expectedHours vacationBalance vacationHistory createdAt")
+
       .populate("companyId", "name")
       .populate("projects.projectId", "name")
       .populate("department", "name");
 
     if (!employee) {
       console.error("Employee not found for ID:", req.params.id);
-      return res
-        .status(404)
-        .json({ success: false, message: "Employee not found" });
+      return res.status(404).json({ success: false, message: "Employee not found" });
+
     }
 
     console.log("Updated employee:", employee);
@@ -452,22 +492,20 @@ export const deleteEmployee = async (req, res) => {
 
     const employee = await Employee.findById(req.params.id);
     if (!employee) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Employee not found" });
+      return res.status(404).json({ success: false, message: "Employee not found" });
     }
+
 
     employee.status = "deleted";
     employee.deletedAt = new Date();
     await employee.save();
 
-    res
-      .status(200)
-      .json({ success: true, message: "Employee soft deleted successfully" });
+    res.status(200).json({ success: true, message: "Employee soft deleted successfully" });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: "Error soft deleting employee",
+
       error: error.message,
     });
   }
@@ -477,7 +515,7 @@ export const addMonthlyVacationDays = async (companyId) => {
   try {
     console.log("Starting addMonthlyVacationDays for company:", companyId);
 
-    const employees = await Employee.find({  }).select(
+    const employees = await Employee.find({}).select(
       "name lastName address.country expectedHours vacationBalance vacationHistory createdAt"
     );
     console.log("Employees found:", employees.length);
@@ -489,7 +527,7 @@ export const addMonthlyVacationDays = async (companyId) => {
 
     for (const employee of employees) {
       // בדיקה למניעת כפילויות
-      const existingEntry = employee.vacationHistory.find(entry => entry.month === monthYear);
+      const existingEntry = employee.vacationHistory.find((entry) => entry.month === monthYear);
       if (existingEntry) {
         console.log(`Skipping update for employee ${employee._id}, already updated for ${monthYear}`);
         continue;
@@ -508,7 +546,9 @@ export const addMonthlyVacationDays = async (companyId) => {
 
       const calculateJobPercentage = (expectedHours) => {
         const percentage = expectedHours ? Number(((expectedHours / 40) * 100).toFixed(2)) : 100;
-        console.log(`Calculating job percentage for employee ${employee._id}: expectedHours=${expectedHours}, percentage=${percentage}`);
+        console.log(
+          `Calculating job percentage for employee ${employee._id}: expectedHours=${expectedHours}, percentage=${percentage}`
+        );
         return percentage;
       };
 
@@ -541,10 +581,7 @@ export const addMonthlyVacationDays = async (companyId) => {
           }
           if (rule.increment && seniority >= rule.years) {
             const extraYears = seniority - rule.years + 1;
-            annualDays = Math.min(
-              annualDays + extraYears * rule.increment,
-              rule.maxDays || Infinity
-            );
+            annualDays = Math.min(annualDays + extraYears * rule.increment, rule.maxDays || Infinity);
           }
         }
 
@@ -590,6 +627,7 @@ export const addMonthlyVacationDays = async (companyId) => {
     throw new Error(`Failed to add monthly vacation days: ${error.message}`);
   }
 };
+
 cron.schedule("0 0 1 * *", async () => {
   console.log("Running monthly vacation update...");
   try {
@@ -599,6 +637,7 @@ cron.schedule("0 0 1 * *", async () => {
     console.error("Error in monthly vacation update:", error.message);
   }
 });
+
 export const triggerMonthlyVacationUpdate = async (req, res) => {
   try {
     const token = req.cookies["auth_token"];
@@ -620,6 +659,8 @@ export const triggerMonthlyVacationUpdate = async (req, res) => {
     });
   }
 };
+
+
 export const updateSickDays = async (req, res) => {
   try {
     const employees = await Employee.find(); // Only active employees
@@ -630,7 +671,8 @@ export const updateSickDays = async (req, res) => {
     const monthYear = `${month}/${year}`;
     for (const employee of employees) {
       const policy = await SickDays.findOne({ country: employee.address.country });
-      if (!policy) continue; 
+      if (!policy) continue;
+
 
       // Parse accrual_rate (e.g., "1.5 לחודש")
       const accrualRateMatch = policy.accrual_rate.match(/(\d+\.?\d*)/);
@@ -650,7 +692,8 @@ export const updateSickDays = async (req, res) => {
         daysAdded: accrualRate,
         newBalance: newSickDays,
         country: employee.address.country,
-        timestamp: currentDate
+        timestamp: currentDate,
+
       });
 
       // Update sickBalance
@@ -667,7 +710,8 @@ export const updateSickDays = async (req, res) => {
       console.log(message);
     }
   } catch (error) {
-    const errorMessage = 'שגיאה בעדכון ימי מחלה: ' + error.message;
+    const errorMessage = "שגיאה בעדכון ימי מחלה: " + error.message;
+
     if (res) {
       res.status(500).json({ message: errorMessage });
     } else {
@@ -676,15 +720,13 @@ export const updateSickDays = async (req, res) => {
   }
 };
 
-cron.schedule(' 0 0 1 * *', async () => {
-  console.log('מריץ עדכון חודשי של ימי מחלה...');
-  try{
-  await updateSickDays();
-  console.log('העדכון החודשי של ימי מחלה הושלם.');
-
-
+cron.schedule("0 0 1 * *", async () => {
+  console.log("מריץ עדכון חודשי של ימי מחלה...");
+  try {
+    await updateSickDays();
+    console.log("העדכון החודשי של ימי מחלה הושלם.");
   } catch (error) {
-    console.error('שגיאה בעדכון ימי מחלה:', error.message);
+    console.error("שגיאה בעדכון ימי מחלה:", error.message);
   }
 });
 
@@ -728,7 +770,10 @@ export const useSickDay = async (req, res) => {
       if (existingShift) {
         return res.status(400).json({
           success: false,
-          message: `לא ניתן להשתמש ביום מחלה בתאריך ${checkDate.toLocaleDateString()} עקב ${existingShift.dayType || 'משמרת'} קיימת`,
+          message: `לא ניתן להשתמש ביום מחלה בתאריך ${checkDate.toLocaleDateString()} עקב ${
+            existingShift.dayType || "משמרת"
+          } קיימת`,
+
         });
       }
     }
@@ -765,7 +810,8 @@ export const useSickDay = async (req, res) => {
     await employee.save();
 
     // 9. פרשנות paid_percentage ו-waiting_period
-    const parts = policy.paid_percentage.split(',').map(p => p.trim());
+    const parts = policy.paid_percentage.split(",").map((p) => p.trim());
+
     const waitDays = parseInt((policy.waiting_period.match(/(\d+)/) || [0, 0])[1], 10);
     const rules = [];
     for (const part of parts) {
@@ -782,7 +828,8 @@ export const useSickDay = async (req, res) => {
     // 10. עיבוד כל יום מחלה
     for (let i = 1; i <= usedDays; i++) {
       if (i <= waitDays) continue;
-      const rule = rules.find(r => i >= r.from && i <= r.to);
+      const rule = rules.find((r) => i >= r.from && i <= r.to);
+
       const pct = rule?.pct || 0;
       if (pct <= 0) continue;
       const multiplier = pct / 100;
@@ -856,7 +903,8 @@ export const useVacationDay = async (req, res) => {
 
     const usedDays = Number(days);
     if (isNaN(usedDays) || usedDays <= 0)
-      return res.status(400).json({ success: false, message: "מספר ימים לא תקין" });
+    return res.status(400).json({ success: false, message: "מספר ימים לא תקין" });
+
 
     // 3. שליפת העובד
     const employee = await Employee.findById(employeeId);
@@ -878,7 +926,10 @@ export const useVacationDay = async (req, res) => {
       if (existingShift) {
         return res.status(400).json({
           success: false,
-          message: `לא ניתן להשתמש ביום חופשה בתאריך ${checkDate.toLocaleDateString()} עקב ${existingShift.dayType || 'משמרת'} קיימת`,
+          message: `לא ניתן להשתמש ביום חופשה בתאריך ${checkDate.toLocaleDateString()} עקב ${
+            existingShift.dayType || "משמרת"
+          } קיימת`,
+
         });
       }
     }
@@ -889,7 +940,10 @@ export const useVacationDay = async (req, res) => {
 
     // 6. עדכון יתרה והיסטוריה
     const newBalance = employee.vacationBalance - usedDays;
-    const monthYear = `${String(new Date(startDate).getMonth() + 1).padStart(2, "0")}/${new Date(startDate).getFullYear()}`;
+    const monthYear = `${String(new Date(startDate).getMonth() + 1).padStart(2, "0")}/${new Date(
+      startDate
+    ).getFullYear()}`;
+
     employee.vacationHistory.push({
       month: monthYear,
       daysAdded: -usedDays,
@@ -976,4 +1030,121 @@ export const useVacationDay = async (req, res) => {
       error: err.message,
     });
   }
+};
+
+export const checkEmployeeDetails = async () => {
+  try {
+    console.log("Starting checkEmployeeDetails...");
+
+    const employees = await Employee.find().select(
+      "name lastName email role department profileImage companyId bankDetails"
+    );
+    console.log(`Found ${employees.length} employees`);
+
+    const missingDetails = [];
+
+    // Check for missing details in each employee
+    for (const employee of employees) {
+      const issues = [];
+
+      // Check for missing department only for non-admin employees
+      if (employee.role !== "Admin" && !employee.department) {
+        issues.push("מחלקה חסרה");
+      }
+
+      // Check for missing bank details
+      if (!employee.role) issues.push(" תפקיד חסר ");
+      if (!employee.bankDetails?.accountNumber) issues.push("מספר חשבון בנק חסר");
+      if (!employee.bankDetails?.bankNumber) issues.push("מספר בנק חסר");
+      if (!employee.bankDetails?.branchCode) issues.push("קוד סניף חסר");
+
+      if (issues.length > 0) {
+        missingDetails.push({
+          employeeId: employee._id.toString(),
+          employeeName: `${employee.name || "Unknown"} ${employee.lastName || ""}`,
+          companyId: employee.companyId,
+          issues,
+        });
+      }
+    }
+
+    // Send a single notification per employee to admins
+    for (const detail of missingDetails) {
+      const admins = await Employee.find({
+        companyId: detail.companyId,
+        role: "Admin",
+        status: "active",
+      }).select("_id");
+
+      if (admins.length === 0) {
+        console.warn(`No active admins found for company ${detail.companyId}`);
+        continue;
+      }
+
+      // Create a message with the employee ID explicitly included
+      const message = `לעובד ${detail.employeeName} (מזהה: ${detail.employeeId}) חסרים הפרטים הבאים: ${detail.issues.join(
+        ", "
+      )}`;
+
+      // Create a notification for each admin
+      for (const admin of admins) {
+        const notification = new Notification({
+          companyId: detail.companyId,
+          content: message,
+          type: "Warning",
+          employeeId: admin._id,
+          PurchaseOrder: "details",
+          isRead: false,
+        });
+
+        await notification.save();
+        console.log(`Notification sent to admin ${admin._id}: ${message}`);
+      }
+    }
+
+    console.log(`Check completed. Found ${missingDetails.length} employees with missing details`);
+    return {
+      success: true,
+      message: `Checked ${employees.length} employees, found ${missingDetails.length} with missing details`,
+      details: missingDetails,
+    };
+  } catch (error) {
+    console.error("Error in checkEmployeeDetails:", error.message);
+    throw new Error(`Failed to check employee details: ${error.message}`);
+  }
+};
+
+// Schedule the check every hours
+cron.schedule("0 * * * *", async () => {
+  console.log("Running scheduled employee details check...");
+  try {
+    await checkEmployeeDetails();
+    console.log("Employee details check completed");
+  } catch (error) {
+    console.error("Error in scheduled employee details check:", error.message);
+  }
+});
+
+// API endpoint to manually trigger the check
+export const triggerEmployeeDetailsCheck = async (req, res) => {
+  try {
+    const token = req.cookies["auth_token"];
+    if (!token) {
+      return res.status(401).json({ success: false, message: "לא מורשה" });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decodedToken) {
+      return res.status(401).json({ success: false, message: "טוקן לא תקין" });
+    }
+
+    const result = await checkEmployeeDetails();
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "שגיאה בבדיקת פרטי עובדים",
+      error: error.message,
+    });
+  }
+
 };

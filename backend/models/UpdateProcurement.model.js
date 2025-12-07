@@ -12,7 +12,7 @@ const PendingUpdateSchema = new mongoose.Schema({
     enum: ["pending update", "approved", "rejected"],
     default: "pending update",
   },
-  changedBy: { type: mongoose.Schema.Types.ObjectId, ref: "employees" },
+  changedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
   createdAt: { type: Date, default: Date.now },
 });
 

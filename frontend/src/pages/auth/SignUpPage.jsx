@@ -2,44 +2,99 @@ import { Link } from "react-router-dom";
 import SignUpForm from "../../components/auth/SignUpForm";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 
 const SignUpPage = () => {
   const { data: authData } = useQuery({ queryKey: ["authUser"] });
   const authUser = authData?.user;
-  const { t } = useTranslation(); // Get logged-in user from context
+  const { t } = useTranslation();
 
-  const isLoggedIn = !!authUser; // Check if user is logged in
+  const isLoggedIn = !!authUser;
 
   return (
-    <div className="max-h-full flex flex-col items-center justify-center py-12 bg-bg relative overflow-hidden">
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-primary via-secondary to-accent opacity-10 animate-fadeIn"></div>
-      <div className="w-full max-w-full space-y-6 bg-bg rounded-lg shadow-lg border animate-fadeIn">
-        <div className="text-center">
-          <img
-            className="mx-auto h-20 w-auto rounded-full border-2 border-button-text shadow-md"
-            src="https://images.unsplash.com/photo-1620288627223-53302f4e8c74?q=80&w=1364&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            alt={t("signupEmployee.signUpPage.logo_alt")}
-          />
-          <h2 className="mt-4 text-3xl font-extrabold text-text sm:text-4xl">
+    <div 
+      className="w-full py-8"
+    >
+      <div className="w-full space-y-6">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center"
+        >
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            className="inline-block mb-4"
+          >
+            <div 
+              className="mx-auto w-24 h-24 rounded-full flex items-center justify-center shadow-2xl"
+              style={{
+                background: `linear-gradient(135deg, var(--color-primary), var(--color-secondary))`,
+                border: '4px solid var(--border-color)'
+              }}
+            >
+              <span className="text-5xl">👤</span>
+            </div>
+          </motion.div>
+          
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-3xl sm:text-4xl font-extrabold mb-3"
+            style={{
+              background: `linear-gradient(135deg, var(--color-primary), var(--color-secondary), var(--color-accent))`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}
+          >
             {isLoggedIn
               ? t("signupEmployee.signUpPage.add_new_employee")
               : t("signupEmployee.signUpPage.create_account")}
-          </h2>
-          <p className="text-secondary">
+          </motion.h2>
+          
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-base"
+            style={{ color: 'var(--text-color)', opacity: 0.8 }}
+          >
             {t("signupEmployee.signUpPage.fill_details")}
-          </p>
-        </div>
-        <SignUpForm />
+          </motion.p>
+        </motion.div>
+
+        {/* Form */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+        >
+          <SignUpForm />
+        </motion.div>
+
+        {/* Login Link */}
         {!isLoggedIn && (
-          <p className="mt-4 text-sm text-center text-secondary">
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="mt-6 text-sm text-center"
+            style={{ color: 'var(--text-color)', opacity: 0.8 }}
+          >
             {t("signupEmployee.signUpPage.already_have_account")}{" "}
             <Link
               to="/login"
-              className="font-medium text-primary hover:text-accent transition-colors duration-200"
+              className="font-semibold transition-all duration-300 hover:underline underline-offset-4"
+              style={{ color: 'var(--color-primary)' }}
+              onMouseEnter={(e) => e.target.style.color = 'var(--color-accent)'}
+              onMouseLeave={(e) => e.target.style.color = 'var(--color-primary)'}
             >
               {t("signupEmployee.signUpPage.log_in_here")}
             </Link>
-          </p>
+          </motion.p>
         )}
       </div>
     </div>

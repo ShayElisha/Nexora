@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import Inventory from "../models/inventory.model.js";
 import ProductTree from "../models/productTree.model.js";
 import mongoose from "mongoose";
+import { paginateResponse } from "../middleware/pagination.js";
 
 export const getProducts = async (req, res) => {
   try {
@@ -21,8 +22,45 @@ export const getProducts = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid token" });
     }
     const companyId = decodedToken.companyId;
-    const products = await Product.find({ companyId });
-    res.status(200).json({ success: true, data: products });
+    
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    // Build query
+    const query = { companyId };
+    
+    // Optional filters
+    if (req.query.category) {
+      query.category = req.query.category;
+    }
+    if (req.query.search) {
+      query.$or = [
+        { productName: { $regex: req.query.search, $options: "i" } },
+        { sku: { $regex: req.query.search, $options: "i" } },
+      ];
+    }
+
+    // Get total count
+    const total = await Product.countDocuments(query);
+    
+    // Get paginated results
+    const products = await Product.find(query)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const pagination = {
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit),
+      hasNext: page * limit < total,
+      hasPrev: page > 1,
+    };
+
+    res.status(200).json(paginateResponse(products, pagination));
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -30,9 +68,9 @@ export const getProducts = async (req, res) => {
 
 export const getProductById = async (req, res) => {
   try {
-    console.log(req.params.id);
+    console.log("Getting product by ID:", req.params.id);
     const product = await Product.findById(req.params.id);
-    console.log(product);
+    console.log("Product found:", product ? "Yes" : "No");
     if (!product) {
       return res
         .status(404)
@@ -40,7 +78,12 @@ export const getProductById = async (req, res) => {
     }
     res.status(200).json({ success: true, data: product });
   } catch (err) {
-    res.status(500).json({ success: false, error: "Server error" });
+    console.error("Error in getProductById:", err);
+    res.status(500).json({ 
+      success: false, 
+      error: "Server error",
+      message: err.message 
+    });
   }
 };
 export const createProduct = async (req, res) => {
@@ -149,6 +192,9 @@ export const createProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   try {
+    console.log("Update product request body keys:", Object.keys(req.body));
+    console.log("Update product request files:", req.files ? Object.keys(req.files) : "No files");
+    
     const product = await Product.findById(req.params.id);
     if (!product) {
       return res
@@ -168,21 +214,67 @@ export const updateProduct = async (req, res) => {
       width,
       height,
       productType,
-      attachedFiles: existingFilesFromBody, // Renamed for clarity
+      sku,
+      barcode,
+      attachments: attachmentsFromBody, // Can be string (JSON) or array
+      attachedFiles: attachedFilesFromBody, // Legacy support
     } = req.body;
+    
+    // Use attachments if provided, otherwise fall back to attachedFiles
+    const existingFilesFromBody = attachmentsFromBody || attachedFilesFromBody;
+    
+    console.log("Existing files from body type:", typeof existingFilesFromBody);
+    console.log("Existing files from body:", existingFilesFromBody);
 
-    // Update basic fields if provided
-    product.productName = productName || product.productName;
-    product.productDescription =
-      productDescription || product.productDescription;
-    product.unitPrice = unitPrice || product.unitPrice;
-    product.category = category || product.category;
-    product.supplierId = supplierId || product.supplierId;
-    product.supplierName = supplierName || product.supplierName;
-    product.length = length || product.length;
-    product.width = width || product.width;
-    product.height = height || product.height;
-    product.productType = productType || product.productType;
+    // Update basic fields if provided (only if they are defined and not empty strings)
+    if (productName !== undefined && productName !== null && productName !== "") {
+      product.productName = productName;
+    }
+    if (productDescription !== undefined && productDescription !== null) {
+      product.productDescription = productDescription;
+    }
+    if (unitPrice !== undefined && unitPrice !== null) {
+      product.unitPrice = Number(unitPrice);
+    }
+    if (category !== undefined && category !== null && category !== "") {
+      product.category = category;
+    }
+    // Handle supplierId - can be null for sale products, but not string "null"
+    // We'll handle this after all other updates, using updateOne with $unset
+    let shouldUnsetSupplierId = false;
+    let validSupplierId = null;
+    
+    if (supplierId !== undefined) {
+      // Normalize string "null" or empty string to actual null
+      const normalizedSupplierId = (supplierId === "null" || supplierId === "" || supplierId === null) ? null : supplierId;
+      
+      if (normalizedSupplierId === null) {
+        shouldUnsetSupplierId = true;
+      } else {
+        validSupplierId = normalizedSupplierId;
+      }
+    }
+    if (supplierName !== undefined && supplierName !== null) {
+      product.supplierName = supplierName;
+    }
+    if (length !== undefined && length !== null && length !== "") {
+      product.length = Number(length);
+    }
+    if (width !== undefined && width !== null && width !== "") {
+      product.width = Number(width);
+    }
+    if (height !== undefined && height !== null && height !== "") {
+      product.height = Number(height);
+    }
+    if (productType !== undefined && productType !== null && productType !== "") {
+      product.productType = productType;
+    }
+    if (sku !== undefined && sku !== null && sku !== "") {
+      product.sku = sku;
+    }
+    if (barcode !== undefined && barcode !== null && barcode !== "") {
+      product.barcode = barcode;
+    }
 
     // Handle product image update
     if (
@@ -229,14 +321,46 @@ export const updateProduct = async (req, res) => {
       }
 
       const existingFiles = product.attachments || [];
-      const updatedFiles = existingFilesFromBody
-        ? JSON.parse(existingFilesFromBody).map((file) => ({
-            fileName: file.name,
-            fileUrl:
-              file.fileUrl ||
-              existingFiles.find((ef) => ef.fileName === file.name)?.fileUrl,
-          }))
-        : existingFiles;
+      let updatedFiles = existingFiles;
+      
+      if (existingFilesFromBody) {
+        try {
+          let parsedFiles;
+          
+          // Handle different input types
+          if (typeof existingFilesFromBody === 'string') {
+            // Try to parse JSON string
+            try {
+              parsedFiles = JSON.parse(existingFilesFromBody);
+            } catch (jsonError) {
+              console.error("Error parsing JSON string:", jsonError);
+              // If it's not valid JSON, treat as empty array
+              parsedFiles = [];
+            }
+          } else if (Array.isArray(existingFilesFromBody)) {
+            // Already an array
+            parsedFiles = existingFilesFromBody;
+          } else {
+            // Unknown type, use empty array
+            console.warn("Unknown attachments type:", typeof existingFilesFromBody);
+            parsedFiles = [];
+          }
+          
+          updatedFiles = Array.isArray(parsedFiles) && parsedFiles.length > 0
+            ? parsedFiles.map((file) => ({
+                fileName: file.name || file.fileName || file.fileName,
+                fileUrl:
+                  file.fileUrl || file.url ||
+                  existingFiles.find((ef) => ef.fileName === (file.name || file.fileName))?.fileUrl,
+              }))
+            : existingFiles;
+        } catch (parseError) {
+          console.error("Error processing existingFilesFromBody:", parseError);
+          console.error("existingFilesFromBody value:", existingFilesFromBody);
+          // If parsing fails, keep existing files
+          updatedFiles = existingFiles;
+        }
+      }
 
       const filesToKeep = updatedFiles.map((f) => f.fileUrl);
       const filesToDelete = existingFiles.filter(
@@ -251,34 +375,76 @@ export const updateProduct = async (req, res) => {
 
       product.attachments = [...updatedFiles, ...newAttachments];
     } else if (existingFilesFromBody) {
-      const updatedFiles = JSON.parse(existingFilesFromBody).map((file) => ({
-        fileName: file.name,
-        fileUrl:
-          file.fileUrl ||
-          product.attachments.find((ef) => ef.fileName === file.name)?.fileUrl,
-      }));
-
-      const filesToKeep = updatedFiles.map((f) => f.fileUrl);
-      const filesToDelete = product.attachments.filter(
-        (file) => !filesToKeep.includes(file.fileUrl)
-      );
-      for (const file of filesToDelete) {
-        const publicId = extractPublicId(file.fileUrl);
-        if (publicId) {
-          await cloudinary.uploader.destroy(publicId);
+      try {
+        let parsedFiles;
+        
+        // Handle different input types
+        if (typeof existingFilesFromBody === 'string') {
+          // Try to parse JSON string
+          try {
+            parsedFiles = JSON.parse(existingFilesFromBody);
+          } catch (jsonError) {
+            console.error("Error parsing JSON string:", jsonError);
+            // If it's not valid JSON, treat as empty array
+            parsedFiles = [];
+          }
+        } else if (Array.isArray(existingFilesFromBody)) {
+          // Already an array
+          parsedFiles = existingFilesFromBody;
+        } else {
+          // Unknown type, use empty array
+          console.warn("Unknown attachments type:", typeof existingFilesFromBody);
+          parsedFiles = [];
         }
-      }
+        
+        const updatedFiles = Array.isArray(parsedFiles) && parsedFiles.length > 0
+          ? parsedFiles.map((file) => ({
+              fileName: file.name || file.fileName || file.fileName,
+              fileUrl:
+                file.fileUrl || file.url ||
+                (product.attachments || []).find((ef) => ef.fileName === (file.name || file.fileName))?.fileUrl,
+            }))
+          : product.attachments || [];
 
-      product.attachments = updatedFiles;
+        const filesToKeep = updatedFiles.map((f) => f.fileUrl).filter(Boolean);
+        const filesToDelete = (product.attachments || []).filter(
+          (file) => file.fileUrl && !filesToKeep.includes(file.fileUrl)
+        );
+        for (const file of filesToDelete) {
+          const publicId = extractPublicId(file.fileUrl);
+          if (publicId) {
+            await cloudinary.uploader.destroy(publicId);
+          }
+        }
+
+        product.attachments = updatedFiles;
+      } catch (parseError) {
+        console.error("Error processing existingFilesFromBody:", parseError);
+        console.error("existingFilesFromBody value:", existingFilesFromBody);
+        // If parsing fails, keep existing attachments
+      }
     }
 
     await product.save();
-    res.status(200).json({ success: true, data: product });
+    
+    // Handle supplierId separately to avoid casting issues
+    if (shouldUnsetSupplierId) {
+      await Product.updateOne({ _id: product._id }, { $unset: { supplierId: "" } });
+    } else if (validSupplierId !== null) {
+      await Product.updateOne({ _id: product._id }, { $set: { supplierId: validSupplierId } });
+    }
+    
+    // Reload product to get latest state
+    const updatedProduct = await Product.findById(product._id);
+    console.log("✅ Product updated successfully:", updatedProduct._id);
+    res.status(200).json({ success: true, data: updatedProduct });
   } catch (err) {
-    console.error("Error updating product:", err);
+    console.error("❌ Error updating product:", err);
+    console.error("❌ Error stack:", err.stack);
     res.status(500).json({
       success: false,
       error: "Error updating product: " + err.message,
+      details: process.env.NODE_ENV === 'development' ? err.stack : undefined,
     });
   }
 };

@@ -1,10 +1,306 @@
 import Shift from "../models/Shifts.model.js";
 import Employee from "../models/employees.model.js";
 import PayRate from "../models/PayRates.model.js";
-import Salary from "../models/salary.model.js";
+import Salary from "../models/Salary.model.js";
 import jwt from "jsonwebtoken";
 import axios from "axios";
 import dotenv from "dotenv";
+
+/**
+ * Calculate night hours between start and end time (22:00-06:00)
+ */
+const calculateNightHours = (start, end) => {
+  if (!start || !end) return 0;
+  
+  let nightHours = 0;
+  let current = new Date(start);
+  const endTime = new Date(end);
+  
+  // Calculate minute by minute
+  while (current < endTime) {
+    const hour = current.getHours();
+    // Night time is 22:00-06:00
+    if (hour >= 22 || hour < 6) {
+      nightHours += 1/60; // Add 1 minute
+    }
+    current = new Date(current.getTime() + 60000); // Add 1 minute
+  }
+  
+  return nightHours;
+};
+
+/**
+ * Calculate advanced shift breakdown with multiple rate types
+ */
+const calculateShiftBreakdown = (
+  effectiveHoursWorked,
+  startTime,
+  endTime,
+  shiftDateObj,
+  payRates,
+  isHoliday,
+  isRestDay
+) => {
+  const regularRate = payRates.find((r) => r.rateType === "Regular") || {
+    _id: null,
+    multiplier: 1.0,
+    hoursThreshold: 8,
+  };
+  const overtime125Rate = payRates.find((r) => r.rateType === "Overtime125") || {
+    _id: null,
+    multiplier: 1.25,
+    hoursThreshold: 2,
+  };
+  const overtime150Rate = payRates.find((r) => r.rateType === "Overtime150") || {
+    _id: null,
+    multiplier: 1.5,
+  };
+  const nightRate = payRates.find((r) => r.rateType === "Night") || {
+    _id: null,
+    multiplier: 1.25,
+  };
+  const holidayRate = payRates.find((r) => r.rateType === "Holiday") || {
+    _id: null,
+    multiplier: 1.5,
+  };
+  const restDayRate = payRates.find((r) => r.rateType === "RestDay") || {
+    _id: null,
+    multiplier: 1.5,
+  };
+
+  let shiftBreakdown = [];
+  let payRateId = regularRate._id;
+  let shiftType = "Day";
+  let dayType = isHoliday ? "Holiday" : isRestDay ? "RestDay" : "Regular";
+
+  // Calculate night and day hours
+  const nightHours = calculateNightHours(startTime, endTime);
+  const dayHours = effectiveHoursWorked - nightHours;
+
+  // Determine shift type
+  if (nightHours > dayHours) {
+    shiftType = "Night";
+    payRateId = nightRate._id;
+  }
+
+  // Build shift breakdown
+  if (isHoliday || isRestDay) {
+    // Special day - calculate overtime based on total hours, then distribute between day and night
+    const baseRate = isHoliday ? holidayRate : restDayRate;
+    const baseRateType = isHoliday ? "Holiday" : "RestDay";
+    const regularThreshold = regularRate.hoursThreshold || 8;
+    const overtime125Threshold = overtime125Rate.hoursThreshold || 2;
+    
+    // Calculate total overtime hours
+    const totalRegularHours = Math.min(effectiveHoursWorked, regularThreshold);
+    const totalOvertimeHours = Math.max(0, effectiveHoursWorked - totalRegularHours);
+    
+    // Calculate overtime breakdown
+    const overtime125Hours = Math.min(totalOvertimeHours, overtime125Threshold);
+    const overtime150Hours = Math.max(0, totalOvertimeHours - overtime125Hours);
+    
+    // Distribute regular hours between day and night
+    let remainingRegularHours = totalRegularHours;
+    let remainingDayHours = dayHours;
+    let remainingNightHours = nightHours;
+    
+    // First, fill regular day hours
+    const regularDayHours = Math.min(remainingDayHours, remainingRegularHours);
+    if (regularDayHours > 0) {
+      shiftBreakdown.push({
+        rateType: baseRateType,
+        hours: parseFloat(regularDayHours.toFixed(2)),
+        multiplier: baseRate.multiplier,
+        payRateId: baseRate._id,
+      });
+      remainingRegularHours -= regularDayHours;
+      remainingDayHours -= regularDayHours;
+    }
+    
+    // Then, fill regular night hours (RestDay/Holiday + Night)
+    const regularNightHours = Math.min(remainingNightHours, remainingRegularHours);
+    if (regularNightHours > 0) {
+      const combinedMultiplier = baseRate.multiplier + (nightRate.multiplier - 1);
+      shiftBreakdown.push({
+        rateType: `${baseRateType}+Night`,
+        hours: parseFloat(regularNightHours.toFixed(2)),
+        multiplier: combinedMultiplier,
+        payRateId: baseRate._id,
+      });
+      remainingRegularHours -= regularNightHours;
+      remainingNightHours -= regularNightHours;
+    }
+    
+    // Distribute overtime 125% hours between day and night
+    let remainingOvertime125 = overtime125Hours;
+    
+    // Overtime 125% in day hours (RestDay/Holiday + Overtime125)
+    const dayOvertime125 = Math.min(remainingDayHours, remainingOvertime125);
+    if (dayOvertime125 > 0) {
+      const combinedMultiplier = baseRate.multiplier + (overtime125Rate.multiplier - 1);
+      shiftBreakdown.push({
+        rateType: `${baseRateType}+Overtime125`,
+        hours: parseFloat(dayOvertime125.toFixed(2)),
+        multiplier: combinedMultiplier,
+        payRateId: baseRate._id,
+      });
+      remainingOvertime125 -= dayOvertime125;
+      remainingDayHours -= dayOvertime125;
+    }
+    
+    // Overtime 125% in night hours (RestDay/Holiday + Night + Overtime125)
+    const nightOvertime125 = Math.min(remainingNightHours, remainingOvertime125);
+    if (nightOvertime125 > 0) {
+      const combinedMultiplier = baseRate.multiplier + (nightRate.multiplier - 1) + (overtime125Rate.multiplier - 1);
+      shiftBreakdown.push({
+        rateType: `${baseRateType}+Night+Overtime125`,
+        hours: parseFloat(nightOvertime125.toFixed(2)),
+        multiplier: combinedMultiplier,
+        payRateId: baseRate._id,
+      });
+      remainingOvertime125 -= nightOvertime125;
+      remainingNightHours -= nightOvertime125;
+    }
+    
+    // Distribute overtime 150% hours between day and night
+    let remainingOvertime150 = overtime150Hours;
+    
+    // Overtime 150% in day hours (RestDay/Holiday + Overtime150)
+    const dayOvertime150 = Math.min(remainingDayHours, remainingOvertime150);
+    if (dayOvertime150 > 0) {
+      const combinedMultiplier = baseRate.multiplier + (overtime150Rate.multiplier - 1);
+      shiftBreakdown.push({
+        rateType: `${baseRateType}+Overtime150`,
+        hours: parseFloat(dayOvertime150.toFixed(2)),
+        multiplier: combinedMultiplier,
+        payRateId: baseRate._id,
+      });
+      remainingOvertime150 -= dayOvertime150;
+      remainingDayHours -= dayOvertime150;
+    }
+    
+    // Overtime 150% in night hours (RestDay/Holiday + Night + Overtime150)
+    const nightOvertime150 = Math.min(remainingNightHours, remainingOvertime150);
+    if (nightOvertime150 > 0) {
+      const combinedMultiplier = baseRate.multiplier + (nightRate.multiplier - 1) + (overtime150Rate.multiplier - 1);
+      shiftBreakdown.push({
+        rateType: `${baseRateType}+Night+Overtime150`,
+        hours: parseFloat(nightOvertime150.toFixed(2)),
+        multiplier: combinedMultiplier,
+        payRateId: baseRate._id,
+      });
+      remainingOvertime150 -= nightOvertime150;
+      remainingNightHours -= nightOvertime150;
+    }
+    
+    payRateId = baseRate._id;
+  } else {
+    // Regular day - calculate overtime based on total hours, then distribute between day and night
+    const regularThreshold = regularRate.hoursThreshold || 8;
+    const overtime125Threshold = overtime125Rate.hoursThreshold || 2;
+    
+    // Calculate total overtime hours
+    const totalRegularHours = Math.min(effectiveHoursWorked, regularThreshold);
+    const totalOvertimeHours = Math.max(0, effectiveHoursWorked - totalRegularHours);
+    
+    // Calculate overtime breakdown
+    const overtime125Hours = Math.min(totalOvertimeHours, overtime125Threshold);
+    const overtime150Hours = Math.max(0, totalOvertimeHours - overtime125Hours);
+    
+    // Distribute regular hours between day and night
+    let remainingRegularHours = totalRegularHours;
+    let remainingDayHours = dayHours;
+    let remainingNightHours = nightHours;
+    
+    // First, fill regular day hours
+    const regularDayHours = Math.min(remainingDayHours, remainingRegularHours);
+    if (regularDayHours > 0) {
+      shiftBreakdown.push({
+        rateType: "Regular",
+        hours: parseFloat(regularDayHours.toFixed(2)),
+        multiplier: regularRate.multiplier,
+        payRateId: regularRate._id,
+      });
+      remainingRegularHours -= regularDayHours;
+      remainingDayHours -= regularDayHours;
+    }
+    
+    // Then, fill regular night hours
+    const regularNightHours = Math.min(remainingNightHours, remainingRegularHours);
+    if (regularNightHours > 0) {
+      shiftBreakdown.push({
+        rateType: "Night",
+        hours: parseFloat(regularNightHours.toFixed(2)),
+        multiplier: nightRate.multiplier,
+        payRateId: nightRate._id,
+      });
+      remainingRegularHours -= regularNightHours;
+      remainingNightHours -= regularNightHours;
+    }
+    
+    // Distribute overtime 125% hours between day and night
+    let remainingOvertime125 = overtime125Hours;
+    
+    // Overtime 125% in day hours
+    const dayOvertime125 = Math.min(remainingDayHours, remainingOvertime125);
+    if (dayOvertime125 > 0) {
+      shiftBreakdown.push({
+        rateType: "Overtime125",
+        hours: parseFloat(dayOvertime125.toFixed(2)),
+        multiplier: overtime125Rate.multiplier,
+        payRateId: overtime125Rate._id,
+      });
+      remainingOvertime125 -= dayOvertime125;
+      remainingDayHours -= dayOvertime125;
+    }
+    
+    // Overtime 125% in night hours (combined with night rate)
+    const nightOvertime125 = Math.min(remainingNightHours, remainingOvertime125);
+    if (nightOvertime125 > 0) {
+      const combinedMultiplier = nightRate.multiplier + (overtime125Rate.multiplier - 1);
+      shiftBreakdown.push({
+        rateType: "Night+Overtime125",
+        hours: parseFloat(nightOvertime125.toFixed(2)),
+        multiplier: combinedMultiplier,
+        payRateId: nightRate._id,
+      });
+      remainingOvertime125 -= nightOvertime125;
+      remainingNightHours -= nightOvertime125;
+    }
+    
+    // Distribute overtime 150% hours between day and night
+    let remainingOvertime150 = overtime150Hours;
+    
+    // Overtime 150% in day hours
+    const dayOvertime150 = Math.min(remainingDayHours, remainingOvertime150);
+    if (dayOvertime150 > 0) {
+      shiftBreakdown.push({
+        rateType: "Overtime150",
+        hours: parseFloat(dayOvertime150.toFixed(2)),
+        multiplier: overtime150Rate.multiplier,
+        payRateId: overtime150Rate._id,
+      });
+      remainingOvertime150 -= dayOvertime150;
+      remainingDayHours -= dayOvertime150;
+    }
+    
+    // Overtime 150% in night hours (combined with night rate)
+    const nightOvertime150 = Math.min(remainingNightHours, remainingOvertime150);
+    if (nightOvertime150 > 0) {
+      const combinedMultiplier = nightRate.multiplier + (overtime150Rate.multiplier - 1);
+      shiftBreakdown.push({
+        rateType: "Night+Overtime150",
+        hours: parseFloat(nightOvertime150.toFixed(2)),
+        multiplier: combinedMultiplier,
+        payRateId: nightRate._id,
+      });
+      remainingOvertime150 -= nightOvertime150;
+      remainingNightHours -= nightOvertime150;
+    }
+  }
+
+  return { shiftBreakdown, shiftType, dayType, payRateId };
+};
 
 export const createShift = async (req, res) => {
   try {
@@ -47,37 +343,47 @@ export const createShift = async (req, res) => {
     }
 
     // Check for overlapping shifts
+    // Two shifts overlap if: start1 < end2 AND start2 < end1
+    // For active shifts (endTime = null), treat as infinite end time
     const shiftDateObj = new Date(shiftDate);
     const newStart = new Date(startTime);
     const newEnd = endTime ? new Date(endTime) : null;
 
-    const overlappingShifts = await Shift.find({
+    // Build overlap query - simplified and more efficient
+    const overlapQuery = {
       employeeId,
       companyId: decodedToken.companyId,
-      shiftDate: {
-        $gte: new Date(shiftDateObj.setHours(0, 0, 0, 0)),
-        $lte: new Date(shiftDateObj.setHours(23, 59, 59, 999)),
-      },
-      $or: [
+      // Shift overlaps if:
+      // 1. Existing shift starts before new shift ends (or new shift has no end)
+      // 2. Existing shift ends after new shift starts (or existing shift has no end)
+      $and: [
+        { startTime: { $lt: newEnd || new Date('2099-12-31') } }, // If newEnd is null, use far future
         {
-          $and: [
-            { startTime: { $lte: newEnd || newStart } },
-            { endTime: { $gte: newStart } },
-          ],
-        },
-        {
-          $and: [
-            { startTime: { $gte: newStart } },
-            { startTime: { $lte: newEnd || newStart } },
-          ],
-        },
-      ],
-    });
+          $or: [
+            { endTime: { $gt: newStart } },
+            { endTime: null } // Active shift always overlaps if it started before newEnd
+          ]
+        }
+      ]
+    };
+
+    const overlappingShifts = await Shift.find(overlapQuery);
 
     if (overlappingShifts.length > 0) {
+      const overlappingShift = overlappingShifts[0];
+      const overlapStart = new Date(overlappingShift.startTime).toLocaleString('he-IL');
+      const overlapEnd = overlappingShift.endTime 
+        ? new Date(overlappingShift.endTime).toLocaleString('he-IL')
+        : 'משמרת פעילה';
+      
       return res.status(400).json({
         success: false,
-        message: "קיימת משמרת חופפת בטווח השעות שנבחר",
+        message: `קיימת משמרת חופפת: ${overlapStart} - ${overlapEnd}`,
+        overlappingShift: {
+          id: overlappingShift._id,
+          startTime: overlappingShift.startTime,
+          endTime: overlappingShift.endTime,
+        }
       });
     }
 
@@ -86,36 +392,6 @@ export const createShift = async (req, res) => {
       companyId: decodedToken.companyId,
       isActive: true,
     });
-    const regularRate = payRates.find((r) => r.rateType === "Regular") || {
-      _id: null,
-      multiplier: 1.0,
-      hoursThreshold: 8,
-    };
-    const overtime125Rate = payRates.find(
-      (r) => r.rateType === "Overtime125"
-    ) || {
-      _id: null,
-      multiplier: 1.25,
-      hoursThreshold: 2,
-    };
-    const overtime150Rate = payRates.find(
-      (r) => r.rateType === "Overtime150"
-    ) || {
-      _id: null,
-      multiplier: 1.5,
-    };
-    const nightRate = payRates.find((r) => r.rateType === "Night") || {
-      _id: null,
-      multiplier: 1.25,
-    };
-    const holidayRate = payRates.find((r) => r.rateType === "Holiday") || {
-      _id: null,
-      multiplier: 1.5,
-    };
-    const restDayRate = payRates.find((r) => r.rateType === "RestDay") || {
-      _id: null,
-      multiplier: 1.5,
-    };
 
     // Determine hourly salary
     const effectiveHourlySalary =
@@ -130,12 +406,6 @@ export const createShift = async (req, res) => {
         effectiveHoursWorked = (newEnd - newStart) / (1000 * 60 * 60);
       }
     }
-
-    // Initialize shift properties
-    let payRateId = regularRate._id;
-    let shiftType = "Day";
-    let dayType = "Regular";
-    let shiftBreakdown = [];
 
     // Check for holidays
     const year = shiftDateObj.getFullYear();
@@ -158,84 +428,32 @@ export const createShift = async (req, res) => {
       );
       const holidays = response.data.response.holidays;
       isHoliday = holidays && holidays.length > 0;
-      if (isHoliday) {
-        dayType = "Holiday";
-        payRateId = holidayRate._id;
-        shiftBreakdown.push({
-          rateType: "Holiday",
-          hours: effectiveHoursWorked,
-          multiplier: holidayRate.multiplier,
-          payRateId: holidayRate._id,
-        });
-      }
     } catch (apiError) {
       console.warn("Failed to fetch holidays:", apiError.message);
     }
 
     // Check for rest day (Saturday)
-    if (!isHoliday && shiftDateObj.getDay() === 6) {
-      dayType = "RestDay";
-      payRateId = restDayRate._id;
-      shiftBreakdown.push({
-        rateType: "RestDay",
-        hours: effectiveHoursWorked,
-        multiplier: restDayRate.multiplier,
-        payRateId: restDayRate._id,
-      });
-    }
+    const isRestDay = shiftDateObj.getDay() === 6;
 
-    // Check for night shift
-    const startHour = newStart.getHours();
-    const endHour = newEnd ? newEnd.getHours() : null;
-    const isNightShift = startHour >= 22 || (endHour !== null && endHour <= 6);
-    if (isNightShift && dayType === "Regular") {
-      shiftType = "Night";
-      payRateId = nightRate._id;
-      shiftBreakdown.push({
-        rateType: "Night",
-        hours: effectiveHoursWorked,
-        multiplier: nightRate.multiplier,
-        payRateId: nightRate._id,
-      });
-    }
+    // Calculate shift breakdown
+    const { shiftBreakdown, shiftType, dayType, payRateId } = calculateShiftBreakdown(
+      effectiveHoursWorked,
+      newStart,
+      newEnd,
+      shiftDateObj,
+      payRates,
+      isHoliday,
+      isRestDay
+    );
 
-    // Regular day shift breakdown
-    if (dayType === "Regular" && !isNightShift) {
-      let remainingHours = effectiveHoursWorked;
-      const regularThreshold = regularRate.hoursThreshold;
-      const overtime125Threshold = overtime125Rate.hoursThreshold;
-
-      const regularHours = Math.min(remainingHours, regularThreshold);
-      if (regularHours > 0) {
-        shiftBreakdown.push({
-          rateType: "Regular",
-          hours: regularHours,
-          multiplier: regularRate.multiplier,
-          payRateId: regularRate._id,
-        });
-        remainingHours -= regularHours;
-      }
-
-      const overtime125Hours = Math.min(remainingHours, overtime125Threshold);
-      if (overtime125Hours > 0) {
-        shiftBreakdown.push({
-          rateType: "Overtime125",
-          hours: overtime125Hours,
-          multiplier: overtime125Rate.multiplier,
-          payRateId: overtime125Rate._id,
-        });
-        remainingHours -= overtime125Hours;
-      }
-
-      const overtime150Hours = remainingHours;
-      if (overtime150Hours > 0) {
-        shiftBreakdown.push({
-          rateType: "Overtime150",
-          hours: overtime150Hours,
-          multiplier: overtime150Rate.multiplier,
-          payRateId: overtime150Rate._id,
-        });
-      }
+    // Ensure shiftBreakdown hours sum equals effectiveHoursWorked (fix rounding issues)
+    const breakdownHoursSum = shiftBreakdown.reduce((sum, part) => sum + part.hours, 0);
+    const hoursDifference = effectiveHoursWorked - breakdownHoursSum;
+    
+    // If there's a difference due to rounding, adjust the last breakdown item
+    if (Math.abs(hoursDifference) > 0.001 && shiftBreakdown.length > 0) {
+      const lastIndex = shiftBreakdown.length - 1;
+      shiftBreakdown[lastIndex].hours = parseFloat((shiftBreakdown[lastIndex].hours + hoursDifference).toFixed(2));
     }
 
     // Calculate total pay
@@ -243,12 +461,13 @@ export const createShift = async (req, res) => {
     shiftBreakdown.forEach((part) => {
       totalPay += part.hours * effectiveHourlySalary * part.multiplier;
     });
+    totalPay = parseFloat(totalPay.toFixed(2));
 
     // Create shift
     const shift = new Shift({
       companyId: decodedToken.companyId,
       employeeId,
-      hoursWorked: effectiveHoursWorked,
+      hoursWorked: parseFloat(effectiveHoursWorked.toFixed(2)),
       hourlySalary: effectiveHourlySalary,
       shiftDate: shiftDateObj,
       startTime: newStart,
@@ -442,42 +661,48 @@ export const updateShift = async (req, res) => {
     }
 
     // Check for overlapping shifts
+    // Two shifts overlap if: start1 < end2 AND start2 < end1
     const newStart = updates.startTime
       ? new Date(updates.startTime)
       : shift.startTime;
     const newEnd = updates.endTime ? new Date(updates.endTime) : shift.endTime;
-    const shiftDateObj = updates.shiftDate
-      ? new Date(updates.shiftDate)
-      : shift.shiftDate;
 
-    const overlappingShifts = await Shift.find({
+    // Build overlap query - simplified and more efficient
+    const overlapQuery = {
       employeeId: shift.employeeId,
       companyId: decodedToken.companyId,
-      shiftDate: {
-        $gte: new Date(shiftDateObj.setHours(0, 0, 0, 0)),
-        $lte: new Date(shiftDateObj.setHours(23, 59, 59, 999)),
-      },
-      _id: { $ne: id },
-      $or: [
+      _id: { $ne: id }, // Exclude current shift
+      // Shift overlaps if:
+      // 1. Existing shift starts before new shift ends (or new shift has no end)
+      // 2. Existing shift ends after new shift starts (or existing shift has no end)
+      $and: [
+        { startTime: { $lt: newEnd || new Date('2099-12-31') } }, // If newEnd is null, use far future
         {
-          $and: [
-            { startTime: { $lte: newEnd || newStart } },
-            { endTime: { $gte: newStart } },
-          ],
-        },
-        {
-          $and: [
-            { startTime: { $gte: newStart } },
-            { startTime: { $lte: newEnd || newStart } },
-          ],
-        },
-      ],
-    });
+          $or: [
+            { endTime: { $gt: newStart } },
+            { endTime: null } // Active shift always overlaps if it started before newEnd
+          ]
+        }
+      ]
+    };
+
+    const overlappingShifts = await Shift.find(overlapQuery);
 
     if (overlappingShifts.length > 0) {
+      const overlappingShift = overlappingShifts[0];
+      const overlapStart = new Date(overlappingShift.startTime).toLocaleString('he-IL');
+      const overlapEnd = overlappingShift.endTime 
+        ? new Date(overlappingShift.endTime).toLocaleString('he-IL')
+        : 'משמרת פעילה';
+      
       return res.status(400).json({
         success: false,
-        message: "קיימת משמרת חופפת בטווח השעות שנבחר",
+        message: `קיימת משמרת חופפת: ${overlapStart} - ${overlapEnd}`,
+        overlappingShift: {
+          id: overlappingShift._id,
+          startTime: overlappingShift.startTime,
+          endTime: overlappingShift.endTime,
+        }
       });
     }
 
@@ -537,42 +762,6 @@ export const updateShift = async (req, res) => {
       companyId: decodedToken.companyId,
       isActive: true,
     });
-    const regularRate = payRates.find((r) => r.rateType === "Regular") || {
-      _id: null,
-      multiplier: 1.0,
-      hoursThreshold: 8,
-    };
-    const overtime125Rate = payRates.find(
-      (r) => r.rateType === "Overtime125"
-    ) || {
-      _id: null,
-      multiplier: 1.25,
-      hoursThreshold: 2,
-    };
-    const overtime150Rate = payRates.find(
-      (r) => r.rateType === "Overtime150"
-    ) || {
-      _id: null,
-      multiplier: 1.5,
-    };
-    const nightRate = payRates.find((r) => r.rateType === "Night") || {
-      _id: null,
-      multiplier: 1.25,
-    };
-    const holidayRate = payRates.find((r) => r.rateType === "Holiday") || {
-      _id: null,
-      multiplier: 1.5,
-    };
-    const restDayRate = payRates.find((r) => r.rateType === "RestDay") || {
-      _id: null,
-      multiplier: 1.5,
-    };
-
-    // Initialize shift properties
-    let payRateId = regularRate._id;
-    let shiftType = shift.shiftType || "Day";
-    let dayType = shift.dayType || "Regular";
-    let shiftBreakdown = [];
 
     // Check for holidays
     const year = shiftDateObj.getFullYear();
@@ -595,84 +784,32 @@ export const updateShift = async (req, res) => {
       );
       const holidays = response.data.response.holidays;
       isHoliday = holidays && holidays.length > 0;
-      if (isHoliday && !updates.dayType) {
-        dayType = "Holiday";
-        payRateId = holidayRate._id;
-        shiftBreakdown.push({
-          rateType: "Holiday",
-          hours: effectiveHoursWorked,
-          multiplier: holidayRate.multiplier,
-          payRateId: holidayRate._id,
-        });
-      }
     } catch (apiError) {
       console.warn("Failed to fetch holidays:", apiError.message);
     }
 
     // Check for rest day (Saturday)
-    if (!isHoliday && shiftDateObj.getDay() === 6 && !updates.dayType) {
-      dayType = "RestDay";
-      payRateId = restDayRate._id;
-      shiftBreakdown.push({
-        rateType: "RestDay",
-        hours: effectiveHoursWorked,
-        multiplier: restDayRate.multiplier,
-        payRateId: restDayRate._id,
-      });
-    }
+    const isRestDay = shiftDateObj.getDay() === 6;
 
-    // Check for night shift
-    const startHour = shift.startTime.getHours();
-    const endHour = shift.endTime ? shift.endTime.getHours() : null;
-    const isNightShift = startHour >= 22 || (endHour !== null && endHour <= 6);
-    if (isNightShift && dayType === "Regular" && !updates.shiftType) {
-      shiftType = "Night";
-      payRateId = nightRate._id;
-      shiftBreakdown.push({
-        rateType: "Night",
-        hours: effectiveHoursWorked,
-        multiplier: nightRate.multiplier,
-        payRateId: nightRate._id,
-      });
-    }
+    // Calculate shift breakdown
+    const { shiftBreakdown, shiftType, dayType, payRateId } = calculateShiftBreakdown(
+      effectiveHoursWorked,
+      shift.startTime,
+      shift.endTime,
+      shiftDateObj,
+      payRates,
+      isHoliday,
+      isRestDay
+    );
 
-    // Regular day shift breakdown
-    if (dayType === "Regular" && !isNightShift) {
-      let remainingHours = effectiveHoursWorked;
-      const regularThreshold = regularRate.hoursThreshold;
-      const overtime125Threshold = overtime125Rate.hoursThreshold;
-
-      const regularHours = Math.min(remainingHours, regularThreshold);
-      if (regularHours > 0) {
-        shiftBreakdown.push({
-          rateType: "Regular",
-          hours: regularHours,
-          multiplier: regularRate.multiplier,
-          payRateId: regularRate._id,
-        });
-        remainingHours -= regularHours;
-      }
-
-      const overtime125Hours = Math.min(remainingHours, overtime125Threshold);
-      if (overtime125Hours > 0) {
-        shiftBreakdown.push({
-          rateType: "Overtime125",
-          hours: overtime125Hours,
-          multiplier: overtime125Rate.multiplier,
-          payRateId: overtime125Rate._id,
-        });
-        remainingHours -= overtime125Hours;
-      }
-
-      const overtime150Hours = remainingHours;
-      if (overtime150Hours > 0) {
-        shiftBreakdown.push({
-          rateType: "Overtime150",
-          hours: overtime150Hours,
-          multiplier: overtime150Rate.multiplier,
-          payRateId: overtime150Rate._id,
-        });
-      }
+    // Ensure shiftBreakdown hours sum equals effectiveHoursWorked (fix rounding issues)
+    const breakdownHoursSum = shiftBreakdown.reduce((sum, part) => sum + part.hours, 0);
+    const hoursDifference = effectiveHoursWorked - breakdownHoursSum;
+    
+    // If there's a difference due to rounding, adjust the last breakdown item
+    if (Math.abs(hoursDifference) > 0.001 && shiftBreakdown.length > 0) {
+      const lastIndex = shiftBreakdown.length - 1;
+      shiftBreakdown[lastIndex].hours = parseFloat((shiftBreakdown[lastIndex].hours + hoursDifference).toFixed(2));
     }
 
     // Calculate total pay
@@ -680,13 +817,15 @@ export const updateShift = async (req, res) => {
     shiftBreakdown.forEach((part) => {
       totalPay += part.hours * shift.hourlySalary * part.multiplier;
     });
+    totalPay = parseFloat(totalPay.toFixed(2));
 
     // Update shift
     shift.shiftType = shiftType;
     shift.dayType = dayType;
     shift.payRateId = payRateId;
     shift.shiftBreakdown = shiftBreakdown;
-    shift.totalPay = totalPay.toFixed(2);
+    shift.totalPay = totalPay;
+    shift.hoursWorked = parseFloat(effectiveHoursWorked.toFixed(2));
 
     await shift.save();
 

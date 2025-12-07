@@ -103,6 +103,13 @@ const ProjectSchema = new mongoose.Schema(
       min: 0,
       max: 100,
     },
+
+    // קישור לליד (אם הפרויקט נוצר מליד)
+    leadId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Lead",
+      required: false,
+    },
   },
   {
     timestamps: true, // מוסיף createdAt ו-updatedAt אוטומטית

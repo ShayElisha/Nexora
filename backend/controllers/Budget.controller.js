@@ -2,6 +2,7 @@ import Budget from "../models/Budget.model.js";
 import Product from "../models/product.model.js";
 import Notification from "../models/notification.model.js";
 import Department from "../models/department.model.js";
+import Signature from "../models/signature.model.js";
 import jwt from "jsonwebtoken";
 import cloudinary, {
   uploadToCloudinaryFile,
@@ -30,7 +31,8 @@ export const getBudgets = async (req, res) => {
 
     const budgets = await Budget.find({ companyId })
       .populate("departmentId", "name")
-      .populate("items.productId", "productName");
+      .populate("items.productId", "productName")
+      .populate("signers.employeeId", "name lastName email");
 
     return res.status(200).json({
       success: true,
@@ -136,13 +138,64 @@ export const createBudget = async (req, res) => {
       }
     }
 
+    // Handle signatureListId - assign signers from signature list
+    let signers = [];
+    if (budgetData.signatureListId) {
+      try {
+        const signatureList = await Signature.findById(budgetData.signatureListId).populate("signers.employeeId", "name lastName email");
+        console.log("Signature list found:", signatureList);
+        console.log("Signature list signers:", signatureList?.signers);
+        if (signatureList && signatureList.signers && signatureList.signers.length > 0) {
+          // Map signature list signers to budget signers format
+          signers = signatureList.signers.map((signer, index) => {
+            // Handle both populated and non-populated employeeId
+            const employeeId = signer.employeeId?._id || signer.employeeId;
+            const employeeName = signer.employeeId?.name || signer.name;
+            const employeeLastName = signer.employeeId?.lastName || "";
+            const fullName = employeeLastName ? `${employeeName} ${employeeLastName}` : employeeName;
+            
+            return {
+              employeeId: employeeId,
+              name: fullName || signer.name,
+              role: signer.role,
+              order: signer.order !== undefined ? signer.order : index,
+              hasSigned: false,
+              timeStamp: null,
+              signatureUrl: null,
+            };
+          });
+          console.log("Mapped signers for budget:", signers);
+        } else {
+          console.log("Signature list not found or has no signers");
+        }
+      } catch (error) {
+        console.error("Error fetching signature list:", error);
+        // Continue without signers if there's an error
+      }
+      // Remove signatureListId from budgetData as it's not part of the schema
+      delete budgetData.signatureListId;
+    } else {
+      console.log("No signatureListId provided in budgetData");
+      console.log("Budget data keys:", Object.keys(budgetData));
+    }
+
+    // Ensure status is set to "Draft" by default
+    // Remove signers from budgetData if it exists to avoid conflicts
+    const { signers: budgetDataSigners, ...restBudgetData } = budgetData;
+    
     const newBudgetData = {
-      ...budgetData,
+      ...restBudgetData,
       companyId: companyId,
       createdBy,
+      status: budgetData.status || "Draft", // Explicitly set to Draft if not provided
+      signers: signers.length > 0 ? signers : (budgetDataSigners || []),
+      currentSignatures: 0,
+      currentSignerIndex: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
+    
+    console.log("Final budget data signers:", newBudgetData.signers);
 
     const newBudget = new Budget(newBudgetData);
     await newBudget.save();

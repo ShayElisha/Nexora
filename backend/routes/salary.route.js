@@ -17,5 +17,9 @@ router.post(
   "/calculate-taxes-for-month",
   salaryController.calculateTaxesForMonthWithTax
 );
+router.post(
+  "/send-payslip-emails",
+  salaryController.sendPayslipEmails
+);
 
 export default router;

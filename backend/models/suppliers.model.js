@@ -10,36 +10,45 @@ const suppliersSchema = new mongoose.Schema(
     SupplierName: {
       type: String,
       required: true,
+      trim: true,
     },
     Contact: {
       type: String,
-      required: false,
+      trim: true,
     },
     Phone: {
       type: String,
-      required: false,
+      trim: true,
     },
     Email: {
       type: String,
-      required: false,
+      trim: true,
+      lowercase: true,
     },
     Address: {
       type: String,
-      required: false,
+      trim: true,
     },
     BankAccount: {
       type: String,
-      required: false,
     },
-    Rating: [{
+    Rating: [
+      {
+        type: Number,
+        min: 1,
+        max: 5,
+      },
+    ],
+    averageRating: {
       type: Number,
-      min: 1,
+      min: 0,
       max: 5,
-      required: false,
-    }],
+      default: 0,
+    },
     baseCurrency: {
       type: String,
       required: [true, "BaseCurrency is required"],
+      uppercase: true,
     },
     IsActive: {
       type: Boolean,
@@ -47,7 +56,6 @@ const suppliersSchema = new mongoose.Schema(
     },
     ConfirmationAccount: {
       type: String,
-      required: false,
     },
     attachments: [
       {
@@ -60,12 +68,10 @@ const suppliersSchema = new mongoose.Schema(
       {
         productId: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "products",
-          required: false,
+          ref: "Product",
         },
         productName: {
           type: String,
-          required: false,
         },
       },
     ],
@@ -75,6 +81,10 @@ const suppliersSchema = new mongoose.Schema(
   }
 );
 
-const Suppliers = mongoose.model("suppliers", suppliersSchema);
+suppliersSchema.index({ companyId: 1, SupplierName: 1 }, { unique: true });
+
+const Suppliers =
+  mongoose.models.Suppliers || mongoose.model("Suppliers", suppliersSchema);
 
 export default Suppliers;
+

@@ -9,6 +9,8 @@ import {
   createProcurementEmail,
   createProcurementUpdateEmail,
   createProcurementDiscrepancyEmail,
+  createPaymentFailedEmail,
+  createSupplierInvoiceEmail,
 } from "./emailHandlers.js";
 
 // Load environment variables
@@ -192,6 +194,66 @@ export const sendProcurementDiscrepancyEmail = async (
     console.log("Procurement discrepancy email sent: " + info.response);
   } catch (error) {
     console.error("Error sending procurement discrepancy email:", error);
+    throw error;
+  }
+};
+
+export const sendPaymentFailedEmail = async (
+  email,
+  companyName,
+  amount,
+  invoiceUrl
+) => {
+  try {
+    const emailData = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Payment Failed - Action Required",
+      html: createPaymentFailedEmail(companyName, amount, invoiceUrl),
+      category: "Payment Notifications",
+    };
+
+    const info = await transporter.sendMail(emailData);
+    console.log("Payment failed email sent: " + info.response);
+  } catch (error) {
+    console.error("Error sending payment failed email:", error);
+    throw error;
+  }
+};
+
+export const sendSupplierInvoiceEmail = async (
+  email,
+  supplierName,
+  companyName,
+  invoiceNumber,
+  invoiceDate,
+  dueDate,
+  totalAmount,
+  currency,
+  invoiceUrl
+) => {
+  try {
+    const emailData = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: `Invoice ${invoiceNumber} from ${companyName}`,
+      html: createSupplierInvoiceEmail(
+        supplierName,
+        companyName,
+        invoiceNumber,
+        invoiceDate,
+        dueDate,
+        totalAmount,
+        currency,
+        invoiceUrl
+      ),
+      category: "Procurement Notifications",
+    };
+
+    const info = await transporter.sendMail(emailData);
+    console.log("Supplier invoice email sent: " + info.response);
+  } catch (error) {
+    console.error("Error sending supplier invoice email:", error);
     throw error;
   }
 };

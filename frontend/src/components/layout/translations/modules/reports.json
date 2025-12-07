@@ -1,0 +1,205 @@
+{
+  "en": {
+    "translation": {
+      "reports": {
+        "title": "Reports"
+      },
+      "analytics": {
+        "title": "Leads Analytics",
+        "subtitle": "Analyze your sales pipeline performance",
+        "loading": "Loading analytics...",
+        "start_date": "Start Date",
+        "end_date": "End Date",
+        "conversion_funnel": "Conversion Funnel",
+        "source_performance": "Source Performance",
+        "win_loss_analysis": "Win/Loss Analysis",
+        "revenue_forecast": "Revenue Forecast",
+        "leads_count": "Leads",
+        "total_value": "Total Value",
+        "total_leads": "Total Leads",
+        "won_leads": "Won",
+        "lost_leads": "Lost",
+        "won": "Won",
+        "lost": "Lost",
+        "count": "Count",
+        "avg_value": "Avg Value",
+        "win_rate": "Win Rate",
+        "weighted_value": "Weighted Value"
+      }
+    }
+  },
+  "he": {
+    "translation": {
+      "reports": {
+        "title": "דוחות"
+      },
+      "analytics": {
+        "title": "אנליטיקת לידים",
+        "subtitle": "נתח את ביצועי צינור המכירות שלך",
+        "loading": "טוען אנליטיקה...",
+        "start_date": "תאריך התחלה",
+        "end_date": "תאריך סיום",
+        "conversion_funnel": "משפך המרה",
+        "source_performance": "ביצועי מקורות",
+        "win_loss_analysis": "ניתוח זכיות והפסדים",
+        "revenue_forecast": "תחזית הכנסות",
+        "leads_count": "לידים",
+        "total_value": "ערך כולל",
+        "total_leads": "סה\"כ לידים",
+        "won_leads": "זכיות",
+        "lost_leads": "הפסדים",
+        "won": "זכיות",
+        "lost": "הפסדים",
+        "count": "כמות",
+        "avg_value": "ערך ממוצע",
+        "win_rate": "שיעור זכיות",
+        "weighted_value": "ערך משוקלל"
+      }
+    }
+  },
+  "ru": {
+    "translation": {
+      "reports": {
+        "title": "Reports"
+      },
+      "analytics": {
+        "title": "Leads Analytics",
+        "subtitle": "Analyze your sales pipeline performance",
+        "loading": "Loading analytics...",
+        "start_date": "Start Date",
+        "end_date": "End Date",
+        "conversion_funnel": "Conversion Funnel",
+        "source_performance": "Source Performance",
+        "win_loss_analysis": "Win/Loss Analysis",
+        "revenue_forecast": "Revenue Forecast",
+        "leads_count": "Leads",
+        "total_value": "Total Value",
+        "total_leads": "Total Leads",
+        "won_leads": "Won",
+        "lost_leads": "Lost",
+        "won": "Won",
+        "lost": "Lost",
+        "count": "Count",
+        "avg_value": "Avg Value",
+        "win_rate": "Win Rate",
+        "weighted_value": "Weighted Value"
+      }
+    }
+  },
+  "ja": {
+    "translation": {
+      "reports": {
+        "title": "Reports"
+      },
+      "analytics": {
+        "title": "Leads Analytics",
+        "subtitle": "Analyze your sales pipeline performance",
+        "loading": "Loading analytics...",
+        "start_date": "Start Date",
+        "end_date": "End Date",
+        "conversion_funnel": "Conversion Funnel",
+        "source_performance": "Source Performance",
+        "win_loss_analysis": "Win/Loss Analysis",
+        "revenue_forecast": "Revenue Forecast",
+        "leads_count": "Leads",
+        "total_value": "Total Value",
+        "total_leads": "Total Leads",
+        "won_leads": "Won",
+        "lost_leads": "Lost",
+        "won": "Won",
+        "lost": "Lost",
+        "count": "Count",
+        "avg_value": "Avg Value",
+        "win_rate": "Win Rate",
+        "weighted_value": "Weighted Value"
+      }
+    }
+  },
+  "fr": {
+    "translation": {
+      "reports": {
+        "title": "Reports"
+      },
+      "analytics": {
+        "title": "Leads Analytics",
+        "subtitle": "Analyze your sales pipeline performance",
+        "loading": "Loading analytics...",
+        "start_date": "Start Date",
+        "end_date": "End Date",
+        "conversion_funnel": "Conversion Funnel",
+        "source_performance": "Source Performance",
+        "win_loss_analysis": "Win/Loss Analysis",
+        "revenue_forecast": "Revenue Forecast",
+        "leads_count": "Leads",
+        "total_value": "Total Value",
+        "total_leads": "Total Leads",
+        "won_leads": "Won",
+        "lost_leads": "Lost",
+        "won": "Won",
+        "lost": "Lost",
+        "count": "Count",
+        "avg_value": "Avg Value",
+        "win_rate": "Win Rate",
+        "weighted_value": "Weighted Value"
+      }
+    }
+  },
+  "es": {
+    "translation": {
+      "reports": {
+        "title": "Reports"
+      },
+      "analytics": {
+        "title": "Leads Analytics",
+        "subtitle": "Analyze your sales pipeline performance",
+        "loading": "Loading analytics...",
+        "start_date": "Start Date",
+        "end_date": "End Date",
+        "conversion_funnel": "Conversion Funnel",
+        "source_performance": "Source Performance",
+        "win_loss_analysis": "Win/Loss Analysis",
+        "revenue_forecast": "Revenue Forecast",
+        "leads_count": "Leads",
+        "total_value": "Total Value",
+        "total_leads": "Total Leads",
+        "won_leads": "Won",
+        "lost_leads": "Lost",
+        "won": "Won",
+        "lost": "Lost",
+        "count": "Count",
+        "avg_value": "Avg Value",
+        "win_rate": "Win Rate",
+        "weighted_value": "Weighted Value"
+      }
+    }
+  },
+  "ar": {
+    "translation": {
+      "reports": {
+        "title": "Reports"
+      },
+      "analytics": {
+        "title": "Leads Analytics",
+        "subtitle": "Analyze your sales pipeline performance",
+        "loading": "Loading analytics...",
+        "start_date": "Start Date",
+        "end_date": "End Date",
+        "conversion_funnel": "Conversion Funnel",
+        "source_performance": "Source Performance",
+        "win_loss_analysis": "Win/Loss Analysis",
+        "revenue_forecast": "Revenue Forecast",
+        "leads_count": "Leads",
+        "total_value": "Total Value",
+        "total_leads": "Total Leads",
+        "won_leads": "Won",
+        "lost_leads": "Lost",
+        "won": "Won",
+        "lost": "Lost",
+        "count": "Count",
+        "avg_value": "Avg Value",
+        "win_rate": "Win Rate",
+        "weighted_value": "Weighted Value"
+      }
+    }
+  }
+}

@@ -1,10 +1,26 @@
-// src/pages/procurement/AllSignatures.jsx
 import { useEffect, useState } from "react";
-import { axiosInstance } from "../../../lib/axios";
+import axiosInstance from "../../../lib/axios";
 import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FileText,
+  User,
+  CheckCircle,
+  Clock,
+  FileSignature,
+  Eye,
+  X,
+  Loader2,
+  AlertCircle,
+  Package,
+  DollarSign,
+  Calendar,
+  Shield,
+  Filter,
+} from "lucide-react";
 
 const AllSignatures = () => {
-  const { t } = useTranslation(); // Using 'allSignatures' dictionary
+  const { t } = useTranslation();
 
   const [documents, setDocuments] = useState([]);
   const [budgetSignatures, setBudgetSignatures] = useState([]);
@@ -12,15 +28,14 @@ const AllSignatures = () => {
   const [errorMessage, setErrorMessage] = useState(null);
   const [modalContent, setModalContent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("procurement");
 
-  // Function to append error messages
   const appendError = (msg) => {
     setErrorMessage((prev) => (prev ? `${prev} | ${msg}` : msg));
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      // Fetch procurement data
       try {
         const procurementResponse = await axiosInstance.get(
           "/procurement/all-signatures",
@@ -46,7 +61,6 @@ const AllSignatures = () => {
         }
       }
 
-      // Fetch budget data
       try {
         const budgetResponse = await axiosInstance.get("/budget", {
           withCredentials: true,
@@ -89,51 +103,212 @@ const AllSignatures = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-bg">
-        <div className="animate-spin rounded-full h-24 w-24 border-t-4 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg-color)' }}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center gap-4"
+        >
+          <Loader2 className="animate-spin" size={48} style={{ color: 'var(--color-primary)' }} />
+          <p style={{ color: 'var(--text-color)' }}>{t("allSignatures.loading")}</p>
+        </motion.div>
       </div>
     );
   }
 
+  const stats = {
+    totalProcurement: documents.length,
+    totalBudget: budgetSignatures.length,
+    pendingProcurement: documents.filter((d) => {
+      const allSigned = d.signers && d.signers.length > 0 && d.signers.every(s => s.hasSigned);
+      return !allSigned;
+    }).length,
+    pendingBudget: budgetSignatures.filter((b) => {
+      const allSigned = b.signers && b.signers.length > 0 && b.signers.every(s => s.hasSigned);
+      return !allSigned;
+    }).length,
+  };
+
   return (
-    <div className="min-h-screen flex items-start justify-center py-12 px-4 sm:px-6 lg:px-8 animate-fade-in">
-      <div className=" p-8 rounded-2xl shadow-2xl w-full max-w-5xl border bg-bg transform transition-all duration-500 hover:shadow-3xl">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-center mb-6 text-text tracking-tight drop-shadow-md">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-indigo-600">
+              <FileSignature size={28} color="white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
           {t("allSignatures.title")}
         </h1>
+              <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
+                {t("allSignatures.manage_all_signatures")}
+              </p>
+            </div>
+          </div>
 
         {/* Error Message */}
         {errorMessage && (
-          <div className="text-center text-red-500 mb-6 font-semibold">
-            {errorMessage}
-          </div>
-        )}
+            <motion.div
+              className="p-4 rounded-xl mb-6 flex items-center gap-3 border-2 border-red-500 bg-red-50"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+            >
+              <AlertCircle size={24} className="text-red-500" />
+              <p className="text-red-700 font-medium">{errorMessage}</p>
+            </motion.div>
+          )}
 
-        {/* Procurement Documents Table */}
-        <div className="mb-12">
-          <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-primary">
+          {/* Statistics Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <motion.div
+              className="p-4 rounded-xl shadow-md border"
+              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-blue-100">
+                  <Package size={24} className="text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
+                    {t("allSignatures.total_procurement")}
+                  </p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
+                    {stats.totalProcurement}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="p-4 rounded-xl shadow-md border"
+              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-green-100">
+                  <DollarSign size={24} className="text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
+                    {t("allSignatures.total_budgets")}
+                  </p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
+                    {stats.totalBudget}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="p-4 rounded-xl shadow-md border"
+              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-yellow-100">
+                  <Clock size={24} className="text-yellow-600" />
+                </div>
+                <div>
+                  <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
+                    {t("allSignatures.pending_procurement")}
+                  </p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
+                    {stats.pendingProcurement}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="p-4 rounded-xl shadow-md border"
+              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-orange-100">
+                  <Clock size={24} className="text-orange-600" />
+                </div>
+                <div>
+                  <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
+                    {t("allSignatures.pending_budgets")}
+                  </p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
+                    {stats.pendingBudget}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex gap-4 mb-6">
+            <button
+              onClick={() => setActiveTab("procurement")}
+              className={`flex-1 py-4 rounded-xl font-bold transition-all ${
+                activeTab === "procurement" ? "shadow-lg" : "shadow-md"
+              }`}
+              style={{
+                backgroundColor: activeTab === "procurement" ? 'var(--color-primary)' : 'var(--border-color)',
+                color: activeTab === "procurement" ? 'var(--button-text)' : 'var(--text-color)',
+              }}
+            >
+              <Package className="inline mr-2" size={20} />
             {t("allSignatures.allDocuments")}
-          </h2>
-          <div className="max-h-[400px] overflow-auto border border-border-color rounded-lg">
-            <table className="w-full border-collapse">
-              <thead className="bg-secondary text-text sticky top-0">
-                <tr>
-                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+            </button>
+            <button
+              onClick={() => setActiveTab("budget")}
+              className={`flex-1 py-4 rounded-xl font-bold transition-all ${
+                activeTab === "budget" ? "shadow-lg" : "shadow-md"
+              }`}
+              style={{
+                backgroundColor: activeTab === "budget" ? 'var(--color-primary)' : 'var(--border-color)',
+                color: activeTab === "budget" ? 'var(--button-text)' : 'var(--text-color)',
+              }}
+            >
+              <DollarSign className="inline mr-2" size={20} />
+              {t("allSignatures.budgetSignatures")}
+            </button>
+          </div>
+        </motion.div>
+
+        {/* Content */}
+        <AnimatePresence mode="wait">
+          {activeTab === "procurement" ? (
+            <motion.div
+              key="procurement"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="rounded-2xl shadow-lg border overflow-hidden"
+              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            >
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b" style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--border-color)' }}>
+                      <th className="px-4 py-4 text-left font-bold" style={{ color: 'var(--button-text)' }}>
                     {t("allSignatures.purchaseOrder")}
                   </th>
-                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                      <th className="px-4 py-4 text-left font-bold" style={{ color: 'var(--button-text)' }}>
                     {t("allSignatures.supplierName")}
                   </th>
-                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                      <th className="px-4 py-4 text-left font-bold" style={{ color: 'var(--button-text)' }}>
                     {t("allSignatures.approvalStatus")}
                   </th>
-                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                      <th className="px-4 py-4 text-left font-bold" style={{ color: 'var(--button-text)' }}>
                     {t("allSignatures.signers")}
                   </th>
-                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                      <th className="px-4 py-4 text-left font-bold" style={{ color: 'var(--button-text)' }}>
                     {t("allSignatures.document")}
                   </th>
-                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                      <th className="px-4 py-4 text-left font-bold" style={{ color: 'var(--button-text)' }}>
                     {t("allSignatures.status")}
                   </th>
                 </tr>
@@ -141,72 +316,114 @@ const AllSignatures = () => {
               <tbody>
                 {documents.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan="6"
-                      className="border border-border-color px-4 py-3 text-center text-gray-500"
-                    >
+                        <td colSpan="6" className="px-4 py-16 text-center">
+                          <AlertCircle size={48} className="mx-auto mb-3" style={{ color: 'var(--color-secondary)' }} />
+                          <p style={{ color: 'var(--color-secondary)' }}>
                       {t("allSignatures.no_documents_found")}
+                          </p>
                     </td>
                   </tr>
                 ) : (
-                  documents.map((doc, index) => (
-                    <tr
+                      documents.map((doc, index) => {
+                        // Check if all signers have signed
+                        const allSigned = doc.signers && doc.signers.length > 0 && doc.signers.every(s => s.hasSigned);
+                        const displayStatus = allSigned ? "approved" : (doc.approvalStatus || "pending");
+                        
+                        return (
+                        <motion.tr
                       key={index}
-                      className="hover:bg-secondary/20 transition-all duration-200"
-                    >
-                      <td className="border border-border-color px-4 py-3 text-text">
+                          className="border-b hover:bg-opacity-50 transition-all"
+                          style={{ borderColor: 'var(--border-color)' }}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.03 }}
+                          whileHover={{ backgroundColor: 'var(--border-color)' }}
+                        >
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-2">
+                              <FileText size={18} style={{ color: 'var(--color-primary)' }} />
+                              <span className="font-medium" style={{ color: 'var(--text-color)' }}>
                         {doc.PurchaseOrder || "N/A"}
+                              </span>
+                            </div>
                       </td>
-                      <td className="border border-border-color px-4 py-3 text-text">
+                          <td className="px-4 py-4" style={{ color: 'var(--text-color)' }}>
                         {doc.supplierName || "N/A"}
                       </td>
-                      <td className="border border-border-color px-4 py-3 text-text">
-                        {doc.approvalStatus || t("allSignatures.pending")}
-                      </td>
-                      <td className="border border-border-color px-4 py-3">
-                        <ul className="max-h-20 overflow-y-auto space-y-2">
-                          {doc.signers.map((signer, i) => (
-                            <li
-                              key={i}
-                              className="flex items-center space-x-3 bg-bg p-2 rounded-lg shadow-sm border border-border-color"
+                          <td className="px-4 py-4">
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                displayStatus === "approved"
+                                  ? "bg-green-100 text-green-700"
+                                  : displayStatus === "rejected"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-yellow-100 text-yellow-700"
+                              }`}
                             >
-                              <div className="flex-shrink-0">
+                              {displayStatus === "approved" ? (
+                                <CheckCircle className="inline mr-1" size={12} />
+                              ) : (
+                                <Clock className="inline mr-1" size={12} />
+                              )}
+                              {displayStatus === "approved" 
+                                ? t("allSignatures.approved")
+                                : displayStatus === "rejected"
+                                ? t("allSignatures.rejected")
+                                : t("allSignatures.pending")}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="space-y-2 max-h-32 overflow-y-auto">
+                              {doc.signers.map((signer, i) => (
+                                <div
+                                  key={i}
+                                  className="flex items-center gap-2 p-2 rounded-lg"
+                                  style={{ backgroundColor: 'var(--border-color)' }}
+                                >
                                 {signer.signatureUrl ? (
                                   <img
                                     src={signer.signatureUrl}
                                     alt={t("allSignatures.signature")}
-                                    className="w-10 h-10 object-contain border border-border-color rounded-md cursor-pointer hover:ring-2 hover:ring-primary transition-all duration-200"
+                                      className="w-10 h-10 object-contain rounded cursor-pointer hover:scale-125 transition-all"
+                                      style={{ backgroundColor: 'white' }}
                                     onClick={() =>
                                       openModal(
                                         <img
                                           src={signer.signatureUrl}
                                           alt={t("allSignatures.signature")}
-                                          className="w-full h-auto"
+                                            className="w-full h-auto rounded-xl"
                                         />
                                       )
                                     }
                                   />
                                 ) : (
-                                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 text-gray-500 text-xs border border-border-color rounded-md">
-                                    {t("allSignatures.no_image")}
+                                    <div className="w-10 h-10 flex items-center justify-center bg-gray-200 text-gray-500 text-xs rounded">
+                                      N/A
                                   </div>
                                 )}
-                              </div>
-                              <div>
-                                <p className="font-medium text-text text-sm">
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-xs truncate" style={{ color: 'var(--text-color)' }}>
                                   {signer.name || t("allSignatures.unknown")}
                                 </p>
-                                <p className="text-xs text-gray-500">
-                                  {signer.hasSigned
-                                    ? t("allSignatures.signed")
-                                    : t("allSignatures.pending")}
+                                    <p className="text-xs" style={{ color: 'var(--color-secondary)' }}>
+                                      {signer.hasSigned ? (
+                                        <span className="text-green-600 flex items-center gap-1">
+                                          <CheckCircle size={10} />
+                                          {t("allSignatures.signed")}
+                                        </span>
+                                      ) : (
+                                        <span className="text-yellow-600 flex items-center gap-1">
+                                          <Clock size={10} />
+                                          {t("allSignatures.pending")}
+                                        </span>
+                                      )}
                                 </p>
                               </div>
-                            </li>
+                                </div>
                           ))}
-                        </ul>
+                            </div>
                       </td>
-                      <td className="border border-border-color px-4 py-3 text-text">
+                          <td className="px-4 py-4">
                         {doc.summeryProcurement ? (
                           <button
                             onClick={() =>
@@ -214,54 +431,64 @@ const AllSignatures = () => {
                                 <iframe
                                   src={doc.summeryProcurement}
                                   title={t("allSignatures.documentViewer")}
-                                  className="w-full h-96 rounded-lg"
+                                      className="w-full h-[500px] rounded-lg"
                                 ></iframe>
                               )
                             }
-                            className="text-primary hover:underline focus:ring-2 focus:ring-primary rounded-md px-2 py-1 transition-all duration-200"
+                                className="px-3 py-2 rounded-lg font-medium transition-all hover:scale-105 flex items-center gap-2"
+                                style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
                           >
+                                <Eye size={16} />
                             {t("allSignatures.viewDocument")}
                           </button>
                         ) : (
-                          t("allSignatures.no_document")
+                              <span style={{ color: 'var(--color-secondary)' }}>
+                                {t("allSignatures.no_document")}
+                              </span>
                         )}
                       </td>
-                      <td className="border border-border-color px-4 py-3 text-text">
+                          <td className="px-4 py-4">
+                            <span className="font-medium" style={{ color: 'var(--text-color)' }}>
                         {doc.status || t("allSignatures.n_a")}
+                            </span>
                       </td>
-                    </tr>
-                  ))
+                        </motion.tr>
+                        );
+                      })
                 )}
               </tbody>
             </table>
           </div>
-        </div>
-
-        {/* Budget Signatures Table */}
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-center mb-6 text-primary">
-            {t("allSignatures.budgetSignatures")}
-          </h2>
-          <div className="max-h-[400px] overflow-auto border border-border-color rounded-lg">
-            <table className="w-full border-collapse">
-              <thead className="bg-secondary text-text sticky top-0">
-                <tr>
-                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+            </motion.div>
+          ) : (
+            <motion.div
+              key="budget"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="rounded-2xl shadow-lg border overflow-hidden"
+              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            >
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b" style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--border-color)' }}>
+                      <th className="px-4 py-4 text-left font-bold" style={{ color: 'var(--button-text)' }}>
                     {t("allSignatures.budgetItem")}
                   </th>
-                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                      <th className="px-4 py-4 text-left font-bold" style={{ color: 'var(--button-text)' }}>
                     {t("allSignatures.startDate")}
                   </th>
-                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                      <th className="px-4 py-4 text-left font-bold" style={{ color: 'var(--button-text)' }}>
                     {t("allSignatures.endDate")}
                   </th>
-                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                      <th className="px-4 py-4 text-left font-bold" style={{ color: 'var(--button-text)' }}>
                     {t("allSignatures.amount")}
                   </th>
-                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                      <th className="px-4 py-4 text-left font-bold" style={{ color: 'var(--button-text)' }}>
                     {t("allSignatures.signers")}
                   </th>
-                  <th className="border border-border-color px-4 py-3 text-sm font-semibold">
+                      <th className="px-4 py-4 text-left font-bold" style={{ color: 'var(--button-text)' }}>
                     {t("allSignatures.status")}
                   </th>
                 </tr>
@@ -269,104 +496,165 @@ const AllSignatures = () => {
               <tbody>
                 {budgetSignatures.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan="6"
-                      className="border border-border-color px-4 py-3 text-center text-gray-500"
-                    >
+                        <td colSpan="6" className="px-4 py-16 text-center">
+                          <AlertCircle size={48} className="mx-auto mb-3" style={{ color: 'var(--color-secondary)' }} />
+                          <p style={{ color: 'var(--color-secondary)' }}>
                       {t("allSignatures.no_budget_signatures_found")}
+                          </p>
                     </td>
                   </tr>
                 ) : (
-                  budgetSignatures.map((budgetItem, index) => (
-                    <tr
+                      budgetSignatures.map((budget, index) => {
+                        // Check if all signers have signed
+                        const allSigned = budget.signers && budget.signers.length > 0 && budget.signers.every(s => s.hasSigned);
+                        const displayStatus = allSigned ? "approved" : (budget.status || "pending");
+                        
+                        return (
+                        <motion.tr
                       key={index}
-                      className="hover:bg-secondary/20 transition-all duration-200"
-                    >
-                      <td className="border border-border-color px-4 py-3 text-text">
-                        {budgetItem.departmentOrProjectName ||
-                          t("allSignatures.n_a")}
+                          className="border-b hover:bg-opacity-50 transition-all"
+                          style={{ borderColor: 'var(--border-color)' }}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.03 }}
+                          whileHover={{ backgroundColor: 'var(--border-color)' }}
+                        >
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-2">
+                              <DollarSign size={18} style={{ color: 'var(--color-primary)' }} />
+                              <span className="font-medium" style={{ color: 'var(--text-color)' }}>
+                                {budget.departmentOrProjectName || t("allSignatures.n_a")}
+                              </span>
+                            </div>
                       </td>
-                      <td className="border border-border-color px-4 py-3 text-text">
-                        {budgetItem.startDate
-                          ? new Date(budgetItem.startDate).toLocaleDateString()
+                          <td className="px-4 py-4" style={{ color: 'var(--text-color)' }}>
+                            {budget.startDate
+                              ? new Date(budget.startDate).toLocaleDateString()
                           : t("allSignatures.n_a")}
                       </td>
-                      <td className="border border-border-color px-4 py-3 text-text">
-                        {budgetItem.endDate
-                          ? new Date(budgetItem.endDate).toLocaleDateString()
+                          <td className="px-4 py-4" style={{ color: 'var(--text-color)' }}>
+                            {budget.endDate
+                              ? new Date(budget.endDate).toLocaleDateString()
                           : t("allSignatures.n_a")}
                       </td>
-                      <td className="border border-border-color px-4 py-3 text-text">
-                        {budgetItem.amount || t("allSignatures.n_a")}
+                          <td className="px-4 py-4">
+                            <span className="font-bold" style={{ color: 'var(--color-primary)' }}>
+                              {budget.amount ? `${budget.amount} ₪` : t("allSignatures.n_a")}
+                            </span>
                       </td>
-                      <td className="border border-border-color px-4 py-3">
-                        <ul className="max-h-20 overflow-y-auto space-y-2">
-                          {budgetItem.signers?.map((signer, i) => (
-                            <li
+                          <td className="px-4 py-4">
+                            <div className="space-y-2 max-h-32 overflow-y-auto">
+                              {budget.signers?.map((signer, i) => (
+                                <div
                               key={i}
-                              className="flex items-center space-x-3 bg-bg p-2 rounded-lg shadow-sm border border-border-color"
+                                  className="flex items-center gap-2 p-2 rounded-lg"
+                                  style={{ backgroundColor: 'var(--border-color)' }}
                             >
-                              <div className="flex-shrink-0">
                                 {signer.signatureUrl ? (
                                   <img
                                     src={signer.signatureUrl}
                                     alt={t("allSignatures.signature")}
-                                    className="w-10 h-10 object-contain border border-border-color rounded-md cursor-pointer hover:ring-2 hover:ring-primary transition-all duration-200"
+                                      className="w-10 h-10 object-contain rounded cursor-pointer hover:scale-125 transition-all"
+                                      style={{ backgroundColor: 'white' }}
                                     onClick={() =>
                                       openModal(
                                         <img
                                           src={signer.signatureUrl}
                                           alt={t("allSignatures.signature")}
-                                          className="w-full h-auto"
+                                            className="w-full h-auto rounded-xl"
                                         />
                                       )
                                     }
                                   />
                                 ) : (
-                                  <div className="w-10 h-10 flex items-center justify-center bg-gray-200 text-gray-500 text-xs border border-border-color rounded-md">
-                                    {t("allSignatures.no_image")}
+                                    <div className="w-10 h-10 flex items-center justify-center bg-gray-200 text-gray-500 text-xs rounded">
+                                      N/A
                                   </div>
                                 )}
-                              </div>
-                              <div>
-                                <p className="font-medium text-text text-sm">
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-xs truncate" style={{ color: 'var(--text-color)' }}>
                                   {signer.name || t("allSignatures.unknown")}
                                 </p>
-                                <p className="text-xs text-gray-500">
-                                  {signer.hasSigned
-                                    ? t("allSignatures.signed")
-                                    : t("allSignatures.pending")}
+                                    <p className="text-xs" style={{ color: 'var(--color-secondary)' }}>
+                                      {signer.hasSigned ? (
+                                        <span className="text-green-600 flex items-center gap-1">
+                                          <CheckCircle size={10} />
+                                          {t("allSignatures.signed")}
+                                        </span>
+                                      ) : (
+                                        <span className="text-yellow-600 flex items-center gap-1">
+                                          <Clock size={10} />
+                                          {t("allSignatures.pending")}
+                                        </span>
+                                      )}
                                 </p>
                               </div>
-                            </li>
+                                </div>
                           ))}
-                        </ul>
+                            </div>
                       </td>
-                      <td className="border border-border-color px-4 py-3 text-text">
-                        {budgetItem.status || t("allSignatures.n_a")}
+                          <td className="px-4 py-4">
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                displayStatus === "approved"
+                                  ? "bg-green-100 text-green-700"
+                                  : displayStatus === "rejected"
+                                  ? "bg-red-100 text-red-700"
+                                  : displayStatus === "draft"
+                                  ? "bg-gray-100 text-gray-700"
+                                  : "bg-yellow-100 text-yellow-700"
+                              }`}
+                            >
+                              {displayStatus === "approved" 
+                                ? t("allSignatures.approved")
+                                : displayStatus === "rejected"
+                                ? t("allSignatures.rejected")
+                                : displayStatus === "draft"
+                                ? t("allSignatures.draft")
+                                : displayStatus || t("allSignatures.n_a")}
+                            </span>
                       </td>
-                    </tr>
-                  ))
+                        </motion.tr>
+                        );
+                      })
                 )}
               </tbody>
             </table>
           </div>
-        </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Modal */}
+        <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
-            <div className="bg-bg rounded-2xl p-6 max-w-3xl w-full shadow-2xl border border-border-color relative transform transition-all duration-300">
-              <button
+            <div
+              className="fixed inset-0 flex items-center justify-center z-50 p-4"
+              style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
                 onClick={closeModal}
-                className="absolute top-4 right-4 text-text hover:text-primary text-xl font-bold focus:outline-none transition-all duration-200"
+            >
+              <motion.div
+                className="rounded-2xl p-6 max-w-4xl w-full shadow-2xl border relative"
+                style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                onClick={(e) => e.stopPropagation()}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
               >
-                ✖
+                <button
+                  onClick={closeModal}
+                  className="absolute top-4 right-4 p-2 rounded-full hover:scale-110 transition-all"
+                  style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
+                >
+                  <X size={20} />
               </button>
+                <div className="mt-8">
               {modalContent}
             </div>
+              </motion.div>
           </div>
         )}
+        </AnimatePresence>
       </div>
     </div>
   );

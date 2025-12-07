@@ -5,8 +5,8 @@ import * as Yup from "yup";
 import { toast } from "react-hot-toast";
 import axiosInstance from "../../../lib/axios";
 import { useTranslation } from "react-i18next";
-import { Calendar, Plus } from "lucide-react";
 import { motion } from "framer-motion";
+import { Calendar, HeartPulse, Award, Loader, Info } from "lucide-react";
 
 const UseSickDay = () => {
   const { t } = useTranslation();
@@ -23,20 +23,18 @@ const UseSickDay = () => {
   const { data: policy } = useQuery({
     queryKey: ["sickPolicy", employee?.address?.country],
     queryFn: async () => {
-      const res = await axiosInstance.get(
-        `/sickDays?country=${employee.address.country}`
-      );
+      const res = await axiosInstance.get(`/sickDays?country=${employee.address.country}`);
       return res.data.data[0] || null;
     },
     enabled: !!employee?.address?.country,
   });
 
   const useMutationFn = useMutation({
-    mutationFn: (payload) =>
-      axiosInstance.put(`/employees/${employee._id}/use`, payload),
+    mutationFn: (payload) => axiosInstance.put(`/employees/${employee._id}/use`, payload),
     onSuccess: () => {
       toast.success(t("useSickDay.success"));
       queryClient.invalidateQueries(["currentEmployee"]);
+      formik.resetForm();
     },
     onError: (err) => {
       toast.error(err.response?.data?.message || t("useSickDay.error"));
@@ -55,10 +53,7 @@ const UseSickDay = () => {
         .min(minDate, t("useSickDay.validation.date_too_old", { days: 45 })),
       days: Yup.number()
         .min(0.5, t("useSickDay.validation.days_min"))
-        .max(
-          employee?.sickBalance || 0,
-          t("useSickDay.validation.days_max", { max: employee?.sickBalance })
-        )
+        .max(employee?.sickBalance || 0, t("useSickDay.validation.days_max", { max: employee?.sickBalance }))
         .required(t("useSickDay.validation.days_required")),
     }),
     onSubmit: (values) => {
@@ -66,112 +61,168 @@ const UseSickDay = () => {
     },
   });
 
-  if (isLoadingEmp)
-    return <p className="text-center mt-6 text-secondary">{t("loading")}</p>;
+  if (isLoadingEmp) {
+    return (
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--bg-color)' }}>
+        <motion.div
+          className="w-16 h-16 border-4 border-t-4 rounded-full"
+          style={{ borderColor: 'var(--border-color)', borderTopColor: 'var(--color-primary)' }}
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1 }}
+        />
+      </div>
+    );
+  }
 
   return (
-    <motion.div className="max-w-2xl  mx-auto p-8 bg animate-fadeIn rounded-2xl shadow-lg relative overflow-hidden">
-      <div className="absolute -right-16 -top-16 w-48 h-48 bg-accent rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob"></div>
-      <div className="absolute -left-16 -bottom-16 w-48 h-48 bg-secondary rounded-full mix-blend-multiply filter blur-2xl opacity-70 animate-blob animation-delay-2000"></div>
-
-      <motion.h1
-        className="text-3xl font-extrabold mb-6 text-center text-primary"
-        initial={{ scale: 0.9 }}
-        animate={{ scale: 1 }}
-        transition={{ type: "spring", stiffness: 200 }}
-      >
-        {t("useSickDay.title")}
-      </motion.h1>
-
-      <motion.p
-        className="mb-4 text-text"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-      >
-        {t("useSickDay.currentBalance")}:{" "}
-        <span className="font-semibold text-primary">
-          {employee.sickBalance}
-        </span>
-      </motion.p>
-
-      {policy && (
-        <motion.p
-          className="mb-6 text-sm text-secondary"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
+      <div className="max-w-2xl mx-auto">
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
         >
-          {t("useSickDay.policyInfo", {
-            rate: policy.accrual_rate,
-            max: policy.max_accrual,
-          })}
-        </motion.p>
-      )}
-
-      <form onSubmit={formik.handleSubmit} className="space-y-6">
-        <div className="animate-fadeIn">
-          <label className="block text-sm font-medium text-text mb-1">
-            {t("useSickDay.form.date")}
-          </label>
-          <div className="relative">
-            <Calendar className="absolute left-3 top-3 text-secondary" />
-            <input
-              type="date"
-              name="date"
-              min={minDate.toISOString().split("T")[0]}
-              value={formik.values.date}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              className={`w-full pl-10 p-3 border border-border-color rounded-lg bg-bg text-text placeholder-secondary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 ${
-                formik.touched.date && formik.errors.date
-                  ? "border-red-500"
-                  : ""
-              }`}
-            />
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-rose-500 to-pink-600">
+              <HeartPulse size={28} color="white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
+                {t("useSickDay.title")}
+              </h1>
+              <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
+                {t("useSickDay.requestSickLeave")}
+              </p>
+            </div>
           </div>
-          {formik.touched.date && formik.errors.date && (
-            <p className="text-red-500 text-xs mt-1">{formik.errors.date}</p>
-          )}
-        </div>
+        </motion.div>
 
-        <div className="animate-fadeIn">
-          <label className="block text-sm font-medium text-text mb-1">
-            {t("useSickDay.form.days")}
-          </label>
-          <input
-            type="number"
-            step="0.5"
-            name="days"
-            value={formik.values.days}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className={`w-full p-3 border border-border-color rounded-lg bg-bg text-text placeholder-secondary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 ${
-              formik.touched.days && formik.errors.days ? "border-red-500" : ""
-            }`}
-            placeholder={t("useSickDay.placeholders.days")}
-          />
-          {formik.touched.days && formik.errors.days && (
-            <p className="text-red-500 text-xs mt-1">{formik.errors.days}</p>
-          )}
-        </div>
-
-        <motion.button
-          type="submit"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          disabled={useMutationFn.isLoading || !formik.isValid}
-          className="w-full flex items-center justify-center bg-button-bg text-button-text py-3 rounded-lg shadow-lg hover:bg-primary transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        <motion.div
+          className="rounded-2xl shadow-lg p-6 lg:p-8 border mb-8"
+          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
         >
-          {useMutationFn.isLoading ? (
-            <span className="animate-spin mr-2 h-5 w-5 border-2 border-button-text border-t-transparent rounded-full"></span>
-          ) : (
-            <Plus className="w-5 h-5 mr-2 text-button-text" />
+          <div className="flex items-center gap-4 p-6 rounded-xl mb-6" style={{ backgroundColor: 'var(--border-color)' }}>
+            <div className="w-16 h-16 rounded-xl flex items-center justify-center bg-gradient-to-br from-rose-500 to-pink-600">
+              <Award size={32} color="white" />
+            </div>
+            <div>
+              <p className="text-sm font-medium" style={{ color: 'var(--color-secondary)' }}>
+                {t("useSickDay.currentBalance")}
+              </p>
+              <p className="text-4xl font-bold text-rose-600">
+                {employee.sickBalance}
+              </p>
+              <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
+                {t("useSickDay.daysAvailable")}
+              </p>
+            </div>
+          </div>
+
+          {policy && (
+            <motion.div
+              className="p-4 rounded-xl mb-6 flex items-start gap-3"
+              style={{ backgroundColor: 'var(--border-color)' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Info size={20} style={{ color: 'var(--color-primary)' }} className="mt-0.5" />
+              <div>
+                <p className="text-sm font-bold mb-1" style={{ color: 'var(--text-color)' }}>
+                  {t("useSickDay.policyInfo")}
+                </p>
+                <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
+                  {t("useSickDay.accrualRate")}: {policy.accrual_rate}<br />
+                  {t("useSickDay.maxAccrual")}: {policy.max_accrual}
+                </p>
+              </div>
+            </motion.div>
           )}
-          {t("useSickDay.buttons.submit")}
-        </motion.button>
-      </form>
-    </motion.div>
+
+          <form onSubmit={formik.handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-bold mb-2 flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
+                <Calendar size={18} />
+                {t("useSickDay.form.date")}
+              </label>
+              <input
+                type="date"
+                name="date"
+                min={minDate.toISOString().split("T")[0]}
+                value={formik.values.date}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={`w-full p-4 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                  formik.touched.date && formik.errors.date
+                    ? "border-red-500 focus:ring-red-500"
+                    : "focus:ring-blue-500"
+                }`}
+                style={{
+                  borderColor: formik.touched.date && formik.errors.date ? '#ef4444' : 'var(--border-color)',
+                  backgroundColor: 'var(--bg-color)',
+                  color: 'var(--text-color)'
+                }}
+              />
+              {formik.touched.date && formik.errors.date && (
+                <p className="text-red-500 text-sm mt-2">{formik.errors.date}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                {t("useSickDay.form.days")}
+              </label>
+              <input
+                type="number"
+                step="0.5"
+                name="days"
+                value={formik.values.days}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className={`w-full p-4 border rounded-xl focus:outline-none focus:ring-2 transition-all ${
+                  formik.touched.days && formik.errors.days
+                    ? "border-red-500 focus:ring-red-500"
+                    : "focus:ring-blue-500"
+                }`}
+                style={{
+                  borderColor: formik.touched.days && formik.errors.days ? '#ef4444' : 'var(--border-color)',
+                  backgroundColor: 'var(--bg-color)',
+                  color: 'var(--text-color)'
+                }}
+                placeholder={t("useSickDay.placeholders.days")}
+              />
+              {formik.touched.days && formik.errors.days && (
+                <p className="text-red-500 text-sm mt-2">{formik.errors.days}</p>
+              )}
+            </div>
+
+            <motion.button
+              type="submit"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              disabled={useMutationFn.isLoading || !formik.isValid}
+              className="w-full py-4 px-6 rounded-xl font-bold text-lg shadow-lg transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
+            >
+              {useMutationFn.isLoading ? (
+                <>
+                  <Loader className="w-5 h-5 animate-spin" />
+                  {t("useSickDay.submitting")}
+                </>
+              ) : (
+                <>
+                  <HeartPulse size={24} />
+                  {t("useSickDay.buttons.submit")}
+                </>
+              )}
+            </motion.button>
+          </form>
+        </motion.div>
+      </div>
+    </div>
   );
 };
 

@@ -1,11 +1,29 @@
 import React, { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 import axiosInstance from "../../../lib/axios";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import {
+  Wallet,
+  Plus,
+  Search,
+  Edit2,
+  Eye,
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  DollarSign,
+  AlertCircle,
+  X,
+  Save,
+  CheckCircle,
+  Clock,
+  XCircle,
+} from "lucide-react";
 
-// ============== UpdateBudgetModal Component ==============
+// Update Budget Modal
 const UpdateBudgetModal = ({ budget, onClose }) => {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
@@ -13,12 +31,8 @@ const UpdateBudgetModal = ({ budget, onClose }) => {
     departmentOrProjectName: budget.departmentOrProjectName || "",
     amount: budget.amount || 0,
     currency: budget.currency || "",
-    startDate: budget.startDate
-      ? new Date(budget.startDate).toISOString().slice(0, 10)
-      : "",
-    endDate: budget.endDate
-      ? new Date(budget.endDate).toISOString().slice(0, 10)
-      : "",
+    startDate: budget.startDate ? new Date(budget.startDate).toISOString().slice(0, 10) : "",
+    endDate: budget.endDate ? new Date(budget.endDate).toISOString().slice(0, 10) : "",
     notes: budget.notes || "",
   });
   const [loading, setLoading] = useState(false);
@@ -32,629 +46,438 @@ const UpdateBudgetModal = ({ budget, onClose }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axiosInstance.put(`/budget/${budget._id}`, {
-        ...formData,
-        resetSigners: true,
-      });
-      toast.success(t("budget.updated_successfully"));
+      await axiosInstance.put(`/budget/${budget._id}`, { ...formData, resetSigners: true });
+      toast.success(t("finance.budget.updated_successfully"));
       queryClient.invalidateQueries({ queryKey: ["budget"] });
       onClose();
     } catch (error) {
-      console.error("Error updating budget:", error);
-      toast.error(t("budget.error_updating"));
+      toast.error(t("finance.budget.error_updating"));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div
-        className="absolute inset-0 bg-black bg-opacity-60 transition-opacity duration-300"
+    <motion.div
+      className="fixed inset-0 flex items-center justify-center z-50 p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
         onClick={onClose}
-      />
-      <div className="relative bg-accent rounded-xl p-6 w-full max-w-lg z-10 shadow-2xl transform transition-all duration-300">
-        <h2 className="text-2xl sm:text-3xl font-bold text-text mb-6 text-center tracking-tight drop-shadow-md">
-          {t("budget.update_budget")}
+    >
+      <div className="absolute inset-0 bg-black bg-opacity-60" />
+      <motion.div
+        className="relative rounded-2xl p-6 w-full max-w-lg z-10 shadow-2xl border"
+        style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+        initial={{ scale: 0.9, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
+          {t("finance.budget.update_budget")}
         </h2>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg hover:scale-110 transition-all"
+            style={{ backgroundColor: 'var(--color-accent)', color: 'var(--button-text)' }}
+          >
+            <X size={20} />
+          </button>
+        </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
-              {t("budget.department_project_name")}
+            <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              {t("finance.budget.department_project_name")}
             </label>
             <input
               type="text"
               name="departmentOrProjectName"
               value={formData.departmentOrProjectName}
               onChange={handleChange}
-              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
+              className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               required
             />
           </div>
+          <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
-              {t("budget.budget_amount")}
+              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              {t("finance.budget.budget_amount")}
             </label>
             <input
               type="number"
               name="amount"
               value={formData.amount}
               onChange={handleChange}
-              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
-              {t("budget.currency")}
+              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              {t("finance.budget.currency")}
             </label>
             <input
               type="text"
               name="currency"
               value={formData.currency}
               onChange={handleChange}
-              placeholder="e.g. USD"
-              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
             />
+            </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
-                {t("budget.start_date")}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                {t("finance.budget.start_date")}
               </label>
               <input
                 type="date"
                 name="startDate"
                 value={formData.startDate}
                 onChange={handleChange}
-                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
-            <div className="flex-1">
-              <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
-                {t("budget.end_date")}
+            <div>
+              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                {t("finance.budget.end_date")}
               </label>
               <input
                 type="date"
                 name="endDate"
                 value={formData.endDate}
                 onChange={handleChange}
-                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
-              {t("budget.notes")}
+            <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              {t("finance.budget.notes")}
             </label>
             <textarea
               name="notes"
               value={formData.notes}
               onChange={handleChange}
               rows="3"
-              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
+              className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
             />
           </div>
-          <div className="flex justify-end gap-4 pt-2">
+          <div className="flex gap-4 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2 bg-bg border border-border-color text-text rounded-full shadow-md hover:bg-gray-200 transition-all duration-200"
+              className="flex-1 px-6 py-3 rounded-xl font-bold transition-all hover:scale-105"
+              style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
             >
-              {t("budget.cancel")}
+              {t("finance.budget.cancel")}
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-button-bg text-button-text rounded-full shadow-lg hover:bg-secondary transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="flex-1 px-6 py-3 rounded-xl font-bold transition-all hover:scale-105 disabled:opacity-50 flex items-center justify-center gap-2"
+              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
             >
-              {loading ? t("budget.updating") : t("budget.update_budget")}
+              {loading ? <><motion.div className="w-5 h-5 border-2 border-t-2 border-white rounded-full" animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} /> {t("finance.budget.updating")}</> : <><Save size={20} /> {t("finance.budget.update_budget")}</>}
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
-// ============== Budgets Component ==============
+// Main Budgets Component
 const Budgets = () => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
-  const [expandedRow, setExpandedRow] = useState(null);
   const [selectedBudgetForUpdate, setSelectedBudgetForUpdate] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1); // Pagination state
-  const budgetsPerPage = 12; // 12 budgets per page
 
-  const { data: authData } = useQuery({ queryKey: ["authUser"] });
-  const queryClient = useQueryClient();
-
-  const {
-    data: budgets,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: budgets, isLoading, error } = useQuery({
     queryKey: ["budget"],
     queryFn: async () => {
       const response = await axiosInstance.get(`/budget`);
       return response.data.data;
     },
-    onError: (err) => {
-      toast.error(`${t("budget.error_create_budget")}: ${err.message}`);
-    },
   });
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-primary"></div>
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--bg-color)' }}>
+        <motion.div
+          className="w-16 h-16 border-4 border-t-4 rounded-full"
+          style={{ borderColor: 'var(--border-color)', borderTopColor: 'var(--color-primary)' }}
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1 }}
+        />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center text-red-500 font-medium text-lg mt-10">
-        {t("budget.error")}: {error.message}
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--bg-color)' }}>
+        <div className="text-center">
+          <AlertCircle size={64} className="mx-auto mb-4 text-red-500" />
+          <p className="text-xl font-semibold text-red-500">{t("finance.budget.error")}: {error.message}</p>
+        </div>
       </div>
     );
   }
 
-  const handleRowClick = (budgetId) => {
-    setExpandedRow((prev) => (prev === budgetId ? null : budgetId));
-  };
-
-  const handleOpenUpdateModal = (budget) => {
-    setSelectedBudgetForUpdate(budget);
-  };
-
-  const handleCloseUpdateModal = () => {
-    setSelectedBudgetForUpdate(null);
-  };
-
   const filteredBudgets = (budgets || []).filter((budget) => {
     const term = searchTerm.toLowerCase();
-    const deptName = budget.departmentOrProjectName?.toLowerCase() || "";
-    const amountStr = budget.amount?.toString()?.toLowerCase() || "";
-    const spentStr = budget.spentAmount?.toString()?.toLowerCase() || "";
-    const currencyStr = budget.currency?.toLowerCase() || "";
-    const statusStr = budget.status?.toLowerCase() || "";
-    const startDateStr = budget.startDate
-      ? new Date(budget.startDate).toLocaleDateString().toLowerCase()
-      : "";
-    const endDateStr = budget.endDate
-      ? new Date(budget.endDate).toLocaleDateString().toLowerCase()
-      : "";
-    const periodStr = `${startDateStr}-${endDateStr}`;
-
     return (
-      deptName.includes(term) ||
-      amountStr.includes(term) ||
-      spentStr.includes(term) ||
-      currencyStr.includes(term) ||
-      statusStr.includes(term) ||
-      periodStr.includes(term)
+      budget.departmentOrProjectName?.toLowerCase().includes(term) ||
+      budget.amount?.toString().includes(term) ||
+      budget.currency?.toLowerCase().includes(term) ||
+      budget.status?.toLowerCase().includes(term)
     );
   });
 
-  // Pagination logic
-  const totalPages = Math.ceil(filteredBudgets.length / budgetsPerPage);
-  const indexOfLastBudget = currentPage * budgetsPerPage;
-  const indexOfFirstBudget = indexOfLastBudget - budgetsPerPage;
-  const currentBudgets = filteredBudgets.slice(
-    indexOfFirstBudget,
-    indexOfLastBudget
-  );
+  // Calculate statistics
+  const stats = {
+    totalBudgets: filteredBudgets.length,
+    totalAllocated: filteredBudgets.reduce((sum, b) => sum + (b.amount || 0), 0),
+    totalSpent: filteredBudgets.reduce((sum, b) => sum + (b.spentAmount || 0), 0),
+    pending: filteredBudgets.filter(b => b.status === "draft").length,
+  };
+  stats.remaining = stats.totalAllocated - stats.totalSpent;
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  const renderPageNumbers = () => {
-    const pageNumbers = [];
-    const maxPagesToShow = 5;
-
-    if (totalPages <= maxPagesToShow) {
-      for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(
-          <button
-            key={i}
-            onClick={() => paginate(i)}
-            className={`px-3 py-1 rounded-full mx-1 ${
-              currentPage === i
-                ? "bg-button-bg text-button-text"
-                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
-            }`}
-          >
-            {i}
-          </button>
-        );
-      }
-    } else {
-      const startPage = Math.max(1, currentPage - 2);
-      const endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-
-      if (startPage > 1) {
-        pageNumbers.push(
-          <button
-            key={1}
-            onClick={() => paginate(1)}
-            className={`px-3 py-1 rounded-full mx-1 ${
-              currentPage === 1
-                ? "bg-button-bg text-button-text"
-                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
-            }`}
-          >
-            1
-          </button>
-        );
-        if (startPage > 2) {
-          pageNumbers.push(
-            <span key="start-dots" className="mx-1">
-              ...
-            </span>
-          );
-        }
-      }
-
-      for (let i = startPage; i <= endPage; i++) {
-        pageNumbers.push(
-          <button
-            key={i}
-            onClick={() => paginate(i)}
-            className={`px-3 py-1 rounded-full mx-1 ${
-              currentPage === i
-                ? "bg-button-bg text-button-text"
-                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
-            }`}
-          >
-            {i}
-          </button>
-        );
-      }
-
-      if (endPage < totalPages) {
-        if (endPage < totalPages - 1) {
-          pageNumbers.push(
-            <span key="end-dots" className="mx-1">
-              ...
-            </span>
-          );
-        }
-        pageNumbers.push(
-          <button
-            key={totalPages}
-            onClick={() => paginate(totalPages)}
-            className={`px-3 py-1 rounded-full mx-1 ${
-              currentPage === totalPages
-                ? "bg-button-bg text-button-text"
-                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
-            }`}
-          >
-            {totalPages}
-          </button>
-        );
-      }
-    }
-
-    return pageNumbers;
+  const cardVariant = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
   };
 
   return (
-    <div className="min-h-screen py-10 animate-fade-in">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-text mb-8 text-center tracking-tight drop-shadow-md">
-          {t("budget.budgets")}
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <motion.div className="mb-8" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-indigo-600">
+                <Wallet size={28} color="white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
+                  {t("finance.budget.budgets_list")}
         </h1>
+                <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
+                  {t("finance.budget.manageBudgets")}
+                </p>
+              </div>
+            </div>
+            <Link to="/dashboard/finance/add-budget">
+              <button
+                className="px-6 py-3 rounded-xl font-bold shadow-lg transition-all hover:scale-105 flex items-center gap-2"
+                style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
+              >
+                <Plus size={20} />
+                {t("finance.budget.create_budget")}
+              </button>
+            </Link>
+          </div>
+        </motion.div>
 
-        <div className="mb-6 flex justify-center">
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {[
+            { label: t("finance.budget.totalBudgets"), value: stats.totalBudgets, icon: Wallet, color: "#3b82f6" },
+            { label: t("finance.budget.totalAllocated"), value: `${stats.totalAllocated.toLocaleString()} ₪`, icon: DollarSign, color: "#10b981" },
+            { label: t("finance.budget.totalSpent"), value: `${stats.totalSpent.toLocaleString()} ₪`, icon: TrendingDown, color: "#ef4444" },
+            { label: t("finance.budget.remaining"), value: `${stats.remaining.toLocaleString()} ₪`, icon: TrendingUp, color: "#f59e0b" },
+          ].map((stat, index) => (
+            <motion.div
+              key={index}
+              variants={cardVariant}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: index * 0.1 }}
+              className="rounded-2xl shadow-lg p-6 border hover:shadow-xl transition-all"
+              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              whileHover={{ y: -5 }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: stat.color + '20' }}>
+                  <stat.icon size={24} color={stat.color} />
+                </div>
+              </div>
+              <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
+                {stat.label}
+              </p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
+                {stat.value}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Search */}
+        <motion.div
+          className="mb-8 rounded-2xl shadow-lg p-6 border"
+          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={20} style={{ color: 'var(--color-secondary)' }} />
           <input
             type="text"
-            placeholder={t("budget.search")}
+              placeholder={t("finance.budget.search_placeholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full max-w-md p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200 placeholder-opacity-50"
+              className="w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
           />
         </div>
+        </motion.div>
 
-        <div className="flex justify-center mb-8">
-          <Link
-            to="/dashboard/finance/add-budget"
-            className="px-6 py-3 bg-button-bg text-button-text rounded-full shadow-lg hover:bg-secondary transition-all duration-200"
-          >
-            {t("budget.add_budget")}
-          </Link>
-        </div>
-
-        <div className="overflow-x-auto rounded-xl shadow-2xl bg-bg border border-border-color">
-          <table className="min-w-full text-text">
-            <thead className="bg-button-bg text-button-text">
-              <tr className="text-center">
-                <th className="py-3 px-4 text-sm font-semibold tracking-wide">
-                  {t("budget.department_project_name")}
-                </th>
-                <th className="py-3 px-4 text-sm font-semibold tracking-wide">
-                  {t("budget.budget_amount")}
-                </th>
-                <th className="py-3 px-4 text-sm font-semibold tracking-wide">
-                  {t("budget.spent_amount")}
-                </th>
-                <th className="py-3 px-4 text-sm font-semibold tracking-wide">
-                  {t("budget.currency")}
-                </th>
-                <th className="py-3 px-4 text-sm font-semibold tracking-wide">
-                  {t("budget.period")}
-                </th>
-                <th className="py-3 px-4 text-sm font-semibold tracking-wide">
-                  {t("budget.status")}
-                </th>
-                <th className="py-3 px-4 text-sm font-semibold tracking-wide">
-                  {t("budget.actions")}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+        {/* Budgets List */}
+        <div className="grid grid-cols-1 gap-4">
               {filteredBudgets.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan="7"
-                    className="py-6 px-4 text-center text-text opacity-70 italic"
-                  >
-                    {t("budget.no_budgets_available")}
-                  </td>
-                </tr>
-              ) : (
-                currentBudgets.map((budget) => {
-                  const isExpanded = expandedRow === budget._id;
-                  const startStr = budget.startDate
-                    ? new Date(budget.startDate).toLocaleDateString()
-                    : "-";
-                  const endStr = budget.endDate
-                    ? new Date(budget.endDate).toLocaleDateString()
-                    : "-";
-                  const creatorName =
-                    budget.signers?.find(
-                      (signer) =>
-                        String(signer.employeeId) === String(budget.createdBy)
-                    )?.name || t("budget.unknown_creator");
+            <motion.div
+              className="text-center py-16 rounded-2xl shadow-lg"
+              style={{ backgroundColor: 'var(--bg-color)' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <AlertCircle size={64} className="mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
+              <p className="text-xl font-semibold" style={{ color: 'var(--text-color)' }}>
+                {t("finance.budget.no_budgets_found")}
+              </p>
+            </motion.div>
+          ) : (
+            filteredBudgets.map((budget, index) => {
+              const spentPercentage = budget.amount > 0 ? ((budget.spentAmount / budget.amount) * 100).toFixed(1) : 0;
+              const remaining = budget.amount - budget.spentAmount;
 
                   return (
-                    <React.Fragment key={budget._id}>
-                      <tr
-                        className="border-b border-border-color hover:bg-accent cursor-pointer text-center"
-                        onClick={() => handleRowClick(budget._id)}
-                      >
-                        <td className="py-3 px-4 text-sm">
-                          {budget.departmentOrProjectName || "-"}
-                        </td>
-                        <td className="py-3 px-4 text-sm">
-                          {budget.amount || "-"}
-                        </td>
-                        <td className="py-3 px-4 text-sm">
-                          {budget.spentAmount || "-"}
-                        </td>
-                        <td className="py-3 px-4 text-sm">
-                          {budget.currency || "-"}
-                        </td>
-                        <td className="py-3 px-4 text-sm">{`${startStr} - ${endStr}`}</td>
-                        <td className="py-3 px-4 text-sm font-semibold">
-                          {t(`budget.${budget.status}`, {
-                            defaultValue: budget.status,
-                          })}
-                        </td>
-                        <td className="py-3 px-4 space-x-2">
-                          <Link
-                            to={`/dashboard/finance/budget-details/${budget._id}`}
-                            className="text-primary hover:text-secondary font-semibold transition-all duration-200"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {t("budget.details")}
-                          </Link>
-                          <button
-                            className="text-purple-500 hover:text-purple-600 font-semibold transition-all duration-200"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenUpdateModal(budget);
+                <motion.div
+                  key={budget._id}
+                  variants={cardVariant}
+                  initial="hidden"
+                  animate="visible"
+                  transition={{ delay: index * 0.05 }}
+                  className="rounded-2xl shadow-lg overflow-hidden border hover:shadow-xl transition-all"
+                  style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                >
+                  <div className="p-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                      {/* Budget Info */}
+                      <div className="lg:col-span-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-500">
+                            <Wallet size={24} color="white" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-lg" style={{ color: 'var(--text-color)' }}>
+                              {budget.departmentOrProjectName}
+                            </p>
+                            <p className="text-sm flex items-center gap-2" style={{ color: 'var(--color-secondary)' }}>
+                              <Calendar size={14} />
+                              {new Date(budget.startDate).toLocaleDateString()} - {new Date(budget.endDate).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Budget Amount */}
+                      <div className="lg:col-span-2 text-center">
+                        <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
+                          {t("finance.budget.allocated")}
+                        </p>
+                        <p className="text-2xl font-bold text-green-600">
+                          {budget.amount.toLocaleString()} {budget.currency}
+                        </p>
+                      </div>
+
+                      {/* Spent Amount */}
+                      <div className="lg:col-span-2 text-center">
+                        <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
+                          {t("finance.budget.spent")}
+                        </p>
+                        <p className="text-2xl font-bold text-red-600">
+                          {budget.spentAmount.toLocaleString()} {budget.currency}
+                        </p>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="lg:col-span-3">
+                        <div className="mb-2 flex justify-between items-center">
+                          <span className="text-sm font-medium" style={{ color: 'var(--text-color)' }}>{t("finance.budget.usage")}</span>
+                          <span className="text-sm font-bold" style={{ color: spentPercentage > 90 ? '#ef4444' : spentPercentage > 70 ? '#f59e0b' : '#10b981' }}>
+                            {spentPercentage}%
+                          </span>
+                        </div>
+                        <div className="w-full h-3 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--border-color)' }}>
+                          <motion.div
+                            className="h-full rounded-full"
+                            style={{
+                              width: `${Math.min(spentPercentage, 100)}%`,
+                              backgroundColor: spentPercentage > 90 ? '#ef4444' : spentPercentage > 70 ? '#f59e0b' : '#10b981'
                             }}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min(spentPercentage, 100)}%` }}
+                            transition={{ duration: 1, delay: index * 0.05 }}
+                          />
+                        </div>
+                        <p className="text-xs mt-1" style={{ color: 'var(--color-secondary)' }}>
+                          {t("finance.budget.remaining")}: {remaining.toLocaleString()} {budget.currency}
+                        </p>
+                      </div>
+
+                      {/* Status & Actions */}
+                      <div className="lg:col-span-2 flex items-center justify-end gap-2">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                          budget.status === "approved" ? 'bg-green-100 text-green-700' :
+                          budget.status === "draft" ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-red-100 text-red-700'
+                        }`}>
+                          {budget.status === "approved" ? <><CheckCircle size={14} className="inline mr-1" /> {t("finance.budget.approved")}</> :
+                           budget.status === "draft" ? <><Clock size={14} className="inline mr-1" /> {t("finance.budget.draft")}</> :
+                           <><XCircle size={14} className="inline mr-1" /> {t("finance.budget.rejected")}</>}
+                        </span>
+                        <button
+                          onClick={() => setSelectedBudgetForUpdate(budget)}
+                          className="p-2 rounded-lg hover:scale-110 transition-all"
+                          style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
+                          title={t("finance.budget.edit")}
+                        >
+                          <Edit2 size={20} />
+                        </button>
+                        <Link to={`/dashboard/finance/budget-details/${budget._id}`}>
+                          <button
+                            className="p-2 rounded-lg hover:scale-110 transition-all"
+                            style={{ backgroundColor: 'var(--color-accent)', color: 'var(--button-text)' }}
+                            title={t("finance.budget.view_details")}
                           >
-                            {t("budget.update")}
+                            <Eye size={20} />
                           </button>
-                        </td>
-                      </tr>
-                      {isExpanded && (
-                        <tr className="bg-bg border-b border-border-color">
-                          <td colSpan="7" className="p-4 text-text">
-                            <div className="space-y-4">
-                              <div>
-                                <strong className="text-sm font-semibold">
-                                  {t("budget.created_by")}:
-                                </strong>{" "}
-                                <span className="text-sm">{creatorName}</span>
+                        </Link>
                               </div>
-                              <div>
-                                <strong className="text-sm font-semibold">
-                                  {t("budget.items")}:
-                                </strong>
-                                {budget.items && budget.items.length > 0 ? (
-                                  <div className="overflow-x-auto mt-2">
-                                    <table className="w-full border border-border-color text-sm">
-                                      <thead className="bg-button-bg text-button-text">
-                                        <tr className="text-center">
-                                          <th className="py-2 px-3">
-                                            {t("budget.product_name")}
-                                          </th>
-                                          <th className="py-2 px-3">
-                                            {t("budget.quantity")}
-                                          </th>
-                                          <th className="py-2 px-3">
-                                            {t("budget.unit_price")}
-                                          </th>
-                                          <th className="py-2 px-3">
-                                            {t("budget.total_price")}
-                                          </th>
-                                          <th className="py-2 px-3">
-                                            {t("budget.added_at")}
-                                          </th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        {budget.items.map((item, idx) => (
-                                          <tr
-                                            key={item._id || idx}
-                                            className="border-b border-border-color hover:bg-accent text-center"
-                                          >
-                                            <td className="py-2 px-3">
-                                              {item.productId?.productName ||
-                                                t("budget.no_name")}
-                                            </td>
-                                            <td className="py-2 px-3">
-                                              {item.quantity || "-"}
-                                            </td>
-                                            <td className="py-2 px-3">
-                                              {item.unitPrice || "-"}
-                                            </td>
-                                            <td className="py-2 px-3">
-                                              {item.totalPrice || "-"}
-                                            </td>
-                                            <td className="py-2 px-3">
-                                              {item.addedAt
-                                                ? new Date(
-                                                    item.addedAt
-                                                  ).toLocaleString()
-                                                : "-"}
-                                            </td>
-                                          </tr>
-                                        ))}
-                                      </tbody>
-                                    </table>
-                                  </div>
-                                ) : (
-                                  <div className="mt-2 text-sm opacity-70">
-                                    {t("budget.no_items")}
-                                  </div>
-                                )}
-                              </div>
-                              {budget.signers && budget.signers.length > 0 && (
-                                <div>
-                                  <strong className="text-sm font-semibold">
-                                    {t("budget.signers")}:
-                                  </strong>
-                                  <div className="overflow-x-auto mt-2">
-                                    <table className="w-full border border-border-color text-sm">
-                                      <thead className="bg-button-bg text-button-text">
-                                        <tr className="text-center">
-                                          <th className="py-2 px-3">
-                                            {t("budget.signer_name")}
-                                          </th>
-                                          <th className="py-2 px-3">
-                                            {t("budget.signer_role")}
-                                          </th>
-                                          <th className="py-2 px-3">
-                                            {t("budget.has_signed")}
-                                          </th>
-                                          <th className="py-2 px-3">
-                                            {t("budget.signature_time")}
-                                          </th>
-                                          <th className="py-2 px-3">
-                                            {t("budget.signature")}
-                                          </th>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        {budget.signers.map(
-                                          (signer, sIndex) => (
-                                            <tr
-                                              key={signer._id || sIndex}
-                                              className="border-b border-border-color hover:bg-accent text-center"
-                                            >
-                                              <td className="py-2 px-3">
-                                                {signer.name || "-"}
-                                              </td>
-                                              <td className="py-2 px-3">
-                                                {signer.role || "-"}
-                                              </td>
-                                              <td className="py-2 px-3">
-                                                {signer.hasSigned
-                                                  ? t("budget.yes")
-                                                  : t("budget.no")}
-                                              </td>
-                                              <td className="py-2 px-3">
-                                                {signer.timeStamp
-                                                  ? new Date(
-                                                      signer.timeStamp
-                                                    ).toLocaleString()
-                                                  : "-"}
-                                              </td>
-                                              <td className="py-2 px-3">
-                                                {signer.signatureUrl ? (
-                                                  <img
-                                                    src={signer.signatureUrl}
-                                                    alt="signature"
-                                                    className="max-h-12 mx-auto"
-                                                  />
-                                                ) : (
-                                                  "-"
-                                                )}
-                                              </td>
-                                            </tr>
-                                          )
-                                        )}
-                                      </tbody>
-                                    </table>
                                   </div>
                                 </div>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </React.Fragment>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-          {filteredBudgets.length > 0 && totalPages > 1 && (
-            <div className="flex justify-center items-center mt-8 space-x-2">
-              <button
-                onClick={() => paginate(currentPage - 1)}
-                disabled={currentPage === 1}
-                className={`px-3 py-1 rounded-full ${
-                  currentPage === 1
-                    ? "bg-gray-300 cursor-not-allowed"
-                    : "bg-button-bg text-button-text hover:bg-secondary"
-                }`}
-              >
-                ←
-              </button>
-              {renderPageNumbers()}
-              <button
-                onClick={() => paginate(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className={`px-3 py-1 rounded-full ${
-                  currentPage === totalPages
-                    ? "bg-gray-300 cursor-not-allowed"
-                    : "bg-button-bg text-button-text hover:bg-secondary"
-                }`}
-              >
-                →
-              </button>
-            </div>
+                </motion.div>
+              );
+            })
           )}
-        </div>
       </div>
 
+        {/* Update Modal */}
       {selectedBudgetForUpdate && (
         <UpdateBudgetModal
           budget={selectedBudgetForUpdate}
-          onClose={handleCloseUpdateModal}
-        />
-      )}
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
-      `}</style>
+            onClose={() => setSelectedBudgetForUpdate(null)}
+          />
+        )}
+      </div>
     </div>
   );
 };

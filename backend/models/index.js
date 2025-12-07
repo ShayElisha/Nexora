@@ -17,7 +17,30 @@ import Project from "./project.model.js";
 import Signature from "./signature.model.js";
 import Suppliers from "./suppliers.model.js";
 import Task from "./tasks.model.js";
-import Message from "./Message.model.js"; // הוסף את זה
+import Message from "./Message.model.js";
+import SupportTicket from "./supportTicket.model.js";
+import Invoice from "./invoice.model.js";
+import Lead from "./Lead.model.js";
+import Activity from "./Activity.model.js";
+import Warehouse from "./warehouse.model.js";
+import WarehouseLocation from "./warehouseLocation.model.js";
+import Account from "./Account.model.js";
+import JournalEntry from "./JournalEntry.model.js";
+import Ledger from "./Ledger.model.js";
+import BankAccount from "./BankAccount.model.js";
+import BankTransaction from "./BankTransaction.model.js";
+import SalesOpportunity from "./SalesOpportunity.model.js";
+import Contract from "./Contract.model.js";
+import CustomerServiceTicket from "./CustomerServiceTicket.model.js";
+import StockCount from "./StockCount.model.js";
+import InventoryMovement from "./InventoryMovement.model.js";
+import InventoryQuality from "./InventoryQuality.model.js";
+import PurchaseRequest from "./PurchaseRequest.model.js";
+import Tender from "./Tender.model.js";
+import SupplierContract from "./SupplierContract.model.js";
+import PriceList from "./PriceList.model.js";
+import SupplierInvoice from "./SupplierInvoice.model.js";
+import SupplySchedule from "./SupplySchedule.model.js";
 
 export {
   Budget,
@@ -39,5 +62,28 @@ export {
   Signature,
   Suppliers,
   Task,
-  Message, // הוסף את זה
+  Message,
+  SupportTicket,
+  Invoice,
+  Lead,
+  Activity,
+  Warehouse,
+  WarehouseLocation,
+  Account,
+  JournalEntry,
+  Ledger,
+  BankAccount,
+  BankTransaction,
+  SalesOpportunity,
+  Contract,
+  CustomerServiceTicket,
+  StockCount,
+  InventoryMovement,
+  InventoryQuality,
+  PurchaseRequest,
+  Tender,
+  SupplierContract,
+  PriceList,
+  SupplierInvoice,
+  SupplySchedule,
 };

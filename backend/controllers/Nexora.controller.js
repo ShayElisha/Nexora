@@ -322,6 +322,148 @@ export const forceUpdateCompanyStatus = async (req, res) => {
   }
 };
 
+export const updateCompanyStatus = async (req, res) => {
+  try {
+    const { id, status } = req.body;
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Company ID is required" });
+    }
+
+    const validStatuses = ["Active", "Pending", "Inactive"];
+    if (!validStatuses.includes(status)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid status value" });
+    }
+
+    const company = await Companies.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true, runValidators: true }
+    );
+
+    if (!company) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Company not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Company status updated successfully",
+      data: company,
+    });
+  } catch (error) {
+    console.error("Error updating company status:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Error updating company status",
+      error: error.message,
+    });
+  }
+};
+
+// Bulk Update Company Status
+export const bulkUpdateCompanyStatus = async (req, res) => {
+  try {
+    const { companyIds, status } = req.body;
+
+    if (!companyIds || !Array.isArray(companyIds) || companyIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Company IDs array is required",
+      });
+    }
+
+    const validStatuses = ["Active", "Pending", "Inactive", "Suspended"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status value",
+      });
+    }
+
+    const result = await Companies.updateMany(
+      { _id: { $in: companyIds } },
+      { $set: { status } }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Successfully updated ${result.modifiedCount} companies`,
+      data: {
+        modifiedCount: result.modifiedCount,
+        matchedCount: result.matchedCount,
+      },
+    });
+  } catch (error) {
+    console.error("Error bulk updating company status:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Error bulk updating company status",
+      error: error.message,
+    });
+  }
+};
+
+// Bulk Update Company Plan
+export const bulkUpdateCompanyPlan = async (req, res) => {
+  try {
+    const { companyIds, plan, duration } = req.body;
+
+    if (!companyIds || !Array.isArray(companyIds) || companyIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Company IDs array is required",
+      });
+    }
+
+    if (!plan) {
+      return res.status(400).json({
+        success: false,
+        message: "Plan is required",
+      });
+    }
+
+    const validPlans = ["Basic", "Pro", "Enterprise", "Free"];
+    if (!validPlans.includes(plan)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid plan value",
+      });
+    }
+
+    const result = await Companies.updateMany(
+      { _id: { $in: companyIds } },
+      {
+        $set: {
+          "subscription.plan": plan,
+          ...(duration && { "subscription.duration": duration }),
+        },
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Successfully updated plan for ${result.modifiedCount} companies`,
+      data: {
+        modifiedCount: result.modifiedCount,
+        matchedCount: result.matchedCount,
+      },
+    });
+  } catch (error) {
+    console.error("Error bulk updating company plan:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Error bulk updating company plan",
+      error: error.message,
+    });
+  }
+};
+
 export const getCompanyStatistics = async (req, res) => {
   try {
     const totalCompanies = await Companies.countDocuments();

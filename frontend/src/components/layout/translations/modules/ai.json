@@ -1,0 +1,163 @@
+{
+  "en": {
+    "translation": {
+      "ai": {
+        "title": "AI Assistant",
+        "subtitle": "Your intelligent business companion",
+        "welcome_message": "Hello! I'm your AI assistant. I can help you with data analysis, predictions, and insights. Ask me anything about your business!",
+        "error_message": "Sorry, I encountered an error. Please try again.",
+        "thinking": "Analyzing data...",
+        "input_placeholder": "Ask me anything...",
+        "predictions": "Predictions",
+        "insights": "Insights",
+        "confidence": "Confidence",
+        "quick_questions": "Quick questions",
+        "quick_question_1": "How many employees do we have?",
+        "quick_question_2": "What's our financial status?",
+        "quick_question_3": "Show me project statistics",
+        "quick_question_4": "Give me predictions",
+        "quick_question_weather": "What's the weather in London?",
+        "quick_question_time": "What time is it in New York?",
+        "refresh": "Refresh data"
+      }
+    }
+  },
+  "he": {
+    "translation": {
+      "ai": {
+        "title": "עוזר AI",
+        "subtitle": "המלווה החכם שלך לעסק",
+        "welcome_message": "שלום! אני עוזר ה-AI שלך. אני יכול לעזור לך בניתוח נתונים, תחזיות ותובנות. שאל אותי כל דבר על העסק שלך!",
+        "error_message": "סליחה, נתקלתי בשגיאה. אנא נסה שוב.",
+        "thinking": "מנתח נתונים...",
+        "input_placeholder": "שאל אותי כל דבר...",
+        "predictions": "תחזיות",
+        "insights": "תובנות",
+        "confidence": "רמת וודאות",
+        "quick_questions": "שאלות מהירות",
+        "quick_question_1": "כמה עובדים יש לנו?",
+        "quick_question_2": "מה המצב הפיננסי שלנו?",
+        "quick_question_3": "הצג סטטיסטיקות פרויקטים",
+        "quick_question_4": "תן לי תחזיות",
+        "quick_question_weather": "מה מזג האוויר בלונדון?",
+        "quick_question_time": "מה השעה בניו יורק?",
+        "refresh": "רענן נתונים"
+      }
+    }
+  },
+  "ru": {
+    "translation": {
+      "ai": {
+        "title": "AI Assistant",
+        "subtitle": "Your intelligent business companion",
+        "welcome_message": "Hello! I'm your AI assistant. I can help you with data analysis, predictions, and insights. Ask me anything about your business!",
+        "error_message": "Sorry, I encountered an error. Please try again.",
+        "thinking": "Analyzing data...",
+        "input_placeholder": "Ask me anything...",
+        "predictions": "Predictions",
+        "insights": "Insights",
+        "confidence": "Confidence",
+        "quick_questions": "Quick questions",
+        "quick_question_1": "How many employees do we have?",
+        "quick_question_2": "What's our financial status?",
+        "quick_question_3": "Show me project statistics",
+        "quick_question_4": "Give me predictions",
+        "quick_question_weather": "What's the weather in London?",
+        "quick_question_time": "What time is it in New York?",
+        "refresh": "Refresh data"
+      }
+    }
+  },
+  "ja": {
+    "translation": {
+      "ai": {
+        "title": "AI Assistant",
+        "subtitle": "Your intelligent business companion",
+        "welcome_message": "Hello! I'm your AI assistant. I can help you with data analysis, predictions, and insights. Ask me anything about your business!",
+        "error_message": "Sorry, I encountered an error. Please try again.",
+        "thinking": "Analyzing data...",
+        "input_placeholder": "Ask me anything...",
+        "predictions": "Predictions",
+        "insights": "Insights",
+        "confidence": "Confidence",
+        "quick_questions": "Quick questions",
+        "quick_question_1": "How many employees do we have?",
+        "quick_question_2": "What's our financial status?",
+        "quick_question_3": "Show me project statistics",
+        "quick_question_4": "Give me predictions",
+        "quick_question_weather": "What's the weather in London?",
+        "quick_question_time": "What time is it in New York?",
+        "refresh": "Refresh data"
+      }
+    }
+  },
+  "fr": {
+    "translation": {
+      "ai": {
+        "title": "AI Assistant",
+        "subtitle": "Your intelligent business companion",
+        "welcome_message": "Hello! I'm your AI assistant. I can help you with data analysis, predictions, and insights. Ask me anything about your business!",
+        "error_message": "Sorry, I encountered an error. Please try again.",
+        "thinking": "Analyzing data...",
+        "input_placeholder": "Ask me anything...",
+        "predictions": "Predictions",
+        "insights": "Insights",
+        "confidence": "Confidence",
+        "quick_questions": "Quick questions",
+        "quick_question_1": "How many employees do we have?",
+        "quick_question_2": "What's our financial status?",
+        "quick_question_3": "Show me project statistics",
+        "quick_question_4": "Give me predictions",
+        "quick_question_weather": "What's the weather in London?",
+        "quick_question_time": "What time is it in New York?",
+        "refresh": "Refresh data"
+      }
+    }
+  },
+  "es": {
+    "translation": {
+      "ai": {
+        "title": "AI Assistant",
+        "subtitle": "Your intelligent business companion",
+        "welcome_message": "Hello! I'm your AI assistant. I can help you with data analysis, predictions, and insights. Ask me anything about your business!",
+        "error_message": "Sorry, I encountered an error. Please try again.",
+        "thinking": "Analyzing data...",
+        "input_placeholder": "Ask me anything...",
+        "predictions": "Predictions",
+        "insights": "Insights",
+        "confidence": "Confidence",
+        "quick_questions": "Quick questions",
+        "quick_question_1": "How many employees do we have?",
+        "quick_question_2": "What's our financial status?",
+        "quick_question_3": "Show me project statistics",
+        "quick_question_4": "Give me predictions",
+        "quick_question_weather": "What's the weather in London?",
+        "quick_question_time": "What time is it in New York?",
+        "refresh": "Refresh data"
+      }
+    }
+  },
+  "ar": {
+    "translation": {
+      "ai": {
+        "title": "AI Assistant",
+        "subtitle": "Your intelligent business companion",
+        "welcome_message": "Hello! I'm your AI assistant. I can help you with data analysis, predictions, and insights. Ask me anything about your business!",
+        "error_message": "Sorry, I encountered an error. Please try again.",
+        "thinking": "Analyzing data...",
+        "input_placeholder": "Ask me anything...",
+        "predictions": "Predictions",
+        "insights": "Insights",
+        "confidence": "Confidence",
+        "quick_questions": "Quick questions",
+        "quick_question_1": "How many employees do we have?",
+        "quick_question_2": "What's our financial status?",
+        "quick_question_3": "Show me project statistics",
+        "quick_question_4": "Give me predictions",
+        "quick_question_weather": "What's the weather in London?",
+        "quick_question_time": "What time is it in New York?",
+        "refresh": "Refresh data"
+      }
+    }
+  }
+}

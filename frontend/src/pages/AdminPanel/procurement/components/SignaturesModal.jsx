@@ -1,24 +1,47 @@
 // src/components/procurement/SignaturesModal.jsx
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 const SignaturesModal = ({
   isOpen,
   onClose,
-  isCreatingNewList,
-  setIsCreatingNewList,
-  newRequirement,
-  setNewRequirement,
-  newSigners,
-  setNewSigners,
+  isCreatingNewList: externalIsCreatingNewList,
+  setIsCreatingNewList: externalSetIsCreatingNewList,
+  newRequirement: externalNewRequirement,
+  setNewRequirement: externalSetNewRequirement,
+  newSigners: externalNewSigners,
+  setNewSigners: externalSetNewSigners,
   employees,
   signatureLists,
   deleteSignatureList,
   createSignatureList,
+  // New props for budget usage
+  employeesData,
+  signatureListsData,
+  onSelectList,
+  onSaveList,
+  onDeleteList,
 }) => {
   const { t } = useTranslation();
+  
+  // Internal state for budget mode
+  const [internalIsCreatingNewList, setInternalIsCreatingNewList] = useState(false);
+  const [internalNewRequirement, setInternalNewRequirement] = useState("");
+  const [internalNewSigners, setInternalNewSigners] = useState([]);
 
-  if (!isOpen) return null;
+  // Determine which props to use
+  const isBudgetMode = !!employeesData;
+  const isCreatingNewList = isBudgetMode ? internalIsCreatingNewList : externalIsCreatingNewList;
+  const setIsCreatingNewList = isBudgetMode ? setInternalIsCreatingNewList : externalSetIsCreatingNewList;
+  const newRequirement = isBudgetMode ? internalNewRequirement : externalNewRequirement;
+  const setNewRequirement = isBudgetMode ? setInternalNewRequirement : externalSetNewRequirement;
+  const newSigners = isBudgetMode ? internalNewSigners : externalNewSigners;
+  const setNewSigners = isBudgetMode ? setInternalNewSigners : externalSetNewSigners;
+  const employeesList = isBudgetMode ? employeesData : employees;
+  const signatureListsList = isBudgetMode ? signatureListsData : signatureLists;
+
+  if (isOpen === false) return null;
 
   const handleSaveSignatureList = async () => {
     if (!newRequirement || newSigners.length === 0) {
@@ -26,16 +49,48 @@ const SignaturesModal = ({
       return;
     }
     try {
-      await createSignatureList({
+      const data = {
+        requirement: newRequirement,
         name: newRequirement,
         signers: newSigners,
-      });
+      };
+      
+      if (isBudgetMode && onSaveList) {
+        await onSaveList(data);
+      } else if (createSignatureList) {
+        await createSignatureList(data);
+      }
+      
       toast.success("Signature list saved successfully!");
       setNewRequirement("");
       setNewSigners([]);
+      setIsCreatingNewList(false);
     } catch (error) {
       console.error("Failed to save signature list:", error);
       toast.error("Failed to save signature list.");
+    }
+  };
+
+  const handleDeleteList = async (listId) => {
+    try {
+      if (isBudgetMode && onDeleteList) {
+        await onDeleteList(listId);
+      } else if (deleteSignatureList) {
+        await deleteSignatureList(listId);
+      }
+    } catch (error) {
+      console.error("Failed to delete signature list:", error);
+      toast.error("Failed to delete signature list.");
+    }
+  };
+
+  const handleSelectList = (list) => {
+    if (isBudgetMode && onSelectList) {
+      onSelectList(list);
+    } else {
+      setNewSigners(list.signers);
+      onClose();
+      setIsCreatingNewList(false);
     }
   };
 
@@ -79,7 +134,7 @@ const SignaturesModal = ({
                 <select
                   onChange={(e) => {
                     const employeeId = e.target.value;
-                    const employee = employees.find(
+                    const employee = employeesList.find(
                       (emp) => emp._id === employeeId
                     );
                     if (employee) {
@@ -99,7 +154,7 @@ const SignaturesModal = ({
                   <option value="">
                     {t("signature_modal.select_employee")}
                   </option>
-                  {employees.map((emp) => (
+                  {employeesList && employeesList.map((emp) => (
                     <option key={emp._id} value={emp._id}>
                       {emp.name} {emp.lastName} - {emp.role}
                     </option>
@@ -152,7 +207,7 @@ const SignaturesModal = ({
           <h3 className="text-xl text-secondary font-semibold mb-4">
             {t("signature_modal.existing_lists_title")}
           </h3>
-          {signatureLists.length > 0 ? (
+          {signatureListsList && signatureListsList.length > 0 ? (
             <table className="w-full border-collapse rounded-lg overflow-hidden shadow-md">
               <thead>
                 <tr className="bg-gradient-to-r from-border-color to-border-color text-text">
@@ -164,16 +219,15 @@ const SignaturesModal = ({
                 </tr>
               </thead>
               <tbody>
-                {signatureLists.map((list, index) => (
+                {signatureListsList.map((list, index) => (
                   <tr
                     key={index}
                     className="bg-bg hover:bg-border-color text-text transition-colors duration-200"
                   >
-                    <td className="p-4">{list.name}</td>
+                    <td className="p-4">{list.requirement || list.name}</td>
                     <td className="p-4">
                       {list?.signers && list.signers.length > 0 ? (
                         list.signers.map((signer, i) => {
-                          console.log("Signer data:", signer);
                           return (
                             <span
                               key={signer?.employeeId || i}
@@ -192,17 +246,13 @@ const SignaturesModal = ({
                     </td>
                     <td className="p-4 text-center space-x-2">
                       <button
-                        onClick={() => deleteSignatureList(list._id)}
+                        onClick={() => handleDeleteList(list._id)}
                         className="bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-button-text py-1 px-4 rounded-full shadow-md transform transition-transform duration-300 hover:scale-105"
                       >
                         {t("signature_modal.delete")}
                       </button>
                       <button
-                        onClick={() => {
-                          setNewSigners(list.signers);
-                          onClose();
-                          setIsCreatingNewList(false);
-                        }}
+                        onClick={() => handleSelectList(list)}
                         className="bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-button-text py-1 px-4 rounded-full shadow-md transform transition-transform duration-300 hover:scale-105"
                       >
                         {t("signature_modal.use_list")}

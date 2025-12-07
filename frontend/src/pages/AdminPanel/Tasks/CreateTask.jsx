@@ -2,13 +2,26 @@ import { useState, useEffect } from "react";
 import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
+import {
+  ListChecks,
+  Building2,
+  FolderKanban,
+  ShoppingCart,
+  FileText,
+  AlignLeft,
+  Flag,
+  Calendar,
+  Users,
+  CheckCircle,
+  Loader2,
+  Package,
+  AlertCircle,
+} from "lucide-react";
 
 const CreateTask = () => {
   const { t } = useTranslation();
 
-  // -----------------------------
-  // State for your form and data
-  // -----------------------------
   const [formData, setFormData] = useState({
     departmentId: "",
     projectId: "",
@@ -24,20 +37,14 @@ const CreateTask = () => {
   const [projectOptions, setProjectOptions] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
-
   const [departmentDetails, setDepartmentDetails] = useState(null);
   const [projectDetails, setProjectDetails] = useState(null);
-
-  // הזמנות
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [selectedItems, setSelectedItems] = useState([]); // array of item._id
-
+  const [selectedItems, setSelectedItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // --------------------------------------------------
-  // 1) Fetch departments
-  // --------------------------------------------------
+  // Fetch departments
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
@@ -55,9 +62,7 @@ const CreateTask = () => {
     fetchDepartments();
   }, [t]);
 
-  // --------------------------------------------------
-  // 2) Fetch projects when departmentId changes
-  // --------------------------------------------------
+  // Fetch projects when department changes
   useEffect(() => {
     if (formData.departmentId) {
       const fetchProjects = async () => {
@@ -65,7 +70,6 @@ const CreateTask = () => {
           const res = await axiosInstance.get(
             `/departments/projectName/${formData.departmentId}`
           );
-          // בהנחה שה־API מחזיר שדה "id" לפרויקט
           const options = res.data.data.map((project) => ({
             id: project.id,
             name: project.name,
@@ -83,9 +87,7 @@ const CreateTask = () => {
     }
   }, [formData.departmentId, t]);
 
-  // --------------------------------------------------
-  // 3) Fetch employees
-  // --------------------------------------------------
+  // Fetch employees
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -99,9 +101,7 @@ const CreateTask = () => {
     fetchEmployees();
   }, [t]);
 
-  // --------------------------------------------------
-  // 4) Fetch department details
-  // --------------------------------------------------
+  // Fetch department details
   useEffect(() => {
     if (formData.departmentId) {
       axiosInstance
@@ -118,9 +118,7 @@ const CreateTask = () => {
     }
   }, [formData.departmentId]);
 
-  // --------------------------------------------------
-  // 5) Fetch project details
-  // --------------------------------------------------
+  // Fetch project details
   useEffect(() => {
     if (formData.projectId) {
       axiosInstance
@@ -137,27 +135,29 @@ const CreateTask = () => {
     }
   }, [formData.projectId]);
 
-  // --------------------------------------------------
-  // 6) Filter employees by dept & project
-  // --------------------------------------------------
+  // Filter employees by department only - show only employees from the selected department
   useEffect(() => {
     let filtered = [];
-    if (departmentDetails && departmentDetails.teamMembers) {
-      // teamMembers => [{employeeId: "XXX"}, ...]
+    
+    // Only show employees if a department is selected
+    if (formData.departmentId && departmentDetails && departmentDetails.teamMembers) {
+      // Filter employees that belong to the selected department
       filtered = employees.filter((emp) =>
         departmentDetails.teamMembers.some(
           (member) => String(member.employeeId) === String(emp._id)
         )
       );
+      
+      // If project is also selected, further filter by project team members
+      if (formData.projectId && projectDetails && projectDetails.teamMembers) {
+        filtered = filtered.filter((emp) =>
+          projectDetails.teamMembers.some(
+            (member) => String(member.employeeId) === String(emp._id)
+          )
+        );
+      }
     }
-    // אם פרויקט נבחר, מצמצמים עוד לפי projectDetails.teamMembers
-    if (formData.projectId && projectDetails && projectDetails.teamMembers) {
-      filtered = filtered.filter((emp) =>
-        projectDetails.teamMembers.some(
-          (member) => String(member.employeeId) === String(emp._id)
-        )
-      );
-    }
+    
     setFilteredEmployees(filtered);
   }, [
     formData.departmentId,
@@ -167,9 +167,30 @@ const CreateTask = () => {
     projectDetails,
   ]);
 
-  // --------------------------------------------------
-  // 7) Fetch orders, filter by unallocated items
-  // --------------------------------------------------
+  // Remove assigned employees that don't belong to the current filtered list
+  useEffect(() => {
+    if (filteredEmployees.length > 0 && formData.assignedTo.length > 0) {
+      const validAssignedIds = filteredEmployees.map(emp => emp._id.toString());
+      const invalidAssigned = formData.assignedTo.filter(empId => !validAssignedIds.includes(empId.toString()));
+      
+      if (invalidAssigned.length > 0) {
+        setFormData((prev) => ({
+          ...prev,
+          assignedTo: prev.assignedTo.filter(empId => validAssignedIds.includes(empId.toString()))
+        }));
+      }
+    } else if (formData.departmentId && filteredEmployees.length === 0) {
+      // If department is selected but no employees found, clear assigned employees
+      if (formData.assignedTo.length > 0) {
+        setFormData((prev) => ({
+          ...prev,
+          assignedTo: []
+        }));
+      }
+    }
+  }, [filteredEmployees, formData.departmentId]);
+
+  // Fetch orders
   const fetchOrders = async () => {
     try {
       const res = await axiosInstance.get("/CustomerOrder");
@@ -193,19 +214,21 @@ const CreateTask = () => {
     fetchOrders();
   }, [t]);
 
-  // --------------------------------------------------
   // Handlers
-  // --------------------------------------------------
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-    // אם שינינו מחלקה, איפסנו פרויקט
-    if (name === "departmentId") {
-      setFormData((prev) => ({ ...prev, projectId: "" }));
-    }
+    setFormData((prev) => {
+      const newData = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
+      // If department changed, clear project and assigned employees
+      if (name === "departmentId") {
+        newData.projectId = "";
+        newData.assignedTo = [];
+      }
+      return newData;
+    });
   };
 
   const handleAssignedChange = (e) => {
@@ -213,7 +236,6 @@ const CreateTask = () => {
     setFormData((prev) => ({ ...prev, assignedTo: selected }));
   };
 
-  // בחירת הזמנה
   const handleOrderChange = (e) => {
     const order = orders.find((o) => o._id === e.target.value);
     setSelectedOrder(order || null);
@@ -227,7 +249,6 @@ const CreateTask = () => {
     }));
   };
 
-  // בחירת פריטים מההזמנה
   const handleItemChange = (itemId) => {
     setSelectedItems((prev) =>
       prev.includes(itemId)
@@ -236,28 +257,22 @@ const CreateTask = () => {
     );
   };
 
-  // --------------------------------------------------
-  // 8) Create task (Submit)
-  // --------------------------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // בדיקות מינימליות
     if (!formData.departmentId) {
       toast.error(t("createTask.department_required"));
       setLoading(false);
       return;
     }
 
-    // אם נבחרה הזמנה אבל לא נבחר שום פריט
     if (selectedOrder && selectedItems.length === 0) {
-      toast.error("אנא בחר לפחות פריט אחד מההזמנה");
+      toast.error(t("createTask.select_items_required"));
       setLoading(false);
       return;
     }
 
-    // בונים מערך של פריטי הזמנה
     const orderItemsArray = selectedOrder
       ? selectedItems.map((itemId) => {
           const item = selectedOrder.items.find((i) => i._id === itemId);
@@ -270,26 +285,17 @@ const CreateTask = () => {
         })
       : [];
 
-    // אובייקט השליחה
     const taskData = {
-      // מכיל departmentId, projectId, וכו'
       ...formData,
-
-      // אם נבחרה הזמנה
       ...(selectedOrder && {
         orderId: selectedOrder._id,
         orderItems: orderItemsArray,
       }),
-
-      // **לא** שולחים { project: { projectId: ... } }! רק projectId ישירות
-      // ולכן לא צריך פה שום דבר נוסף, כי formData.projectId כבר קיים
     };
 
     try {
       await axiosInstance.post("/tasks", taskData);
       toast.success(t("createTask.success"));
-
-      // איפוס
       await fetchOrders();
       setSelectedOrder(null);
       setSelectedItems([]);
@@ -315,246 +321,368 @@ const CreateTask = () => {
     (p) => p.id === formData.projectId
   );
 
-  // --------------------------------------------------
-  // Render
-  // --------------------------------------------------
   return (
-    <div className="container mx-auto max-w-4xl p-8 bg-bg rounded-2xl shadow-2xl border border-border-color transform transition-all duration-500 hover:shadow-3xl">
-      <h2 className="text-3xl font-bold mb-6 text-primary">
-        {t("createTask.title")}
-      </h2>
-
-      <form onSubmit={handleSubmit}>
-        {/* Department */}
-        <div className="mb-4">
-          <label htmlFor="departmentId" className="block font-medium mb-1">
-            {t("createTask.departmentLabel")}
-          </label>
-          <select
-            id="departmentId"
-            name="departmentId"
-            value={formData.departmentId}
-            onChange={handleChange}
-            className="w-full border border-border-color p-2 rounded bg-bg text-text"
-            required
-          >
-            <option value="">{t("createTask.selectDepartment")}</option>
-            {departmentOptions.map((dept) => (
-              <option key={dept.id} value={dept.id}>
-                {dept.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Project (optional) */}
-        {formData.departmentId && (
-          <div className="mb-4">
-            <label htmlFor="projectId" className="block font-medium mb-1">
-              {t("createTask.projectLabel")}
-            </label>
-            <select
-              id="projectId"
-              name="projectId"
-              value={formData.projectId}
-              onChange={handleChange}
-              className="w-full border border-border-color p-2 rounded bg-bg text-text"
-            >
-              <option value="">{t("createTask.selectProject")}</option>
-              {projectOptions.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {/* Order selection */}
-        <div className="mb-4">
-          <label htmlFor="orderId" className="block font-medium mb-1">
-            {t("createTask.orderLabel")}
-          </label>
-          <select
-            id="orderId"
-            value={selectedOrder?._id || ""}
-            onChange={handleOrderChange}
-            className="w-full border border-border-color p-2 rounded bg-bg text-text"
-          >
-            <option value="">{t("createTask.selectOrder")}</option>
-            {orders.map((order) => (
-              <option key={order._id} value={order._id}>
-                {order.customer?.name || "Unknown Customer"} -{" "}
-                {new Date(order.orderDate).toLocaleDateString()}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Items from selected order */}
-        {selectedOrder && (
-          <div className="mb-4">
-            <label className="block font-medium mb-1">
-              {t("createTask.selectItemsFromOrder")}
-            </label>
-            {selectedOrder.items
-              .filter((item) => !item.isAllocated)
-              .map((item) => (
-                <div key={item._id} className="flex items-center mb-2">
-                  <input
-                    type="checkbox"
-                    id={`item-${item._id}`}
-                    checked={selectedItems.includes(item._id)}
-                    onChange={() => handleItemChange(item._id)}
-                    className="mr-2"
-                  />
-                  <label htmlFor={`item-${item._id}`} className="text-text">
-                    {item.product?.productName || "Unknown Product"} - Quantity:{" "}
-                    {item.quantity}
-                  </label>
-                </div>
-              ))}
-          </div>
-        )}
-
-        {/* Title */}
-        <div className="mb-4">
-          <label htmlFor="title" className="block font-medium mb-1">
-            {t("createTask.taskTitleLabel")}
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            className="w-full border border-border-color p-2 rounded bg-bg text-text"
-            required
-          />
-        </div>
-
-        {/* Description */}
-        <div className="mb-4">
-          <label htmlFor="description" className="block font-medium mb-1">
-            {t("createTask.descriptionLabel")}
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows="4"
-            className="w-full border border-border-color p-2 rounded bg-bg text-text"
-          />
-        </div>
-
-        {/* Status */}
-        <div className="mb-4">
-          <label htmlFor="status" className="block font-medium mb-1">
-            {t("createTask.statusLabel")}
-          </label>
-          <select
-            id="status"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className="w-full border border-border-color p-2 rounded bg-bg text-text"
-          >
-            <option value="pending">{t("createTask.status.pending")}</option>
-            <option value="in progress">
-              {t("createTask.status.inProgress")}
-            </option>
-            <option value="completed">
-              {t("createTask.status.completed")}
-            </option>
-            <option value="cancelled">
-              {t("createTask.status.cancelled")}
-            </option>
-          </select>
-        </div>
-
-        {/* Priority */}
-        <div className="mb-4">
-          <label htmlFor="priority" className="block font-medium mb-1">
-            {t("createTask.priorityLabel")}
-          </label>
-          <select
-            id="priority"
-            name="priority"
-            value={formData.priority}
-            onChange={handleChange}
-            className="w-full border border-border-color p-2 rounded bg-bg text-text"
-          >
-            <option value="low">{t("createTask.priority.low")}</option>
-            <option value="medium">{t("createTask.priority.medium")}</option>
-            <option value="high">{t("createTask.priority.high")}</option>
-          </select>
-        </div>
-
-        {/* Due Date */}
-        <div className="mb-4">
-          <label htmlFor="dueDate" className="block font-medium mb-1">
-            {t("createTask.dueDateLabel")}
-          </label>
-          <input
-            type="date"
-            id="dueDate"
-            name="dueDate"
-            value={formData.dueDate}
-            onChange={handleChange}
-            className="w-full border border-border-color p-2 rounded bg-bg text-text"
-          />
-        </div>
-
-        {/* Display project end date if a project is selected */}
-        {formData.projectId && selectedProject && (
-          <div className="mb-4">
-            <label className="block font-medium mb-1">
-              {t("createTask.projectEndDateLabel")}
-            </label>
-            <p className="p-2 border border-border-color rounded bg-bg text-text">
-              {selectedProject.endDate
-                ? new Date(selectedProject.endDate).toLocaleDateString()
-                : t("createTask.notAvailable")}
-            </p>
-          </div>
-        )}
-
-        {/* Employee selection */}
-        {filteredEmployees.length > 0 && (
-          <div className="mb-4">
-            <label htmlFor="assignedTo" className="block font-medium mb-1">
-              {t("createTask.assignedToLabel")}
-            </label>
-            <select
-              id="assignedTo"
-              name="assignedTo"
-              multiple
-              value={formData.assignedTo}
-              onChange={handleAssignedChange}
-              className="w-full border border-border-color p-2 rounded bg-bg text-text"
-            >
-              {filteredEmployees.map((emp) => (
-                <option key={emp._id} value={emp._id}>
-                  {emp.name} {emp.lastName}
-                </option>
-              ))}
-            </select>
-            <small className="text-sm text-gray-600">
-              {t("createTask.selectEmployeesOptional")}
-            </small>
-          </div>
-        )}
-
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-button-bg text-button-text px-4 py-2 rounded"
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
         >
-          {loading ? t("createTask.creating") : t("createTask.submitButton")}
-        </button>
-      </form>
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-indigo-600">
+              <ListChecks size={28} color="white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
+                {t("createTask.title")}
+              </h1>
+              <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
+                {t("createTask.create_task_description")}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Form */}
+        <motion.div
+          className="rounded-2xl shadow-lg border p-6 lg:p-8"
+          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Department */}
+            <div>
+              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <Building2 className="inline mr-2" size={16} />
+                {t("createTask.departmentLabel")} *
+              </label>
+              <select
+                name="departmentId"
+                value={formData.departmentId}
+                onChange={handleChange}
+                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: 'var(--border-color)',
+                  backgroundColor: 'var(--bg-color)',
+                  color: 'var(--text-color)',
+                }}
+                required
+              >
+                <option value="">{t("createTask.selectDepartment")}</option>
+                {departmentOptions.map((dept) => (
+                  <option key={dept.id} value={dept.id}>
+                    {dept.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Project (optional) */}
+            {formData.departmentId && (
+              <div>
+                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <FolderKanban className="inline mr-2" size={16} />
+                  {t("createTask.projectLabel")}
+                </label>
+                <select
+                  name="projectId"
+                  value={formData.projectId}
+                  onChange={handleChange}
+                  className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                  style={{
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-color)',
+                    color: 'var(--text-color)',
+                  }}
+                >
+                  <option value="">{t("createTask.selectProject")}</option>
+                  {projectOptions.map((project) => (
+                    <option key={project.id} value={project.id}>
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Order selection */}
+            <div>
+              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <ShoppingCart className="inline mr-2" size={16} />
+                {t("createTask.orderLabel")}
+              </label>
+              <select
+                value={selectedOrder?._id || ""}
+                onChange={handleOrderChange}
+                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: 'var(--border-color)',
+                  backgroundColor: 'var(--bg-color)',
+                  color: 'var(--text-color)',
+                }}
+              >
+                <option value="">{t("createTask.selectOrder")}</option>
+                {orders.map((order) => (
+                  <option key={order._id} value={order._id}>
+                    {order.customer?.name || "Unknown Customer"} -{" "}
+                    {new Date(order.orderDate).toLocaleDateString()}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Items from selected order */}
+            {selectedOrder && (
+              <div className="p-4 rounded-xl border" style={{ backgroundColor: 'var(--border-color)', borderColor: 'var(--border-color)' }}>
+                <label className="block text-sm font-bold mb-3" style={{ color: 'var(--text-color)' }}>
+                  <Package className="inline mr-2" size={16} />
+                  {t("createTask.selectItemsFromOrder")}
+                </label>
+                <div className="space-y-2">
+                  {selectedOrder.items
+                    .filter((item) => !item.isAllocated)
+                    .map((item) => (
+                      <label
+                        key={item._id}
+                        className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-opacity-80 transition-all"
+                        style={{ backgroundColor: 'var(--bg-color)' }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedItems.includes(item._id)}
+                          onChange={() => handleItemChange(item._id)}
+                          className="w-5 h-5 mr-3 rounded"
+                        />
+                        <span style={{ color: 'var(--text-color)' }}>
+                          {item.product?.productName || "Unknown Product"} - 
+                          <span className="font-bold ml-2">
+                            {t("createTask.quantity")}: {item.quantity}
+                          </span>
+                        </span>
+                      </label>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* Title */}
+            <div>
+              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <FileText className="inline mr-2" size={16} />
+                {t("createTask.taskTitleLabel")} *
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: 'var(--border-color)',
+                  backgroundColor: 'var(--bg-color)',
+                  color: 'var(--text-color)',
+                }}
+                placeholder={t("createTask.enter_task_title")}
+                required
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <AlignLeft className="inline mr-2" size={16} />
+                {t("createTask.descriptionLabel")}
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows="4"
+                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: 'var(--border-color)',
+                  backgroundColor: 'var(--bg-color)',
+                  color: 'var(--text-color)',
+                }}
+                placeholder={t("createTask.enter_description")}
+              />
+            </div>
+
+            {/* Status and Priority Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Status */}
+              <div>
+                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <CheckCircle className="inline mr-2" size={16} />
+                  {t("createTask.statusLabel")}
+                </label>
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                  style={{
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-color)',
+                    color: 'var(--text-color)',
+                  }}
+                >
+                  <option value="pending">{t("createTask.status.pending")}</option>
+                  <option value="in progress">{t("createTask.status.inProgress")}</option>
+                  <option value="completed">{t("createTask.status.completed")}</option>
+                  <option value="cancelled">{t("createTask.status.cancelled")}</option>
+                </select>
+              </div>
+
+              {/* Priority */}
+              <div>
+                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <Flag className="inline mr-2" size={16} />
+                  {t("createTask.priorityLabel")}
+                </label>
+                <select
+                  name="priority"
+                  value={formData.priority}
+                  onChange={handleChange}
+                  className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                  style={{
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-color)',
+                    color: 'var(--text-color)',
+                  }}
+                >
+                  <option value="low">{t("createTask.priority.low")}</option>
+                  <option value="medium">{t("createTask.priority.medium")}</option>
+                  <option value="high">{t("createTask.priority.high")}</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Due Date */}
+            <div>
+              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <Calendar className="inline mr-2" size={16} />
+                {t("createTask.dueDateLabel")}
+              </label>
+              <input
+                type="date"
+                name="dueDate"
+                value={formData.dueDate}
+                onChange={handleChange}
+                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: 'var(--border-color)',
+                  backgroundColor: 'var(--bg-color)',
+                  color: 'var(--text-color)',
+                }}
+              />
+            </div>
+
+            {/* Project end date display */}
+            {formData.projectId && selectedProject && (
+              <div className="p-4 rounded-xl border-2 border-blue-300 bg-blue-50">
+                <div className="flex items-center gap-2">
+                  <AlertCircle size={20} className="text-blue-600" />
+                  <span className="font-bold text-blue-900">
+                    {t("createTask.projectEndDateLabel")}:
+                  </span>
+                  <span className="text-blue-700">
+                    {selectedProject.endDate
+                      ? new Date(selectedProject.endDate).toLocaleDateString()
+                      : t("createTask.notAvailable")}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Employee selection - only show if department is selected */}
+            {formData.departmentId ? (
+              filteredEmployees.length > 0 ? (
+                <div>
+                  <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                    <Users className="inline mr-2" size={16} />
+                    {t("createTask.assignedToLabel")}
+                  </label>
+                  <select
+                    name="assignedTo"
+                    multiple
+                    value={formData.assignedTo}
+                    onChange={handleAssignedChange}
+                    className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2 h-32"
+                    style={{
+                      borderColor: 'var(--border-color)',
+                      backgroundColor: 'var(--bg-color)',
+                      color: 'var(--text-color)',
+                    }}
+                  >
+                    {filteredEmployees.map((emp) => (
+                      <option key={emp._id} value={emp._id}>
+                        {emp.name} {emp.lastName} - {emp.role || "Employee"}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs mt-2" style={{ color: 'var(--color-secondary)' }}>
+                    {t("createTask.selectEmployeesOptional")} ({filteredEmployees.length} {t("createTask.employeesInDepartment", { defaultValue: "employees in department" })})
+                  </p>
+                  
+                  {/* Selected Employees Display */}
+                  {formData.assignedTo.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {formData.assignedTo.map((empId) => {
+                        const employee = filteredEmployees.find((e) => e._id === empId);
+                        if (!employee) return null;
+                        return (
+                          <span
+                            key={empId}
+                            className="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700"
+                          >
+                            {employee.name} {employee.lastName}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="p-4 rounded-xl border" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)' }}>
+                  <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
+                    {t("createTask.noEmployeesInDepartment", { defaultValue: "No employees found in the selected department" })}
+                  </p>
+                </div>
+              )
+            ) : (
+              <div className="p-4 rounded-xl border" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)' }}>
+                <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
+                  {t("createTask.selectDepartmentFirst", { defaultValue: "Please select a department first to assign employees" })}
+                </p>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin" size={24} />
+                  {t("createTask.creating")}
+                </>
+              ) : (
+                <>
+                  <CheckCircle size={24} />
+                  {t("createTask.submitButton")}
+                </>
+              )}
+            </button>
+          </form>
+        </motion.div>
+      </div>
     </div>
   );
 };

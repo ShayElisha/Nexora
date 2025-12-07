@@ -16,7 +16,7 @@ import {
   assignToBudget,
   getBudgetByDepartments,
 } from "../controllers/Budget.controller.js";
-import { protectRoute } from "../middleware/protectRoute.js";
+import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router = Router();
 

@@ -1,6 +1,7 @@
 import Customer from "../models/customers.model.js";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
+import { paginateResponse } from "../middleware/pagination.js";
 
 // Create a new customer
 export const createCustomer = async (req, res) => {
@@ -87,10 +88,72 @@ export const getAllCustomers = async (req, res) => {
     }
 
     const companyId = decodedToken?.companyId;
+    
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    // Build query
+    const query = { companyId };
+    
+    // Optional filters
+    if (req.query.status) {
+      query.status = req.query.status;
+    }
+    if (req.query.customerType) {
+      query.customerType = req.query.customerType;
+    }
+    if (req.query.search) {
+      query.$or = [
+        { name: { $regex: req.query.search, $options: "i" } },
+        { email: { $regex: req.query.search, $options: "i" } },
+        { phone: { $regex: req.query.search, $options: "i" } },
+      ];
+    }
+
+    // Get total count
+    const total = await Customer.countDocuments(query);
+    
+    // Get paginated results
+    const customers = await Customer.find(query)
+      .populate("companyId")
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const pagination = {
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit),
+      hasNext: page * limit < total,
+      hasPrev: page > 1,
+    };
+
+    return res.status(200).json(paginateResponse(customers, pagination));
+  } catch (error) {
+    console.error("Error fetching customers:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Get customers for SuperAdmin (by companyId)
+export const getCustomersForSuperAdmin = async (req, res) => {
+  try {
+    const { companyId } = req.query;
+
+    if (!companyId) {
+      return res.status(400).json({
+        success: false,
+        message: "Company ID is required",
+      });
+    }
+
     const customers = await Customer.find({ companyId }).populate("companyId");
     return res.status(200).json({ success: true, data: customers });
   } catch (error) {
-    console.error("Error fetching customers:", error);
+    console.error("Error fetching customers for SuperAdmin:", error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };

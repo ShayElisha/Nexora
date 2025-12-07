@@ -46,7 +46,7 @@ export const generateLoginToken = (
   res.cookie("auth_token", token, {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     httpOnly: true, // prevent XSS attack cross-site scripting attacks
-    sameSite: "strict", // prevent CSRF attacks cross-site request forgery attacks
+    sameSite: "lax", // allow cross-site requests for development
     secure: process.env.NODE_ENV === "production", // prevents man-in-the-middle attacks
   });
 };

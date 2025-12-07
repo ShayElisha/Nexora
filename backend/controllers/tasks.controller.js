@@ -3,6 +3,63 @@ import jwt from "jsonwebtoken";
 import Task from "../models/tasks.model.js";
 import Project from "../models/project.model.js";
 import CustomerOrder from "../models/CustomerOrder.model.js";
+import Employee from "../models/employees.model.js";
+import {
+  linkTaskToLead,
+  unlinkTaskFromLead,
+  updateLeadStatusFromTask,
+} from "../services/RelationshipService.js";
+
+/**
+ * Helper function to update project progress based on completed tasks
+ * מחשב ומעדכן את ההתקדמות של הפרויקט בהתבסס על המשימות שהושלמו
+ */
+const updateProjectProgress = async (projectId) => {
+  try {
+    if (!projectId || !mongoose.Types.ObjectId.isValid(projectId)) {
+      return;
+    }
+
+    // Find all tasks for this project
+    const tasks = await Task.find({ projectId });
+
+    if (tasks.length === 0) {
+      // If no tasks, set progress to 0
+      await Project.findByIdAndUpdate(projectId, { progress: 0 });
+      return;
+    }
+
+    // Count completed tasks
+    const completedTasks = tasks.filter(
+      (task) => task.status === "completed"
+    ).length;
+
+    // Calculate progress percentage
+    const progress = Math.round((completedTasks / tasks.length) * 100);
+
+    // Update project progress
+    await Project.findByIdAndUpdate(projectId, { progress });
+
+    // If all tasks are completed, update project status to "Completed"
+    if (completedTasks === tasks.length && tasks.length > 0) {
+      await Project.findByIdAndUpdate(projectId, { status: "Completed" });
+    }
+    // If project was completed but now has incomplete tasks, set status back to "Active"
+    else if (completedTasks < tasks.length) {
+      const project = await Project.findById(projectId);
+      if (project && project.status === "Completed") {
+        await Project.findByIdAndUpdate(projectId, { status: "Active" });
+      }
+    }
+
+    console.log(
+      `Project ${projectId} progress updated to ${progress}% (${completedTasks}/${tasks.length} tasks completed)`
+    );
+  } catch (error) {
+    console.error("Error updating project progress:", error);
+    // Don't throw error - we don't want to break the task operation
+  }
+};
 
 export const createTask = async (req, res) => {
   try {
@@ -30,6 +87,7 @@ export const createTask = async (req, res) => {
       assignedTo = [],
       orderId,
       orderItems = [],
+      leadId,
     } = req.body;
 
     // בדיקת projectId (אם קיים)
@@ -47,6 +105,20 @@ export const createTask = async (req, res) => {
         return res
           .status(404)
           .json({ success: false, message: "Project not found" });
+      }
+
+      // בדיקה שהפרויקט לא פג תוקפו (endDate < היום)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (selectedProject.endDate) {
+        const projectEndDate = new Date(selectedProject.endDate);
+        projectEndDate.setHours(0, 0, 0, 0);
+        if (projectEndDate < today) {
+          return res.status(400).json({
+            success: false,
+            message: "Cannot assign tasks to expired projects",
+          });
+        }
       }
 
       // בדיקת תאריך היעד מול תאריך סיום פרויקט
@@ -74,10 +146,29 @@ export const createTask = async (req, res) => {
       orderId,
       orderItems, // [{ itemId, productId, productName, quantity }, ...]
       ...(projectId && { projectId }), // רק אם קיים projectId
+      ...(leadId && { leadId }), // רק אם קיים leadId
     };
 
     // יצירת משימה חדשה
     const task = await Task.create(newTaskData);
+
+    // Update project tasks list and progress if task is linked to a project
+    if (projectId) {
+      // הוספת המשימה לרשימת המשימות של הפרויקט
+      await Project.findByIdAndUpdate(
+        projectId,
+        { $addToSet: { tasks: task._id } }, // $addToSet מונע כפילויות
+        { new: true }
+      );
+      
+      // עדכון הפרוגרס של הפרויקט
+      await updateProjectProgress(projectId);
+    }
+
+    // Link task to lead if leadId is provided
+    if (leadId) {
+      await linkTaskToLead(task._id, leadId);
+    }
 
     // אם יש orderId ו־orderItems, נשנה את מצב ה־items ב־CustomerOrder
     if (orderId && orderItems.length > 0) {
@@ -136,13 +227,9 @@ export const getTasks = async (req, res) => {
       .populate("assignedTo", "name email role") // מילוי פרטי העובדים שהוקצו
       .sort({ dueDate: 1, priority: 1 });
 
-    if (!tasks || tasks.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, message: "No tasks found" });
-    }
-
-    res.status(200).json({ success: true, data: tasks });
+    // Return empty array if no tasks found instead of 404
+    // This is more RESTful - the resource exists, it's just empty
+    res.status(200).json({ success: true, data: tasks || [] });
   } catch (error) {
     console.error("Error fetching tasks:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -217,6 +304,49 @@ export const updateTask = async (req, res) => {
     // מניעת עדכון שדה companyId אם נשלח בבקשה
     if (req.body.companyId) delete req.body.companyId;
 
+    // Find the task before update to get the projectId
+    const taskBeforeUpdate = await Task.findOne({ _id: id, companyId });
+    if (!taskBeforeUpdate) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found or not authorized",
+      });
+    }
+
+    // בדיקה אם משנים projectId - לא ניתן להקצות לפרויקטים שפג תוקפם
+    if (req.body.projectId && req.body.projectId !== taskBeforeUpdate.projectId?.toString()) {
+      const newProjectId = req.body.projectId;
+      
+      if (!mongoose.Types.ObjectId.isValid(newProjectId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid project ID format",
+        });
+      }
+
+      const newProject = await Project.findById(newProjectId);
+      if (!newProject) {
+        return res.status(404).json({
+          success: false,
+          message: "Project not found",
+        });
+      }
+
+      // בדיקה שהפרויקט לא פג תוקפו
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (newProject.endDate) {
+        const projectEndDate = new Date(newProject.endDate);
+        projectEndDate.setHours(0, 0, 0, 0);
+        if (projectEndDate < today) {
+          return res.status(400).json({
+            success: false,
+            message: "Cannot assign tasks to expired projects",
+          });
+        }
+      }
+    }
+
     // עדכון המשימה רק אם היא שייכת לחברה של המשתמש
     const updatedTask = await Task.findOneAndUpdate(
       { _id: id, companyId },
@@ -232,6 +362,55 @@ export const updateTask = async (req, res) => {
         success: false,
         message: "Task not found or not authorized",
       });
+    }
+
+    // Handle project relationship updates
+    const oldProjectId = taskBeforeUpdate.projectId?.toString();
+    const newProjectId = updatedTask.projectId?.toString();
+
+    if (oldProjectId !== newProjectId) {
+      // Remove task from old project's tasks list
+      if (oldProjectId) {
+        await Project.findByIdAndUpdate(
+          oldProjectId,
+          { $pull: { tasks: id } },
+          { new: true }
+        );
+        await updateProjectProgress(oldProjectId);
+      }
+      
+      // Add task to new project's tasks list
+      if (newProjectId) {
+        await Project.findByIdAndUpdate(
+          newProjectId,
+          { $addToSet: { tasks: id } }, // $addToSet מונע כפילויות
+          { new: true }
+        );
+        await updateProjectProgress(newProjectId);
+      }
+    } else if (newProjectId) {
+      // אם projectId לא השתנה אבל יש projectId, עדכן רק את הפרוגרס
+      await updateProjectProgress(newProjectId);
+    }
+
+    // Handle lead relationship updates
+    const oldLeadId = taskBeforeUpdate.leadId?.toString();
+    const newLeadId = updatedTask.leadId?.toString();
+
+    if (oldLeadId !== newLeadId) {
+      // Unlink from old lead if changed
+      if (oldLeadId) {
+        await unlinkTaskFromLead(updatedTask._id, oldLeadId);
+      }
+      // Link to new lead if provided
+      if (newLeadId) {
+        await linkTaskToLead(updatedTask._id, newLeadId);
+      }
+    }
+
+    // Update lead status if task is completed
+    if (updatedTask.status === "completed") {
+      await updateLeadStatusFromTask(updatedTask._id);
     }
 
     return res.status(200).json({ success: true, data: updatedTask });
@@ -274,6 +453,10 @@ export const deleteTask = async (req, res) => {
         .json({ success: false, message: "Task not found or not authorized" });
     }
 
+    // Save projectId and leadId before deletion for updates
+    const projectIdToUpdate = task.projectId;
+    const leadIdToUnlink = task.leadId;
+
     // אם למשימה יש orderId, נטפל בהחזרת isAllocated = false לפריטים
     if (task.orderId) {
       // מוצאים את ההזמנה
@@ -302,8 +485,27 @@ export const deleteTask = async (req, res) => {
       }
     }
 
+    // Unlink task from lead before deletion
+    if (leadIdToUnlink) {
+      await unlinkTaskFromLead(id, leadIdToUnlink);
+    }
+
+    // הסרת המשימה מרשימת המשימות של הפרויקט
+    if (projectIdToUpdate) {
+      await Project.findByIdAndUpdate(
+        projectIdToUpdate,
+        { $pull: { tasks: id } },
+        { new: true }
+      );
+    }
+
     // כעת נוכל למחוק את המשימה
     await Task.findOneAndDelete({ _id: id, companyId });
+
+    // Update project progress after task deletion
+    if (projectIdToUpdate) {
+      await updateProjectProgress(projectIdToUpdate);
+    }
 
     return res.status(200).json({
       success: true,

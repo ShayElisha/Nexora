@@ -4,6 +4,21 @@ import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
+import { motion } from "framer-motion";
+import {
+  Search,
+  Filter,
+  Edit,
+  Trash2,
+  ChevronDown,
+  ChevronUp,
+  Package,
+  ShoppingCart,
+  TrendingUp,
+  AlertCircle,
+  FileText,
+  Image as ImageIcon
+} from "lucide-react";
 
 // ------------------ Attached Files Modal ------------------
 const AttachedFilesModal = ({ files, onClose }) => {
@@ -217,7 +232,7 @@ const EditInventoryModal = ({ item, onClose }) => {
     setBomComponents(bomComponents.filter((_, i) => i !== index));
   };
 
-  const { mutate: updateProduct } = useMutation({
+  const { mutateAsync: updateProduct } = useMutation({
     mutationFn: async (updates) => {
       const formDataToSend = new FormData();
       Object.entries(updates).forEach(([key, value]) => {
@@ -244,20 +259,9 @@ const EditInventoryModal = ({ item, onClose }) => {
       );
       return response.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["inventory"] });
-      toast.success("Product updated successfully");
-    },
-    onError: (error) => {
-      toast.error(
-        `Failed to update product: ${
-          error.response?.data?.message || error.message
-        }`
-      );
-    },
   });
 
-  const { mutate: updateInventoryItem } = useMutation({
+  const { mutateAsync: updateInventoryItem } = useMutation({
     mutationFn: async (updates) => {
       const response = await axiosInstance.put(
         `/inventory/${item._id}`,
@@ -265,20 +269,9 @@ const EditInventoryModal = ({ item, onClose }) => {
       );
       return response.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["inventory"] });
-      toast.success("Inventory updated successfully");
-    },
-    onError: (error) => {
-      toast.error(
-        `Failed to update inventory: ${
-          error.response?.data?.message || error.message
-        }`
-      );
-    },
   });
 
-  const { mutate: updateBOM } = useMutation({
+  const { mutateAsync: updateBOM } = useMutation({
     mutationFn: async (components) => {
       if (productTreeId) {
         const response = await axiosInstance.put(
@@ -296,20 +289,9 @@ const EditInventoryModal = ({ item, onClose }) => {
         return response.data;
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["inventory"] });
-      toast.success("BOM updated successfully");
-    },
-    onError: (error) => {
-      toast.error(
-        `Failed to update BOM: ${
-          error.response?.data?.message || error.message
-        }`
-      );
-    },
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const productData = {
       productName: formData.productName,
@@ -330,23 +312,62 @@ const EditInventoryModal = ({ item, onClose }) => {
     };
 
     const inventoryData = {
-      quantity: formData.quantity,
-      minStockLevel: formData.minStockLevel,
-      reorderQuantity: formData.reorderQuantity,
-      batchNumber: formData.batchNumber,
-      expirationDate: formData.expirationDate,
-      shelfLocation: formData.shelfLocation,
-      lastOrderDate: formData.lastOrderDate,
+      quantity: formData.quantity ? Number(formData.quantity) : undefined,
+      minStockLevel: formData.minStockLevel ? Number(formData.minStockLevel) : undefined,
+      reorderQuantity: formData.reorderQuantity ? Number(formData.reorderQuantity) : undefined,
+      batchNumber: formData.batchNumber || undefined,
+      expirationDate: formData.expirationDate || undefined,
+      shelfLocation: formData.shelfLocation || undefined,
+      lastOrderDate: formData.lastOrderDate || undefined,
     };
 
-    updateProduct(productData);
-    updateInventoryItem(inventoryData);
+    // Remove undefined values
+    Object.keys(inventoryData).forEach(key => {
+      if (inventoryData[key] === undefined) {
+        delete inventoryData[key];
+      }
+    });
 
-    if (formData.productType === "sale" || formData.productType === "both") {
-      updateBOM(bomComponents);
+    console.log("Inventory data to send:", inventoryData);
+
+    try {
+      // Run all updates in parallel
+      const updatePromises = [
+        updateProduct(productData),
+        Object.keys(inventoryData).length > 0 ? updateInventoryItem(inventoryData) : Promise.resolve(),
+      ];
+
+      // Add BOM update if needed (only if there are components or if productTreeId exists)
+      if ((formData.productType === "sale" || formData.productType === "both")) {
+        // Only update BOM if there are components OR if productTreeId exists (to allow clearing BOM)
+        if (bomComponents.length > 0 || productTreeId) {
+          updatePromises.push(updateBOM(bomComponents));
+        }
+      }
+
+      // Wait for all updates to complete
+      await Promise.all(updatePromises);
+
+      // Invalidate queries and show success
+      queryClient.invalidateQueries({ queryKey: ["inventory"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("כל העדכונים בוצעו בהצלחה");
+      onClose();
+    } catch (error) {
+      // Collect all errors
+      const errors = [];
+      if (error.response?.data?.message) {
+        errors.push(error.response.data.message);
+      } else if (error.message) {
+        errors.push(error.message);
+      }
+
+      // Show error message
+      toast.error(
+        `שגיאה בעדכון: ${errors.length > 0 ? errors.join(", ") : "שגיאה לא ידועה"}`
+      );
+      console.error("Error updating product/inventory/BOM:", error);
     }
-
-    onClose();
   };
 
   return (
@@ -859,26 +880,160 @@ const ProductList = () => {
     }
   }, [authError]);
 
+  // Group products by productId to merge duplicates from different warehouses
+  const groupedProducts = useMemo(() => {
+    if (!inventoryData || inventoryData.length === 0) return [];
+    
+    const grouped = {};
+    
+    inventoryData.forEach((item) => {
+      // Extract the actual productId from the item
+      // The item might have productId as a field, or it might be the _id itself
+      // If _id is in format "productId_inventoryId_index", extract the productId part
+      let productId = null;
+      
+      // Try to get productId from various possible locations
+      if (item.productId) {
+        productId = item.productId._id?.toString() || item.productId.toString() || item.productId;
+      } else if (item._id) {
+        // Check if _id is a compound ID (from backend: `${product._id}_${inventory._id}_${index}`)
+        const idStr = item._id.toString();
+        if (idStr.includes('_') && !idStr.includes('no_inventory')) {
+          // Extract productId from compound ID (first part before first underscore)
+          const parts = idStr.split('_');
+          if (parts.length >= 2) {
+            productId = parts[0];
+          }
+        } else if (!idStr.includes('no_inventory')) {
+          // If it's a simple ID, use it as productId
+          productId = idStr;
+        }
+      }
+      
+      // Fallback: try to group by SKU or Barcode if productId is not available
+      let groupKey = productId;
+      if (!groupKey) {
+        // Use SKU as fallback
+        if (item.sku) {
+          groupKey = `sku_${item.sku}`;
+        } else if (item.barcode) {
+          // Use Barcode as fallback
+          groupKey = `barcode_${item.barcode}`;
+        } else if (item.productName) {
+          // Use productName as last resort
+          groupKey = `name_${item.productName}`;
+        } else {
+          // If nothing matches, treat as unique
+          groupKey = item._id?.toString() || `unique_${Date.now()}_${Math.random()}`;
+        }
+      }
+      
+      if (!grouped[groupKey]) {
+        // First occurrence of this product
+        // Use the actual productId as the _id for the grouped item
+        const actualProductId = productId || (item._id && item._id.toString().split('_')[0]) || groupKey;
+        grouped[groupKey] = {
+          ...item,
+          _id: actualProductId, // Use productId as the main ID
+          productId: actualProductId,
+          inventoryItems: [item],
+          totalQuantity: item.inventory?.quantity || item.quantity || 0,
+          warehouses: item.warehouseId ? [item.warehouseId] : [],
+          // Keep the original _id for reference
+          originalIds: [item._id],
+        };
+      } else {
+        // Merge with existing product
+        grouped[groupKey].inventoryItems.push(item);
+        grouped[groupKey].totalQuantity += (item.inventory?.quantity || item.quantity || 0);
+        
+        // Track warehouse IDs
+        const warehouseId = item.warehouseId?._id?.toString() || item.warehouseId?.toString() || item.warehouseId;
+        if (warehouseId) {
+          const existingWarehouses = grouped[groupKey].warehouses.map(w => 
+            w._id?.toString() || w.toString() || w
+          );
+          if (!existingWarehouses.includes(warehouseId)) {
+            grouped[groupKey].warehouses.push(item.warehouseId);
+          }
+        }
+        
+        // Keep track of original IDs
+        if (!grouped[groupKey].originalIds) {
+          grouped[groupKey].originalIds = [grouped[groupKey]._id];
+        }
+        grouped[groupKey].originalIds.push(item._id);
+        
+        // Update other fields if they're missing in the grouped item
+        if (!grouped[groupKey].productName && item.productName) {
+          grouped[groupKey].productName = item.productName;
+        }
+        if (!grouped[groupKey].sku && item.sku) {
+          grouped[groupKey].sku = item.sku;
+        }
+        if (!grouped[groupKey].barcode && item.barcode) {
+          grouped[groupKey].barcode = item.barcode;
+        }
+        if (!grouped[groupKey].productImage && item.productImage) {
+          grouped[groupKey].productImage = item.productImage;
+        }
+        if (!grouped[groupKey].unitPrice && item.unitPrice) {
+          grouped[groupKey].unitPrice = item.unitPrice;
+        }
+        if (!grouped[groupKey].supplierName && item.supplierName) {
+          grouped[groupKey].supplierName = item.supplierName;
+        }
+        if (!grouped[groupKey].category && item.category) {
+          grouped[groupKey].category = item.category;
+        }
+        if (!grouped[groupKey].productType && item.productType) {
+          grouped[groupKey].productType = item.productType;
+        }
+      }
+    });
+    
+    return Object.values(grouped);
+  }, [inventoryData]);
+
   useEffect(() => {
     if (isFetchingInventory) {
       setLoading(true);
       return;
     }
-    if (inventoryData) {
-      setAllProducts(inventoryData);
+    if (groupedProducts) {
+      setAllProducts(groupedProducts);
       setLoading(false);
     }
-  }, [inventoryData, isFetchingInventory]);
+  }, [groupedProducts, isFetchingInventory]);
 
   const handleEdit = (id) => {
-    const item = allProducts.find((p) => p._id === id);
-    setSelectedItem(item || null);
-    setModalOpen(true);
+    const item = allProducts.find((p) => p._id === id || p.productId === id);
+    if (item) {
+      // If item has multiple inventory locations, use the first one for editing
+      // The modal will show the product details and allow editing inventory
+      const itemToEdit = item.inventoryItems && item.inventoryItems.length > 0 
+        ? { ...item, _id: item.productId || item._id, inventory: item.inventoryItems[0].inventory || item.inventory }
+        : item;
+      setSelectedItem(itemToEdit);
+      setModalOpen(true);
+    }
   };
 
   const handleDelete = (id) => {
-    if (window.confirm(t("inventory.confirm_delete"))) {
-      deleteProduct(id);
+    const item = allProducts.find((p) => p._id === id || p.productId === id);
+    if (item && item.inventoryItems && item.inventoryItems.length > 1) {
+      // If product has multiple locations, ask user what to delete
+      const message = t("inventory.delete_all_locations", { count: item.inventoryItems.length });
+      if (window.confirm(message)) {
+        // Delete the product itself (which will delete all inventory items)
+        const productIdToDelete = item.productId || item._id;
+        deleteProduct(productIdToDelete);
+      }
+    } else {
+      if (window.confirm(t("inventory.confirm_delete"))) {
+        const productIdToDelete = item?.productId || id;
+        deleteProduct(productIdToDelete);
+      }
     }
   };
 
@@ -1059,15 +1214,18 @@ const ProductList = () => {
   const purchaseProducts = sortedProducts.filter(
     (prod) => prod.productType === "purchase"
   );
+  const bothProducts = sortedProducts.filter(
+    (prod) => prod.productType === "both"
+  );
 
   const renderTable = (products, title) => (
-    <div className="mb-8">
-      <h2 className="text-2xl font-bold text-text mb-4 tracking-tight drop-shadow-md">
+    <div className="mb-8" dir="rtl">
+      <h2 className="text-2xl font-bold mb-4 tracking-tight" style={{ color: "var(--text-color)" }}>
         {title}
       </h2>
-      <div className="overflow-x-auto shadow-2xl rounded-xl">
-        <table className="min-w-full">
-          <thead className="bg-gradient-to-r from-primary to-secondary text-button-text">
+      <div className="overflow-x-auto shadow-lg rounded-xl border" style={{ borderColor: "var(--border-color)" }}>
+        <table className="min-w-full" dir="rtl">
+          <thead style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}>
             <tr>
               {[
                 t("inventory.image"),
@@ -1081,7 +1239,7 @@ const ProductList = () => {
               ].map((header) => (
                 <th
                   key={header}
-                  className="py-4 px-6 text-left text-sm font-bold tracking-wider"
+                  className="py-4 px-6 text-right text-sm font-bold tracking-wider"
                 >
                   {header}
                 </th>
@@ -1093,7 +1251,8 @@ const ProductList = () => {
               <tr>
                 <td
                   colSpan={8}
-                  className="py-6 text-center text-text text-lg opacity-70"
+                  className="py-6 text-center text-lg"
+                  style={{ color: "var(--color-secondary)" }}
                 >
                   {t("inventory.no_products_available")}
                 </td>
@@ -1104,12 +1263,14 @@ const ProductList = () => {
                 return (
                   <React.Fragment key={item._id}>
                     <tr
-                      className={`border-b border-border-color transition-all duration-300 ${
-                        index % 2 === 0 ? "bg-bg" : "bg-bg"
-                      } hover:bg-secondary hover:shadow-inner cursor-pointer`}
+                      className="border-b transition-all duration-300 cursor-pointer"
+                      style={{
+                        borderColor: "var(--border-color)",
+                        backgroundColor: "var(--bg-color)",
+                      }}
                       onClick={() => handleToggleRow(item._id)}
                     >
-                      <td className="py-4 px-6">
+                      <td className="py-4 px-6 text-right">
                         {item.productImage ? (
                           <img
                             src={item.productImage}
@@ -1122,62 +1283,146 @@ const ProductList = () => {
                           </span>
                         )}
                       </td>
-                      <td className="py-4 px-6 text-text font-medium">
+                      <td className="py-4 px-6 font-medium text-right" style={{ color: "var(--text-color)" }}>
                         {item.productName || t("inventory.not_available")}
                       </td>
-                      <td className="py-4 px-6 text-text">
+                      <td className="py-4 px-6 text-right" style={{ color: "var(--text-color)" }}>
                         {item.sku || t("inventory.not_available")}
                       </td>
-                      <td className="py-4 px-6 text-text">
+                      <td className="py-4 px-6 text-right" style={{ color: "var(--text-color)" }}>
                         {item.barcode || t("inventory.not_available")}
                       </td>
-                      <td className="py-4 px-6 text-text">
+                      <td className="py-4 px-6 text-right" style={{ color: "var(--text-color)" }}>
                         {item.supplierName || t("inventory.not_available")}
                       </td>
-                      <td className="py-4 px-6 text-text">
+                      <td className="py-4 px-6 text-right" style={{ color: "var(--text-color)" }}>
                         {item.unitPrice || t("inventory.not_available")}
                       </td>
-                      <td className="py-4 px-6 text-text">
-                        {item.inventory?.quantity ?? 0}
+                      <td className="py-4 px-6 text-right" style={{ color: "var(--text-color)" }}>
+                        <div className="flex flex-col items-end">
+                          <span className="font-semibold">{item.totalQuantity ?? (item.inventory?.quantity ?? 0)}</span>
+                          {item.inventoryItems && item.inventoryItems.length > 1 && (
+                            <span className="text-xs opacity-70">
+                              ({item.inventoryItems.length} {t("inventory.locations")})
+                            </span>
+                          )}
+                        </div>
                       </td>
-                      <td className="py-4 px-6 flex items-center justify-end space-x-2">
-                        <button
-                          className="px-3 py-1 bg-button-bg text-button-text rounded-full shadow-md hover:bg-accent transition-all duration-200 transform hover:scale-105"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEdit(item._id);
-                          }}
-                        >
-                          {t("inventory.edit")}
-                        </button>
-                        <button
-                          className="px-3 py-1 bg-red-500 text-white rounded-full shadow-md hover:bg-red-600 transition-all duration-200 transform hover:scale-105"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDelete(item._id);
-                          }}
-                        >
-                          {t("inventory.delete")}
-                        </button>
-                        <button
-                          className="p-1 text-text hover:text-gray-800 transition-all duration-200 transform hover:scale-110"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleToggleRow(item._id);
-                          }}
-                        >
-                          {isExpanded ? "▲" : "▼"}
-                        </button>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center justify-start gap-2" dir="ltr">
+                          <button
+                            className="p-2 rounded-xl transition-all hover:scale-110"
+                            style={{
+                              backgroundColor: "rgba(59, 130, 246, 0.1)",
+                              color: "#3b82f6",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(item._id);
+                            }}
+                            title={t("inventory.edit")}
+                          >
+                            <Edit size={18} />
+                          </button>
+                          <button
+                            className="p-2 rounded-xl transition-all hover:scale-110"
+                            style={{
+                              backgroundColor: "rgba(239, 68, 68, 0.1)",
+                              color: "#ef4444",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(item._id);
+                            }}
+                            title={t("inventory.delete")}
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                          <button
+                            className="p-2 rounded-xl transition-all hover:scale-110"
+                            style={{
+                              backgroundColor: "var(--border-color)",
+                              color: "var(--text-color)",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleRow(item._id);
+                            }}
+                          >
+                            {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                     {isExpanded && (
-                      <tr className="bg-bg hover:bg-secondary">
+                      <tr style={{ backgroundColor: "var(--bg-color)" }}>
                         <td colSpan={8} className="p-6">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-text">
+                          {/* Show multiple locations if product is grouped */}
+                          {item.inventoryItems && item.inventoryItems.length > 1 ? (
+                            <div className="space-y-4">
+                              <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--text-color)" }}>
+                                {t("inventory.locations")} ({item.inventoryItems.length})
+                              </h3>
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {item.inventoryItems.map((inventoryItem, idx) => (
+                                  <div
+                                    key={inventoryItem._id || idx}
+                                    className="p-4 rounded-lg border"
+                                    style={{
+                                      borderColor: "var(--border-color)",
+                                      backgroundColor: "var(--bg-color)",
+                                    }}
+                                  >
+                                    <h4 className="font-semibold mb-2" style={{ color: "var(--text-color)" }}>
+                                      {t("inventory.location")} {idx + 1}
+                                    </h4>
+                                    <p className="text-sm">
+                                      <span className="font-medium">{t("inventory.quantity")}:</span>{" "}
+                                      {inventoryItem.inventory?.quantity || inventoryItem.quantity || 0}
+                                    </p>
+                                    {inventoryItem.warehouseId && (
+                                      <p className="text-sm">
+                                        <span className="font-medium">{t("inventory.warehouse")}:</span>{" "}
+                                        {inventoryItem.warehouseId?.name || inventoryItem.warehouseId}
+                                      </p>
+                                    )}
+                                    {inventoryItem.inventory?.shelfLocation && (
+                                      <p className="text-sm">
+                                        <span className="font-medium">{t("inventory.shelf_location")}:</span>{" "}
+                                        {inventoryItem.inventory.shelfLocation}
+                                      </p>
+                                    )}
+                                    {inventoryItem.inventory?.batchNumber && (
+                                      <p className="text-sm">
+                                        <span className="font-medium">{t("inventory.batch_number")}:</span>{" "}
+                                        {inventoryItem.inventory.batchNumber}
+                                      </p>
+                                    )}
+                                    {inventoryItem.inventory?.expirationDate && (
+                                      <p className="text-sm">
+                                        <span className="font-medium">{t("inventory.expiration_date")}:</span>{" "}
+                                        {format(
+                                          new Date(inventoryItem.inventory.expirationDate),
+                                          "yyyy-MM-dd"
+                                        )}
+                                      </p>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ) : null}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6" style={{ color: "var(--text-color)" }}>
                             <div>
-                              <h3 className="text-lg font-semibold text-text mb-3">
+                              <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--text-color)" }}>
                                 {t("inventory.inventory_details")}
                               </h3>
+                              <p>
+                                <span className="font-medium">
+                                  {t("inventory.total_quantity")}:
+                                </span>{" "}
+                                {item.totalQuantity ?? (item.inventory?.quantity ?? 0)}
+                              </p>
                               <p>
                                 <span className="font-medium">
                                   {t("inventory.min_stock_level")}:
@@ -1228,7 +1473,7 @@ const ProductList = () => {
                               </p>
                             </div>
                             <div>
-                              <h3 className="text-lg font-semibold text-text mb-3">
+                              <h3 className="text-lg font-semibold mb-3" style={{ color: "var(--text-color)" }}>
                                 {t("inventory.additional_details")}
                               </h3>
                               <p>
@@ -1265,7 +1510,11 @@ const ProductList = () => {
                                   t("inventory.not_available")}
                               </p>
                               <button
-                                className="mt-4 px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-accent transition-all duration-200 transform hover:scale-105"
+                                className="mt-4 px-4 py-2 rounded-xl shadow-md transition-all duration-200 transform hover:scale-105"
+                                style={{
+                                  backgroundColor: "var(--color-primary)",
+                                  color: "var(--button-text)",
+                                }}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   openFilesModal(item.attachments || []);
@@ -1306,20 +1555,158 @@ const ProductList = () => {
     );
   }
 
+  // Calculate stats
+  const totalProducts = sortedProducts.length;
+  const saleCount = saleProducts.length;
+  const purchaseCount = purchaseProducts.length;
+  const bothCount = bothProducts.length;
+  const lowStockCount = sortedProducts.filter(p => {
+    const quantity = p.totalQuantity ?? p.inventory?.quantity ?? 0;
+    const minStock = p.inventory?.minStockLevel ?? 0;
+    return quantity < minStock && minStock > 0;
+  }).length;
+
   return (
-    <div className="min-h-screen  p-6 animate-fade-in">
-      <div className="container mx-auto max-w-full">
-        <div className="bg-bg rounded-2xl shadow-2xl p-6 sm:p-8 border border-border-color transform transition-all duration-500 hover:shadow-3xl">
-          <h1 className="text-3xl font-extrabold text-text mb-6 text-center tracking-tight drop-shadow-md">
-            {t("inventory.Product_Inventory_List")}
-          </h1>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }}>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-purple-600">
+              <Package size={28} color="white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: "var(--text-color)" }}>
+                {t("inventory.Product_Inventory_List")}
+              </h1>
+              <p className="text-lg" style={{ color: "var(--color-secondary)" }}>
+                {t("inventory.Product_Inventory_List")}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+          <motion.div
+            className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
+            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium mb-1" style={{ color: "var(--color-secondary)" }}>סה"כ מוצרים</p>
+                <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>{totalProducts}</p>
+              </div>
+              <div className="p-3 rounded-full" style={{ backgroundColor: "rgba(59, 130, 246, 0.1)" }}>
+                <Package style={{ color: "var(--color-primary)" }} size={24} />
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
+            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium mb-1" style={{ color: "var(--color-secondary)" }}>מוצרי מכירה</p>
+                <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>{saleCount}</p>
+              </div>
+              <div className="p-3 rounded-full" style={{ backgroundColor: "rgba(34, 197, 94, 0.1)" }}>
+                <TrendingUp style={{ color: "#22c55e" }} size={24} />
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
+            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium mb-1" style={{ color: "var(--color-secondary)" }}>מוצרי רכש</p>
+                <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>{purchaseCount}</p>
+              </div>
+              <div className="p-3 rounded-full" style={{ backgroundColor: "rgba(168, 85, 247, 0.1)" }}>
+                <ShoppingCart style={{ color: "#a855f7" }} size={24} />
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
+            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium mb-1" style={{ color: "var(--color-secondary)" }}>מוצרים גם וגם</p>
+                <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>{bothCount}</p>
+              </div>
+              <div className="p-3 rounded-full" style={{ backgroundColor: "rgba(59, 130, 246, 0.1)" }}>
+                <ShoppingCart style={{ color: "#3b82f6" }} size={24} />
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
+            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium mb-1" style={{ color: "var(--color-secondary)" }}>מלאי נמוך</p>
+                <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>{lowStockCount}</p>
+              </div>
+              <div className="p-3 rounded-full" style={{ backgroundColor: "rgba(239, 68, 68, 0.1)" }}>
+                <AlertCircle style={{ color: "#ef4444" }} size={24} />
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Main Content Card */}
+        <motion.div
+          className="rounded-2xl shadow-lg border p-6 sm:p-8 mb-6"
+          style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <div className="flex items-center gap-2 mb-6">
+            <Filter size={24} style={{ color: "var(--color-secondary)" }} />
+            <h2 className="text-2xl font-bold" style={{ color: "var(--text-color)" }}>סינון וחיפוש</h2>
+          </div>
 
           {/* Filters and Search */}
           <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             <select
               value={filterProductType}
               onChange={(e) => setFilterProductType(e.target.value)}
-              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-bg text-text"
+              className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+              style={{
+                borderColor: "var(--border-color)",
+                backgroundColor: "var(--bg-color)",
+                color: "var(--text-color)",
+              }}
             >
               <option value="all">
                 {t("inventory.filter_all_product_types")}
@@ -1328,11 +1715,14 @@ const ProductList = () => {
               <option value="purchase">
                 {t("inventory.purchase_products")}
               </option>
+              <option value="both">
+                {t("inventory.both_products")}
+              </option>
             </select>
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-bg text-text"
+              className="w-full p-3 p-3 rounded-xl border focus:outline-none focus:ring-2"
             >
               <option value="all">
                 {t("inventory.filter_all_categories")}
@@ -1350,7 +1740,7 @@ const ProductList = () => {
             <select
               value={filterSupplier}
               onChange={(e) => setFilterSupplier(e.target.value)}
-              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-bg text-text"
+              className="w-full p-3 p-3 rounded-xl border focus:outline-none focus:ring-2"
             >
               <option value="all">{t("inventory.filter_all_suppliers")}</option>
               {Array.from(
@@ -1366,7 +1756,7 @@ const ProductList = () => {
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
-              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-bg text-text"
+              className="w-full p-3 p-3 rounded-xl border focus:outline-none focus:ring-2"
             >
               <option value="">{t("inventory.sort_by")}</option>
               <option value="productName_asc">
@@ -1427,28 +1817,45 @@ const ProductList = () => {
               </option>
             </select>
           </div>
-          <div className="mb-6">
+          <div className="mb-6 relative">
+            <Search
+              className="absolute left-3 top-1/2 transform -translate-y-1/2"
+              size={20}
+              style={{ color: "var(--color-secondary)" }}
+            />
             <input
               type="text"
               placeholder={t("inventory.search_placeholder")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-bg text-text placeholder-opacity-50"
+              className="w-full pl-10 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2"
+              style={{
+                borderColor: "var(--border-color)",
+                backgroundColor: "var(--bg-color)",
+                color: "var(--text-color)",
+              }}
             />
           </div>
 
           {/* Tables */}
           {loading ? (
-            <div className="text-center text-text text-lg animate-pulse">
-              Loading products...
+            <div className="text-center py-16">
+              <div
+                className="inline-block animate-spin rounded-full h-12 w-12 border-b-2"
+                style={{ borderColor: "var(--border-color)", borderTopColor: "var(--color-primary)" }}
+              />
+              <p className="mt-4 text-lg" style={{ color: "var(--text-color)" }}>
+                Loading products...
+              </p>
             </div>
           ) : (
             <>
               {renderTable(saleProducts, t("inventory.sale_products"))}
               {renderTable(purchaseProducts, t("inventory.purchase_products"))}
+              {bothProducts.length > 0 && renderTable(bothProducts, t("inventory.both_products"))}
             </>
           )}
-        </div>
+        </motion.div>
       </div>
 
       {/* Modals */}

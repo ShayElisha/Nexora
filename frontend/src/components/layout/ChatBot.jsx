@@ -19,13 +19,13 @@ const ChatBot = () => {
     // הוספת הודעת המשתמש לרשימה
     setMessages((prev) => [...prev, { text: input, sender: "user" }]);
     try {
-      const response = await axiosInstance.post("/chat", {
+      const response = await axiosInstance.post("/ai/chat", {
         message: input,
       });
       // הוספת תגובת הבוט
       setMessages((prev) => [
         ...prev,
-        { text: response.data.reply, sender: "bot" },
+        { text: response.data.response, sender: "bot" },
       ]);
     } catch (error) {
       console.error("שגיאה בשליחת הודעה:", error);

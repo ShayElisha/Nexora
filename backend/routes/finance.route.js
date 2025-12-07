@@ -4,6 +4,11 @@ import {
   getAllFinanceRecords,
   updateFinanceRecord,
   deleteFinanceRecord,
+  getCashFlowAnalysis,
+  getCashFlowByCategory,
+  getCashFlowByBankAccount,
+  getCumulativeCashFlow,
+  getCashFlowForecast,
 } from "../controllers/finance.controller.js";
 import multer from "multer";
 
@@ -20,5 +25,12 @@ router.post(
 router.get("/", getAllFinanceRecords);
 router.put("/:id", updateFinanceRecord);
 router.delete("/:id", deleteFinanceRecord);
+
+// Cash Flow Analysis Routes
+router.get("/cash-flow/analysis", getCashFlowAnalysis);
+router.get("/cash-flow/by-category", getCashFlowByCategory);
+router.get("/cash-flow/by-bank-account", getCashFlowByBankAccount);
+router.get("/cash-flow/cumulative", getCumulativeCashFlow);
+router.get("/cash-flow/forecast", getCashFlowForecast);
 
 export default router;

@@ -5,6 +5,7 @@ import Employee from "../models/employees.model.js";
 import Company from "../models/companies.model.js";
 import UpdateProcurement from "../models/UpdateProcurement.model.js";
 import jwt from "jsonwebtoken";
+import { paginateResponse } from "../middleware/pagination.js";
 // Create a new supplier
 import {
   uploadToCloudinary,
@@ -127,17 +128,48 @@ export const getAllSuppliers = async (req, res) => {
     if (!companyId) {
       return res.status(400).json({ success: false, message: "Invalid token" });
     }
-    const suppliers = await Suppliers.find({ companyId });
+    
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
 
-    if (suppliers.length > 0) {
-      return res.status(200).json({ success: true, data: suppliers });
-    } else {
-      return res
-        .status(404)
-        .json({ success: false, message: "No suppliers found" });
+    // Build query
+    const query = { companyId };
+    
+    // Optional filters
+    if (req.query.IsActive !== undefined) {
+      query.IsActive = req.query.IsActive === "true";
     }
+    if (req.query.search) {
+      query.$or = [
+        { SupplierName: { $regex: req.query.search, $options: "i" } },
+        { Email: { $regex: req.query.search, $options: "i" } },
+        { Phone: { $regex: req.query.search, $options: "i" } },
+      ];
+    }
+
+    // Get total count
+    const total = await Suppliers.countDocuments(query);
+    
+    // Get paginated results
+    const suppliers = await Suppliers.find(query)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const pagination = {
+      page,
+      limit,
+      total,
+      pages: Math.ceil(total / limit),
+      hasNext: page * limit < total,
+      hasPrev: page > 1,
+    };
+
+    return res.status(200).json(paginateResponse(suppliers, pagination));
   } catch (error) {
-    console.error("Error retrieving suppliers:", error); // לוג לשגיאות
+    console.error("Error retrieving suppliers:", error);
     return res.status(500).json({
       success: false,
       message: "Error retrieving suppliers",

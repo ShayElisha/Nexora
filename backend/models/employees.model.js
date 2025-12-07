@@ -45,8 +45,48 @@ const employeeSchema = new mongoose.Schema(
     role: {
       type: String,
       required: false,
-      enum: ["Admin", "Manager", "Employee", "SuperAdmin"],
+      enum: ["Admin", "Manager", "Employee"],
     },
+    roleId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Role",
+      required: false,
+    },
+    customPermissions: [
+      {
+        module: {
+          type: String,
+          enum: [
+            "products",
+            "suppliers",
+            "finance",
+            "budgets",
+            "procurement",
+            "projects",
+            "employees",
+            "signatures",
+            "departments",
+            "reports",
+            "tasks",
+            "customers",
+            "events",
+            "settings",
+            "invoices",
+            "inventory",
+            "analytics",
+            "shifts",
+            "salary",
+            "ai",
+          ],
+        },
+        actions: [
+          {
+            type: String,
+            enum: ["view", "create", "update", "delete", "approve", "export"],
+          },
+        ],
+      },
+    ],
     phone: {
       type: String,
       required: true,
@@ -151,6 +191,12 @@ const employeeSchema = new mongoose.Schema(
       accountNumber: { type: String },
       bankNumber: { type: String },
       branchCode: { type: String },
+    },
+    passwordResetToken: {
+      type: String,
+    },
+    passwordResetExpires: {
+      type: Date,
     },
 
   },

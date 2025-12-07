@@ -36,19 +36,19 @@ const BudgetSchema = new mongoose.Schema({
       unitPrice: { type: Number },
       totalPrice: { type: Number },
       addedAt: { type: Date, default: Date.now },
-      employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "employees" },
+      employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
     },
   ],
   notes: { type: String },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "employee",
+    ref: "Employee",
     required: true,
   },
-  updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "employees" },
+  updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
   approvals: [
     {
-      approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: "employees" },
+      approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
       approvedAt: { type: Date },
       comment: { type: String },
     },
@@ -57,13 +57,20 @@ const BudgetSchema = new mongoose.Schema({
   currentSignerIndex: { type: Number, default: 0 },
   signers: [
     {
-      employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "employees" },
+      employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
       name: { type: String, required: true },
       role: { type: String, required: true },
       order: { type: Number, required: true, default: 0 },
       hasSigned: { type: Boolean, default: false },
       timeStamp: { type: Date, default: Date.now },
       signatureUrl: { type: String },
+    },
+  ],
+  // קישור לרשומות Finance
+  financeRecords: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Finance",
     },
   ],
   createdAt: { type: Date, default: Date.now },

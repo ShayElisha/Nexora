@@ -12,6 +12,18 @@ const inventorySchema = new mongoose.Schema(
       ref: "Product",
       required: [true, "Product ID is required"],
     },
+    warehouseId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Warehouse",
+      required: false,
+      index: true,
+    },
+    locationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "WarehouseLocation",
+      required: false,
+      index: true,
+    },
     quantity: {
       type: Number,
       required: [true, "Quantity is required"],

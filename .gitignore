@@ -11,6 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.local
+.env.*.local
 node_modules/
 
 
@@ -27,6 +30,7 @@ node_modules/
 .qodo
 server/venv/
 venv/
-venv/
-venv/
-venv/
+AI/venv/
+uploads/
+*.MP4
+*.mp4

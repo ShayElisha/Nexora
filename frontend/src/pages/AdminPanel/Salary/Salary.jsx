@@ -1,12 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import axiosInstance from "../../../lib/axios";
-import { FaEdit, FaFilePdf } from "react-icons/fa";
-import { jsPDF } from "jspdf";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import toast from "react-hot-toast";
+import {
+  DollarSign,
+  Users,
+  TrendingUp,
+  Calendar,
+  FileText,
+  Edit2,
+  Save,
+  X,
+  Download,
+  Calculator,
+  Eye,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  Award,
+  AlertCircle,
+  Mail,
+} from "lucide-react";
 
 const Salary = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLang = i18n.language || localStorage.getItem("i18nextLng") || "he";
+  const isRTL = currentLang === "he";
+  
   const [salaries, setSalaries] = useState([]);
   const [taxConfigs, setTaxConfigs] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -19,6 +42,11 @@ const Salary = () => {
   });
   const [showPayslipModal, setShowPayslipModal] = useState(false);
   const [payslipUrl, setPayslipUrl] = useState("");
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailMonth, setEmailMonth] = useState(new Date().getMonth() + 1);
+  const [emailYear, setEmailYear] = useState(new Date().getFullYear());
+  const [sendingEmails, setSendingEmails] = useState(false);
+  const [companyInfo, setCompanyInfo] = useState(null);
 
   const fetchSalaries = async () => {
     setLoading(true);
@@ -26,25 +54,23 @@ const Salary = () => {
       const response = await axiosInstance.get("/salary");
       const formattedSalaries = response.data.data.map((salary) => ({
         ...salary,
-        employeeName: `${salary.employeeId?.name || ""} ${
-          salary.employeeId?.lastName || ""
-        }`,
+        employeeName: `${salary.employeeId?.name || ""} ${salary.employeeId?.lastName || ""}`,
         totalHours: Number(salary.totalHours).toFixed(2),
         totalPay: Number(salary.totalPay).toFixed(2),
         bonus: salary.bonus ? Number(salary.bonus).toFixed(2) : "0.00",
         netPay: Number(salary.netPay).toFixed(2),
-        taxDeduction: salary.taxDeduction
-          ? Number(salary.taxDeduction).toFixed(2)
-          : "0.00",
+        taxDeduction: salary.taxDeduction ? Number(salary.taxDeduction).toFixed(2) : "0.00",
         otherDeductions: salary.otherDeductions.map((deduction) => ({
           ...deduction,
           amount: Number(deduction.amount).toFixed(2),
         })),
         currency: salary.currency || "ILS",
+        // Include full employee data for payslip
+        employeeData: salary.employeeId,
       }));
       setSalaries(formattedSalaries);
     } catch (err) {
-      toast.error(t("salary.errorFetchingSalaries") + " " + err.message);
+      toast.error(t("finance.salary.errorFetchingSalaries") + " " + err.message);
     } finally {
       setLoading(false);
     }
@@ -55,13 +81,33 @@ const Salary = () => {
       const response = await axiosInstance.get("/tax-config");
       setTaxConfigs(response.data.data.filter((config) => config.isActive));
     } catch (err) {
-      toast.error(t("salary.errorFetchingTaxConfigs") + " " + err.message);
+      toast.error(t("finance.salary.errorFetchingTaxConfigs") + " " + err.message);
+    }
+  };
+
+  const fetchCompanyInfo = async () => {
+    try {
+      const response = await axiosInstance.get("/company/get-company");
+      if (response.data && response.data.data) {
+        setCompanyInfo(response.data.data);
+      }
+    } catch (err) {
+      console.error("Error fetching company info:", err);
+      // Fallback to default company info
+      setCompanyInfo({ 
+        name: "Company",
+        address: { street: "", city: "", postalCode: "" },
+        phone: "",
+        email: "",
+        taxId: ""
+      });
     }
   };
 
   useEffect(() => {
     fetchSalaries();
     fetchTaxConfigs();
+    fetchCompanyInfo();
   }, []);
 
   const formatDate = (date) => {
@@ -70,10 +116,6 @@ const Salary = () => {
       month: "2-digit",
       day: "2-digit",
     });
-  };
-
-  const formatStatus = (status) => {
-    return t(`salary.status.${status}`);
   };
 
   const formatCurrency = (currency) => {
@@ -86,44 +128,32 @@ const Salary = () => {
 
   const handleEdit = (salary) => {
     setEditingSalary({ ...salary });
-    toast(t("salary.editMode"));
+    toast(t("finance.salary.editMode"));
   };
 
   const handleInputChange = (e, field) => {
-    const value = field === "status" ? e.target.value : e.target.value;
-    setEditingSalary({ ...editingSalary, [field]: value });
-  };
-
-  const handleTaxCalcInputChange = (e, field) => {
-    setTaxCalcInput({ ...taxCalcInput, [field]: e.target.value });
+    setEditingSalary({ ...editingSalary, [field]: e.target.value });
   };
 
   const saveEdit = async () => {
     try {
       await axiosInstance.put(`/salary/${editingSalary._id}`, editingSalary);
-      setSalaries(
-        salaries.map((s) =>
-          s._id === editingSalary._id ? { ...editingSalary } : s
-        )
-      );
       setEditingSalary(null);
       fetchSalaries();
-      toast.success(t("salary.updatedSuccess"));
+      toast.success(t("finance.salary.updatedSuccess"));
     } catch (err) {
-      toast.error(t("salary.errorUpdatingSalary") + " " + err.message);
+      toast.error(t("finance.salary.errorUpdatingSalary") + " " + err.message);
     }
   };
 
   const cancelEdit = () => {
     setEditingSalary(null);
-    toast(t("salary.cancelled"));
+    toast(t("finance.salary.cancelled"));
   };
 
   const calculateTaxesForMonth = async (e) => {
     e.preventDefault();
-
     setLoading(true);
-
     try {
       const payload = {
         year: Number(taxCalcInput.year),
@@ -132,266 +162,994 @@ const Salary = () => {
       };
 
       if (!payload.taxConfigId) {
-        throw new Error(t("salary.selectTaxConfig"));
+        throw new Error(t("finance.salary.selectTaxConfig"));
       }
 
-      const response = await axiosInstance.post(
-        "/salary/calculate-taxes-for-month",
-        payload
-      );
+      const response = await axiosInstance.post("/salary/calculate-taxes-for-month", payload);
       toast.success(response.data.message);
       fetchSalaries();
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message ||
-        err.message ||
-        t("salary.errorCalculatingTax");
+      const errorMessage = err.response?.data?.message || err.message || t("finance.salary.errorCalculatingTax");
       toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  const generatePayslip = (salary) => {
+  const generatePayslip = async (salary) => {
+    if (!salary) {
+      toast.error("שגיאה: אין נתוני משכורת");
+      return;
+    }
+    
     try {
-      const doc = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
 
-      doc.setFont("Helvetica");
-      doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0);
-
-      const textLeft = (text, x, y, maxWidth = 180) => {
-        doc.text(text, x, y, { align: "left", maxWidth });
-      };
-
-      const textRight = (text, x, y, maxWidth = 180) => {
-        doc.text(text, x, y, { align: "right", maxWidth });
-      };
-
-      const addTableRow = (
-        x,
-        y,
-        col1,
-        col2,
-        col3,
-        col4,
-        col5,
-        isHeader = false
-      ) => {
-        if (isHeader) {
-          doc.setFillColor(200, 200, 200);
-          doc.rect(x, y - 4, 170, 8, "F");
+      const currentLang = localStorage.getItem("i18nextLng") || "he";
+      const isRTL = currentLang === "he";
+      
+      // Create HTML content for payslip
+      // Get employee data - try from salary.employeeId (populated) first, then employeeData
+      const employeeData = salary.employeeId || salary.employeeData || {};
+      const employeeName = employeeData.name || "N/A";
+      const employeeLastName = employeeData.lastName || "";
+      const fullEmployeeName = employeeLastName ? `${employeeName} ${employeeLastName}` : employeeName;
+      const employeeId = employeeData.identity || (employeeData._id ? employeeData._id.toString().slice(-6) : "N/A");
+      const employeeEmail = employeeData.email || "N/A";
+      const employeePhone = employeeData.phone || "N/A";
+      
+      // Get company information - try from salary.companyId (populated) first, then companyInfo state
+      let companyName = "Company Name";
+      let companyAddress = "";
+      let companyPhone = "";
+      let companyEmail = "";
+      let companyTaxId = "";
+      
+      // First try to get from salary.companyId (populated from API)
+      if (salary.companyId && typeof salary.companyId === 'object') {
+        const company = salary.companyId;
+        companyName = company.name || "Company Name";
+        if (company.address) {
+          const addr = company.address;
+          companyAddress = `${addr.street || ""}, ${addr.city || ""} ${addr.postalCode || ""}`.trim();
         }
-        textLeft(col1, x, y);
-        textLeft(col2, x + 40, y);
-        textLeft(col3, x + 80, y);
-        textLeft(col4, x + 110, y);
-        textLeft(col5, x + 140, y);
-      };
-
-      doc.setFontSize(14);
-      textLeft(t("salary.payslip"), 20, 10);
-      doc.setFontSize(10);
-      textLeft(t("salary.companyName"), 20, 18);
-      textLeft(t("salary.companyId"), 20, 24);
-      textLeft(`${t("salary.date")}: ${formatDate(new Date())}`, 20, 30);
-      textLeft(
-        `${t("salary.payPeriod")}: ${formatDate(
-          salary.periodStart
-        )} - ${formatDate(salary.periodEnd)}`,
-        20,
-        36
-      );
-      textRight(`${t("salary.employee")}: ${salary.employeeName}`, 190, 18);
-      textRight(
-        `${t("salary.id")}: ${salary.employeeId?.idNumber || "N/A"}`,
-        190,
-        24
-      );
-      textRight(
-        `${t("salary.address")}: ${salary.employeeId?.address || "N/A"}`,
-        190,
-        30
-      );
-      textRight(
-        `${t("salary.startDate")}: ${salary.employeeId?.startDate || "N/A"}`,
-        190,
-        36
-      );
-
-      let yPos = 50;
-      textLeft(t("salary.earnings"), 20, yPos);
-      yPos += 8;
-      addTableRow(
-        20,
-        yPos,
-        t("salary.code"),
-        t("salary.description"),
-        t("salary.hours"),
-        t("salary.value"),
-        t("salary.total"),
-        true
-      );
-      yPos += 8;
-      addTableRow(
-        20,
-        yPos,
-        "001",
-        t("salary.baseSalary"),
-        salary.totalHours,
-        salary.totalPay,
-        salary.totalPay
-      );
-      if (salary.bonus && Number(salary.bonus) > 0) {
-        addTableRow(
-          20,
-          yPos + 8,
-          "006",
-          t("salary.bonus"),
-          "",
-          salary.bonus,
-          salary.bonus
-        );
-        yPos += 8;
+        companyPhone = company.phone || "";
+        companyEmail = company.email || "";
+        companyTaxId = company.taxId || "";
+      } else if (companyInfo && companyInfo.name) {
+        // Fallback: try to get from companyInfo state
+        companyName = companyInfo.name;
+        if (companyInfo.address) {
+          const addr = companyInfo.address;
+          companyAddress = `${addr.street || ""}, ${addr.city || ""} ${addr.postalCode || ""}`.trim();
+        }
+        companyPhone = companyInfo.phone || "";
+        companyEmail = companyInfo.email || "";
+        companyTaxId = companyInfo.taxId || "";
       }
-      yPos += 8;
-      addTableRow(
-        20,
-        yPos,
-        "103",
-        t("salary.totalPayments"),
-        "",
-        "",
-        (Number(salary.totalPay) + Number(salary.bonus)).toFixed(2)
-      );
-
-      yPos += 16;
-      textLeft(t("salary.deductions"), 20, yPos);
-      yPos += 8;
-      addTableRow(
-        20,
-        yPos,
-        t("salary.code"),
-        t("salary.description"),
-        t("salary.rate"),
-        t("salary.value"),
-        t("salary.total"),
-        true
-      );
-      yPos += 8;
-      if (salary.taxDeduction && Number(salary.taxDeduction) > 0) {
-        addTableRow(
-          20,
-          yPos,
-          "107",
-          t("salary.incomeTax"),
-          "",
-          salary.taxDeduction,
-          salary.taxDeduction
-        );
-        yPos += 8;
+      
+      const payslipId = salary._id ? salary._id.toString().slice(-6) : "000000";
+      
+      // Get employee additional data
+      const employeeDateOfBirth = employeeData.dateOfBirth ? new Date(employeeData.dateOfBirth).toLocaleDateString(isRTL ? "he-IL" : "en-US") : "N/A";
+      const employeeStartDate = employeeData.createdAt ? new Date(employeeData.createdAt).toLocaleDateString(isRTL ? "he-IL" : "en-US") : "N/A";
+      const employeeRole = employeeData.role || "N/A";
+      const employeeDepartment = employeeData.department?.name || "N/A";
+      const employeeAddress = employeeData.address ? `${employeeData.address.street || ""}, ${employeeData.address.city || ""} ${employeeData.address.postalCode || ""}`.trim() : "N/A";
+      
+      // Get bank details
+      const bankAccount = employeeData.bankDetails?.accountNumber || "N/A";
+      const bankNumber = employeeData.bankDetails?.bankNumber || "N/A";
+      const branchCode = employeeData.bankDetails?.branchCode || "N/A";
+      
+      // Calculate base salary
+      const hourlySalary = parseFloat(employeeData.hourlySalary || 0);
+      const globalSalary = parseFloat(employeeData.globalSalary || 0);
+      const expectedHours = parseFloat(employeeData.expectedHours || 0);
+      const paymentType = employeeData.paymentType || "Global";
+      
+      let baseSalary = 0;
+      if (paymentType === "Global") {
+        baseSalary = globalSalary;
+      } else if (paymentType === "Hourly") {
+        baseSalary = hourlySalary * expectedHours;
       }
-      salary.otherDeductions.forEach((deduction, index) => {
-        addTableRow(
-          20,
-          yPos,
-          `10${8 + index}`,
-          deduction.description,
-          "",
-          deduction.amount,
-          deduction.amount
-        );
-        yPos += 8;
-      });
-      yPos += 8;
-      const totalDeductions = (
-        Number(salary.taxDeduction) +
-        salary.otherDeductions.reduce((sum, d) => sum + Number(d.amount), 0)
-      ).toFixed(2);
-      addTableRow(
-        20,
-        yPos,
-        "",
-        t("salary.totalDeductions"),
-        "",
-        "",
-        totalDeductions
-      );
-
-      yPos += 16;
-      textLeft(t("salary.netPay"), 20, yPos);
-      yPos += 8;
-      addTableRow(
-        20,
-        yPos,
-        "",
-        t("salary.netAmountPayable"),
-        "",
-        "",
-        salary.netPay
-      );
-
-      yPos += 16;
-      textLeft(t("salary.signature"), 20, yPos);
-      textRight(`${t("salary.date")}: ${formatDate(new Date())}`, 190, yPos);
-
+      
+      // Fetch shifts data for detailed hours breakdown
+      let baseSalaryAmount = 0;
+      let overtimeAmount = 0;
+      let vacationDaysAmount = 0;
+      let sickDaysAmount = 0;
+      let workDays = 0;
+      let vacationDays = 0;
+      let sickDays = 0;
+      let regularHours = 0;
+      let overtimeHours = 0;
+      
+      try {
+        const startDateStr = new Date(salary.periodStart).toISOString().split('T')[0];
+        const endDateStr = new Date(salary.periodEnd).toISOString().split('T')[0];
+        const shiftsResponse = await axiosInstance.get(`/shifts?employeeId=${employeeData._id}&startDate=${startDateStr}&endDate=${endDateStr}`);
+        if (shiftsResponse.data && shiftsResponse.data.data) {
+          const shifts = shiftsResponse.data.data;
+          
+          shifts.forEach(shift => {
+            const shiftPay = parseFloat(shift.totalPay || 0);
+            const shiftHours = parseFloat(shift.hoursWorked || 0);
+            
+            // Calculate payment by day type
+            if (shift.dayType === "Regular") {
+              workDays++;
+              // Calculate regular vs overtime from breakdown
+              if (shift.shiftBreakdown && Array.isArray(shift.shiftBreakdown)) {
+                shift.shiftBreakdown.forEach(breakdown => {
+                  const hours = parseFloat(breakdown.hours || 0);
+                  if (breakdown.rateType === "Regular") {
+                    regularHours += hours;
+                    baseSalaryAmount += hours * hourlySalary;
+                  } else if (breakdown.rateType === "Overtime125" || breakdown.rateType === "Overtime150") {
+                    overtimeHours += hours;
+                    overtimeAmount += hours * hourlySalary * parseFloat(breakdown.multiplier || 1.25);
+                  }
+                });
+              } else {
+                // Fallback: use shift totalPay
+                const regular = Math.max(0, shiftHours - parseFloat(shift.overtimeHours || 0));
+                regularHours += regular;
+                overtimeHours += parseFloat(shift.overtimeHours || 0);
+                baseSalaryAmount += regular * hourlySalary;
+                overtimeAmount += parseFloat(shift.overtimeHours || 0) * hourlySalary * 1.25;
+              }
+            } else if (shift.dayType === "Vacation") {
+              vacationDays++;
+              vacationDaysAmount += shiftPay;
+            } else if (shift.dayType === "Sickday") {
+              sickDays++;
+              sickDaysAmount += shiftPay;
+            }
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching shifts:", err);
+      }
+      
+      // If no base salary calculated from shifts, use globalSalary or calculate from base
+      // But only if we didn't get any shifts data
+      if (baseSalaryAmount === 0 && workDays === 0) {
+        if (paymentType === "Global") {
+          baseSalaryAmount = globalSalary;
+        } else if (paymentType === "Hourly" && expectedHours > 0) {
+          baseSalaryAmount = hourlySalary * expectedHours;
+        } else {
+          // Fallback: use baseSalary calculated earlier
+          baseSalaryAmount = baseSalary;
+        }
+      }
+      
+      // If baseSalaryAmount is still 0, use the calculated baseSalary
+      if (baseSalaryAmount === 0) {
+        baseSalaryAmount = baseSalary;
+      }
+      
+      // Get salary data first (before using bonus)
+      const totalPay = parseFloat(salary.totalPay || 0);
+      const bonus = parseFloat(salary.bonus || 0);
+      const taxDeduction = parseFloat(salary.taxDeduction || 0);
+      const netPay = parseFloat(salary.netPay || 0);
+      
+      // Calculate total gross from all components
+      const calculatedGross = baseSalaryAmount + overtimeAmount + vacationDaysAmount + sickDaysAmount + bonus;
+      // Use the calculated gross (sum of all components) as the final gross
+      const finalGross = calculatedGross > 0 ? calculatedGross : totalPay;
+      
+      // Get vacation and sick leave data
+      const vacationBalance = parseFloat(employeeData.vacationBalance || 0);
+      const sickBalance = parseFloat(employeeData.sickBalance || 0);
+      
+      // Calculate monthly changes for current period
+      const periodMonth = new Date(salary.periodStart).getMonth() + 1;
+      const periodYear = new Date(salary.periodStart).getFullYear();
+      const periodMonthYear = `${String(periodMonth).padStart(2, '0')}/${periodYear}`;
+      
+      // Find vacation history for this month
+      let vacationAdded = 0;
+      let vacationUsed = 0;
+      if (employeeData.vacationHistory && Array.isArray(employeeData.vacationHistory)) {
+        const monthHistory = employeeData.vacationHistory.filter(h => h.month === periodMonthYear);
+        monthHistory.forEach(h => {
+          if (h.daysAdded > 0) {
+            vacationAdded += h.daysAdded;
+          } else {
+            vacationUsed += Math.abs(h.daysAdded);
+          }
+        });
+      }
+      
+      // Find sick leave history for this month
+      let sickAdded = 0;
+      let sickUsed = 0;
+      if (employeeData.sickHistory && Array.isArray(employeeData.sickHistory)) {
+        const monthHistory = employeeData.sickHistory.filter(h => h.month === periodMonthYear);
+        monthHistory.forEach(h => {
+          if (h.daysAdded > 0) {
+            sickAdded += h.daysAdded;
+          } else {
+            sickUsed += Math.abs(h.daysAdded);
+          }
+        });
+      }
+      
+      const vacationRemaining = vacationBalance;
+      const sickRemaining = sickBalance;
+      
+      // Calculate total deductions
+      let totalDeductions = taxDeduction;
+      const otherDeductionsList = [];
+      if (salary.otherDeductions && salary.otherDeductions.length > 0) {
+        salary.otherDeductions.forEach((deduction) => {
+          const amount = parseFloat(deduction.amount || 0);
+          if (amount > 0) {
+            totalDeductions += amount;
+            otherDeductionsList.push({
+              desc: deduction.description || (isRTL ? "ניכוי אחר" : "Other Deduction"),
+              amount: amount,
+            });
+          }
+        });
+      }
+      
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html dir="${isRTL ? 'rtl' : 'ltr'}" lang="${currentLang}">
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&display=swap');
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+              font-family: 'Assistant', 'Arial', sans-serif;
+              direction: ${isRTL ? 'rtl' : 'ltr'};
+              padding: 20px;
+              background: white;
+              color: #1e293b;
+            }
+            .payslip-container {
+              max-width: 210mm;
+              margin: 0 auto;
+              background: white;
+            }
+            .header {
+              background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+              color: white;
+              padding: 30px;
+              border-radius: 8px 8px 0 0;
+              position: relative;
+            }
+            .company-name {
+              font-size: 28px;
+              font-weight: 700;
+              margin-bottom: 8px;
+            }
+            .payslip-title {
+              font-size: 18px;
+              opacity: 0.9;
+            }
+            .badge {
+              position: absolute;
+              ${isRTL ? 'left' : 'right'}: 20px;
+              top: 20px;
+              background: white;
+              padding: 12px 16px;
+              border-radius: 6px;
+              color: #2563eb;
+              text-align: center;
+            }
+            .badge-label {
+              font-size: 10px;
+              font-weight: 600;
+              margin-bottom: 4px;
+            }
+            .badge-value {
+              font-size: 14px;
+              font-weight: 700;
+            }
+            .section {
+              margin: 20px 0;
+            }
+            .info-box {
+              border: 1px solid #e2e8f0;
+              border-radius: 6px;
+              padding: 20px;
+              margin-bottom: 20px;
+            }
+            .section-title {
+              font-size: 11px;
+              font-weight: 600;
+              color: #64748b;
+              margin-bottom: 12px;
+              text-transform: uppercase;
+            }
+            .info-row {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 16px;
+              margin-bottom: 12px;
+            }
+            .info-item {
+              font-size: 12px;
+            }
+            .info-label {
+              font-weight: 600;
+              color: #64748b;
+              margin-bottom: 4px;
+            }
+            .info-value {
+              color: #1e293b;
+              font-weight: 500;
+            }
+            .period-box {
+              background: #f8fafc;
+              border: 1px solid #e2e8f0;
+              border-radius: 6px;
+              padding: 12px 20px;
+              text-align: ${isRTL ? 'right' : 'left'};
+              font-weight: 600;
+            }
+            .earnings-section {
+              margin: -106px 0 24px 0;
+            }
+            .deductions-section {
+              margin: 24px 0;
+            }
+            .section-header {
+              background: ${isRTL ? '#ef4444' : '#2563eb'};
+              color: white;
+              padding: 12px 20px;
+              border-radius: 6px 6px 0 0;
+              font-weight: 700;
+              font-size: 14px;
+            }
+            .table {
+              width: 100%;
+              border-collapse: collapse;
+              border: 1px solid #e2e8f0;
+              border-top: none;
+            }
+            .table thead {
+              background: #f8fafc;
+            }
+            .table th {
+              padding: 10px 16px;
+              text-align: ${isRTL ? 'right' : 'left'};
+              font-size: 11px;
+              font-weight: 600;
+              color: #64748b;
+              border-bottom: 1px solid #e2e8f0;
+            }
+            .table td {
+              padding: 10px 16px;
+              text-align: ${isRTL ? 'right' : 'left'};
+              font-size: 12px;
+              border-bottom: 1px solid #f1f5f9;
+            }
+            .table tbody tr:last-child td {
+              border-bottom: none;
+            }
+            .amount {
+              font-weight: 700;
+              color: #059669;
+            }
+            .deduction-amount {
+              font-weight: 700;
+              color: #ef4444;
+            }
+            .total-row {
+              background: ${isRTL ? '#fef2f2' : '#f0fdf4'};
+              font-weight: 700;
+            }
+            .total-row td {
+              padding: 12px 16px;
+              border-top: 2px solid ${isRTL ? '#ef4444' : '#10b981'};
+              border-bottom: 2px solid ${isRTL ? '#ef4444' : '#10b981'};
+            }
+            .net-pay {
+              background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+              color: white;
+              padding: 24px;
+              border-radius: 8px;
+              margin: 24px 0;
+              text-align: ${isRTL ? 'right' : 'left'};
+            }
+            .net-pay-label {
+              font-size: 12px;
+              font-weight: 600;
+              opacity: 0.9;
+              margin-bottom: 8px;
+            }
+            .net-pay-amount {
+              font-size: 32px;
+              font-weight: 700;
+            }
+            .footer {
+              margin-top: 30px;
+              padding-top: 20px;
+              border-top: 1px solid #e2e8f0;
+              text-align: center;
+              font-size: 10px;
+              color: #64748b;
+              font-style: italic;
+            }
+            @media print {
+              body { padding: 0; }
+              .payslip-container { max-width: 100%; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="payslip-container">
+            <div class="header">
+              <div class="company-name">${companyName}</div>
+              <div class="payslip-title">${isRTL ? 'תלוש שכר' : 'PAYSLIP'}</div>
+              <div class="badge">
+                <div class="badge-label">${isRTL ? 'מספר תלוש' : 'PAYSLIP #'}</div>
+                <div class="badge-value">SL-${payslipId}</div>
+                <div style="margin-top: 8px; font-size: 9px; color: #64748b;">${isRTL ? 'תאריך' : 'DATE'}</div>
+                <div style="font-size: 11px; color: #1e293b;">${new Date().toLocaleDateString(isRTL ? "he-IL" : "en-US")}</div>
+              </div>
+            </div>
+            
+            <!-- Company Information -->
+            <div class="section">
+              <div class="info-box" style="background: #f8fafc;">
+                <div class="section-title">${isRTL ? 'פרטי חברה' : 'COMPANY INFORMATION'}</div>
+                <div class="info-row">
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'שם חברה' : 'Company Name'}</div>
+                    <div class="info-value">${companyName}</div>
+                  </div>
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'ח.פ./מס ערך מוסף' : 'Tax ID/VAT'}</div>
+                    <div class="info-value">${companyTaxId || 'N/A'}</div>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'כתובת' : 'Address'}</div>
+                    <div class="info-value">${companyAddress || 'N/A'}</div>
+                  </div>
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'טלפון' : 'Phone'}</div>
+                    <div class="info-value">${companyPhone || 'N/A'}</div>
+                  </div>
+                </div>
+                ${companyEmail ? `
+                <div class="info-row">
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'אימייל' : 'Email'}</div>
+                    <div class="info-value">${companyEmail}</div>
+                  </div>
+                </div>
+                ` : ''}
+              </div>
+            </div>
+            
+            <div class="section">
+              <div class="info-box">
+                <div class="section-title">${isRTL ? 'פרטי עובד' : 'EMPLOYEE INFORMATION'}</div>
+                <div class="info-row">
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'שם' : 'Name'}</div>
+                    <div class="info-value">${fullEmployeeName}</div>
+                  </div>
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'ת.ז.' : 'ID'}</div>
+                    <div class="info-value">${employeeId}</div>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'תאריך לידה' : 'Date of Birth'}</div>
+                    <div class="info-value">${employeeDateOfBirth}</div>
+                  </div>
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'תאריך תחילת עבודה' : 'Start Date'}</div>
+                    <div class="info-value">${employeeStartDate}</div>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'תפקיד' : 'Role'}</div>
+                    <div class="info-value">${employeeRole}</div>
+                  </div>
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'מחלקה' : 'Department'}</div>
+                    <div class="info-value">${employeeDepartment}</div>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'כתובת' : 'Address'}</div>
+                    <div class="info-value">${employeeAddress}</div>
+                  </div>
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'טלפון' : 'Phone'}</div>
+                    <div class="info-value">${employeePhone}</div>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'אימייל' : 'Email'}</div>
+                    <div class="info-value">${employeeEmail}</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Bank Details -->
+              <div class="info-box" style="background: #fef3c7; margin-top: 16px;">
+                <div class="section-title">${isRTL ? 'פרטי בנק להעברה' : 'BANK DETAILS FOR TRANSFER'}</div>
+                <div class="info-row">
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'מספר חשבון' : 'Account Number'}</div>
+                    <div class="info-value" style="font-weight: 700;">${bankAccount}</div>
+                  </div>
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'מספר בנק' : 'Bank Number'}</div>
+                    <div class="info-value" style="font-weight: 700;">${bankNumber}</div>
+                  </div>
+                </div>
+                <div class="info-row">
+                  <div class="info-item">
+                    <div class="info-label">${isRTL ? 'מספר סניף' : 'Branch Code'}</div>
+                    <div class="info-value" style="font-weight: 700;">${branchCode}</div>
+                  </div>
+                </div>
+              </div>
+              
+            
+            <!-- Period Information -->
+            <div class="section">
+              <div class="period-box">
+                ${isRTL ? 'תקופת שכר' : 'PAY PERIOD'}: ${formatDate(salary.periodStart)} - ${formatDate(salary.periodEnd)}
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px;">
+                <div style="background: #f0fdf4; padding: 12px; border-radius: 6px; text-align: center;">
+                  <div style="font-size: 10px; color: #64748b; margin-bottom: 4px;">${isRTL ? 'ימי עבודה' : 'Work Days'}</div>
+                  <div style="font-size: 18px; font-weight: 700; color: #059669;">${workDays}</div>
+                </div>
+                <div style="background: #fef3c7; padding: 12px; border-radius: 6px; text-align: center;">
+                  <div style="font-size: 10px; color: #64748b; margin-bottom: 4px;">${isRTL ? 'ימי חופשה' : 'Vacation Days'}</div>
+                  <div style="font-size: 18px; font-weight: 700; color: #d97706;">${vacationDays}</div>
+                </div>
+                <div style="background: #fee2e2; padding: 12px; border-radius: 6px; text-align: center;">
+                  <div style="font-size: 10px; color: #64748b; margin-bottom: 4px;">${isRTL ? 'ימי מחלה' : 'Sick Days'}</div>
+                  <div style="font-size: 18px; font-weight: 700; color: #dc2626;">${sickDays}</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="earnings-section">
+              <div class="section-header">${isRTL ? 'הכנסות' : 'EARNINGS'}</div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>${isRTL ? 'תיאור' : 'DESCRIPTION'}</th>
+                    <th style="text-align: ${isRTL ? 'left' : 'right'}">${isRTL ? 'כמות' : 'AMOUNT'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>${isRTL ? 'שכר בסיס' : 'Base Salary'}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}" class="amount">${baseSalaryAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₪</td>
+                  </tr>
+                  ${overtimeAmount > 0 ? `
+                  <tr>
+                    <td>${isRTL ? `שעות נוספות (${overtimeHours.toFixed(2)}h)` : `Overtime Hours (${overtimeHours.toFixed(2)}h)`}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}" class="amount">${overtimeAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₪</td>
+                  </tr>
+                  ` : ''}
+                  ${sickDaysAmount > 0 ? `
+                  <tr>
+                    <td>${isRTL ? `ימי מחלה (${sickDays} ימים)` : `Sick Days (${sickDays} days)`}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}" class="amount">${sickDaysAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₪</td>
+                  </tr>
+                  ` : ''}
+                  ${vacationDaysAmount > 0 ? `
+                  <tr>
+                    <td>${isRTL ? `ימי חופש (${vacationDays} ימים)` : `Vacation Days (${vacationDays} days)`}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}" class="amount">${vacationDaysAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₪</td>
+                  </tr>
+                  ` : ''}
+                  ${bonus > 0 ? `
+                  <tr>
+                    <td>${isRTL ? 'בונוס' : 'Bonus'}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}" class="amount">${bonus.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₪</td>
+                  </tr>
+                  ` : ''}
+                  <tr class="total-row">
+                    <td>${isRTL ? 'שכר ברוטו' : 'GROSS SALARY'}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}" class="amount">${finalGross.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₪</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="deductions-section">
+              <div class="section-header" style="background: #ef4444;">${isRTL ? 'ניכויים' : 'DEDUCTIONS'}</div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>${isRTL ? 'תיאור' : 'DESCRIPTION'}</th>
+                    <th style="text-align: ${isRTL ? 'left' : 'right'}">${isRTL ? 'סכום' : 'AMOUNT'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${taxDeduction > 0 ? `
+                  <tr>
+                    <td>${isRTL ? 'מס הכנסה' : 'Income Tax'}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}" class="deduction-amount">-${taxDeduction.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₪</td>
+                  </tr>
+                  ` : ''}
+                  ${otherDeductionsList.map(d => `
+                  <tr>
+                    <td>${d.desc}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}" class="deduction-amount">-${d.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₪</td>
+                  </tr>
+                  `).join('')}
+                  ${totalDeductions === 0 ? `
+                  <tr>
+                    <td colspan="2" style="text-align: center; color: #64748b; font-style: italic;">${isRTL ? 'אין ניכויים' : 'No Deductions'}</td>
+                  </tr>
+                  ` : ''}
+                  <tr class="total-row">
+                    <td>${isRTL ? 'סה"כ ניכויים' : 'TOTAL DEDUCTIONS'}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}" class="deduction-amount">-${totalDeductions.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₪</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="net-pay">
+              <div class="net-pay-label">${isRTL ? 'משכורת נטו' : 'NET PAY'}</div>
+              <div class="net-pay-amount">${netPay.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₪</div>
+            </div>
+            
+            <div class="section" style="font-size: 11px; color: #64748b;">
+              <div style="margin-bottom: 8px;">${isRTL ? `שעות עבודה: ${salary.totalHours}h` : `Hours Worked: ${salary.totalHours}h`}</div>
+              <div>${isRTL ? `סטטוס: ${salary.status}` : `Status: ${salary.status}`}</div>
+              ${salary.notes ? `
+              <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+                <div style="font-weight: 600; margin-bottom: 4px;">${isRTL ? 'הערות:' : 'Notes:'}</div>
+                <div>${salary.notes}</div>
+              </div>
+              ` : ''}
+            </div>
+            
+            <!-- Vacation and Sick Leave Table -->
+            <div class="section" style="margin-top: 30px;">
+              <div class="section-header" style="background: #8b5cf6; margin-bottom: 0;">
+                ${isRTL ? 'ימי חופשה ומחלה' : 'VACATION & SICK LEAVE'}
+              </div>
+              <table class="table" style="border-top: none;">
+                <thead>
+                  <tr>
+                    <th>${isRTL ? 'סוג' : 'TYPE'}</th>
+                    <th style="text-align: ${isRTL ? 'left' : 'right'}">${isRTL ? 'יתרה התחלתית' : 'Starting Balance'}</th>
+                    <th style="text-align: ${isRTL ? 'left' : 'right'}">${isRTL ? 'התווספו החודש' : 'Added This Month'}</th>
+                    <th style="text-align: ${isRTL ? 'left' : 'right'}">${isRTL ? 'נוצל החודש' : 'Used This Month'}</th>
+                    <th style="text-align: ${isRTL ? 'left' : 'right'}">${isRTL ? 'יתרה נוכחית' : 'Current Balance'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="font-weight: 600;">${isRTL ? 'ימי חופשה' : 'Vacation Days'}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}">${(vacationBalance + vacationUsed - vacationAdded).toFixed(2)}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}; color: #10b981; font-weight: 600;">+${vacationAdded.toFixed(2)}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}; color: #ef4444; font-weight: 600;">-${vacationUsed.toFixed(2)}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}; font-weight: 700; color: #2563eb;">${vacationRemaining.toFixed(2)}</td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 600;">${isRTL ? 'ימי מחלה' : 'Sick Days'}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}">${(sickBalance + sickUsed - sickAdded).toFixed(2)}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}; color: #10b981; font-weight: 600;">+${sickAdded.toFixed(2)}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}; color: #ef4444; font-weight: 600;">-${sickUsed.toFixed(2)}</td>
+                    <td style="text-align: ${isRTL ? 'left' : 'right'}; font-weight: 700; color: #2563eb;">${sickRemaining.toFixed(2)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <div class="footer">
+              ${isRTL ? 'תלוש זה נוצר אוטומטית על ידי מערכת Nexora' : 'This payslip was automatically generated by Nexora System'}
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+      
+      // Show modal immediately with HTML content for preview
+      console.log("Opening payslip modal...");
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      setPayslipUrl(url);
+      setShowPayslipModal(true);
+      console.log("Modal state set to true, payslipUrl:", url);
+      
+      // Create a hidden div to render HTML for PDF generation
+      const hiddenDiv = document.createElement('div');
+      hiddenDiv.style.position = 'fixed';
+      hiddenDiv.style.left = '-9999px';
+      hiddenDiv.style.top = '0';
+      hiddenDiv.style.width = '210mm';
+      hiddenDiv.style.minHeight = '297mm';
+      hiddenDiv.style.backgroundColor = '#ffffff';
+      hiddenDiv.style.padding = '0';
+      hiddenDiv.style.margin = '0';
+      hiddenDiv.innerHTML = htmlContent;
+      document.body.appendChild(hiddenDiv);
+      
+      // Wait for fonts and styles to load, then generate PDF
+      setTimeout(async () => {
+        try {
+          // Wait for fonts to load
+          await document.fonts.ready;
+          
+          // Use html2canvas to convert HTML to canvas
+          const canvas = await html2canvas(hiddenDiv, {
+            scale: 2,
+            useCORS: true,
+            letterRendering: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+            allowTaint: true,
+            width: hiddenDiv.scrollWidth,
+            height: hiddenDiv.scrollHeight,
+          });
+          
+          // Convert canvas to PDF
+          const imgData = canvas.toDataURL('image/png', 1.0);
+      const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+          
+          const imgWidth = 210; // A4 width in mm
+          const pageHeight = 297; // A4 height in mm
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          let heightLeft = imgHeight;
+          
+          let position = 0;
+          
+          // Add first page
+          doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+          heightLeft -= pageHeight;
+          
+          // Add additional pages if needed
+          while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            doc.addPage();
+            doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
+            heightLeft -= pageHeight;
+          }
+          
+          // Generate PDF blob and update the URL
       const pdfBlob = doc.output("blob");
       const pdfUrl = URL.createObjectURL(pdfBlob);
+          
+          // Revoke old URL if exists
+          if (payslipUrl) {
+            URL.revokeObjectURL(payslipUrl);
+          }
+          
       setPayslipUrl(pdfUrl);
-      setShowPayslipModal(true);
-
-      doc.save(`payslip_${salary.employeeName.replace(/\s+/g, "_")}.pdf`);
-      toast.success(t("salary.payslipGenerated"));
+          
+          // Cleanup
+          document.body.removeChild(hiddenDiv);
+          
+          toast.success(isRTL ? "תלוש שכר נוצר בהצלחה" : "Payslip generated successfully");
+        } catch (error) {
+          console.error("Error generating PDF:", error);
+          
+          // Modal is already open with HTML preview
+          // Just show error toast
+          toast.error(isRTL ? "שגיאה ביצירת PDF, התלוש מוצג בתצוגה מקדימה" : "Error generating PDF, payslip shown in preview");
+          
+          if (document.body.contains(hiddenDiv)) {
+            document.body.removeChild(hiddenDiv);
+          }
+        }
+      }, 1500);
     } catch (err) {
-      toast.error(t("salary.errorGeneratingPayslip") + err.message);
+      console.error("Error generating payslip:", err);
+      
+      // Even if there's an error, try to show the modal with basic HTML
+      try {
+        const errorHtml = `
+          <!DOCTYPE html>
+          <html dir="${document.documentElement.dir || 'rtl'}" lang="${localStorage.getItem('i18nextLng') || 'he'}">
+          <head>
+            <meta charset="UTF-8">
+            <style>
+              body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+              h1 { color: #ef4444; }
+            </style>
+          </head>
+          <body>
+            <h1>שגיאה ביצירת תלוש שכר</h1>
+            <p>${err.message}</p>
+          </body>
+          </html>
+        `;
+        const blob = new Blob([errorHtml], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        setPayslipUrl(url);
+        setShowPayslipModal(true);
+      } catch (fallbackErr) {
+        console.error("Error in fallback:", fallbackErr);
+      }
+      
+      toast.error((isRTL ? "שגיאה ביצירת תלוש שכר: " : "Error generating payslip: ") + err.message);
     }
   };
 
   const closePayslipModal = () => {
     setShowPayslipModal(false);
     setPayslipUrl("");
-    toast(t("salary.modalClosed"));
+  };
+
+  const sendPayslipEmails = async () => {
+    if (!emailMonth || !emailYear) {
+      toast.error(isRTL ? "אנא בחר חודש ושנה" : "Please select month and year");
+      return;
+    }
+
+    setSendingEmails(true);
+    try {
+      const response = await axiosInstance.post("/salary/send-payslip-emails", {
+        year: emailYear,
+        month: emailMonth,
+      });
+
+      if (response.data.success) {
+        toast.success(
+          isRTL
+            ? `נשלחו ${response.data.results.sent.length} תלושי שכר בהצלחה`
+            : `Successfully sent ${response.data.results.sent.length} payslips`
+        );
+        if (response.data.results.failed.length > 0) {
+          toast.warning(
+            isRTL
+              ? `${response.data.results.failed.length} תלושי שכר נכשלו בשליחה`
+              : `${response.data.results.failed.length} payslips failed to send`
+          );
+        }
+        setShowEmailModal(false);
+      } else {
+        toast.error(response.data.message || (isRTL ? "שגיאה בשליחת מיילים" : "Error sending emails"));
+      }
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || err.message || (isRTL ? "שגיאה בשליחת מיילים" : "Error sending emails");
+      toast.error(errorMessage);
+    } finally {
+      setSendingEmails(false);
+    }
+  };
+
+  // Calculate statistics
+  const stats = {
+    totalSalaries: salaries.length,
+    totalPayout: salaries.reduce((sum, s) => sum + parseFloat(s.netPay), 0),
+    avgSalary: salaries.length > 0 ? salaries.reduce((sum, s) => sum + parseFloat(s.netPay), 0) / salaries.length : 0,
+    pending: salaries.filter(s => s.status === "Draft").length,
+  };
+
+  const cardVariant = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
   };
 
   return (
-    <div className="max-w-full mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6 text-center">
-        {t("salary.salaryList")}
-      </h2>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-pink-600">
+              <DollarSign size={28} color="white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
+        {t("finance.salary.salaryList")}
+              </h1>
+              <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
+                {t("finance.salary.manageSalaries")}
+              </p>
+            </div>
+            </div>
+            <button
+              onClick={() => setShowEmailModal(true)}
+              className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all hover:scale-105 shadow-lg"
+              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
+            >
+              <Mail size={20} />
+              {isRTL ? "שלח תלושי שכר במייל" : "Send Payslips via Email"}
+            </button>
+          </div>
+        </motion.div>
 
-      <div className="bg-white shadow-md rounded-lg p-6 mb-8">
-        <h3 className="text-lg font-semibold mb-4">
-          {t("salary.calculateTaxForMonth")}
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {[
+            { label: t("finance.salary.totalEmployees"), value: stats.totalSalaries, icon: Users, color: "#3b82f6" },
+            { label: t("finance.salary.totalPayout"), value: `${stats.totalPayout.toLocaleString()} ₪`, icon: DollarSign, color: "#10b981" },
+            { label: t("finance.salary.avgSalary"), value: `${stats.avgSalary.toLocaleString()} ₪`, icon: TrendingUp, color: "#f59e0b" },
+            { label: t("finance.salary.pendingApproval"), value: stats.pending, icon: Clock, color: "#ef4444" },
+          ].map((stat, index) => (
+            <motion.div
+              key={index}
+              variants={cardVariant}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: index * 0.1 }}
+              className="rounded-2xl shadow-lg p-6 border hover:shadow-xl transition-all"
+              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              whileHover={{ y: -5 }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: stat.color + '20' }}>
+                  <stat.icon size={24} color={stat.color} />
+                </div>
+              </div>
+              <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
+                {stat.label}
+              </p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
+                {stat.value}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Tax Calculator */}
+        <motion.div
+          className="mb-8 rounded-2xl shadow-lg p-6 border"
+          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          variants={cardVariant}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.4 }}
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <Calculator size={24} style={{ color: 'var(--color-primary)' }} />
+            <h3 className="text-xl font-bold" style={{ color: 'var(--text-color)' }}>
+          {t("finance.salary.calculateTaxForMonth")}
         </h3>
-        <div className="flex gap-4 mb-4">
-          <div className="flex-1">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              {t("salary.year")}
+          </div>
+          <form onSubmit={calculateTaxesForMonth} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              {t("finance.salary.year")}
             </label>
             <input
               type="number"
               value={taxCalcInput.year}
-              onChange={(e) => handleTaxCalcInputChange(e, "year")}
-              className="border p-2 rounded w-full"
-              placeholder={t("salary.yearPlaceholder")}
+                onChange={(e) => setTaxCalcInput({ ...taxCalcInput, year: e.target.value })}
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               required
             />
           </div>
-          <div className="flex-1">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              {t("salary.month")}
+            <div>
+              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              {t("finance.salary.month")}
             </label>
             <select
               value={taxCalcInput.month}
-              onChange={(e) => handleTaxCalcInputChange(e, "month")}
-              className="border p-2 rounded w-full"
+                onChange={(e) => setTaxCalcInput({ ...taxCalcInput, month: e.target.value })}
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               required
             >
-              <option value="">{t("salary.selectMonth")}</option>
               {[...Array(12)].map((_, i) => (
                 <option key={i + 1} value={i + 1}>
                   {t(`salary.months.${i + 1}`)}
@@ -399,315 +1157,399 @@ const Salary = () => {
               ))}
             </select>
           </div>
-          <div className="flex-1">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              {t("salary.taxConfig")}
+            <div>
+              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              {t("finance.salary.taxConfig")}
             </label>
             <select
               value={taxCalcInput.taxConfigId}
-              onChange={(e) => handleTaxCalcInputChange(e, "taxConfigId")}
-              className="border p-2 rounded w-full"
+                onChange={(e) => setTaxCalcInput({ ...taxCalcInput, taxConfigId: e.target.value })}
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               required
             >
-              <option value="">{t("salary.selectTaxConfig")}</option>
+              <option value="">{t("finance.salary.selectTaxConfig")}</option>
               {taxConfigs.map((config) => (
                 <option key={config._id} value={config._id}>
-                  {`${config.taxName} (${config.countryCode}, ${config.currency})`}
+                    {`${config.taxName} (${config.countryCode})`}
                 </option>
               ))}
             </select>
           </div>
-        </div>
-        <button
-          onClick={calculateTaxesForMonth}
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-          disabled={loading}
-        >
-          {loading ? t("salary.calculating") : t("salary.calculateTaxForMonth")}
-        </button>
-      </div>
-
-      {showPayslipModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl">
-            <h3 className="text-lg font-semibold mb-4">
-              {t("salary.payslip")}
-            </h3>
-            <iframe
-              src={payslipUrl}
-              className="w-full h-[600px] border rounded"
-              title={t("salary.payslipPreview")}
-            ></iframe>
-            <div className="flex justify-end gap-4 mt-4">
-              <a
-                href={payslipUrl}
-                download={`payslip_${
-                  salaries
-                    .find(
-                      (s) => s._id === (editingSalary?._id || salaries[0]?._id)
-                    )
-                    ?.employeeName.replace(/\s+/g, "_") || "payslip"
-                }.pdf`}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                {t("salary.downloadPDF")}
-              </a>
+            <div className="flex items-end">
               <button
-                onClick={closePayslipModal}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 px-6 rounded-xl font-bold transition-all hover:scale-105 shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
+                style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
               >
-                {t("salary.close")}
+                <Calculator size={20} />
+                {loading ? t("finance.salary.calculating") : t("finance.salary.calculate")}
               </button>
             </div>
+          </form>
+        </motion.div>
+
+        {/* Salaries List */}
+        {loading ? (
+          <div className="flex items-center justify-center h-64">
+            <motion.div
+              className="w-16 h-16 border-4 border-t-4 rounded-full"
+              style={{ borderColor: 'var(--border-color)', borderTopColor: 'var(--color-primary)' }}
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 1 }}
+            />
           </div>
+      ) : salaries.length === 0 ? (
+          <motion.div
+            className="text-center py-16 rounded-2xl shadow-lg"
+            style={{ backgroundColor: 'var(--bg-color)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <AlertCircle size={64} className="mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
+            <p className="text-xl font-semibold" style={{ color: 'var(--text-color)' }}>
+          {t("finance.salary.noSalariesFound")}
+            </p>
+          </motion.div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4">
+            {salaries.map((salary, index) => (
+              <motion.div
+                key={salary._id}
+                variants={cardVariant}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: index * 0.05 }}
+                className="rounded-2xl shadow-lg overflow-hidden border hover:shadow-xl transition-all"
+                style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              >
+                <div className="p-6 cursor-pointer" onClick={() => toggleRow(salary._id)}>
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                    {/* Employee Info */}
+                    <div className="lg:col-span-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500">
+                          <Users size={24} color="white" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-lg" style={{ color: 'var(--text-color)' }}>
+                            {salary.employeeName}
+                          </p>
+                          <p className="text-sm flex items-center gap-2" style={{ color: 'var(--color-secondary)' }}>
+                            <Calendar size={14} />
+                            {formatDate(salary.periodStart)} - {formatDate(salary.periodEnd)}
+                          </p>
+                        </div>
+                      </div>
+        </div>
+
+                    {/* Hours & Pay */}
+                    <div className="lg:col-span-3 grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
+                  {t("finance.salary.totalHours")}
+                        </p>
+                        <p className="text-xl font-bold" style={{ color: 'var(--text-color)' }}>
+                          {salary.totalHours}h
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
+                          {t("finance.salary.totalPay")}
+                        </p>
+                        <p className="text-xl font-bold text-green-600">
+                          {salary.totalPay} ₪
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Bonus & Deductions */}
+                    <div className="lg:col-span-3 grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
+                          {t("finance.salary.bonus")}
+                        </p>
+                        <p className="text-xl font-bold text-blue-600">
+                          +{salary.bonus} ₪
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
+                  {t("finance.salary.taxDeduction")}
+                        </p>
+                        <p className="text-xl font-bold text-red-600">
+                          -{salary.taxDeduction} ₪
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Net Pay & Status */}
+                    <div className="lg:col-span-2">
+                      <p className="text-xs font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
+                        {t("finance.salary.netPay")}
+                      </p>
+                      <p className="text-2xl font-bold text-green-600 mb-2">
+                        {salary.netPay} ₪
+                      </p>
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        salary.status === "Paid" ? 'bg-green-100 text-green-700' :
+                        salary.status === "Approved" ? 'bg-blue-100 text-blue-700' :
+                        salary.status === "Draft" ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {t(`salary.status.${salary.status}`)}
+                      </span>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="lg:col-span-1 flex gap-2 justify-center">
+                      {editingSalary && editingSalary._id === salary._id ? (
+                        <>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); saveEdit(); }}
+                            className="p-2 rounded-lg hover:scale-110 transition-all bg-green-500 text-white"
+                          >
+                            <Save size={20} />
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); cancelEdit(); }}
+                            className="p-2 rounded-lg hover:scale-110 transition-all bg-red-500 text-white"
+                          >
+                            <X size={20} />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleEdit(salary); }}
+                            className="p-2 rounded-lg hover:scale-110 transition-all"
+                            style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
+                          >
+                            <Edit2 size={20} />
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); generatePayslip(salary); }}
+                            className="p-2 rounded-lg hover:scale-110 transition-all"
+                            style={{ backgroundColor: 'var(--color-accent)', color: 'var(--button-text)' }}
+                          >
+                            <Download size={20} />
+                          </button>
+                        </>
+                      )}
+                      {expandedRow === salary._id ? (
+                        <ChevronUp size={24} style={{ color: 'var(--color-primary)' }} />
+                      ) : (
+                        <ChevronDown size={24} style={{ color: 'var(--color-primary)' }} />
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Expanded Details */}
+                {expandedRow === salary._id && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    className="border-t p-6"
+                    style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)', opacity: 0.95 }}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="text-lg font-bold mb-3" style={{ color: 'var(--text-color)' }}>
+                          {t("finance.salary.deductionsDetails")}
+                        </h4>
+                        {salary.otherDeductions && salary.otherDeductions.length > 0 ? (
+                          <div className="space-y-2">
+                            {salary.otherDeductions.map((deduction, idx) => (
+                              <div key={idx} className="flex justify-between p-2 rounded-lg" style={{ backgroundColor: 'var(--border-color)' }}>
+                                <span style={{ color: 'var(--text-color)' }}>{deduction.description}</span>
+                                <span className="font-bold text-red-600">-{deduction.amount} ₪</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p style={{ color: 'var(--color-secondary)' }}>{t("finance.salary.noDeductions")}</p>
+                        )}
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-bold mb-3" style={{ color: 'var(--text-color)' }}>
+                          {t("finance.salary.notes")}
+                        </h4>
+                        <p style={{ color: 'var(--text-color)' }}>
+                          {salary.notes || t("finance.salary.noNotes")}
+                        </p>
+                      </div>
+                          </div>
+                  </motion.div>
+                    )}
+              </motion.div>
+              ))}
         </div>
       )}
 
-      {loading ? (
-        <div className="text-center text-gray-500">{t("salary.loading")}</div>
-      ) : salaries.length === 0 ? (
-        <div className="text-center text-gray-500">
-          {t("salary.noSalariesFound")}
-        </div>
-      ) : (
-        <div className="overflow-x-auto ml-[100px]">
-          <table className="min-w-full bg-white shadow-md rounded-lg">
-            <thead>
-              <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                <th className="py-3 px-6 text-left">{t("salary.employee")}</th>
-                <th className="py-3 px-6 text-left">{t("salary.period")}</th>
-                <th className="py-3 px-6 text-left">
-                  {t("salary.totalHours")}
-                </th>
-                <th className="py-3 px-6 text-left">{t("salary.totalPay")}</th>
-                <th className="py-3 px-6 text-left">{t("salary.bonus")}</th>
-                <th className="py-3 px-6 text-left">
-                  {t("salary.taxDeduction")}
-                </th>
-                <th className="py-3 px-6 text-left">
-                  {t("salary.otherDeductions")}
-                </th>
-                <th className="py-3 px-6 text-left">{t("salary.netPay")}</th>
-                <th className="py-3 px-6 text-left">{t("salary.Status")}</th>
-                <th className="py-3 px-6 text-left">{t("salary.notes")}</th>
-                <th className="py-3 px-6 text-left">{t("salary.actions")}</th>
-              </tr>
-            </thead>
-            <tbody className="text-gray-600 text-sm font-light">
-              {salaries.map((salary) => (
-                <React.Fragment key={salary._id}>
-                  <tr
-                    onClick={() => toggleRow(salary._id)}
-                    className="border-b border-gray-200 hover:bg-gray-100 cursor-pointer"
+        {/* Email Modal */}
+        {showEmailModal && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-60 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            onClick={() => setShowEmailModal(false)}
+          >
+            <motion.div
+              className="rounded-2xl shadow-2xl p-6 max-w-md w-full border"
+              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
+                  <Mail size={28} style={{ color: 'var(--color-primary)' }} />
+                  {isRTL ? "שלח תלושי שכר במייל" : "Send Payslips via Email"}
+                </h2>
+                <button
+                  onClick={() => setShowEmailModal(false)}
+                  className="p-2 rounded-lg hover:scale-110 transition-all"
+                  style={{ backgroundColor: 'var(--color-accent)', color: 'var(--button-text)' }}
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-color)' }}>
+                    {isRTL ? "חודש" : "Month"}
+                  </label>
+                  <select
+                    value={emailMonth}
+                    onChange={(e) => setEmailMonth(parseInt(e.target.value))}
+                    className="w-full p-3 rounded-lg border"
+                    style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
                   >
-                    <td className="py-3 px-6 text-left">
-                      {salary.employeeName}
-                    </td>
-                    <td className="py-3 px-6 text-left">{`${formatDate(
-                      salary.periodStart
-                    )} - ${formatDate(salary.periodEnd)}`}</td>
-                    <td className="py-3 px-6 text-left">
-                      {editingSalary && editingSalary._id === salary._id ? (
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={editingSalary.totalHours}
-                          onChange={(e) => handleInputChange(e, "totalHours")}
-                          className="border p-1 rounded"
-                        />
-                      ) : (
-                        salary.totalHours
-                      )}
-                    </td>
-                    <td className="py-3 px-6 text-left">
-                      {editingSalary && editingSalary._id === salary._id ? (
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={editingSalary.totalPay}
-                          onChange={(e) => handleInputChange(e, "totalPay")}
-                          className="border p-1 rounded"
-                        />
-                      ) : (
-                        `${formatCurrency(salary.currency)}${salary.totalPay}`
-                      )}
-                    </td>
-                    <td className="py-3 px-6 text-left">
-                      {editingSalary && editingSalary._id === salary._id ? (
-                        <input
-                          type="number"
-                          step="any"
-                          value={editingSalary.bonus || 0}
-                          onChange={(e) => handleInputChange(e, "bonus")}
-                          className="border p-1 rounded"
-                        />
-                      ) : (
-                        `${formatCurrency(salary.currency)}${salary.bonus}`
-                      )}
-                    </td>
-                    <td className="py-3 px-6 text-left">
-                      {editingSalary && editingSalary._id === salary._id ? (
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={editingSalary.taxDeduction || 0}
-                          onChange={(e) => handleInputChange(e, "taxDeduction")}
-                          className="border p-1 rounded"
-                        />
-                      ) : (
-                        `${formatCurrency(salary.currency)}${
-                          salary.taxDeduction
-                        }`
-                      )}
-                    </td>
-                    <td className="py-3 px-6 text-left">
-                      {salary.otherDeductions &&
-                      salary.otherDeductions.length > 0
-                        ? t("salary.clickForDetails")
-                        : "-"}
-                    </td>
-                    <td className="py-3 px-6 text-left">
-                      {editingSalary && editingSalary._id === salary._id ? (
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={editingSalary.netPay}
-                          onChange={(e) => handleInputChange(e, "netPay")}
-                          className="border p-1 rounded"
-                        />
-                      ) : (
-                        `${formatCurrency(salary.currency)}${salary.netPay}`
-                      )}
-                    </td>
-                    <td className="py-3 px-6 text-left">
-                      {editingSalary && editingSalary._id === salary._id ? (
-                        <select
-                          value={editingSalary.status}
-                          onChange={(e) => handleInputChange(e, "status")}
-                          className="border p-1 rounded"
-                        >
-                          <option value="Draft">
-                            {t("salary.status.Draft")}
-                          </option>
-                          <option value="Approved">
-                            {t("salary.status.Approved")}
-                          </option>
-                          <option value="Paid">
-                            {t("salary.status.Paid")}
-                          </option>
-                          <option value="Canceled">
-                            {t("salary.status.Canceled")}
-                          </option>
-                        </select>
-                      ) : (
-                        formatStatus(salary.status)
-                      )}
-                    </td>
-                    <td className="py-3 px-6 text-left">
-                      {editingSalary && editingSalary._id === salary._id ? (
-                        <input
-                          type="text"
-                          value={editingSalary.notes || ""}
-                          onChange={(e) => handleInputChange(e, "notes")}
-                          className="border p-1 rounded"
-                        />
-                      ) : (
-                        salary.notes || "-"
-                      )}
-                    </td>
-                    <td className="py-3 px-6 text-left">
-                      <div className="flex items-center gap-2">
-                        {editingSalary && editingSalary._id === salary._id ? (
-                          <>
-                            <button
-                              onClick={saveEdit}
-                              className="bg-green-500 text-white px-2 py-1 rounded"
-                            >
-                              {t("salary.save")}
-                            </button>
-                            <button
-                              onClick={cancelEdit}
-                              className="bg-red-500 text-white px-2 py-1 rounded"
-                            >
-                              {t("salary.cancel")}
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <FaEdit
-                              className="text-blue-500 cursor-pointer"
-                              onClick={() => handleEdit(salary)}
-                            />
-                            <FaFilePdf
-                              className={`text-red-500 cursor-pointer ${
-                                !salary.taxDeduction ||
-                                !salary.otherDeductions.length
-                                  ? "opacity-50 cursor-not-allowed"
-                                  : ""
-                              }`}
-                              onClick={() =>
-                                salary.taxDeduction &&
-                                salary.otherDeductions.length
-                                  ? generatePayslip(salary)
-                                  : null
-                              }
-                            />
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                  {expandedRow === salary._id &&
-                    salary.otherDeductions &&
-                    salary.otherDeductions.length > 0 && (
-                      <tr>
-                        <td colSpan="11" className="bg-gray-50 p-4">
-                          <div className="border rounded-lg p-4 bg-white shadow-sm">
-                            <h3 className="text-lg font-semibold mb-2">
-                              {t("salary.deductionDetails")}
-                            </h3>
-                            <table className="w-full text-sm">
-                              <thead>
-                                <tr className="bg-gray-100">
-                                  <th className="py-2 px-4 text-left">
-                                    {t("salary.description")}
-                                  </th>
-                                  <th className="py-2 px-4 text-left">
-                                    {t("salary.amount")}
-                                  </th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {salary.otherDeductions.map(
-                                  (deduction, index) => (
-                                    <tr
-                                      key={index}
-                                      className="border-b border-gray-200"
-                                    >
-                                      <td className="py-2 px-4 text-left">
-                                        {deduction.description}
-                                      </td>
-                                      <td className="py-2 px-4 text-left">
-                                        {formatCurrency(salary.currency)}
-                                        {deduction.amount}
-                                      </td>
-                                    </tr>
-                                  )
-                                )}
-                              </tbody>
-                            </table>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((m) => (
+                      <option key={m} value={m}>
+                        {isRTL ? `חודש ${m}` : `Month ${m}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-color)' }}>
+                    {isRTL ? "שנה" : "Year"}
+                  </label>
+                  <input
+                    type="number"
+                    value={emailYear}
+                    onChange={(e) => setEmailYear(parseInt(e.target.value))}
+                    className="w-full p-3 rounded-lg border"
+                    style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
+                    min="2020"
+                    max="2100"
+                  />
+                </div>
+                
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={() => setShowEmailModal(false)}
+                    className="flex-1 p-3 rounded-lg font-semibold transition-all"
+                    style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
+                  >
+                    {isRTL ? "ביטול" : "Cancel"}
+                  </button>
+                  <button
+                    onClick={sendPayslipEmails}
+                    disabled={sendingEmails}
+                    className="flex-1 p-3 rounded-lg font-semibold transition-all hover:scale-105 disabled:opacity-50"
+                    style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
+                  >
+                    {sendingEmails ? (isRTL ? "שולח..." : "Sending...") : (isRTL ? "שלח" : "Send")}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
       )}
+
+        {/* Payslip Modal */}
+        {showPayslipModal && (
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-60 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            onClick={closePayslipModal}
+          >
+            <motion.div
+              className="rounded-2xl shadow-2xl p-6 max-w-4xl w-full border"
+              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
+                  <FileText size={28} style={{ color: 'var(--color-primary)' }} />
+                  {t("finance.salary.payslip")}
+                </h2>
+                <button
+                  onClick={closePayslipModal}
+                  className="p-2 rounded-lg hover:scale-110 transition-all"
+                  style={{ backgroundColor: 'var(--color-accent)', color: 'var(--button-text)' }}
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              <iframe
+                src={payslipUrl}
+                className="w-full h-96 border rounded-xl"
+                style={{ borderColor: 'var(--border-color)' }}
+                title={t("finance.salary.payslipPreview")}
+              />
+              <div className="flex justify-end gap-4 mt-6">
+                {payslipUrl && (
+                  <button
+                    onClick={() => {
+                      // Create download link
+                      const currentSalary = salaries.find(s => s._id === expandedRow);
+                      const fileName = `payslip_${currentSalary?.employeeName?.replace(/\s+/g, "_") || "employee"}_${formatDate(currentSalary?.periodStart || new Date()).replace(/\//g, "_")}.pdf`;
+                      
+                      // Fetch the PDF blob and download
+                      fetch(payslipUrl)
+                        .then(res => res.blob())
+                        .then(blob => {
+                          const url = window.URL.createObjectURL(blob);
+                          const link = document.createElement('a');
+                          link.href = url;
+                          link.download = fileName;
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                          window.URL.revokeObjectURL(url);
+                        })
+                        .catch(err => {
+                          console.error("Error downloading PDF:", err);
+                          toast.error("שגיאה בהורדת התלוש");
+                        });
+                    }}
+                  className="px-6 py-3 rounded-xl font-bold transition-all hover:scale-105 flex items-center gap-2"
+                  style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
+                >
+                  <Download size={20} />
+                  {t("finance.salary.downloadPDF")}
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </div>
     </div>
   );
 };
 
 export default Salary;
+
+

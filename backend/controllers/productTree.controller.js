@@ -72,26 +72,59 @@ export const getProductTreeById = async (req, res) => {
 
 export const updateProductTree = async (req, res) => {
   try {
-    const { companyId, productId, components, notes } = req.body;
+    const token = req.cookies["auth_token"];
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const companyId = decodedToken.companyId;
+
+    const { components, notes } = req.body;
+
+    if (!components || !Array.isArray(components)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Components array is required" 
+      });
+    }
 
     const productTree = await ProductTree.findById(req.params.id);
     if (!productTree) {
-      return res.status(404).json({ message: "Product tree not found" });
+      return res.status(404).json({ 
+        success: false, 
+        message: "Product tree not found" 
+      });
     }
 
-    productTree.companyId = companyId || productTree.companyId;
-    productTree.productId = productId || productTree.productId;
-    productTree.components = components || productTree.components;
-    productTree.notes = notes || productTree.notes;
+    // Verify companyId matches
+    if (productTree.companyId.toString() !== companyId.toString()) {
+      return res.status(403).json({ 
+        success: false, 
+        message: "Unauthorized access to this product tree" 
+      });
+    }
 
+    // Update components and notes
+    // Allow empty array to clear BOM
+    productTree.components = components;
+    if (notes !== undefined) {
+      productTree.notes = notes;
+    }
+
+    // Recalculate total cost (will be 0 if components is empty)
     productTree.totalCost = components.reduce((sum, comp) => {
-      return sum + (comp.unitCost || 0) * comp.quantity;
+      return sum + (comp.unitCost || 0) * (comp.quantity || 0);
     }, 0);
 
     await productTree.save();
-    res.status(200).json(productTree);
+    res.status(200).json({ success: true, data: productTree });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error updating product tree:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message 
+    });
   }
 };
 

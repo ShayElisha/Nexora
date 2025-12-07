@@ -1,7 +1,24 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
+import {
+  Percent,
+  Plus,
+  Edit2,
+  Trash2,
+  Clock,
+  Calendar,
+  TrendingUp,
+  DollarSign,
+  Settings,
+  CheckCircle,
+  XCircle,
+  Info,
+  Save,
+  X as XIcon,
+} from "lucide-react";
 
 const JobPercentages = () => {
   const { t } = useTranslation();
@@ -136,13 +153,10 @@ const JobPercentages = () => {
       };
 
       if (isEditing) {
-        const response = await axiosInstance.put(
-          `/payRate/${editingPayRateId}`,
-          payload
-        );
+        await axiosInstance.put(`/payRate/${editingPayRateId}`, payload);
         toast.success(t("jobPercentages.payRateUpdated"));
       } else {
-        const response = await axiosInstance.post(`/payRate`, payload);
+        await axiosInstance.post(`/payRate`, payload);
         toast.success(t("jobPercentages.payRateCreated"));
       }
 
@@ -185,7 +199,6 @@ const JobPercentages = () => {
     });
     setIsEditing(true);
     setEditingPayRateId(rate._id);
-
     toast(t("jobPercentages.editMode"));
   };
 
@@ -202,52 +215,98 @@ const JobPercentages = () => {
     }
   };
 
-  return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white shadow-md rounded-lg p-6 mb-8">
-        <h2 className="text-2xl font-bold mb-6 text-center">
-          {isEditing
-            ? t("jobPercentages.updatePayRate")
-            : t("jobPercentages.createPayRate")}
-        </h2>
+  const cardVariant = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+  const getRateColor = (rateType) => {
+    const colors = {
+      Regular: "#3b82f6",
+      Overtime125: "#f59e0b",
+      Overtime150: "#ef4444",
+      Night: "#6366f1",
+      Holiday: "#ec4899",
+      RestDay: "#14b8a6",
+      Custom: "#8b5cf6",
+    };
+    return colors[rateType] || "#6b7280";
+  };
+
+  return (
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="flex items-center gap-4 mb-4">
+            <div 
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-indigo-600"
+            >
+              <Percent size={28} color="white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
+                {t("jobPercentages.title")}
+              </h1>
+              <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
+                {t("jobPercentages.managePayRates")}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Form Section */}
+        <motion.div
+          className="mb-8 rounded-2xl shadow-lg p-6 lg:p-8 border"
+          style={{ 
+            backgroundColor: 'var(--bg-color)',
+            borderColor: 'var(--border-color)'
+          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <Settings size={24} style={{ color: 'var(--color-primary)' }} />
+            <h2 className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
+              {isEditing ? t("jobPercentages.updatePayRate") : t("jobPercentages.createPayRate")}
+        </h2>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Rate Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
               {t("jobPercentages.rateType")}
             </label>
             <select
               name="rateType"
               value={formData.rateType}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="Regular">
-                {t("jobPercentages.rateTypes.Regular")}
+                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 transition-all"
+                  style={{ 
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-color)',
+                    color: 'var(--text-color)'
+                  }}
+                >
+                  {["Regular", "Overtime125", "Overtime150", "Night", "Holiday", "RestDay", "Custom"].map(type => (
+                    <option key={type} value={type}>
+                      {t(`jobPercentages.rateTypes.${type}`)}
               </option>
-              <option value="Overtime125">
-                {t("jobPercentages.rateTypes.Overtime125")}
-              </option>
-              <option value="Overtime150">
-                {t("jobPercentages.rateTypes.Overtime150")}
-              </option>
-              <option value="Night">
-                {t("jobPercentages.rateTypes.Night")}
-              </option>
-              <option value="Holiday">
-                {t("jobPercentages.rateTypes.Holiday")}
-              </option>
-              <option value="RestDay">
-                {t("jobPercentages.rateTypes.RestDay")}
-              </option>
-              <option value="Custom">
-                {t("jobPercentages.rateTypes.Custom")}
-              </option>
+                  ))}
             </select>
           </div>
 
+              {/* Multiplier */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <TrendingUp className="inline mr-2" size={16} />
               {t("jobPercentages.multiplier")}
             </label>
             <input
@@ -257,13 +316,20 @@ const JobPercentages = () => {
               onChange={handleChange}
               step="0.01"
               min="1"
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={t("jobPercentages.multiplierPlaceholder")}
+                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  style={{ 
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-color)',
+                    color: 'var(--text-color)'
+                  }}
+                  placeholder="1.0"
             />
           </div>
 
+              {/* Full Time Hours */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <Clock className="inline mr-2" size={16} />
               {t("jobPercentages.fullTimeHours")}
             </label>
             <input
@@ -273,18 +339,25 @@ const JobPercentages = () => {
               onChange={handleChange}
               step="0.1"
               min="0"
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={t("jobPercentages.fullTimeHoursPlaceholder")}
+                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  style={{ 
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-color)',
+                    color: 'var(--text-color)'
+                  }}
+                  placeholder="42.0"
             />
             {formData.rateType === "Regular" && !formData.fullTimeHours && (
-              <p className="text-sm text-yellow-600 mt-1">
+                  <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
+                    <Info size={12} />
                 {t("jobPercentages.fullTimeHoursRecommended")}
               </p>
             )}
           </div>
 
+              {/* Hours Threshold */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
               {t("jobPercentages.hoursThreshold")}
             </label>
             <input
@@ -294,47 +367,60 @@ const JobPercentages = () => {
               onChange={handleChange}
               step="0.1"
               min="0"
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={t("jobPercentages.hoursThresholdPlaceholder")}
-            />
-            {["Overtime125", "Overtime150"].includes(formData.rateType) &&
-              !formData.hoursThreshold && (
-                <p className="text-sm text-yellow-600 mt-1">
-                  {t("jobPercentages.hoursThresholdRecommended")}
-                </p>
-              )}
+                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  style={{ 
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-color)',
+                    color: 'var(--text-color)'
+                  }}
+                  placeholder="0"
+                />
           </div>
 
+              {/* Start Time */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <Clock className="inline mr-2" size={16} />
               {t("jobPercentages.startTime")}
             </label>
             <input
-              type="text"
+                  type="time"
               name="workHours.startTime"
               value={formData.workHours.startTime}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={t("jobPercentages.startTimePlaceholder")}
+                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  style={{ 
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-color)',
+                    color: 'var(--text-color)'
+                  }}
             />
           </div>
 
+              {/* End Time */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <Clock className="inline mr-2" size={16} />
               {t("jobPercentages.endTime")}
             </label>
             <input
-              type="text"
+                  type="time"
               name="workHours.endTime"
               value={formData.workHours.endTime}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={t("jobPercentages.endTimePlaceholder")}
+                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  style={{ 
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-color)',
+                    color: 'var(--text-color)'
+                  }}
             />
           </div>
 
+              {/* Work Days Per Week */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <Calendar className="inline mr-2" size={16} />
               {t("jobPercentages.workDaysPerWeek")}
             </label>
             <input
@@ -344,45 +430,91 @@ const JobPercentages = () => {
               onChange={handleChange}
               min="1"
               max="7"
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={t("jobPercentages.workDaysPerWeekPlaceholder")}
+                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  style={{ 
+                    borderColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-color)',
+                    color: 'var(--text-color)'
+                  }}
+                  placeholder="5"
             />
           </div>
 
+              {/* Calculated Job Percentage Display */}
+              <div>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <Percent className="inline mr-2" size={16} />
+                  {t("jobPercentages.calculatedPercentage")}
+                </label>
+                <div 
+                  className="w-full p-3 border rounded-xl font-bold text-2xl text-center"
+                  style={{ 
+                    borderColor: 'var(--color-primary)',
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--button-text)'
+                  }}
+                >
+                  {jobPercentage}%
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
               {t("jobPercentages.description")}
             </label>
             <textarea
               name="description"
               value={formData.description}
               onChange={handleChange}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                style={{ 
+                  borderColor: 'var(--border-color)',
+                  backgroundColor: 'var(--bg-color)',
+                  color: 'var(--text-color)'
+                }}
               placeholder={t("jobPercentages.descriptionPlaceholder")}
-              rows="4"
+                rows="3"
             />
           </div>
 
-          <div className="flex items-center">
+            {/* Is Active Checkbox */}
+            <div className="flex items-center gap-3 p-4 rounded-xl border" style={{ borderColor: 'var(--border-color)' }}>
             <input
               type="checkbox"
               name="isActive"
               checked={formData.isActive}
               onChange={handleChange}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label className="ml-2 text-sm font-medium text-gray-700">
-              {t("jobPercentages.isActive")}
+                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label className="text-sm font-medium" style={{ color: 'var(--text-color)' }}>
+                {formData.isActive ? (
+                  <span className="flex items-center gap-2 text-green-600">
+                    <CheckCircle size={18} />
+                    {t("jobPercentages.active")}
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2 text-gray-500">
+                    <XCircle size={18} />
+                    {t("jobPercentages.inactive")}
+                  </span>
+                )}
             </label>
           </div>
 
+            {/* Submit Buttons */}
+            <div className="flex gap-4">
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            {isEditing
-              ? t("jobPercentages.updatePayRate")
-              : t("jobPercentages.createPayRate")}
+                className="flex-1 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 hover:scale-105 shadow-lg"
+                style={{
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--button-text)'
+                }}
+              >
+                {isEditing ? <Save size={20} /> : <Plus size={20} />}
+                {isEditing ? t("jobPercentages.updatePayRate") : t("jobPercentages.createPayRate")}
           </button>
 
           {isEditing && (
@@ -404,32 +536,57 @@ const JobPercentages = () => {
                 });
                 setIsEditing(false);
                 setEditingPayRateId(null);
-
                 toast(t("jobPercentages.cancelled"));
               }}
-              className="w-full bg-gray-300 text-gray-700 p-2 rounded-md hover:bg-gray-400 mt-2"
-            >
+                  className="px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 hover:scale-105"
+                  style={{
+                    backgroundColor: 'var(--color-accent)',
+                    color: 'var(--button-text)'
+                  }}
+                >
+                  <XIcon size={20} />
               {t("jobPercentages.cancel")}
             </button>
           )}
+            </div>
         </form>
-      </div>
+        </motion.div>
 
-      <div>
-        <h3 className="text-xl font-semibold mb-4">
+        {/* Existing Pay Rates */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          <h3 className="text-2xl font-bold mb-6 flex items-center gap-3" style={{ color: 'var(--text-color)' }}>
+            <DollarSign size={28} style={{ color: 'var(--color-primary)' }} />
           {t("jobPercentages.existingPayRates")}
         </h3>
+
         {loading ? (
-          <div className="text-center text-gray-500">
-            {t("jobPercentages.loading")}
+            <div className="flex items-center justify-center h-64">
+              <motion.div
+                className="w-16 h-16 border-4 border-t-4 rounded-full"
+                style={{ borderColor: 'var(--border-color)', borderTopColor: 'var(--color-primary)' }}
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 1 }}
+              />
           </div>
         ) : payRates.length === 0 ? (
-          <div className="text-center text-gray-500">
+            <motion.div
+              className="text-center py-16 rounded-2xl shadow-lg"
+              style={{ backgroundColor: 'var(--bg-color)' }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <Percent size={64} className="mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
+              <p className="text-xl font-semibold" style={{ color: 'var(--text-color)' }}>
             {t("jobPercentages.noPayRatesFound")}
-          </div>
+              </p>
+            </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {payRates.map((rate) => {
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {payRates.map((rate, index) => {
               const rateDailyHours = calculateDailyHours(
                 rate.workHours?.startTime,
                 rate.workHours?.endTime
@@ -439,115 +596,169 @@ const JobPercentages = () => {
                 rate.workDaysPerWeek,
                 rate.fullTimeHours
               );
+
               return (
-                <div
-                  key={rate._id}
-                  className={`p-4 border rounded-lg shadow-sm ${
-                    rate.isActive ? "bg-green-50" : "bg-gray-100"
-                  } relative`}
-                >
-                  <div className="absolute top-2 right-2 flex space-x-2">
+                  <motion.div
+                    key={rate._id}
+                    variants={cardVariant}
+                    initial="hidden"
+                    animate="visible"
+                    transition={{ delay: index * 0.1 }}
+                    className={`rounded-2xl shadow-lg p-6 border-2 hover:shadow-xl transition-all relative ${
+                      rate.isActive ? '' : 'opacity-60'
+                    }`}
+                    style={{ 
+                      backgroundColor: 'var(--bg-color)',
+                      borderColor: getRateColor(rate.rateType)
+                    }}
+                    whileHover={{ y: -5, scale: 1.02 }}
+                  >
+                    {/* Header with Actions */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div 
+                        className="px-4 py-2 rounded-xl font-bold text-white shadow-lg"
+                        style={{ backgroundColor: getRateColor(rate.rateType) }}
+                      >
+                        {t(`jobPercentages.rateTypes.${rate.rateType}`)}
+                      </div>
+                      <div className="flex gap-2">
                     <button
                       onClick={() => handleEdit(rate)}
-                      className="text-blue-600 hover:text-blue-800"
+                          className="p-2 rounded-lg hover:scale-110 transition-all"
+                          style={{ backgroundColor: '#3b82f6', color: 'white' }}
                       title={t("jobPercentages.editPayRate")}
                     >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                        />
-                      </svg>
+                          <Edit2 size={18} />
                     </button>
                     <button
                       onClick={() => handleDelete(rate._id)}
-                      className="text-red-600 hover:text-red-800"
+                          className="p-2 rounded-lg hover:scale-110 transition-all"
+                          style={{ backgroundColor: '#ef4444', color: 'white' }}
                       title={t("jobPercentages.deactivatePayRate")}
                     >
-                      <svg
-                        className="w-5 h-5"
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Job Percentage Circle */}
+                    <div className="flex items-center justify-center mb-6">
+                      <div className="relative w-32 h-32">
+                        <svg className="w-32 h-32 transform -rotate-90">
+                          <circle
+                            cx="64"
+                            cy="64"
+                            r="56"
+                            stroke="var(--border-color)"
+                            strokeWidth="8"
+                            fill="none"
+                          />
+                          <circle
+                            cx="64"
+                            cy="64"
+                            r="56"
+                            stroke={getRateColor(rate.rateType)}
+                            strokeWidth="8"
                         fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
+                            strokeDasharray={`${(rateJobPercentage / 100) * 352} 352`}
                           strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M6 18L18 6M6 6l12 12"
                         />
                       </svg>
-                    </button>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <Percent size={20} style={{ color: 'var(--color-secondary)' }} />
+                          <span className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
+                            {rateJobPercentage || 0}%
+                          </span>
+                        </div>
+                      </div>
                   </div>
-                  <h4 className="text-lg font-medium text-gray-800">
-                    {t(`jobPercentages.rateTypes.${rate.rateType}`)}
-                  </h4>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold">
+
+                    {/* Details */}
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center p-2 rounded-lg" style={{ backgroundColor: 'var(--bg-color)' }}>
+                        <span className="text-sm font-medium" style={{ color: 'var(--color-secondary)' }}>
                       {t("jobPercentages.multiplier")}:
-                    </span>{" "}
-                    {rate.multiplier.toFixed(2)}x
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold">
+                        </span>
+                        <span className="font-bold text-lg" style={{ color: 'var(--text-color)' }}>
+                          x{rate.multiplier.toFixed(2)}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between items-center p-2 rounded-lg" style={{ backgroundColor: 'var(--bg-color)' }}>
+                        <span className="text-sm font-medium" style={{ color: 'var(--color-secondary)' }}>
                       {t("jobPercentages.fullTimeHours")}:
-                    </span>{" "}
+                        </span>
+                        <span className="font-semibold" style={{ color: 'var(--text-color)' }}>
                     {rate.fullTimeHours ? rate.fullTimeHours.toFixed(1) : "-"}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold">
-                      {t("jobPercentages.hoursThreshold")}:
-                    </span>{" "}
-                    {rate.hoursThreshold ? rate.hoursThreshold.toFixed(1) : "-"}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold">
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between items-center p-2 rounded-lg" style={{ backgroundColor: 'var(--bg-color)' }}>
+                        <span className="text-sm font-medium" style={{ color: 'var(--color-secondary)' }}>
                       {t("jobPercentages.workHours")}:
-                    </span>{" "}
+                        </span>
+                        <span className="font-semibold" style={{ color: 'var(--text-color)' }}>
                     {rate.workHours?.startTime && rate.workHours?.endTime
                       ? `${rate.workHours.startTime} - ${rate.workHours.endTime}`
                       : "-"}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold">
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between items-center p-2 rounded-lg" style={{ backgroundColor: 'var(--bg-color)' }}>
+                        <span className="text-sm font-medium" style={{ color: 'var(--color-secondary)' }}>
                       {t("jobPercentages.workDaysPerWeek")}:
-                    </span>{" "}
-                    {rate.workDaysPerWeek || "-"}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold">
-                      {t("jobPercentages.jobPercentage")}:
-                    </span>{" "}
-                    {rateJobPercentage ? `${rateJobPercentage}%` : "-"}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold">
-                      {t("jobPercentages.description")}:
-                    </span>{" "}
-                    {rate.description || "-"}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold">
-                      {t("jobPercentages.status")}:
-                    </span>{" "}
-                    {rate.isActive
-                      ? t("jobPercentages.active")
-                      : t("jobPercentages.inactive")}
+                        </span>
+                        <span className="font-semibold" style={{ color: 'var(--text-color)' }}>
+                          {rate.workDaysPerWeek || "-"} {t("jobPercentages.days")}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between items-center p-2 rounded-lg" style={{ backgroundColor: 'var(--bg-color)' }}>
+                        <span className="text-sm font-medium" style={{ color: 'var(--color-secondary)' }}>
+                          {t("jobPercentages.dailyHours")}:
+                        </span>
+                        <span className="font-semibold" style={{ color: 'var(--text-color)' }}>
+                          {rateDailyHours.toFixed(1)} {t("jobPercentages.hours")}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    {rate.description && (
+                      <div className="mt-4 p-3 rounded-lg border-l-4" style={{ 
+                        backgroundColor: 'var(--bg-color)',
+                        borderLeftColor: getRateColor(rate.rateType)
+                      }}>
+                        <p className="text-sm" style={{ color: 'var(--text-color)' }}>
+                          {rate.description}
                   </p>
                 </div>
+                    )}
+
+                    {/* Status Badge */}
+                    <div className="mt-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 w-fit ${
+                        rate.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {rate.isActive ? (
+                          <>
+                            <CheckCircle size={14} />
+                            {t("jobPercentages.active")}
+                          </>
+                        ) : (
+                          <>
+                            <XCircle size={14} />
+                            {t("jobPercentages.inactive")}
+                          </>
+                        )}
+                      </span>
+                    </div>
+                  </motion.div>
               );
             })}
           </div>
         )}
+        </motion.div>
       </div>
     </div>
   );

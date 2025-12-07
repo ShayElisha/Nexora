@@ -11,7 +11,7 @@ const DepartmentSchema = new mongoose.Schema(
     name: {
       type: String,
       required: [true, "Department name is required"],
-      unique: true,
+      trim: true,
     },
     description: {
       type: String,
@@ -44,11 +44,20 @@ const DepartmentSchema = new mongoose.Schema(
         },
       },
     ],
+    // לידים קשורים למחלקה
+    leadIds: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Lead",
+      },
+    ],
   },
   {
     timestamps: true,
   }
 );
+
+DepartmentSchema.index({ companyId: 1, name: 1 }, { unique: true });
 
 const Department =
   mongoose.models.Department || mongoose.model("Department", DepartmentSchema);

@@ -2,7 +2,22 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
-import { useTranslation } from "react-i18next"; 
+import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
+import { 
+  Truck, 
+  Mail, 
+  Phone, 
+  User, 
+  Star, 
+  Edit, 
+  FileText, 
+  TrendingUp,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  Plus
+} from "lucide-react"; 
 const SupplierList = () => {
   const { t, i18n } = useTranslation();
   const direction = i18n.dir(); // "rtl" or "ltr"
@@ -170,11 +185,18 @@ const SupplierList = () => {
           <button
             key={i}
             onClick={() => paginate(i)}
-            className={`px-3 py-1 rounded-full mx-1 ${
-              currentPage === i
-                ? "bg-button-bg text-button-text"
-                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
-            }`}
+                    className="min-w-[40px] px-4 py-2 rounded-xl font-semibold transition-all duration-200 hover:scale-105"
+                    style={
+                      currentPage === i
+                        ? {
+                            background: "linear-gradient(to right, #6366f1, #a855f7)",
+                            color: "var(--button-text)",
+                          }
+                        : {
+                            backgroundColor: "var(--border-color)",
+                            color: "var(--text-color)",
+                          }
+                    }
           >
             {i}
           </button>
@@ -189,10 +211,10 @@ const SupplierList = () => {
           <button
             key={1}
             onClick={() => paginate(1)}
-            className={`px-3 py-1 rounded-full mx-1 ${
+            className={`min-w-[40px] px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
               currentPage === 1
-                ? "bg-button-bg text-button-text"
-                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md scale-105"
+                : "bg-white text-gray-700 hover:bg-gray-100 shadow-sm"
             }`}
           >
             1
@@ -212,11 +234,18 @@ const SupplierList = () => {
           <button
             key={i}
             onClick={() => paginate(i)}
-            className={`px-3 py-1 rounded-full mx-1 ${
-              currentPage === i
-                ? "bg-button-bg text-button-text"
-                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
-            }`}
+                    className="min-w-[40px] px-4 py-2 rounded-xl font-semibold transition-all duration-200 hover:scale-105"
+                    style={
+                      currentPage === i
+                        ? {
+                            background: "linear-gradient(to right, #6366f1, #a855f7)",
+                            color: "var(--button-text)",
+                          }
+                        : {
+                            backgroundColor: "var(--border-color)",
+                            color: "var(--text-color)",
+                          }
+                    }
           >
             {i}
           </button>
@@ -226,7 +255,7 @@ const SupplierList = () => {
       if (endPage < totalPages) {
         if (endPage < totalPages - 1) {
           pageNumbers.push(
-            <span key="end-dots" className="mx-1">
+            <span key="end-dots" className="px-2 text-gray-400 font-bold">
               ...
             </span>
           );
@@ -235,10 +264,10 @@ const SupplierList = () => {
           <button
             key={totalPages}
             onClick={() => paginate(totalPages)}
-            className={`px-3 py-1 rounded-full mx-1 ${
+            className={`min-w-[40px] px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
               currentPage === totalPages
-                ? "bg-button-bg text-button-text"
-                : "bg-accent text-text hover:bg-secondary hover:text-button-text"
+                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md scale-105"
+                : "bg-white text-gray-700 hover:bg-gray-100 shadow-sm"
             }`}
           >
             {totalPages}
@@ -268,113 +297,277 @@ const SupplierList = () => {
     );
   }
 
+  // Calculate stats
+  const totalSuppliers = suppliers.length;
+  const activeSuppliers = suppliers.filter(s => s.IsActive).length;
+  const inactiveSuppliers = suppliers.filter(s => !s.IsActive).length;
+  const avgRating = suppliers.length > 0 
+    ? (suppliers.reduce((sum, s) => sum + (parseFloat(s.Rating) || 0), 0) / suppliers.length).toFixed(1)
+    : 0;
+
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-      <div
-        className="flex flex-col md:flex-row w-full min-h-screen text-text animate-fade-in"
-        dir={direction}
-      >
-        <div className="flex-1 py-12 px-6">
-          <h2 className="text-3xl font-extrabold text-text mb-6 text-center tracking-tight drop-shadow-md">
-            {t("supplier.list_title")}
-          </h2>
-          {error && (
-            <p className="text-red-500 text-center mb-6 font-medium bg-accent p-4 rounded-lg shadow-sm border border-border-color">
-              {error}
-            </p>
-          )}
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }} dir={direction}>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-indigo-500 to-purple-600">
+              <Truck size={28} color="white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: "var(--text-color)" }}>
+                {t("supplier.list_title")}
+              </h1>
+              <p className="text-lg" style={{ color: "var(--color-secondary)" }}>
+                {t("supplier.list_title")}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Error Alert */}
+        {error && (
+          <motion.div
+            className="mb-6 rounded-xl p-4 flex items-start gap-3 shadow-md border"
+            style={{
+              backgroundColor: "rgba(239, 68, 68, 0.1)",
+              borderColor: "rgba(239, 68, 68, 0.3)",
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <AlertCircle className="flex-shrink-0 mt-0.5" size={24} style={{ color: "#ef4444" }} />
+            <div>
+              <h3 className="font-semibold mb-1" style={{ color: "#991b1b" }}>שגיאה</h3>
+              <p style={{ color: "#dc2626" }}>{error}</p>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <motion.div
+            className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
+            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium mb-1" style={{ color: "var(--color-secondary)" }}>סה"כ ספקים</p>
+                <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>{totalSuppliers}</p>
+              </div>
+              <div className="p-3 rounded-full" style={{ backgroundColor: "rgba(99, 102, 241, 0.1)" }}>
+                <Truck style={{ color: "#6366f1" }} size={24} />
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
+            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium mb-1" style={{ color: "var(--color-secondary)" }}>ספקים פעילים</p>
+                <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>{activeSuppliers}</p>
+              </div>
+              <div className="p-3 rounded-full" style={{ backgroundColor: "rgba(34, 197, 94, 0.1)" }}>
+                <CheckCircle style={{ color: "#22c55e" }} size={24} />
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
+            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium mb-1" style={{ color: "var(--color-secondary)" }}>ספקים לא פעילים</p>
+                <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>{inactiveSuppliers}</p>
+              </div>
+              <div className="p-3 rounded-full" style={{ backgroundColor: "rgba(239, 68, 68, 0.1)" }}>
+                <XCircle style={{ color: "#ef4444" }} size={24} />
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
+            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium mb-1" style={{ color: "var(--color-secondary)" }}>דירוג ממוצע</p>
+                <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>{avgRating}</p>
+              </div>
+              <div className="p-3 rounded-full" style={{ backgroundColor: "rgba(234, 179, 8, 0.1)" }}>
+                <Star style={{ color: "#eab308" }} size={24} />
+              </div>
+            </div>
+          </motion.div>
+        </div>
           {suppliers.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {currentSuppliers.map((supplier) => (
-                  <div
+                  <motion.div
                     key={supplier._id}
-                    className="relative bg-bg rounded-xl p-6 shadow-lg hover:scale-105 hover:shadow-neutral-800 hover:shadow-2xl transition-transform duration-300 border border-border-color"
+                    className="relative rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
+                    style={{
+                      backgroundColor: "var(--bg-color)",
+                      borderColor: "var(--border-color)",
+                    }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
                   >
+                    {/* Status Badge */}
+                    <div className="absolute top-4 left-4">
+                      <span
+                        className="px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1"
+                        style={
+                          supplier.IsActive
+                            ? { backgroundColor: "rgba(34, 197, 94, 0.1)", color: "#16a34a" }
+                            : { backgroundColor: "rgba(239, 68, 68, 0.1)", color: "#dc2626" }
+                        }
+                      >
+                        {supplier.IsActive ? <CheckCircle size={12} /> : <XCircle size={12} />}
+                        {supplier.IsActive ? 'פעיל' : 'לא פעיל'}
+                      </span>
+                    </div>
+
+                    {/* Attachments Button */}
                     <button
                       onClick={() => openAttachmentsModal(supplier)}
-                      className="absolute top-2 p-2 bg-bg rounded-full shadow-md hover:bg-secondary hover:text-button-text transition-all duration-200 transform hover:scale-110"
-                      style={
-                        direction === "rtl" ? { left: "8px" } : { right: "8px" }
-                      }
+                      className="absolute top-4 right-4 p-2 rounded-lg transition-all duration-200 transform hover:scale-110"
+                      style={{
+                        backgroundColor: "var(--border-color)",
+                        color: "var(--text-color)",
+                      }}
                       title={t("supplier.view_attachments")}
                     >
-                      📄
+                      <FileText size={18} />
                     </button>
-                    <h3 className="text-primary font-semibold text-lg mb-3 tracking-tight">
-                      {supplier.SupplierName}
-                    </h3>
-                    <p className="text-text text-sm">
-                      {t("supplier.contact")}:{" "}
-                      {supplier.Contact || t("supplier.not_available")}
-                    </p>
-                    <p className="text-text text-sm">
-                      {t("supplier.email")}:{" "}
-                      {supplier.Email || t("supplier.not_available")}
-                    </p>
-                    <p className="text-text text-sm">
-                      {t("supplier.phone")}:{" "}
-                      {supplier.Phone || t("supplier.not_available")}
-                    </p>
-                    <p className="text-text text-sm">
-                      {t("supplier.rating")}:{" "}
-                      {supplier.Rating || t("supplier.not_available")}
-                    </p>
-                    <div className="flex items-center mt-4">
-                      <label className="flex items-center cursor-pointer">
-                        <div className="relative">
+
+                    {/* Supplier Name */}
+                    <div className="mt-8 mb-4">
+                      <h3 className="text-xl font-bold flex items-center gap-2" style={{ color: "var(--text-color)" }}>
+                        <Truck style={{ color: "#6366f1" }} size={20} />
+                        {supplier.SupplierName}
+                      </h3>
+                    </div>
+
+                    {/* Supplier Details */}
+                    <div className="space-y-3 mb-5">
+                      <div className="flex items-center gap-2" style={{ color: "var(--text-color)" }}>
+                        <User style={{ color: "var(--color-secondary)" }} size={16} />
+                        <span className="text-sm">{supplier.Contact || t("supplier.not_available")}</span>
+                      </div>
+                      <div className="flex items-center gap-2" style={{ color: "var(--text-color)" }}>
+                        <Mail style={{ color: "var(--color-secondary)" }} size={16} />
+                        <span className="text-sm truncate">{supplier.Email || t("supplier.not_available")}</span>
+                      </div>
+                      <div className="flex items-center gap-2" style={{ color: "var(--text-color)" }}>
+                        <Phone style={{ color: "var(--color-secondary)" }} size={16} />
+                        <span className="text-sm">{supplier.Phone || t("supplier.not_available")}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => {
+                            const displayRating = supplier.averageRating && supplier.averageRating > 0 
+                              ? supplier.averageRating 
+                              : 1;
+                            return (
+                              <Star
+                                key={star}
+                                size={14}
+                                className={
+                                  star <= displayRating
+                                    ? "text-yellow-500 fill-yellow-500"
+                                    : "text-gray-300"
+                                }
+                              />
+                            );
+                          })}
+                        </div>
+                        <span className="text-sm font-semibold" style={{ color: "var(--text-color)" }}>
+                          {supplier.averageRating && supplier.averageRating > 0
+                            ? `${supplier.averageRating.toFixed(1)}/5` 
+                            : "1.0/5"}
+                          {supplier.Rating && supplier.Rating.length > 0 && (
+                            <span className="text-xs ml-1" style={{ color: "var(--color-secondary)" }}>
+                              ({supplier.Rating.length})
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                    {/* Actions */}
+                    <div className="border-t-2 pt-4 mt-4 space-y-3" style={{ borderColor: "var(--border-color)" }}>
+                      {/* Toggle Switch */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium" style={{ color: "var(--text-color)" }}>סטטוס</span>
+                        <label className="relative inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"
                             checked={supplier.IsActive}
-                            onChange={() =>
-                              handleToggle(supplier._id, supplier.IsActive)
-                            }
-                            className="sr-only"
+                            onChange={() => handleToggle(supplier._id, supplier.IsActive)}
+                            className="sr-only peer"
                           />
-                          <div
-                            className={`block w-10 h-6 rounded-full transition-colors duration-300 ${
-                              supplier.IsActive ? "bg-green-500" : "bg-red-500"
-                            }`}
-                          ></div>
-                          <div
-                            className={`absolute left-1 top-1 bg-button-text w-4 h-4 rounded-full transition-transform duration-300 ${
-                              supplier.IsActive ? "translate-x-4" : ""
-                            }`}
-                          ></div>
-                        </div>
-                        <span
-                          className={`ml-2 text-sm font-semibold ${
-                            supplier.IsActive
-                              ? "text-green-500"
-                              : "text-red-500"
-                          }`}
-                        >
-                          {supplier.IsActive
-                            ? t("supplier.active")
-                            : t("supplier.inactive")}
-                        </span>
-                      </label>
+                          <div className="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
+                        </label>
+                      </div>
+
+                      {/* Edit Button */}
+                      <button
+                        onClick={() => openModal(supplier)}
+                        className="w-full font-semibold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2"
+                        style={{
+                          background: "linear-gradient(to right, #6366f1, #a855f7)",
+                          color: "var(--button-text)",
+                        }}
+                      >
+                        <Edit size={18} />
+                        {t("supplier.update")}
+                      </button>
                     </div>
-                    <button
-                      onClick={() => openModal(supplier)}
-                      className="mt-4 px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105 w-full"
-                    >
-                      {t("supplier.update")}
-                    </button>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
               {/* Pagination Controls */}
               {totalPages > 1 && (
-                <div className="flex justify-center items-center mt-8 space-x-2">
+                <div className="flex justify-center items-center mt-10 gap-2">
                   <button
                     onClick={() => paginate(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`px-3 py-1 rounded-full ${
+                    className="px-4 py-2 rounded-xl font-medium transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={
                       currentPage === 1
-                        ? "bg-gray-300 cursor-not-allowed"
-                        : "bg-button-bg text-button-text hover:bg-secondary"
-                    }`}
+                        ? {
+                            backgroundColor: "var(--border-color)",
+                            color: "var(--color-secondary)",
+                          }
+                        : {
+                            backgroundColor: "var(--bg-color)",
+                            color: "var(--text-color)",
+                            borderColor: "var(--border-color)",
+                          }
+                    }
                   >
                     {direction === "rtl" ? "→" : "←"}
                   </button>
@@ -382,10 +575,10 @@ const SupplierList = () => {
                   <button
                     onClick={() => paginate(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className={`px-3 py-1 rounded-full ${
+                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                       currentPage === totalPages
-                        ? "bg-gray-300 cursor-not-allowed"
-                        : "bg-button-bg text-button-text hover:bg-secondary"
+                        ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                        : "bg-white text-gray-700 hover:bg-indigo-600 hover:text-white shadow-md hover:shadow-lg transform hover:scale-105"
                     }`}
                   >
                     {direction === "rtl" ? "←" : "→"}
@@ -394,11 +587,13 @@ const SupplierList = () => {
               )}
             </>
           ) : (
-            <p className="text-center text-text opacity-70 text-lg mt-6">
-              {t("supplier.no_suppliers")}
-            </p>
+            <div className="bg-white rounded-2xl p-12 shadow-lg text-center">
+              <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                <Truck className="text-gray-400" size={40} />
+              </div>
+              <p className="text-gray-600 text-lg font-medium">{t("supplier.no_suppliers")}</p>
+            </div>
           )}
-        </div>
 
         {/* Supplier Update Modal */}
         {isModalOpen && selectedSupplier && (
@@ -549,49 +744,40 @@ const SupplierList = () => {
             dir={direction}
             className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fadeIn"
           >
-            <div className="bg-bg rounded-2xl shadow-2xl p-6 w-full max-w-md border border-border-color">
-              <div
-                className={`flex ${
-                  direction === "rtl" ? "flex-row-reverse" : ""
-                } justify-between items-center mb-4`}
-              >
-                <h2 className="text-xl font-bold text-text tracking-tight">
-                  {t("supplier.attachments_for")}{" "}
-                  {attachmentsSupplier.SupplierName}
-                </h2>
-                <button
-                  onClick={() => setIsAttachmentsModalOpen(false)}
-                  className="text-text hover:text-gray-800 text-xl transition-all duration-200 transform hover:scale-110"
-                >
-                  ×
-                </button>
-              </div>
-              <div className={direction === "rtl" ? "text-right" : "text-left"}>
-                {attachmentsSupplier.attachments &&
-                attachmentsSupplier.attachments.length > 0 ? (
-                  <ul className="space-y-2">
-                    {attachmentsSupplier.attachments.map((file, index) => (
-                      <li
-                        key={index}
-                        className="bg-accent p-3 rounded-lg shadow-sm border border-border-color hover:bg-primary hover:text-button-text transition-all duration-200"
+            <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md border-2 border-gray-200">
+              <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">
+                {t("supplier.attachments")} - {attachmentsSupplier.SupplierName}
+              </h2>
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {attachmentsSupplier.attachments && attachmentsSupplier.attachments.length > 0 ? (
+                  attachmentsSupplier.attachments.map((file, index) => (
+                    <div
+                      key={index}
+                      className="bg-gray-50 p-3 rounded-lg border border-gray-200 hover:bg-gray-100 transition-all duration-200"
+                    >
+                      <a
+                        href={file.fileUrl || "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-2"
                       >
-                        <a
-                          href={file.fileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-primary hover:underline font-medium"
-                        >
-                          {file.fileName}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
+                        <FileText size={16} />
+                        {file.fileName || `File ${index + 1}`}
+                      </a>
+                    </div>
+                  ))
                 ) : (
-                  <p className="text-text text-center text-lg opacity-70">
+                  <p className="text-gray-500 text-center py-6">
                     {t("supplier.no_attachments")}
                   </p>
                 )}
               </div>
+              <button
+                onClick={() => setIsAttachmentsModalOpen(false)}
+                className="mt-6 w-full bg-gray-200 text-gray-800 font-semibold py-3 px-4 rounded-xl hover:bg-gray-300 transition-all duration-200"
+              >
+                סגור
+              </button>
             </div>
           </div>
         )}

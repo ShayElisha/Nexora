@@ -3,6 +3,11 @@ import jwt from "jsonwebtoken";
 import Employee from "../models/employees.model.js";
 import Department from "../models/department.model.js";
 import Budget from "../models/Budget.model.js"; // ודא שהנתיב נכון
+import {
+  linkLeadToProject,
+  unlinkLeadFromProject,
+  updateLeadStatusFromProject,
+} from "../services/RelationshipService.js";
 
 export const createProject = async (req, res) => {
   try {
@@ -33,6 +38,7 @@ export const createProject = async (req, res) => {
       tags,
       comments,
       progress,
+      leadId,
     } = req.body;
 
     // בדיקת שדות נדרשים
@@ -90,6 +96,7 @@ export const createProject = async (req, res) => {
       tags: tagsArray,
       comments,
       progress,
+      ...(leadId && { leadId }),
     };
 
     console.log("Project data:", projectData);
@@ -146,6 +153,13 @@ export const createProject = async (req, res) => {
       );
     }
 
+    // Link project to lead if leadId is provided
+    if (leadId) {
+      await linkLeadToProject(leadId, newProject._id);
+      // Update lead status when project is created
+      await updateLeadStatusFromProject(newProject._id);
+    }
+
     return res.status(201).json({ data: newProject });
   } catch (err) {
     console.error("Error creating project:", err);
@@ -198,8 +212,13 @@ export const getProjectById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // אפשר להוסיף populate("department teamMembers ...") אם רוצים
-    const project = await Project.findById(id);
+    // שליפת הפרויקט עם כל המידע הקשור, כולל משימות
+    const project = await Project.findById(id)
+      .populate("teamMembers.employeeId", "name lastName email")
+      .populate("departmentId", "name")
+      .populate("projectManager", "name lastName email")
+      .populate("companyId", "name")
+      .populate("tasks", "title description status priority dueDate assignedTo"); // טעינת המשימות
 
     if (!project) {
       return res.status(404).json({
@@ -231,6 +250,15 @@ export const updateProject = async (req, res) => {
     const { id } = req.params;
     const updateData = req.body;
 
+    // Get current project to check for relationship changes
+    const currentProject = await Project.findById(id);
+    if (!currentProject) {
+      return res.status(404).json({
+        success: false,
+        message: "Project not found",
+      });
+    }
+
     // new: true -> מחזיר את הפרויקט המעודכן ולא את הישן
     const updatedProject = await Project.findByIdAndUpdate(id, updateData, {
       new: true,
@@ -242,6 +270,23 @@ export const updateProject = async (req, res) => {
         success: false,
         message: "Project not found",
       });
+    }
+
+    // Handle lead relationship updates
+    const oldLeadId = currentProject.leadId?.toString();
+    const newLeadId = updateData.leadId?.toString();
+    if (oldLeadId !== newLeadId) {
+      if (oldLeadId) {
+        await unlinkLeadFromProject(oldLeadId, id);
+      }
+      if (newLeadId) {
+        await linkLeadToProject(newLeadId, id);
+      }
+    }
+
+    // Update lead status if project status changed
+    if (updateData.status && updateData.status !== currentProject.status) {
+      await updateLeadStatusFromProject(id);
     }
 
     return res.status(200).json({
@@ -266,6 +311,20 @@ export const updateProject = async (req, res) => {
 export const deleteProject = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Get project before deletion to unlink relationships
+    const projectToDelete = await Project.findById(id);
+    if (!projectToDelete) {
+      return res.status(404).json({
+        success: false,
+        message: "Project not found",
+      });
+    }
+
+    // Unlink from lead before deletion
+    if (projectToDelete.leadId) {
+      await unlinkLeadFromProject(projectToDelete.leadId, id);
+    }
 
     const deletedProject = await Project.findByIdAndRemove(id);
 

@@ -44,6 +44,13 @@ const taskSchema = new mongoose.Schema(
       required: false,
     },
 
+    // קישור לליד (אם המשימה נוצרה מליד)
+    leadId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Lead",
+      required: false,
+    },
+
     // מערך של פריטים שנבחרו מתוך ההזמנה
     orderItems: [
       {

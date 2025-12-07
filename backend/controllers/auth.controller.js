@@ -1,10 +1,34 @@
 import Employee from "../models/employees.model.js";
 import Company from "../models/companies.model.js";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { generateLoginToken } from "../config/utils/generateToken.js";
+import crypto from "crypto";
+import { AuthService } from "../services/auth.service.js";
+import { transporter } from "../config/lib/nodemailer.js";
 import cloudinary, { uploadToCloudinary } from "../config/lib/cloudinary.js";
 import Payment from "../models/payment.model.js";
+
+const CLIENT_URL = process.env.FRONTEND_URL || process.env.FRONTEND_BASE_URL || "http://localhost:5173";
+
+const buildResetPasswordEmail = (name = "there", resetURL) => `
+  <div style="font-family: 'Segoe UI', Arial, sans-serif; padding: 24px; background-color: #f4f6fb;">
+    <div style="max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);">
+      <h2 style="color: #0f172a; margin-bottom: 16px;">Hi ${name},</h2>
+      <p style="color: #475569; line-height: 1.6;">
+        We received a request to reset the password for your Nexora account. If this was you, please click the button below to set a new password. This link will expire in 30 minutes.
+      </p>
+      <a href="${resetURL}" style="display: inline-block; margin: 24px 0; padding: 12px 24px; background: linear-gradient(135deg, #2563eb, #6d28d9); color: #ffffff; text-decoration: none; border-radius: 999px; font-weight: 600;">Reset Password</a>
+      <p style="color: #475569; line-height: 1.6;">
+        If the button above doesn't work, copy and paste this link into your browser:
+        <br />
+        <a href="${resetURL}" style="color: #2563eb;">${resetURL}</a>
+      </p>
+      <p style="color: #94a3b8; font-size: 13px; margin-top: 24px;">
+        If you did not request a password reset, you can safely ignore this email.
+      </p>
+    </div>
+    <p style="text-align: center; color: #94a3b8; font-size: 12px; margin-top: 16px;">© ${new Date().getFullYear()} Nexora</p>
+  </div>
+`;
 
 export const signUp = async (req, res) => {
   try {
@@ -183,8 +207,7 @@ export const signUp = async (req, res) => {
     }
 
     // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await AuthService.hashPassword(password);
 
     // Create new employee
     const newEmployee = new Employee({
@@ -255,7 +278,7 @@ export const login = async (req, res) => {
     }
 
     // Check password
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await AuthService.comparePassword(password, user.password);
     if (!isMatch) {
       return res
         .status(401)
@@ -264,22 +287,23 @@ export const login = async (req, res) => {
 
     const imageURL = user.profileImage ? user.profileImage : "";
 
-    // Generate a JWT token and set cookie
-    generateLoginToken(
-      user._id,
-      user.companyId,
-      user.role,
+    // Generate tokens and set cookies
+    const payload = {
+      userId: user._id.toString(),
+      companyId: user.companyId?.toString(),
+      role: user.role,
       imageURL,
-      user._id,
-      res
-    );
+      employeeId: user._id.toString(),
+    };
+
+    AuthService.setAuthCookies(res, payload);
 
     res.status(200).json({
       success: true,
       message: "Login successful",
       user: {
         name: user.name,
-        employeeId: user._Id,
+        employeeId: user._id,
         lastName: user.lastName || null,
         email: user.email,
         role: user.role,
@@ -293,8 +317,59 @@ export const login = async (req, res) => {
   }
 };
 export const logout = (req, res) => {
-  res.clearCookie("auth_token");
+  AuthService.clearAuthCookies(res);
   res.status(200).json({ success: true, message: "Logged out successfully" });
+};
+
+export const refreshToken = async (req, res) => {
+  try {
+    const refreshToken = req.cookies["auth_refresh_token"];
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: "No refresh token provided",
+      });
+    }
+
+    const decoded = AuthService.verifyRefreshToken(refreshToken);
+    
+    // Find the user
+    const user = await Employee.findById(decoded.userId).select("-password");
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // Generate new access token
+    const newAccessToken = AuthService.generateAccessToken({
+      userId: decoded.userId,
+      companyId: decoded.companyId,
+      role: decoded.role,
+      imageURL: decoded.imageURL,
+      employeeId: decoded.employeeId,
+    });
+
+    res.cookie("auth_token", newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 15 * 60 * 1000, // 15 minutes
+    });
+
+    res.json({
+      success: true,
+      message: "Token refreshed successfully",
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: "Invalid refresh token",
+      error: error.message,
+    });
+  }
 };
 
 export const getCurrentUser = async (req, res) => {
@@ -368,6 +443,7 @@ export const switchCompany = async (req, res) => {
 
     res.cookie("auth_token", updatedToken, {
       httpOnly: true,
+      sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
     });
 
@@ -379,6 +455,113 @@ export const switchCompany = async (req, res) => {
       success: false,
       message: "Error switching company",
       error: error.message,
+    });
+  }
+};
+
+
+export const requestPasswordReset = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email is required" });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await Employee.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      return res.status(200).json({
+        success: true,
+        message:
+          "If an account exists for that email, a reset link has been sent.",
+      });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    user.passwordResetToken = hashedToken;
+    user.passwordResetExpires = Date.now() + 30 * 60 * 1000; // 30 minutes
+    await user.save();
+
+    const resetURL = `${CLIENT_URL}/reset-password?token=${resetToken}&email=${encodeURIComponent(
+      normalizedEmail
+    )}`;
+
+    try {
+      await transporter.sendMail({
+        to: normalizedEmail,
+        from: process.env.EMAIL_USER,
+        subject: "Reset your Nexora password",
+        html: buildResetPasswordEmail(user.name || "there", resetURL),
+      });
+    } catch (mailError) {
+      user.passwordResetToken = undefined;
+      user.passwordResetExpires = undefined;
+      await user.save();
+      throw mailError;
+    }
+
+    return res.status(200).json({
+      success: true,
+      message:
+        "If an account exists for that email, a reset link has been sent.",
+    });
+  } catch (error) {
+    console.error("Error requesting password reset:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to process password reset request",
+    });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { token, email, password } = req.body;
+
+    if (!token || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Token, email, and new password are required",
+      });
+    }
+
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const user = await Employee.findOne({
+      email: email.trim().toLowerCase(),
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid or expired reset token" });
+    }
+
+    user.password = await AuthService.hashPassword(password);
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+    });
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to reset password",
     });
   }
 };

@@ -169,6 +169,46 @@ export function createSubscriptionEndingEmail(company, name) {
   `;
 }
 
+export function createPaymentFailedEmail(companyName, amount, invoiceUrl) {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Payment Failed</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(to right, #DC143C, #FF6347); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+        <img src="https://img.freepik.com/premium-vector/linkedin-logo_578229-227.jpg" alt="UnLinked Logo" style="width: 150px; margin-bottom: 20px; border-radius: 10px;"/>
+        <h1 style="color: white; margin: 0; font-size: 28px;">Payment Failed</h1>
+      </div>
+      <div style="background-color: #ffffff; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        <p style="font-size: 18px; color: #DC143C;"><strong>Hello,</strong></p>
+        <p>We were unable to process your payment for <strong>${companyName}</strong>.</p>
+        <p style="background-color: #FFF3CD; padding: 15px; border-radius: 5px; border-left: 4px solid #FFC107;">
+          <strong>Amount:</strong> $${amount.toFixed(2)}<br>
+          <strong>Status:</strong> Payment Failed
+        </p>
+        <p>This could be due to:</p>
+        <ul>
+          <li>Insufficient funds in your account</li>
+          <li>Expired payment method</li>
+          <li>Card declined by your bank</li>
+          <li>Payment method needs to be updated</li>
+        </ul>
+        <p>Please update your payment method to continue using our services without interruption.</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${invoiceUrl || 'https://www.unlinked.com/update-payment'}" style="background-color: #DC143C; color: white; padding: 14px 28px; text-decoration: none; border-radius: 30px; font-weight: bold; font-size: 16px; display: inline-block;">Update Payment Method</a>
+        </div>
+        <p style="color: #666; font-size: 14px;">If you have any questions or need assistance, please contact our support team immediately.</p>
+        <p>Best regards,<br>The UnLinked Team</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
 export function createProcurementEmail(
   supplierName,
   companyName,
@@ -298,6 +338,450 @@ export function createProcurementDiscrepancyEmail(
           <p class="mt-6">If you have any questions or need further assistance, please do not hesitate to contact us.</p>
           <p class="mt-4">Best regards,<br>The <strong>${companyName}</strong> Team</p>
         </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+/**
+ * Create payment invoice email template with Nexora logo
+ */
+export function createPaymentInvoiceEmail(companyName, invoice, invoicePdfUrl, logoUrl = null) {
+  // Use provided logo URL or default Nexora logo
+  const defaultLogoUrl = logoUrl || "https://via.placeholder.com/150x80/667eea/ffffff?text=Nexora";
+  
+  return `
+    <!DOCTYPE html>
+    <html lang="he" dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Invoice - ${invoice.invoiceNumber}</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          margin: 0;
+          padding: 0;
+          background-color: #f5f5f5;
+        }
+        .email-container {
+          max-width: 600px;
+          margin: 0 auto;
+          background-color: #ffffff;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          padding: 30px;
+          text-align: center;
+          color: white;
+        }
+        .logo {
+          max-width: 150px;
+          max-height: 80px;
+          margin-bottom: 15px;
+        }
+        .header h1 {
+          margin: 0;
+          font-size: 28px;
+          font-weight: bold;
+        }
+        .content {
+          padding: 30px;
+        }
+        .invoice-info {
+          background-color: #f8f9fa;
+          border-radius: 8px;
+          padding: 20px;
+          margin: 20px 0;
+        }
+        .invoice-info-row {
+          display: flex;
+          justify-content: space-between;
+          padding: 8px 0;
+          border-bottom: 1px solid #e9ecef;
+        }
+        .invoice-info-row:last-child {
+          border-bottom: none;
+        }
+        .invoice-info-label {
+          font-weight: bold;
+          color: #666;
+        }
+        .invoice-info-value {
+          color: #333;
+        }
+        .button {
+          display: inline-block;
+          padding: 14px 28px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          text-decoration: none;
+          border-radius: 30px;
+          font-weight: bold;
+          font-size: 16px;
+          margin: 20px 0;
+          transition: transform 0.2s;
+        }
+        .button:hover {
+          transform: translateY(-2px);
+        }
+        .footer {
+          background-color: #f8f9fa;
+          padding: 20px;
+          text-align: center;
+          color: #666;
+          font-size: 14px;
+        }
+        .invoice-details {
+          background-color: #ffffff;
+          border: 1px solid #e9ecef;
+          border-radius: 8px;
+          padding: 20px;
+          margin: 20px 0;
+        }
+        .invoice-details h3 {
+          margin-top: 0;
+          color: #333;
+          border-bottom: 2px solid #667eea;
+          padding-bottom: 10px;
+        }
+        .plan-name {
+          font-size: 24px;
+          font-weight: bold;
+          color: #667eea;
+          margin: 10px 0;
+        }
+        .amount {
+          font-size: 32px;
+          font-weight: bold;
+          color: #764ba2;
+          margin: 15px 0;
+        }
+        .thank-you {
+          text-align: center;
+          padding: 20px;
+          background-color: #f8f9fa;
+          border-radius: 8px;
+          margin: 20px 0;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="email-container">
+        <div class="header">
+          <img src="${defaultLogoUrl}" alt="Nexora Logo" class="logo" />
+          <h1>תודה על התשלום!</h1>
+        </div>
+        
+        <div class="content">
+          <p style="font-size: 18px; color: #333;"><strong>שלום ${companyName},</strong></p>
+          
+          <p>תודה על התשלום שלך! אנו מודים לך על השימוש בפלטפורמת Nexora.</p>
+          
+          <div class="invoice-info">
+            <div class="invoice-info-row">
+              <span class="invoice-info-label">מספר חשבונית:</span>
+              <span class="invoice-info-value">${invoice.invoiceNumber}</span>
+            </div>
+            <div class="invoice-info-row">
+              <span class="invoice-info-label">תאריך:</span>
+              <span class="invoice-info-value">${new Date(invoice.issueDate).toLocaleDateString('he-IL')}</span>
+            </div>
+            <div class="invoice-info-row">
+              <span class="invoice-info-label">תוכנית:</span>
+              <span class="invoice-info-value">${invoice.items?.[0]?.description?.match(/(Basic|Pro|Enterprise)/)?.[0] || 'N/A'}</span>
+            </div>
+            <div class="invoice-info-row">
+              <span class="invoice-info-label">משך זמן:</span>
+              <span class="invoice-info-value">${invoice.items?.[0]?.description?.match(/(Monthly|Quarterly|Yearly)/)?.[0] || 'N/A'}</span>
+            </div>
+            <div class="invoice-info-row">
+              <span class="invoice-info-label">סכום כולל:</span>
+              <span class="invoice-info-value" style="font-size: 20px; font-weight: bold; color: #764ba2;">${invoice.currency || 'USD'} ${invoice.totalAmount?.toFixed(2) || '0.00'}</span>
+            </div>
+          </div>
+          
+          <div class="invoice-details">
+            <h3>פרטי החשבונית</h3>
+            <div class="plan-name">${invoice.items?.[0]?.description || 'Subscription Invoice'}</div>
+            <p><strong>כמות:</strong> ${invoice.items?.[0]?.quantity || 1}</p>
+            <p><strong>מחיר ליחידה:</strong> ${invoice.currency || 'USD'} ${invoice.items?.[0]?.unitPrice?.toFixed(2) || '0.00'}</p>
+            ${invoice.items?.[0]?.discount > 0 ? `<p><strong>הנחה:</strong> ${invoice.items[0].discount}%</p>` : ''}
+            ${invoice.taxAmount > 0 ? `<p><strong>מע"מ (${invoice.taxRate}%):</strong> ${invoice.currency || 'USD'} ${invoice.taxAmount.toFixed(2)}</p>` : ''}
+            <div class="amount">סה"כ: ${invoice.currency || 'USD'} ${invoice.totalAmount?.toFixed(2) || '0.00'}</div>
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${invoicePdfUrl}" class="button">הורד חשבונית PDF</a>
+          </div>
+          
+          <div class="thank-you">
+            <p style="font-size: 18px; color: #667eea; margin: 0;"><strong>תודה שתמכת בנו!</strong></p>
+            <p style="margin: 10px 0 0 0;">אנו מצפים להמשך שיתוף פעולה פורה.</p>
+          </div>
+          
+          <p style="margin-top: 30px; color: #666;">
+            אם יש לך שאלות או זקוק לעזרה, צוות התמיכה שלנו כאן בשבילך.
+          </p>
+          
+          <p style="color: #666;">
+            בברכה,<br>
+            <strong>צוות Nexora</strong>
+          </p>
+        </div>
+        
+        <div class="footer">
+          <p>© ${new Date().getFullYear()} Nexora. כל הזכויות שמורות.</p>
+          <p>מייל זה נשלח אוטומטית, אנא אל תגיב עליו.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+
+/**
+ * Create order summary email template with Nexora logo
+ */
+export function createOrderSummaryEmail(companyName, order, orderPdfUrl, logoUrl = null) {
+  const defaultLogoUrl = logoUrl || "https://via.placeholder.com/150x80/667eea/ffffff?text=Nexora";
+  
+  return `
+    <!DOCTYPE html>
+    <html lang="he" dir="rtl">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Order Summary - ${order._id}</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          margin: 0;
+          padding: 0;
+          background-color: #f5f5f5;
+        }
+        .email-container {
+          max-width: 600px;
+          margin: 0 auto;
+          background-color: #ffffff;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          padding: 30px;
+          text-align: center;
+          color: white;
+        }
+        .logo {
+          max-width: 150px;
+          max-height: 80px;
+          margin-bottom: 15px;
+        }
+        .header h1 {
+          margin: 0;
+          font-size: 28px;
+          font-weight: bold;
+        }
+        .content {
+          padding: 30px;
+        }
+        .order-info {
+          background-color: #f8f9fa;
+          border-radius: 8px;
+          padding: 20px;
+          margin: 20px 0;
+        }
+        .order-info-row {
+          display: flex;
+          justify-content: space-between;
+          padding: 8px 0;
+          border-bottom: 1px solid #e9ecef;
+        }
+        .order-info-row:last-child {
+          border-bottom: none;
+        }
+        .order-info-label {
+          font-weight: bold;
+          color: #666;
+        }
+        .order-info-value {
+          color: #333;
+        }
+        .button {
+          display: inline-block;
+          padding: 14px 28px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          text-decoration: none;
+          border-radius: 30px;
+          font-weight: bold;
+          font-size: 16px;
+          margin: 20px 0;
+          transition: transform 0.2s;
+        }
+        .button:hover {
+          transform: translateY(-2px);
+        }
+        .footer {
+          background-color: #f8f9fa;
+          padding: 20px;
+          text-align: center;
+          color: #666;
+          font-size: 14px;
+        }
+        .order-details {
+          background-color: #ffffff;
+          border: 1px solid #e9ecef;
+          border-radius: 8px;
+          padding: 20px;
+          margin: 20px 0;
+        }
+        .order-details h3 {
+          margin-top: 0;
+          color: #333;
+          border-bottom: 2px solid #667eea;
+          padding-bottom: 10px;
+        }
+        .amount {
+          font-size: 32px;
+          font-weight: bold;
+          color: #764ba2;
+          margin: 15px 0;
+        }
+        .thank-you {
+          text-align: center;
+          padding: 20px;
+          background-color: #f8f9fa;
+          border-radius: 8px;
+          margin: 20px 0;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="email-container">
+        <div class="header">
+          <img src="${defaultLogoUrl}" alt="Nexora Logo" class="logo" />
+          <h1>סיכום הזמנה</h1>
+        </div>
+        
+        <div class="content">
+          <p style="font-size: 18px; color: #333;"><strong>שלום ${companyName},</strong></p>
+          
+          <p>תודה על ההזמנה שלך! אנו מודים לך על השימוש בפלטפורמת Nexora.</p>
+          
+          <div class="order-info">
+            <div class="order-info-row">
+              <span class="order-info-label">מספר הזמנה:</span>
+              <span class="order-info-value">${order._id}</span>
+            </div>
+            <div class="order-info-row">
+              <span class="order-info-label">תאריך הזמנה:</span>
+              <span class="order-info-value">${new Date(order.orderDate).toLocaleDateString('he-IL')}</span>
+            </div>
+            ${order.deliveryDate ? `
+            <div class="order-info-row">
+              <span class="order-info-label">תאריך משלוח:</span>
+              <span class="order-info-value">${new Date(order.deliveryDate).toLocaleDateString('he-IL')}</span>
+            </div>
+            ` : ''}
+            <div class="order-info-row">
+              <span class="order-info-label">סטטוס:</span>
+              <span class="order-info-value">${order.status || 'Pending'}</span>
+            </div>
+            <div class="order-info-row">
+              <span class="order-info-label">סכום כולל:</span>
+              <span class="order-info-value" style="font-size: 20px; font-weight: bold; color: #764ba2;">USD ${order.orderTotal?.toFixed(2) || '0.00'}</span>
+            </div>
+          </div>
+          
+          <div class="order-details">
+            <h3>פרטי ההזמנה</h3>
+            <p><strong>מספר פריטים:</strong> ${order.items?.length || 0}</p>
+            ${order.globalDiscount > 0 ? `<p><strong>הנחה כוללת:</strong> ${order.globalDiscount}%</p>` : ''}
+            ${order.taxRate > 0 ? `<p><strong>מע"מ (${order.taxRate}%):</strong> USD ${order.taxAmount?.toFixed(2) || '0.00'}</p>` : ''}
+            <div class="amount">סה"כ: USD ${order.orderTotal?.toFixed(2) || '0.00'}</div>
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${orderPdfUrl}" class="button">הורד סיכום הזמנה PDF</a>
+          </div>
+          
+          <div class="thank-you">
+            <p style="font-size: 18px; color: #667eea; margin: 0;"><strong>תודה שתמכת בנו!</strong></p>
+            <p style="margin: 10px 0 0 0;">אנו מצפים להמשך שיתוף פעולה פורה.</p>
+          </div>
+          
+          <p style="margin-top: 30px; color: #666;">
+            אם יש לך שאלות או זקוק לעזרה, צוות התמיכה שלנו כאן בשבילך.
+          </p>
+          
+          <p style="color: #666;">
+            בברכה,<br>
+            <strong>צוות Nexora</strong>
+          </p>
+        </div>
+        
+        <div class="footer">
+          <p>© ${new Date().getFullYear()} Nexora. כל הזכויות שמורות.</p>
+          <p>מייל זה נשלח אוטומטית, אנא אל תגיב עליו.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+
+export function createSupplierInvoiceEmail(
+  supplierName,
+  companyName,
+  invoiceNumber,
+  invoiceDate,
+  dueDate,
+  totalAmount,
+  currency,
+  invoiceUrl
+) {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Supplier Invoice</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(to right, #2196F3, #03A9F4); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 28px;">Supplier Invoice</h1>
+      </div>
+      <div style="background-color: #ffffff; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        <p style="font-size: 18px; color: #2196F3;"><strong>Hello ${supplierName},</strong></p>
+        <p>We are pleased to share the invoice details from <strong>${companyName}</strong>.</p>
+        <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <p style="margin: 5px 0;"><strong>Invoice Number:</strong> ${invoiceNumber}</p>
+          <p style="margin: 5px 0;"><strong>Invoice Date:</strong> ${new Date(invoiceDate).toLocaleDateString()}</p>
+          <p style="margin: 5px 0;"><strong>Due Date:</strong> ${new Date(dueDate).toLocaleDateString()}</p>
+          <p style="margin: 5px 0;"><strong>Total Amount:</strong> ${totalAmount.toLocaleString()} ${currency}</p>
+        </div>
+        ${invoiceUrl ? `
+        <p>You can view the full invoice details using the link below:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${invoiceUrl}" style="background-color: #2196F3; color: white; padding: 14px 28px; text-decoration: none; border-radius: 30px; font-weight: bold; font-size: 16px; transition: background-color 0.3s;">View Invoice</a>
+        </div>
+        ` : ''}
+        <p>If you have any questions or need further assistance, please feel free to contact us.</p>
+        <p>Best regards,<br>The ${companyName} Team</p>
       </div>
     </body>
     </html>

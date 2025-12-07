@@ -71,6 +71,8 @@ const companySchema = new mongoose.Schema(
         default: "Pending",
       },
       subscriptionId: { type: String },
+      lastPaymentAttempt: { type: Date },
+      failedAttempts: { type: Number, default: 0 },
     },
     industry: {
       type: String,
@@ -164,6 +166,47 @@ const companySchema = new mongoose.Schema(
           uploadedAt: { type: Date, default: Date.now },
         },
       ],
+    },
+    // Invoice Settings
+    invoiceSettings: {
+      // Invoice number prefix (e.g., "INV-2024-")
+      invoiceNumberPrefix: {
+        type: String,
+        default: "INV",
+        trim: true,
+      },
+      // Invoice number format pattern
+      invoiceNumberFormat: {
+        type: String,
+        default: "YYYY-####", // Year followed by sequence number
+        enum: ["YYYY-####", "YY-####", "####-YYYY", "PREFIX-YYYY-####"],
+      },
+      // Default currency for invoices
+      defaultCurrency: {
+        type: String,
+        default: "USD",
+        uppercase: true,
+        match: /^[A-Z]{3}$/, // ISO 4217 currency code
+      },
+      // Base currency for the company
+      baseCurrency: {
+        type: String,
+        default: "USD",
+        uppercase: true,
+        match: /^[A-Z]{3}$/,
+      },
+    },
+    // Payroll Automation Settings
+    payrollAutomationSettings: {
+      enabled: { type: Boolean, default: false },
+      calculationDate: { type: Number, default: 25, min: 1, max: 31 },
+      approvalDate: { type: Number, default: 27, min: 1, max: 31 },
+      paymentDate: { type: Number, default: 1, min: 1, max: 31 },
+      autoApprove: { type: Boolean, default: false },
+      autoSendPayslips: { type: Boolean, default: true },
+      notificationDays: { type: Number, default: 3, min: 0, max: 7 },
+      nextMonthApprovalDate: { type: Date }, // תאריך אישור ספציפי לחודש הבא
+      defaultTaxConfigId: { type: mongoose.Schema.Types.ObjectId, ref: "TaxConfig" }, // תצורת מס ברירת מחדש לאוטומציה
     },
   },
   { timestamps: true }

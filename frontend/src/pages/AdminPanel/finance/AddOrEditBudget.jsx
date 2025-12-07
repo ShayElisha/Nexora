@@ -2,98 +2,117 @@ import React, { useState, useEffect } from "react";
 import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import SignaturesModal from "../Procurement/components/SignaturesModal";
 import currency from "./currency.json";
+import {
+  Plus,
+  Wallet,
+  Building,
+  DollarSign,
+  Calendar,
+  FileText,
+  Users,
+  Save,
+  X,
+} from "lucide-react";
 
-// ---------- AddDepartmentModal Component ----------
+// Add Department Modal
 const AddDepartmentModal = ({ isOpen, onClose, onSuccess }) => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({ name: "", description: "" });
   const [loading, setLoading] = useState(false);
-  if (!isOpen) return null;
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       await axiosInstance.post("/departments", formData);
-      toast.success(t("budget.department_created"));
+      toast.success(t("finance.budget.department_created"));
       setFormData({ name: "", description: "" });
       onSuccess();
       onClose();
     } catch (error) {
-      console.error("Error creating department:", error);
-      toast.error(t("budget.error_creating_department"));
+      toast.error(t("finance.budget.error_creating_department"));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div
-        className="absolute inset-0 bg-black bg-opacity-60 transition-opacity duration-300"
-        onClick={onClose}
-      />
-      <div className="relative bg-accent rounded-xl p-6 w-full max-w-md z-10 shadow-2xl transform transition-all duration-300">
-        <h2 className="text-2xl font-bold text-text mb-6 text-center tracking-tight drop-shadow-md">
-          {t("budget.add_department")}
+    <motion.div
+      className="fixed inset-0 flex items-center justify-center z-50 p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      onClick={onClose}
+    >
+      <div className="absolute inset-0 bg-black bg-opacity-60" />
+      <motion.div
+        className="relative rounded-2xl p-6 w-full max-w-md z-10 shadow-2xl border"
+        style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+        initial={{ scale: 0.9, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-color)' }}>
+          {t("finance.budget.add_department")}
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
-              {t("budget.department_name")}
+            <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              {t("finance.budget.department_name")}
             </label>
             <input
               type="text"
               name="name"
               value={formData.name}
-              onChange={handleChange}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
-              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
+              className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
-              {t("budget.description")}
+            <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              {t("finance.budget.description")}
             </label>
             <textarea
               name="description"
               value={formData.description}
-              onChange={handleChange}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows="3"
-              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
+              className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
             />
           </div>
-          <div className="flex justify-end gap-4">
+          <div className="flex gap-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2 bg-bg border border-border-color text-text rounded-full shadow-md hover:bg-gray-200 transition-all duration-200"
+              className="flex-1 px-6 py-3 rounded-xl font-bold transition-all hover:scale-105"
+              style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
             >
-              {t("budget.cancel")}
+              {t("finance.budget.cancel")}
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-button-bg text-button-text rounded-full shadow-lg hover:bg-secondary transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="flex-1 px-6 py-3 rounded-xl font-bold transition-all hover:scale-105 disabled:opacity-50"
+              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
             >
-              {loading ? t("budget.creating") : t("budget.create_department")}
+              {loading ? t("finance.budget.creating") : t("finance.budget.create_department")}
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
-// ---------- AddBudget Component ----------
+// Main AddBudget Component
 const AddBudget = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -116,7 +135,7 @@ const AddBudget = () => {
     departmentId: "",
     departmentOrProjectName: "",
     amount: 0,
-    currency: "USD",
+    currency: "ILS",
     period: "",
     startDate: "",
     endDate: "",
@@ -125,10 +144,6 @@ const AddBudget = () => {
   });
 
   const [departmentOptions, setDepartmentOptions] = useState([]);
-  const [budget, setBudget] = useState(null);
-  const [employees, setEmployees] = useState([]);
-  const [filteredEmployees, setFilteredEmployees] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [showAddDepartmentModal, setShowAddDepartmentModal] = useState(false);
   const [showSignatureModal, setShowSignatureModal] = useState(false);
 
@@ -148,23 +163,6 @@ const AddBudget = () => {
     },
   });
 
-  const deleteSignersListMutation = useMutation({
-    mutationFn: async (id) => await axiosInstance.delete(`/signatures/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["signatureLists"] });
-      toast.success(t("budget.signers_deleted"));
-    },
-  });
-
-  const saveSignersListMutation = useMutation({
-    mutationFn: async (data) =>
-      await axiosInstance.post("/signatures/create", data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["signatureLists"] });
-      toast.success(t("budget.signers_saved"));
-    },
-  });
-
   useEffect(() => {
     const companyId = localStorage.getItem("companyId") || "";
     setFormData((prev) => ({ ...prev, companyId }));
@@ -180,62 +178,21 @@ const AddBudget = () => {
         }));
         setDepartmentOptions(options);
       } catch (error) {
-        console.error("Error fetching department options:", error);
-        toast.error(t("budget.error_loading_departments"));
+        toast.error(t("finance.budget.error_loading_departments"));
       }
     };
     fetchDepartmentOptions();
-  }, []);
+  }, [t]);
 
   const handleDepartmentSelect = (e) => {
     const selectedDeptId = e.target.value;
-    const selectedDept = departmentOptions.find(
-      (dept) => dept.id === selectedDeptId
-    );
+    const selectedDept = departmentOptions.find((dept) => dept.id === selectedDeptId);
     setFormData((prev) => ({
       ...prev,
       departmentId: selectedDeptId,
       departmentOrProjectName: selectedDept ? selectedDept.name : "",
     }));
   };
-
-  useEffect(() => {
-    if (formData.departmentId) {
-      const fetchBudget = async () => {
-        try {
-          const res = await axiosInstance.get(
-            `/budget/by-department/${formData.departmentId}`
-          );
-          setBudget(res.data.data);
-        } catch (error) {
-          console.error("Error fetching budget:", error);
-          toast.error(t("budget.error_loading_budget") + ": " + error.message);
-        }
-      };
-      fetchBudget();
-
-      const filtered = employees.filter(
-        (emp) => String(emp.department) === formData.departmentId
-      );
-      setFilteredEmployees(filtered);
-    } else {
-      setBudget(null);
-      setFilteredEmployees([]);
-    }
-  }, [formData.departmentId, employees]);
-
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const res = await axiosInstance.get("/employees");
-        setEmployees(res.data.data);
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-        toast.error(t("budget.error_loading_employees"));
-      }
-    };
-    fetchEmployees();
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -244,292 +201,283 @@ const AddBudget = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    
+    if (!selectedSignatureList) {
+      toast.error(t("finance.budget.please_add_signer"));
+      return;
+    }
+
     try {
       const budgetData = {
         ...formData,
-        signers: selectedSignatureList
-          ? selectedSignatureList.signers
-          : newSigners,
+        signatureListId: selectedSignatureList._id,
       };
       await axiosInstance.post("/budget", budgetData);
-      toast.success(t("budget.created_successfully"));
+      toast.success(t("finance.budget.success_create_budget"));
       setFormData({
-        departmentOrProjectName: "",
         departmentId: "",
+        departmentOrProjectName: "",
         amount: 0,
-        currency: "USD",
+        currency: "ILS",
         period: "",
         startDate: "",
         endDate: "",
         notes: "",
         companyId: authUser?.companyId || "",
       });
-      setBudget(null);
       setSelectedSignatureList(null);
-      setNewSigners([]);
     } catch (error) {
-      console.error("Error creating budget:", error);
-      const errorMsg =
-        error.response && error.response.data && error.response.data.error
-          ? error.response.data.error
-          : t("budget.error_creating_budget");
-      toast.error(errorMsg);
-    } finally {
-      setLoading(false);
+      toast.error(t("finance.budget.error_create_budget"));
     }
   };
 
-  useEffect(() => {
-    if (newSigners && newSigners.length > 0) {
-      setSelectedSignatureList({ signers: newSigners });
-    }
-  }, [newSigners]);
-
-  const onUseList = (list) => {
-    if (list === undefined || list === null) {
-      setSelectedSignatureList(null);
-    } else if (Array.isArray(list)) {
-      setSelectedSignatureList({ signers: list });
-    } else if (list.signers && Array.isArray(list.signers)) {
-      setSelectedSignatureList(list);
-    } else if (typeof list === "object") {
-      setSelectedSignatureList({ signers: [list] });
-    } else {
-      console.error("Invalid format:", list);
-      setSelectedSignatureList(null);
-    }
-    setShowSignatureModal(false);
-    setIsCreatingNewList(false);
+  const cardVariant = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
   };
 
   return (
-    <div className="min-h-screen  flex justify-center py-10 animate-fade-in">
-      <div className="w-full max-w-4xl p-8 bg-bg rounded-xl shadow-xl border border-border-color">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-text mb-8 text-center tracking-tight drop-shadow-md">
-          {t("budget.create_budget")}
-        </h1>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="flex flex-col sm:flex-row gap-4 items-end">
-            <div className="flex-1">
-              <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
-                {t("budget.department_project_name")}
-              </label>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
+      <div className="max-w-4xl mx-auto">
+        <motion.div className="mb-8" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-pink-600">
+              <Plus size={28} color="white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
+                {t("finance.budget.create_budget")}
+              </h1>
+              <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
+                {t("finance.budget.createNewBudget")}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="rounded-2xl shadow-lg p-6 lg:p-8 border"
+          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          variants={cardVariant}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.2 }}
+        >
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Department Selection */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-bold" style={{ color: 'var(--text-color)' }}>
+                  <Building className="inline mr-2" size={18} />
+                  {t("finance.budget.department_project_name")}
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowAddDepartmentModal(true)}
+                  className="text-sm px-3 py-1 rounded-lg font-medium transition-all hover:scale-105"
+                  style={{ backgroundColor: 'var(--color-accent)', color: 'var(--button-text)' }}
+                >
+                  + {t("finance.budget.add_department")}
+                </button>
+              </div>
               <select
-                name="departmentId"
                 value={formData.departmentId}
                 onChange={handleDepartmentSelect}
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 required
-                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
               >
-                <option value="">
-                  {t("budget.select_department_project")}
-                </option>
-                {departmentOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.name}
+                <option value="">{t("finance.budget.select_department")}</option>
+                {departmentOptions.map((dept) => (
+                  <option key={dept.id} value={dept.id}>
+                    {dept.name}
                   </option>
                 ))}
               </select>
             </div>
-            <button
-              type="button"
-              onClick={() => setShowAddDepartmentModal(true)}
-              className="px-6 py-3 bg-button-bg text-button-text rounded-full shadow-lg hover:bg-secondary transition-all duration-200"
-            >
-              {t("budget.add_department")}
-            </button>
-          </div>
 
-          {budget && (
-            <div className="p-4 bg-bg border border-border-color rounded-lg shadow-md">
-              <h3 className="text-sm font-semibold text-text mb-2 drop-shadow-sm">
-                {t("budget.department_budget")}
-              </h3>
-              <p className="text-sm text-text">
-                {t("budget.allocated")}: {budget.amount}
-              </p>
-              <p className="text-sm text-text">
-                {t("budget.spent")}: {budget.spentAmount}
-              </p>
-              <p className="text-sm text-text">
-                {t("budget.remaining")}: {budget.amount - budget.spentAmount}
-              </p>
-            </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
-              {t("budget.budget_amount")}
-            </label>
-            <input
-              type="number"
-              name="amount"
-              value={formData.amount}
-              onChange={handleChange}
-              required
-              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
-              {t("budget.currency")}
-            </label>
-            <select
-              name="currency"
-              value={formData.currency}
-              onChange={handleChange}
-              required
-              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
-            >
-              {currency.map((cur) => (
-                <option key={cur.currencyCode} value={cur.currencyCode}>
-                  {cur.currencyName} ({cur.currencyCode})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
-                {t("budget.start_date")}
-              </label>
-              <input
-                type="date"
-                name="startDate"
-                value={formData.startDate}
-                onChange={handleChange}
-                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
-                {t("budget.end_date")}
-              </label>
-              <input
-                type="date"
-                name="endDate"
-                value={formData.endDate}
-                onChange={handleChange}
-                className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold text-text mb-2 drop-shadow-sm">
-              {t("budget.notes")}
-            </label>
-            <textarea
-              name="notes"
-              value={formData.notes}
-              onChange={handleChange}
-              rows="4"
-              className="w-full p-3 border border-border-color rounded-lg bg-bg text-text shadow-md focus:ring-2 focus:ring-primary transition-all duration-200"
-            />
-          </div>
-
-          <div className="space-y-4">
-            <button
-              type="button"
-              onClick={() => setShowSignatureModal(true)}
-              className="px-6 py-3 bg-purple-500 text-white rounded-full shadow-lg hover:bg-purple-600 transition-all duration-200"
-            >
-              {t("budget.select_signers")}
-            </button>
-            {selectedSignatureList && (
-              <div className="p-4 bg-bg border border-border-color rounded-lg shadow-md">
-                <p className="text-sm font-semibold text-text mb-2 drop-shadow-sm">
-                  {t("budget.selected_signers")}:
-                </p>
-                {selectedSignatureList.signers &&
-                selectedSignatureList.signers.length > 0 ? (
-                  selectedSignatureList.signers.map((signer, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-3 text-sm text-text"
-                    >
-                      <span className="font-semibold">
-                        {signer.name || t("budget.unknown_name")}
-                      </span>
-                      <span className="opacity-70">
-                        {signer.role || t("budget.no_role")}
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-text opacity-70">
-                    {t("budget.empty_signers_list")}
-                  </p>
-                )}
+            {/* Amount & Currency */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <DollarSign className="inline mr-2" size={18} />
+                  {t("finance.budget.budget_amount")}
+                </label>
+                <input
+                  type="number"
+                  name="amount"
+                  value={formData.amount}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+                />
               </div>
-            )}
-          </div>
+              <div>
+                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                  {t("finance.budget.currency")}
+                </label>
+                <select
+                  name="currency"
+                  value={formData.currency}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+                >
+                  {currency.map((c) => (
+                    <option key={c.currencyCode} value={c.currencyCode}>
+                      {c.currencyName} ({c.currencyCode})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full px-6 py-3 bg-button-bg text-button-text rounded-full shadow-lg hover:bg-secondary transition-all duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
-            {loading ? t("budget.creating") : t("budget.create_budget")}
-          </button>
-        </form>
+            {/* Dates */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <Calendar className="inline mr-2" size={18} />
+                  {t("finance.budget.start_date")}
+                </label>
+                <input
+                  type="date"
+                  name="startDate"
+                  value={formData.startDate}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <Calendar className="inline mr-2" size={18} />
+                  {t("finance.budget.end_date")}
+                </label>
+                <input
+                  type="date"
+                  name="endDate"
+                  value={formData.endDate}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+                />
+              </div>
+            </div>
+
+            {/* Notes */}
+            <div>
+              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <FileText className="inline mr-2" size={18} />
+                {t("finance.budget.notes")}
+              </label>
+              <textarea
+                name="notes"
+                value={formData.notes}
+                onChange={handleChange}
+                rows="4"
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+                placeholder={t("finance.budget.notes_placeholder")}
+              />
+            </div>
+
+            {/* Signers */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-bold" style={{ color: 'var(--text-color)' }}>
+                  <Users className="inline mr-2" size={18} />
+                  {t("finance.budget.select_signers")}
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowSignatureModal(true)}
+                  className="px-4 py-2 rounded-xl font-medium transition-all hover:scale-105 flex items-center gap-2"
+                  style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
+                >
+                  <Plus size={16} />
+                  {t("finance.budget.add_signers")}
+                </button>
+              </div>
+              {selectedSignatureList && (
+                <motion.div
+                  className="p-4 rounded-xl border"
+                  style={{ backgroundColor: 'var(--border-color)', borderColor: 'var(--border-color)' }}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                >
+                  <p className="font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                    {selectedSignatureList.requirement}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedSignatureList.signers.map((signer, idx) => (
+                      <span
+                        key={idx}
+                        className="px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700"
+                      >
+                        {signer.name}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              className="w-full py-4 px-6 rounded-xl font-bold text-lg shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-3"
+              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
+            >
+              <Save size={24} />
+              {t("finance.budget.create_budget")}
+            </button>
+          </form>
+        </motion.div>
+
+        {/* Modals */}
+        {showAddDepartmentModal && (
+          <AddDepartmentModal
+            isOpen={showAddDepartmentModal}
+            onClose={() => setShowAddDepartmentModal(false)}
+            onSuccess={() => {
+              const fetchDepartments = async () => {
+                const res = await axiosInstance.get("/departments");
+                const options = res.data.data.map((dept) => ({ id: dept._id, name: dept.name }));
+                setDepartmentOptions(options);
+              };
+              fetchDepartments();
+            }}
+          />
+        )}
+
+        {showSignatureModal && (
+          <SignaturesModal
+            isOpen={showSignatureModal}
+            employeesData={employeesData}
+            signatureListsData={signatureListsData}
+            onClose={() => setShowSignatureModal(false)}
+            onSelectList={(list) => {
+              setSelectedSignatureList(list);
+              setShowSignatureModal(false);
+            }}
+            onSaveList={(data) => {
+              axiosInstance.post("/signatures/create", data).then(() => {
+                queryClient.invalidateQueries({ queryKey: ["signatureLists"] });
+                toast.success(t("finance.budget.signers_saved"));
+              });
+            }}
+            onDeleteList={(id) => {
+              axiosInstance.delete(`/signatures/${id}`).then(() => {
+                queryClient.invalidateQueries({ queryKey: ["signatureLists"] });
+                toast.success(t("finance.budget.signers_deleted"));
+              });
+            }}
+          />
+        )}
       </div>
-
-      {showAddDepartmentModal && (
-        <AddDepartmentModal
-          isOpen={showAddDepartmentModal}
-          onClose={() => setShowAddDepartmentModal(false)}
-          onSuccess={() => {
-            axiosInstance.get("/departments").then((res) => {
-              const options = res.data.data.map((dept) => ({
-                id: dept._id,
-                name: dept.name,
-              }));
-              setDepartmentOptions(options);
-              toast.success(t("budget.department_added"));
-            });
-          }}
-        />
-      )}
-
-      {showSignatureModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-          <div className="bg-accent rounded-xl p-6 w-full max-w-4xl shadow-2xl transform transition-all duration-300">
-            <h2 className="text-2xl font-bold text-text mb-6 text-center tracking-tight drop-shadow-md">
-              {t("budget.select_signers")}
-            </h2>
-            <SignaturesModal
-              isOpen={showSignatureModal}
-              onClose={() => setShowSignatureModal(false)}
-              isCreatingNewList={isCreatingNewList}
-              setIsCreatingNewList={setIsCreatingNewList}
-              newRequirement={newRequirement}
-              setNewRequirement={setNewRequirement}
-              newSigners={newSigners}
-              setNewSigners={setNewSigners}
-              employees={employeesData || []}
-              signatureLists={signatureListsData || []}
-              deleteSignatureList={(id) => deleteSignersListMutation.mutate(id)}
-              createSignatureList={(payload) =>
-                saveSignersListMutation.mutate(payload)
-              }
-              onUseList={onUseList}
-              t={t}
-            />
-          </div>
-        </div>
-      )}
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
-      `}</style>
     </div>
   );
 };

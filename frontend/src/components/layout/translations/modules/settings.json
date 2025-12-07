@@ -1,0 +1,346 @@
+{
+  "en": {
+    "translation": {
+      "settings": {
+        "title": "Settings"
+      },
+      "company": {
+        "name": "Company Name",
+        "email": "Company Email",
+        "phone": "Company Phone",
+        "website": "Company Website",
+        "logo": "Company Logo",
+        "tax_id": "Tax ID",
+        "street": "Street",
+        "city": "City",
+        "state": "State",
+        "postal_code": "Postal Code",
+        "country": "Country",
+        "logo_alt": "Nexora Logo",
+        "start_journey": "Start Your Business Journey",
+        "already_have": "Already have a company?",
+        "login_button": "Log In",
+        "select_industry": "Select Industry",
+        "industries": {
+          "technology": "Technology",
+          "retail": "Retail",
+          "finance": "Finance",
+          "healthcare": "Healthcare",
+          "education": "Education",
+          "real_estate": "Real Estate",
+          "manufacturing": "Manufacturing",
+          "other": "Other"
+        },
+        "create_button": "Create Company",
+        "success_message": "Company created successfully!",
+        "error_message": "Something went wrong, please try again."
+      }
+    }
+  },
+  "he": {
+    "translation": {
+      "settings": {
+        "title": "הגדרות"
+      },
+      "company": {
+        "name": "שם החברה",
+        "email": "דוא\"ל",
+        "phone": "טלפון",
+        "website": "אתר אינטרנט",
+        "logo": "לוגו",
+        "tax_id": "מספר מס",
+        "street": "רחוב",
+        "city": "עיר",
+        "state": "מדינה/אזור",
+        "postal_code": "מיקוד",
+        "country": "מדינה",
+        "logo_alt": "לוגו נקסורה",
+        "start_journey": "התחל את המסע העסקי שלך",
+        "already_have": "כבר יש לך חברה?",
+        "login_button": "התחבר",
+        "industry": "תעשייה",
+        "select_industry": "בחר תעשייה",
+        "success_message": "החברה נוצרה בהצלחה!",
+        "error_message": "שגיאה ביצירת החברה, אנא נסה שוב",
+        "create_button": "צור חברה",
+        "previous": "קודם",
+        "next": "הבא",
+        "steps": {
+          "basic_info": "מידע בסיסי",
+          "address": "כתובת",
+          "additional_details": "פרטים נוספים"
+        },
+        "placeholders": {
+          "name": "הזן שם החברה",
+          "email": "הזן כתובת דוא\"ל",
+          "phone": "הזן מספר טלפון",
+          "website": "הזן כתובת אתר",
+          "logo": "הזן כתובת URL של הלוגו",
+          "tax_id": "הזן מספר מס",
+          "street": "הזן רחוב",
+          "city": "הזן עיר",
+          "state": "הזן מדינה/אזור",
+          "postal_code": "הזן מיקוד",
+          "country": "הזן מדינה"
+        },
+        "industries": {
+          "technology": "טכנולוגיה",
+          "retail": "קמעונאות",
+          "finance": "פיננסים",
+          "healthcare": "בריאות",
+          "education": "חינוך",
+          "real_estate": "נדל\"ן",
+          "manufacturing": "ייצור",
+          "hospitality": "אירוח",
+          "transportation": "תחבורה",
+          "entertainment": "בידור",
+          "energy": "אנרגיה",
+          "construction": "בנייה",
+          "agriculture": "חקלאות",
+          "telecommunications": "תקשורת",
+          "aerospace": "תעופה וחלל",
+          "nonprofit": "ללא מטרות רווח",
+          "consulting": "ייעוץ",
+          "government": "ממשל",
+          "fashion": "אופנה",
+          "food_&_beverage": "מזון ומשקאות",
+          "sports": "ספורט",
+          "e-commerce": "מסחר אלקטרוני",
+          "media": "מדיה",
+          "legal_services": "שירותים משפטיים",
+          "software_development": "פיתוח תוכנה",
+          "hardware_development": "פיתוח חומרה",
+          "biotechnology": "ביוטכנולוגיה",
+          "pharmaceuticals": "תרופות",
+          "automotive": "רכב",
+          "logistics": "לוגיסטיקה",
+          "gaming": "משחקים",
+          "public_relations": "יחסי ציבור",
+          "event_management": "ניהול אירועים",
+          "advertising": "פרסום",
+          "tourism": "תיירות",
+          "mining": "כרייה",
+          "chemical_industry": "תעשייה כימית",
+          "art_&_design": "אמנות ועיצוב",
+          "publishing": "הוצאה לאור",
+          "music_&_performing_arts": "מוזיקה ואמנויות הבמה",
+          "environmental_services": "שירותי סביבה",
+          "security_services": "שירותי אבטחה",
+          "research_&_development": "מחקר ופיתוח",
+          "wholesale": "סיטונאות",
+          "human_resources": "משאבי אנוש",
+          "insurance": "ביטוח",
+          "digital_marketing": "שיווק דיגיטלי",
+          "data_analytics": "ניתוח נתונים",
+          "waste_management": "ניהול פסולת",
+          "marine_industry": "תעשייה ימית",
+          "electronics": "אלקטרוניקה",
+          "medical_devices": "מכשור רפואי",
+          "architecture": "אדריכלות",
+          "fitness_&_wellness": "כושר ובריאות",
+          "agritech": "טכנולוגיה חקלאית",
+          "fintech": "טכנולוגיה פיננסית",
+          "edtech": "טכנולוגיה חינוכית",
+          "healthtech": "טכנולוגיה רפואית",
+          "proptech": "טכנולוגיה נדל\"נית",
+          "saas": "תוכנה כשירות",
+          "cybersecurity": "אבטחת סייבר",
+          "nanotechnology": "ננוטכנולוגיה",
+          "blockchain": "בלוקצ'יין",
+          "artificial_intelligence": "בינה מלאכותית",
+          "other": "אחר"
+        }
+      }
+    }
+  },
+  "ru": {
+    "translation": {
+      "settings": {
+        "title": "Settings"
+      },
+      "company": {
+        "name": "Название компании",
+        "email": "Электронная почта компании",
+        "phone": "Телефон компании",
+        "website": "Сайт компании",
+        "logo": "Логотип компании",
+        "tax_id": "Налоговый номер",
+        "street": "Улица",
+        "city": "Город",
+        "state": "Область",
+        "postal_code": "Почтовый индекс",
+        "country": "Страна",
+        "logo_alt": "Логотип Nexora",
+        "start_journey": "Начните своё предпринимательское путешествие",
+        "already_have": "Уже есть компания?",
+        "login_button": "Войти",
+        "select_industry": "Выберите отрасль",
+        "industries": {
+          "technology": "Технологии",
+          "retail": "Розничная торговля",
+          "finance": "Финансы",
+          "healthcare": "Здравоохранение",
+          "education": "Образование",
+          "real_estate": "Недвижимость",
+          "manufacturing": "Промышленность",
+          "other": "Другое"
+        },
+        "create_button": "Создать компанию",
+        "success_message": "Компания успешно создана!",
+        "error_message": "Произошла ошибка, пожалуйста, попробуйте снова."
+      }
+    }
+  },
+  "ja": {
+    "translation": {
+      "settings": {
+        "title": "Settings"
+      },
+      "company": {
+        "name": "会社名",
+        "email": "会社のメール",
+        "phone": "会社の電話番号",
+        "website": "会社のウェブサイト",
+        "logo": "会社のロゴ",
+        "tax_id": "税番号",
+        "street": "通り",
+        "city": "市",
+        "state": "州",
+        "postal_code": "郵便番号",
+        "country": "国",
+        "logo_alt": "Nexoraのロゴ",
+        "start_journey": "あなたのビジネスの旅を始めましょう",
+        "already_have": "既に会社がありますか？",
+        "login_button": "ログイン",
+        "select_industry": "業界を選択",
+        "industries": {
+          "technology": "テクノロジー",
+          "retail": "小売",
+          "finance": "金融",
+          "healthcare": "医療",
+          "education": "教育",
+          "real_estate": "不動産",
+          "manufacturing": "製造",
+          "other": "その他"
+        },
+        "create_button": "会社を作成",
+        "success_message": "会社が正常に作成されました！",
+        "error_message": "問題が発生しました。もう一度お試しください。"
+      }
+    }
+  },
+  "fr": {
+    "translation": {
+      "settings": {
+        "title": "Settings"
+      },
+      "company": {
+        "name": "Nom de l'Entreprise",
+        "email": "E-mail de l'Entreprise",
+        "phone": "Téléphone de l'Entreprise",
+        "website": "Site Web de l'Entreprise",
+        "logo": "Logo de l'Entreprise",
+        "tax_id": "Numéro d'Identification Fiscale",
+        "street": "Rue",
+        "city": "Ville",
+        "state": "État/Province",
+        "postal_code": "Code Postal",
+        "country": "Pays",
+        "logo_alt": "Logo de Nexora",
+        "start_journey": "Commencez votre aventure entrepreneuriale",
+        "already_have": "Vous avez déjà une entreprise ?",
+        "login_button": "Se Connecter",
+        "select_industry": "Sélectionnez l'Industrie",
+        "industries": {
+          "technology": "Technologie",
+          "retail": "Commerce de Détail",
+          "finance": "Finance",
+          "healthcare": "Soins de Santé",
+          "education": "Éducation",
+          "real_estate": "Immobilier",
+          "manufacturing": "Fabrication",
+          "other": "Autre"
+        },
+        "create_button": "Créer une Entreprise",
+        "success_message": "Entreprise créée avec succès !",
+        "error_message": "Un problème est survenu, veuillez réessayer."
+      }
+    }
+  },
+  "es": {
+    "translation": {
+      "settings": {
+        "title": "Settings"
+      },
+      "company": {
+        "name": "Nombre de la Empresa",
+        "email": "Correo Electrónico de la Empresa",
+        "phone": "Teléfono de la Empresa",
+        "website": "Sitio Web de la Empresa",
+        "logo": "Logo de la Empresa",
+        "tax_id": "Número de Identificación Fiscal",
+        "street": "Calle",
+        "city": "Ciudad",
+        "state": "Estado/Provincia",
+        "postal_code": "Código Postal",
+        "country": "País",
+        "logo_alt": "Logo de Nexora",
+        "start_journey": "Comienza tu viaje empresarial",
+        "already_have": "¿Ya tienes una empresa?",
+        "login_button": "Iniciar Sesión",
+        "select_industry": "Selecciona la Industria",
+        "industries": {
+          "technology": "Tecnología",
+          "retail": "Minorista",
+          "finance": "Finanzas",
+          "healthcare": "Salud",
+          "education": "Educación",
+          "real_estate": "Bienes Raíces",
+          "manufacturing": "Manufactura",
+          "other": "Otro"
+        },
+        "create_button": "Crear Empresa",
+        "success_message": "¡Empresa creada con éxito!",
+        "error_message": "Algo salió mal, por favor intenta de nuevo."
+      }
+    }
+  },
+  "ar": {
+    "translation": {
+      "settings": {
+        "title": "Settings"
+      },
+      "company": {
+        "name": "اسم الشركة",
+        "email": "البريد الإلكتروني للشركة",
+        "phone": "هاتف الشركة",
+        "website": "موقع الشركة",
+        "logo": "شعار الشركة",
+        "tax_id": "الرقم الضريبي",
+        "street": "الشارع",
+        "city": "المدينة",
+        "state": "الولاية",
+        "postal_code": "الرمز البريدي",
+        "country": "الدولة",
+        "logo_alt": "شعار نكسورا",
+        "start_journey": "ابدأ رحلتك التجارية",
+        "already_have": "هل لديك شركة بالفعل؟",
+        "login_button": "تسجيل الدخول",
+        "select_industry": "اختر الصناعة",
+        "industries": {
+          "technology": "تكنولوجيا",
+          "retail": "تجزئة",
+          "finance": "مالية",
+          "healthcare": "الرعاية الصحية",
+          "education": "التعليم",
+          "real_estate": "العقارات",
+          "manufacturing": "تصنيع",
+          "other": "أخرى"
+        },
+        "create_button": "إنشاء شركة",
+        "success_message": "تم إنشاء الشركة بنجاح!",
+        "error_message": "حدث خطأ، يرجى المحاولة مرة أخرى."
+      }
+    }
+  }
+}

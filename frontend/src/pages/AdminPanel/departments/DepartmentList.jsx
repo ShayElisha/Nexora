@@ -1,27 +1,40 @@
 import { useState, useEffect } from "react";
-import React from "react"; // ייבוא מפורש של React עבור React.Fragment
+import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "../../../lib/axios";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  FaEdit,
-  FaTrash,
-  FaSearch,
-  FaExclamationTriangle,
-} from "react-icons/fa";
+  Building2,
+  Users,
+  User,
+  Edit,
+  Trash2,
+  Search,
+  Loader2,
+  AlertCircle,
+  X,
+  Briefcase,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 
-// Function to generate a random color
-const getRandomColor = () => {
-  const letters = "0123456789ABCDEF";
+// Deterministic color generator
+const colorFromString = (input) => {
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+    hash = input.charCodeAt(i) + ((hash << 5) - hash);
+    hash &= hash;
+  }
   let color = "#";
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
+  for (let i = 0; i < 3; i++) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += ("00" + value.toString(16)).slice(-2);
   }
   return color;
 };
 
-// Edit Department Modal Component
 const EditDepartmentModal = ({ department, isOpen, onClose }) => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -102,14 +115,36 @@ const EditDepartmentModal = ({ department, isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center z-50 transition-opacity duration-500 animate-fade-in">
-      <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto border border-border-color transform transition-all duration-300 scale-95 hover:scale-100">
-        <h2 className="text-2xl font-bold text-text mb-6 tracking-tight drop-shadow-sm">
-          {t("departments.edit_department", { name: department.name })}
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50 p-4"
+      style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
+      onClick={onClose}
+    >
+      <motion.div
+        className="rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border"
+        style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
+            {t("departments.edit_department")}
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="animate-slide-up">
-            <label className="block mb-2 text-text font-semibold">
+          <button
+            onClick={onClose}
+            className="p-2 rounded-full hover:scale-110 transition-all"
+            style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <Building2 className="inline mr-2" size={16} />
               {t("departments.name")}
             </label>
             <input
@@ -117,12 +152,18 @@ const EditDepartmentModal = ({ department, isOpen, onClose }) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full p-4 border border-border-color rounded-lg focus:ring-4 focus:ring-primary focus:border-primary transition-all duration-300 bg-white text-text placeholder-gray-400 shadow-sm hover:shadow-md"
+              className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+              style={{
+                borderColor: 'var(--border-color)',
+                backgroundColor: 'var(--bg-color)',
+                color: 'var(--text-color)',
+              }}
               required
             />
           </div>
-          <div className="animate-slide-up" style={{ animationDelay: "100ms" }}>
-            <label className="block mb-2 text-text font-semibold">
+
+          <div>
+            <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
               {t("departments.description")}
             </label>
             <textarea
@@ -130,18 +171,30 @@ const EditDepartmentModal = ({ department, isOpen, onClose }) => {
               value={formData.description}
               onChange={handleChange}
               rows="4"
-              className="w-full p-4 border border-border-color rounded-lg focus:ring-4 focus:ring-primary focus:border-primary transition-all duration-300 bg-white text-text placeholder-gray-400 shadow-sm hover:shadow-md resize-none"
+              className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+              style={{
+                borderColor: 'var(--border-color)',
+                backgroundColor: 'var(--bg-color)',
+                color: 'var(--text-color)',
+              }}
             />
           </div>
-          <div className="animate-slide-up" style={{ animationDelay: "200ms" }}>
-            <label className="block mb-2 text-text font-semibold">
+
+          <div>
+            <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <User className="inline mr-2" size={16} />
               {t("departments.manager")}
             </label>
             <select
               name="departmentManager"
               value={formData.departmentManager}
               onChange={handleChange}
-              className="w-full p-4 border border-border-color rounded-lg focus:ring-4 focus:ring-primary focus:border-primary transition-all duration-300 bg-white text-text shadow-sm hover:shadow-md"
+              className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+              style={{
+                borderColor: 'var(--border-color)',
+                backgroundColor: 'var(--bg-color)',
+                color: 'var(--text-color)',
+              }}
             >
               <option value="">{t("departments.select_manager")}</option>
               {employees
@@ -153,8 +206,10 @@ const EditDepartmentModal = ({ department, isOpen, onClose }) => {
                 ))}
             </select>
           </div>
-          <div className="animate-slide-up" style={{ animationDelay: "300ms" }}>
-            <label className="block mb-2 text-text font-semibold">
+
+          <div>
+            <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <Users className="inline mr-2" size={16} />
               {t("departments.team_members")}
             </label>
             <select
@@ -162,7 +217,12 @@ const EditDepartmentModal = ({ department, isOpen, onClose }) => {
               multiple
               value={formData.teamMembers}
               onChange={handleTeamMembersChange}
-              className="w-full p-4 border border-border-color rounded-lg focus:ring-4 focus:ring-primary focus:border-primary transition-all duration-300 bg-white text-text shadow-sm hover:shadow-md h-40"
+              className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2 h-40"
+              style={{
+                borderColor: 'var(--border-color)',
+                backgroundColor: 'var(--bg-color)',
+                color: 'var(--text-color)',
+              }}
             >
               {employees.map((emp) => (
                 <option key={emp._id} value={emp._id}>
@@ -171,26 +231,26 @@ const EditDepartmentModal = ({ department, isOpen, onClose }) => {
               ))}
             </select>
           </div>
-          <div
-            className="flex justify-end gap-4 animate-slide-up"
-            style={{ animationDelay: "400ms" }}
-          >
+
+          <div className="flex justify-end gap-4 mt-6">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 bg-gradient-to-r from-secondary to-primary text-button-text rounded-full hover:bg-secondary transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+              className="px-6 py-3 rounded-xl font-bold transition-all hover:scale-105"
+              style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
             >
               {t("departments.cancel")}
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-gradient-to-r from-button-bg to-accent text-button-text rounded-full hover:bg-accent transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+              className="px-6 py-3 rounded-xl font-bold shadow-lg transition-all hover:scale-105"
+              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
             >
               {t("departments.save")}
             </button>
           </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };
@@ -259,6 +319,13 @@ const DepartmentList = () => {
     return searchableString.includes(searchLower);
   });
 
+  const stats = {
+    total: departments.length,
+    withManager: departments.filter((d) => d.departmentManager).length,
+    totalMembers: departments.reduce((sum, d) => sum + (d.teamMembers?.length || 0), 0),
+    totalProjects: departments.reduce((sum, d) => sum + (d.projects?.length || 0), 0),
+  };
+
   const handleRowClick = (dept) => {
     setSelectedRow(selectedRow === dept._id ? null : dept._id);
   };
@@ -273,59 +340,186 @@ const DepartmentList = () => {
     setEditDepartment(dept);
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center" style={{ backgroundColor: 'var(--bg-color)' }}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center gap-4"
+        >
+          <Loader2 className="animate-spin" size={48} style={{ color: 'var(--color-primary)' }} />
+          <p style={{ color: 'var(--text-color)' }}>{t("departments.loading")}</p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="min-h-screen flex justify-center items-center" style={{ backgroundColor: 'var(--bg-color)' }}>
+        <div className="text-center">
+          <AlertCircle size={64} className="mx-auto mb-4 text-red-500" />
+          <div className="text-red-500 font-medium text-lg">
+            {error?.message || t("departments.failed_to_load_departments")}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto p-8 bg-gradient-to-br from-bg to-bg min-h-screen animate-fade-in">
-      <h1 className="text-4xl font-extrabold text-text mb-8 text-center tracking-tight drop-shadow-md">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-cyan-500 to-blue-600">
+              <Building2 size={28} color="white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
         {t("departments.department_list")}
       </h1>
+              <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
+                {t("departments.manage_all_departments")}
+              </p>
+            </div>
+          </div>
 
-      <div className="mb-6 flex justify-center">
-        <div className="relative w-full max-w-md">
+          {/* Statistics Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <motion.div
+              className="p-4 rounded-xl shadow-md border"
+              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-blue-100">
+                  <Building2 size={24} className="text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
+                    {t("departments.total_departments")}
+                  </p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
+                    {stats.total}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="p-4 rounded-xl shadow-md border"
+              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-green-100">
+                  <User size={24} className="text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
+                    {t("departments.with_manager")}
+                  </p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
+                    {stats.withManager}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="p-4 rounded-xl shadow-md border"
+              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-purple-100">
+                  <Users size={24} className="text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
+                    {t("departments.total_members")}
+                  </p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
+                    {stats.totalMembers}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="p-4 rounded-xl shadow-md border"
+              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-orange-100">
+                  <Briefcase size={24} className="text-orange-600" />
+                </div>
+                <div>
+                  <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
+                    {t("departments.total_projects")}
+                  </p>
+                  <p className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
+                    {stats.totalProjects}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Search */}
+          <div className="relative">
+            <Search
+              size={20}
+              className="absolute left-3 top-1/2 -translate-y-1/2"
+              style={{ color: 'var(--color-secondary)' }}
+            />
           <input
             type="text"
             placeholder={t("departments.search_placeholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-4 pl-12 border border-border-color rounded-full shadow-md focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300 bg-white text-text placeholder-gray-400"
-          />
-          <FaSearch
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 text-secondary"
-            size={20}
+              className="w-full pl-10 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2"
+              style={{
+                borderColor: 'var(--border-color)',
+                backgroundColor: 'var(--bg-color)',
+                color: 'var(--text-color)',
+              }}
           />
         </div>
-      </div>
+        </motion.div>
 
-      {isLoading ? (
-        <div className="flex justify-center items-center h-64">
-          <p className="text-text animate-pulse text-lg">
-            {t("departments.loading")}
-          </p>
-        </div>
-      ) : isError ? (
-        <div className="bg-red-100 border-l-4 border-red-600 text-red-800 p-4 mb-8 rounded-lg shadow-lg animate-slide-in max-w-2xl mx-auto">
-          <p className="flex items-center">
-            <FaExclamationTriangle className="mr-2" />
-            {error?.message || t("departments.failed_to_load_departments")}
-          </p>
-        </div>
-      ) : (
-        <div className="overflow-x-auto shadow-2xl rounded-xl bg-white transform transition-all duration-500 hover:shadow-3xl">
-          <table className="min-w-full text-text">
-            <thead className="bg-gradient-to-r from-primary to-secondary text-button-text">
-              <tr>
-                <th className="py-4 px-6 text-left text-sm font-bold tracking-wider">
+        {/* Table */}
+        <motion.div
+          className="rounded-2xl shadow-lg border overflow-hidden"
+          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b" style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--border-color)' }}>
+                  <th className="px-4 py-4 text-left font-bold" style={{ color: 'var(--button-text)' }}>
                   {t("departments.name")}
                 </th>
-                <th className="py-4 px-6 text-left text-sm font-bold tracking-wider">
+                  <th className="px-4 py-4 text-left font-bold" style={{ color: 'var(--button-text)' }}>
                   {t("departments.description")}
                 </th>
-                <th className="py-4 px-6 text-left text-sm font-bold tracking-wider">
+                  <th className="px-4 py-4 text-left font-bold" style={{ color: 'var(--button-text)' }}>
                   {t("departments.manager")}
                 </th>
-                <th className="py-4 px-6 text-left text-sm font-bold tracking-wider">
+                  <th className="px-4 py-4 text-left font-bold" style={{ color: 'var(--button-text)' }}>
                   {t("departments.team_members")}
                 </th>
-                <th className="py-4 px-6 text-center text-sm font-bold tracking-wider">
+                  <th className="px-4 py-4 text-center font-bold" style={{ color: 'var(--button-text)' }}>
                   {t("departments.actions")}
                 </th>
               </tr>
@@ -333,105 +527,147 @@ const DepartmentList = () => {
             <tbody>
               {filteredDepartments.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="py-6 px-4 text-center text-text italic animate-fade-in"
-                  >
+                    <td colSpan="5" className="px-4 py-16 text-center">
+                      <AlertCircle size={48} className="mx-auto mb-3" style={{ color: 'var(--color-secondary)' }} />
+                      <p style={{ color: 'var(--color-secondary)' }}>
                     {searchTerm
                       ? t("departments.no_departments_match")
                       : t("departments.no_departments")}
+                      </p>
                   </td>
                 </tr>
               ) : (
                 filteredDepartments.map((dept, index) => {
                   const initial = (dept.name || "D")[0].toUpperCase();
-                  const backgroundColor = getRandomColor();
+                    const backgroundColor = colorFromString(dept._id || dept.name || "d");
 
                   return (
                     <React.Fragment key={dept._id}>
-                      <tr
-                        className={`border-b transition-all duration-300 ${
-                          index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                        } hover:bg-accent hover:shadow-inner animate-slide-up`}
-                        style={{ animationDelay: `${index * 50}ms` }}
+                        <motion.tr
+                          className="border-b hover:bg-opacity-50 transition-all cursor-pointer"
+                          style={{ borderColor: 'var(--border-color)' }}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.03 }}
+                          whileHover={{ backgroundColor: 'var(--border-color)' }}
                         onClick={() => handleRowClick(dept)}
                       >
-                        <td className="py-4 px-6">
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-3">
                           <div
                             className="w-12 h-12 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-md"
                             style={{ backgroundColor }}
                           >
                             {initial}
                           </div>
-                          <span className="block mt-2 font-medium">
+                              <span className="font-bold" style={{ color: 'var(--text-color)' }}>
                             {dept.name || "-"}
                           </span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 max-w-xs">
+                            <p className="truncate" style={{ color: 'var(--text-color)' }}>
+                              {dept.description || "-"}
+                            </p>
                         </td>
-                        <td className="py-4 px-6">{dept.description || "-"}</td>
-                        <td className="py-4 px-6">
+                          <td className="px-4 py-4" style={{ color: 'var(--text-color)' }}>
                           {dept.departmentManager
                             ? `${dept.departmentManager.name} ${dept.departmentManager.lastName}`
                             : "-"}
                         </td>
-                        <td className="py-4 px-6">
-                          {dept.teamMembers && dept.teamMembers.length > 0
-                            ? dept.teamMembers
-                                .map((member) =>
-                                  `${member.employeeId?.name || ""} ${
-                                    member.employeeId?.lastName || ""
-                                  }`.trim()
-                                )
-                                .filter(Boolean)
-                                .join(", ") || "-"
-                            : t("departments.no_team_members")}
+                          <td className="px-4 py-4">
+                            <span
+                              className="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700"
+                            >
+                              {dept.teamMembers?.length || 0} {t("departments.members")}
+                            </span>
                         </td>
-                        <td className="py-4 px-6 flex gap-3 justify-center">
+                          <td className="px-4 py-4">
+                            <div className="flex gap-2 justify-center">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleEdit(dept);
                             }}
-                            className="text-primary hover:text-secondary transition-all duration-200 transform hover:scale-125 hover:rotate-6"
+                                className="p-2 rounded-lg transition-all hover:scale-110"
+                                style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
                             title={t("departments.edit")}
                           >
-                            <FaEdit size={24} />
+                                <Edit size={18} />
                           </button>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDelete(dept._id);
                             }}
-                            className="text-red-600 hover:text-red-800 transition-all duration-200 transform hover:scale-125 hover:rotate-6"
+                                className="p-2 bg-red-500 text-white rounded-lg transition-all hover:scale-110 hover:bg-red-600"
                             title={t("departments.delete")}
                           >
-                            <FaTrash size={24} />
+                                <Trash2 size={18} />
                           </button>
+                            </div>
                         </td>
-                      </tr>
+                        </motion.tr>
+
+                        {/* Expandable Row */}
+                        <AnimatePresence>
                       {selectedRow === dept._id && (
-                        <tr className="bg-gray-50 animate-slide-up">
-                          <td colSpan={5} className="py-4 px-6">
-                            <div className="flex flex-col gap-2">
-                              <div>
-                                <strong className="text-text">
+                            <motion.tr
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              style={{ backgroundColor: 'var(--border-color)' }}
+                            >
+                              <td colSpan="5" className="px-6 py-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  {/* Team Members */}
+                                  <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-color)' }}>
+                                    <h4 className="font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
+                                      <Users size={18} style={{ color: 'var(--color-primary)' }} />
+                                      {t("departments.team_members")}:
+                                    </h4>
+                                    {dept.teamMembers && dept.teamMembers.length > 0 ? (
+                                      <ul className="space-y-1 text-sm">
+                                        {dept.teamMembers.map((member, idx) => (
+                                          <li key={idx} style={{ color: 'var(--text-color)' }}>
+                                            • {member.employeeId?.name || ""}{" "}
+                                            {member.employeeId?.lastName || ""} -{" "}
+                                            {member.employeeId?.role || "-"}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    ) : (
+                                      <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
+                                        {t("departments.no_team_members")}
+                                      </p>
+                                    )}
+                                  </div>
+
+                                  {/* Projects */}
+                                  <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-color)' }}>
+                                    <h4 className="font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
+                                      <Briefcase size={18} style={{ color: 'var(--color-primary)' }} />
                                   {t("departments.projects")}:
-                                </strong>{" "}
+                                    </h4>
                                 {dept.projects && dept.projects.length > 0 ? (
-                                  <ul className="list-disc list-inside text-text">
+                                      <ul className="space-y-1 text-sm">
                                     {dept.projects.map((proj, idx) => (
-                                      <li key={idx}>
-                                        {proj.projectId?.name || "-"}
+                                          <li key={idx} style={{ color: 'var(--text-color)' }}>
+                                            • {proj.projectId?.name || "-"}
                                       </li>
                                     ))}
                                   </ul>
                                 ) : (
-                                  t("departments.no_projects")
+                                      <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
+                                        {t("departments.no_projects")}
+                                      </p>
                                 )}
                               </div>
                             </div>
                           </td>
-                        </tr>
+                            </motion.tr>
                       )}
+                        </AnimatePresence>
                     </React.Fragment>
                   );
                 })
@@ -439,31 +675,14 @@ const DepartmentList = () => {
             </tbody>
           </table>
         </div>
-      )}
+        </motion.div>
 
       <EditDepartmentModal
         department={editDepartment}
         isOpen={!!editDepartment}
         onClose={() => setEditDepartment(null)}
       />
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateX(-20px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        .animate-slide-up { animation: slideUp 0.4s ease-out; }
-        .animate-slide-in { animation: slideIn 0.4s ease-out; }
-      `}</style>
+      </div>
     </div>
   );
 };

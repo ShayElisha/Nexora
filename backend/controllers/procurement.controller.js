@@ -3,16 +3,48 @@ import Supplier from "../models/suppliers.model.js";
 import Company from "../models/companies.model.js";
 import Product from "../models/product.model.js";
 import Inventory from "../models/inventory.model.js";
+import InventoryHistory from "../models/InventoryHistory.model.js";
+import Finance from "../models/finance.model.js";
+import Warehouse from "../models/warehouse.model.js";
 import {
   sendProcurementEmailWithPDF,
   sendProcurementDiscrepancyEmail,
 } from "../emails/emailService.js";
 
 import jwt from "jsonwebtoken";
+import axios from "axios";
+import mongoose from "mongoose";
 import cloudinary, {
   extractPublicId,
   uploadToCloudinaryFile,
 } from "../config/lib/cloudinary.js";
+
+const normalizeShippingAddress = (
+  address = {},
+  fallbackStreet = "",
+  fallbackContactName = "",
+  fallbackContactPhone = ""
+) => {
+  if (!address || typeof address !== "object") {
+    address = {};
+  }
+
+  const normalized = {
+    street: (address.street || fallbackStreet || "").trim(),
+    city: (address.city || "").trim(),
+    state: (address.state || "").trim(),
+    country: (address.country || "").trim(),
+    zipCode: (address.zipCode || "").trim(),
+    contactName: (address.contactName || fallbackContactName || "").trim(),
+    contactPhone: (address.contactPhone || fallbackContactPhone || "").trim(),
+  };
+
+  const hasValue = Object.values(normalized).some((value) =>
+    typeof value === "string" ? value.length > 0 : Boolean(value)
+  );
+
+  return hasValue ? normalized : null;
+};
 
 // Create a new procurement
 export const createProcurementRecord = async (req, res) => {
@@ -22,6 +54,7 @@ export const createProcurementRecord = async (req, res) => {
     PurchaseOrder,
     supplierId,
     supplierName,
+    warehouseId,
     products,
     PaymentMethod,
     PaymentTerms,
@@ -45,26 +78,42 @@ export const createProcurementRecord = async (req, res) => {
     signers,
     status,
     statusUpdate,
+    shippingAddress,
+    contactPerson,
+    contactPhone,
   } = req.body;
 
   console.log("Received procurement data:", req.body);
+  console.log("📦 WarehouseId received:", warehouseId, "Type:", typeof warehouseId);
+
+  const normalizedShippingAddress = normalizeShippingAddress(
+    shippingAddress,
+    typeof DeliveryAddress === "string" ? DeliveryAddress : "",
+    contactPerson,
+    contactPhone
+  );
+
+  const effectiveDeliveryAddress =
+    (normalizedShippingAddress && normalizedShippingAddress.street) ||
+    (typeof DeliveryAddress === "string" ? DeliveryAddress.trim() : "");
 
   if (
     !PurchaseOrder ||
     !companyId ||
     !supplierId ||
+    !warehouseId ||
     !PaymentMethod ||
     !PaymentTerms ||
     !products ||
     products.length === 0 ||
-    !DeliveryAddress ||
+    !effectiveDeliveryAddress ||
     !totalCost ||
     !summeryProcurement
   ) {
     return res.status(400).json({
       success: false,
       message:
-        "All required fields must be provided, including products and supplier details.",
+        "All required fields must be provided, including products, supplier details, warehouse, delivery address, and summary.",
     });
   }
 
@@ -115,10 +164,11 @@ export const createProcurementRecord = async (req, res) => {
       PurchaseOrder,
       supplierId,
       supplierName,
+      warehouseId,
       products: validatedProducts,
       PaymentMethod,
       PaymentTerms,
-      DeliveryAddress,
+      DeliveryAddress: effectiveDeliveryAddress,
       ShippingMethod,
       purchaseDate: purchaseDate ? new Date(purchaseDate) : new Date(),
       deliveryDate: deliveryDate ? new Date(deliveryDate) : null,
@@ -133,16 +183,72 @@ export const createProcurementRecord = async (req, res) => {
         ? new Date(warrantyExpiration)
         : null,
       receivedDate: receivedDate ? new Date(receivedDate) : null,
-      totalCost: parseFloat(totalCost),
+      totalCost: parseFloat(totalCost) + (parseFloat(shippingCost) || 0), // Include shipping cost in total
       summeryProcurement: summeryProcurementUrl,
       currentSignatures: currentSignatures || 0,
       currentSignerIndex: currentSignerIndex || 0,
       signers: Array.isArray(signers) ? signers : [],
       status: status || "pending",
       statusUpdate: statusUpdate || null,
+      shippingAddress: normalizedShippingAddress,
+      contactPerson: contactPerson || normalizedShippingAddress?.contactName,
+      contactPhone: contactPhone || normalizedShippingAddress?.contactPhone,
     });
 
     const savedProcurementRecord = await newProcurementRecord.save();
+
+    // יצירת רשומה פיננסית אוטומטית
+    try {
+      // המרת PaymentTerms מ-Procurement ל-Finance
+      const mapPaymentTerms = (procurementTerms) => {
+        const mapping = {
+          "Due on receipt": "Immediate",
+          "Net 30 days": "Net 30",
+          "Net 45 days": "Net 45",
+          "Net 60 days": "Net 60",
+        };
+        return mapping[procurementTerms] || "Net 30";
+      };
+
+      // קביעת סטטוס התשלום
+      let financeStatus = "Pending";
+      if (paymentStatus === "Paid") {
+        financeStatus = "Completed";
+      } else if (paymentStatus === "Partial") {
+        financeStatus = "Pending";
+      }
+
+      // יצירת תיאור מפורט
+      const productsDescription = validatedProducts
+        .map((p) => `${p.productName} (${p.quantity}x ${p.unitPrice})`)
+        .join(", ");
+      const financeDescription = `תעודת רכש ${PurchaseOrder} - ${supplierName}${productsDescription ? `: ${productsDescription}` : ""}`;
+
+      const financeRecord = new Finance({
+        companyId,
+        transactionType: "Expense",
+        category: "Procurement",
+        transactionAmount: parseFloat(totalCost) + (parseFloat(shippingCost) || 0), // totalCost already includes shipping
+        transactionDate: purchaseDate ? new Date(purchaseDate) : new Date(),
+        transactionCurrency: currency || "USD",
+        transactionDescription: financeDescription,
+        bankAccount: PaymentMethod || "Bank Transfer",
+        transactionStatus: financeStatus,
+        recordType: "supplier",
+        partyId: supplierId,
+        invoiceNumber: PurchaseOrder,
+        paymentTerms: mapPaymentTerms(PaymentTerms),
+        otherDetails: `יוצר אוטומטית מתעודת רכש ${PurchaseOrder}.${notes ? ` הערות: ${notes}` : ""}${shippingCost ? ` עלות משלוח: ${shippingCost} ${currency || "USD"}` : ""}`,
+        attachmentURL: summeryProcurementUrl ? [summeryProcurementUrl] : [],
+      });
+
+      await financeRecord.save();
+      console.log(`✅ Created finance record ${financeRecord._id} for procurement ${PurchaseOrder}`);
+    } catch (financeError) {
+      console.error("⚠️  Error creating finance record:", financeError);
+      console.error("Finance error details:", financeError.message);
+      // לא נכשיל את כל הפעולה אם הרשומה הפיננסית נכשלה
+    }
 
     res.status(201).json({ success: true, data: savedProcurementRecord });
   } catch (error) {
@@ -196,28 +302,119 @@ export const getProcurementRecordById = async (req, res) => {
 };
 
 export const signProcurement = async (req, res) => {
+  console.log("📝 signProcurement called with:", {
+    id: req.params.id,
+    employeeId: req.body.employeeId,
+    hasSignature: !!req.body.signature,
+    companyId: req.user?.companyId,
+    hasUser: !!req.user,
+  });
+
+  // בדיקה ש-req.user קיים
+  if (!req.user || !req.user.companyId) {
+    console.error("❌ req.user or companyId is missing");
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized - User not authenticated",
+    });
+  }
+
   const companyId = req.user.companyId;
   const { id } = req.params;
   const { employeeId, signature } = req.body; // המשתמש שמנסה לחתום
 
   try {
+    // בדיקות בסיסיות
+    if (!employeeId) {
+      console.error("❌ Employee ID is missing");
+      return res.status(400).json({
+        success: false,
+        message: "Employee ID is required",
+      });
+    }
+
+    if (!signature) {
+      console.error("❌ Signature data is missing");
+      return res.status(400).json({
+        success: false,
+        message: "Signature data is required",
+      });
+    }
+
     const procurement = await Procurement.findById(id);
+    console.log("📦 Procurement found:", {
+      id: procurement?._id,
+      hasWarehouseId: !!procurement?.warehouseId,
+      signersCount: procurement?.signers?.length,
+    });
     if (!procurement) {
       return res
         .status(404)
         .json({ success: false, message: "Procurement not found" });
     }
-    const uploadResponse = await cloudinary.uploader.upload(signature, {
+
+    // בדיקה שה-procurement שייך ל-companyId של המשתמש
+    if (procurement.companyId.toString() !== companyId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You don't have permission to sign this procurement",
+      });
+    }
+
+    // העלאת החתימה ל-Cloudinary
+    let uploadResponse;
+    try {
+      console.log("☁️ Uploading signature to Cloudinary...");
+      uploadResponse = await cloudinary.uploader.upload(signature, {
       folder: "signatures",
       public_id: `signature_${id}_${employeeId}`,
-    });
+        resource_type: "image",
+      });
+      console.log("✅ Signature uploaded successfully:", uploadResponse.secure_url);
+    } catch (uploadError) {
+      console.error("❌ Error uploading signature to Cloudinary:", uploadError);
+      console.error("Upload error details:", {
+        message: uploadError.message,
+        http_code: uploadError.http_code,
+        name: uploadError.name,
+      });
+      return res.status(500).json({
+        success: false,
+        message: "Failed to upload signature",
+        error: uploadError.message,
+      });
+    }
 
-    procurement.signers.sort((a, b) => a.order - b.order);
+    // בדיקה שיש signers
+    if (!procurement.signers || procurement.signers.length === 0) {
+      console.error("❌ No signers found in procurement");
+      return res.status(400).json({
+        success: false,
+        message: "No signers found in this procurement.",
+      });
+    }
+
+    procurement.signers.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    console.log("👥 Signers list:", procurement.signers.map(s => ({
+      employeeId: s.employeeId?.toString(),
+      order: s.order,
+      hasSigned: s.hasSigned,
+    })));
 
     const signerInList = procurement.signers.find(
-      (signer) => signer.employeeId?.toString() === employeeId
+      (signer) => {
+        const signerEmployeeId = signer.employeeId?.toString();
+        const requestedEmployeeId = employeeId.toString();
+        return signerEmployeeId === requestedEmployeeId;
+      }
     );
+    
     if (!signerInList) {
+      console.error("❌ Employee not in signers list:", {
+        requestedEmployeeId: employeeId,
+        availableSigners: procurement.signers.map(s => s.employeeId?.toString()),
+      });
       return res.status(400).json({
         success: false,
         message: "You are not in the signers list for this procurement.",
@@ -225,6 +422,7 @@ export const signProcurement = async (req, res) => {
     }
 
     if (signerInList.hasSigned) {
+      console.warn("⚠️ Employee already signed");
       return res.status(400).json({
         success: false,
         message: "You have already signed this procurement.",
@@ -236,28 +434,40 @@ export const signProcurement = async (req, res) => {
     );
 
     if (!nextSigner) {
+      console.error("❌ No next signer found:", {
+        currentSignerIndex: procurement.currentSignerIndex,
+        signers: procurement.signers.map(s => ({ order: s.order, employeeId: s.employeeId?.toString() })),
+      });
       return res.status(400).json({
         success: false,
         message: "No next signer found or invalid order state.",
       });
     }
 
-    if (nextSigner.employeeId?.toString() !== employeeId) {
+    if (nextSigner.employeeId?.toString() !== employeeId.toString()) {
+      console.warn("⚠️ Not user's turn to sign:", {
+        nextSignerEmployeeId: nextSigner.employeeId?.toString(),
+        requestedEmployeeId: employeeId.toString(),
+      });
       return res.status(400).json({
         success: false,
         message: "It is not your turn to sign yet. Please wait for your turn.",
       });
     }
+    
     const signerIndex = procurement.signers.findIndex(
-      (signer) => signer.employeeId?.toString() === employeeId
+      (signer) => signer.employeeId?.toString() === employeeId.toString()
     );
 
     if (signerIndex === -1) {
+      console.error("❌ Signer index not found");
       return res.status(400).json({
         success: false,
         message: "Signer not found in the list.",
       });
     }
+    
+    console.log("✅ All validations passed, updating signature...");
     procurement.signers[signerIndex].signatureUrl = uploadResponse.secure_url;
 
     signerInList.hasSigned = true;
@@ -267,32 +477,37 @@ export const signProcurement = async (req, res) => {
     procurement.currentSignerIndex = procurement.currentSignatures;
 
     if (procurement.currentSignatures === procurement.signers.length) {
+      console.log("🎉 All signers have signed, updating status and sending email...");
       procurement.status = "completed";
       procurement.approvalStatus = "Approved";
+      procurement.approvedAt = new Date();
+      
+      // שליחת אימייל - לא נכשיל את החתימה אם זה נכשל
+      try {
       const supplierDetails = await Supplier.findById(procurement.supplierId);
       const companyDetails = await Company.findById(companyId);
 
       if (!supplierDetails || !supplierDetails.Email) {
-        console.error("Supplier details or email not found:", supplierDetails);
-        throw new Error("Supplier email is missing.");
-      }
-      if (!companyDetails || !companyDetails.name) {
-        console.error("Company details or name not found:", companyDetails);
-        throw new Error("Company name is missing.");
-      }
-      if (!procurement.summeryProcurement) {
-        console.error(
-          "Summery procurement data is missing:",
-          summeryProcurement,
-          summeryProcurementUrl
-        );
-        throw new Error("PDF data or URL is missing.");
-      }
-
-      // Convert PDF Base64 to Buffer
-      const pdfBuffer = Buffer.from(procurement.summeryProcurement, "base64");
-
+          console.warn("⚠️ Supplier details or email not found - skipping email");
+        } else if (!companyDetails || !companyDetails.name) {
+          console.warn("⚠️ Company details or name not found - skipping email");
+        } else if (!procurement.summeryProcurement) {
+          console.warn("⚠️ PDF data is missing - skipping email");
+        } else {
+      let pdfBuffer = null;
       try {
+        if (
+          typeof procurement.summeryProcurement === "string" &&
+          procurement.summeryProcurement.startsWith("http")
+        ) {
+          const response = await axios.get(procurement.summeryProcurement, {
+            responseType: "arraybuffer",
+          });
+          pdfBuffer = Buffer.from(response.data);
+        } else {
+          pdfBuffer = Buffer.from(procurement.summeryProcurement, "base64");
+      }
+
         await sendProcurementEmailWithPDF(
           supplierDetails.Email,
           supplierDetails.SupplierName,
@@ -300,14 +515,74 @@ export const signProcurement = async (req, res) => {
           procurement.summeryProcurement,
           pdfBuffer
         );
-        console.log("Procurement email sent successfully.");
-      } catch (emailError) {
-        console.error("Error sending procurement email:", emailError.message);
-        console.error("Error details:", emailError);
+            console.log("✅ Procurement email sent successfully.");
+          } catch (emailOrBufferError) {
+            // טיפול בשגיאות של buffer או email
+            if (emailOrBufferError.message?.includes("buffer") || emailOrBufferError.message?.includes("PDF")) {
+              console.error("⚠️ Failed to prepare procurement PDF buffer:", emailOrBufferError);
+            } else {
+              console.error("⚠️ Error sending procurement email:", emailOrBufferError.message);
+              console.error("Error details:", emailOrBufferError);
+            }
+            // לא נכשיל את החתימה
+          }
+        }
+      } catch (emailSetupError) {
+        console.error("⚠️ Error setting up email:", emailSetupError);
+        // לא נכשיל את החתימה
       }
     }
 
+    // אם warehouseId חסר, ננסה למצוא מחסן ברירת מחדל
+    // אבל לא נכשיל את החתימה אם אין מחסן - זה לא חובה לחתימה
+    if (!procurement.warehouseId) {
+      console.log("⚠️ Procurement missing warehouseId, attempting to find default warehouse");
+      try {
+        const defaultWarehouse = await Warehouse.findOne({
+          companyId: companyId,
+          status: "operational"
+        }).sort({ createdAt: 1 });
+        
+        if (defaultWarehouse) {
+          procurement.warehouseId = defaultWarehouse._id;
+          console.log(`✅ Using default warehouse: ${defaultWarehouse.name}`);
+        } else {
+          console.warn("⚠️ No default warehouse found for company - signature will proceed without warehouseId");
+          // לא נכשיל את החתימה - warehouseId לא חובה לחתימה
+          // אבל נשמור את זה ב-procurement ללא warehouseId (אם המודל מאפשר)
+        }
+      } catch (warehouseError) {
+        console.error("Error finding default warehouse:", warehouseError);
+        // לא נכשיל את החתימה - רק נוסיף לוג
+      }
+    }
+
+    // שמירת ה-procurement
+    try {
     await procurement.save();
+    } catch (saveError) {
+      console.error("Error saving procurement after signature:", saveError);
+      console.error("Save error details:", {
+        message: saveError.message,
+        name: saveError.name,
+        errors: saveError.errors,
+      });
+      // אם יש בעיה עם ה-save, ננסה למחוק את החתימה שהועלתה ל-Cloudinary
+      try {
+        if (uploadResponse?.public_id) {
+          await cloudinary.uploader.destroy(uploadResponse.public_id);
+        }
+      } catch (deleteError) {
+        console.error("Error deleting uploaded signature:", deleteError);
+      }
+      return res.status(500).json({
+        success: false,
+        message: "Failed to save procurement signature",
+        error: saveError.message,
+        validationErrors: saveError.errors ? Object.keys(saveError.errors) : undefined,
+      });
+    }
+
     return res.status(200).json({
       success: true,
       data: procurement,
@@ -315,9 +590,13 @@ export const signProcurement = async (req, res) => {
     });
   } catch (error) {
     console.error("Error signing procurement:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Error signing procurement" });
+    console.error("Error stack:", error.stack);
+    res.status(500).json({
+      success: false,
+      message: "Error signing procurement",
+      error: error.message,
+      details: process.env.NODE_ENV === "development" ? error.stack : undefined,
+    });
   }
 };
 export const getAllSignatures = async (req, res) => {
@@ -458,10 +737,12 @@ export const updateProcurementRecord = async (req, res) => {
   const allowedUpdates = [
     "supplierName",
     "PurchaseOrder",
+    "warehouseId",
     "products", // מערך מוצרים
     "PaymentMethod",
     "PaymentTerms",
     "DeliveryAddress",
+    "shippingAddress",
     "ShippingMethod",
     "purchaseDate",
     "deliveryDate",
@@ -482,24 +763,25 @@ export const updateProcurementRecord = async (req, res) => {
     "currentSignatures",
     "currentSignerIndex",
     "statusUpdate",
+    "contactPerson",
+    "contactPhone",
   ];
 
   const pro = await Procurement.findById(procurementId);
-  if (pro.summeryProcurement) {
-    const publicId = extractPublicId(pro.summeryProcurement);
-    if (publicId) {
-      // חשוב לא להשתמש שוב בשם "res", מכיוון שזה קונפליקט עם response
-      const deletionResult = await cloudinary.uploader.destroy(publicId);
-      console.log("Deletion result:", deletionResult);
-    } else {
-      console.log("Could not extract public_id from URL");
-    }
-  }
-
   let summeryProcurementUrl = "";
 
   // אם ה-PDF נשלח, העלה אותו ל-Cloudinary
   if (updates.summeryProcurement) {
+    if (pro?.summeryProcurement) {
+      const publicId = extractPublicId(pro.summeryProcurement);
+      if (publicId) {
+        const deletionResult = await cloudinary.uploader.destroy(publicId);
+        console.log("Deletion result:", deletionResult);
+      } else {
+        console.log("Could not extract public_id from URL");
+      }
+    }
+
     try {
       const uploadResult = await uploadToCloudinaryFile(
         updates.summeryProcurement,
@@ -521,11 +803,27 @@ export const updateProcurementRecord = async (req, res) => {
     .reduce((obj, key) => {
       if (key === "summeryProcurement" && summeryProcurementUrl) {
         obj["summeryProcurement"] = summeryProcurementUrl;
+      } else if (key === "shippingAddress") {
+        obj[key] = normalizeShippingAddress(
+          updates.shippingAddress,
+          updates.DeliveryAddress || pro?.DeliveryAddress || "",
+          updates.contactPerson || pro?.contactPerson || "",
+          updates.contactPhone || pro?.contactPhone || ""
+        );
       } else if (key !== "summeryProcurement") {
         obj[key] = updates[key];
       }
       return obj;
     }, {});
+
+  if (
+    sanitizedUpdates.shippingAddress &&
+    typeof sanitizedUpdates.shippingAddress === "object" &&
+    !sanitizedUpdates.DeliveryAddress
+  ) {
+    sanitizedUpdates.DeliveryAddress =
+      sanitizedUpdates.shippingAddress.street || pro?.DeliveryAddress || "";
+  }
 
   console.log("Sanitized updates:", sanitizedUpdates);
 
@@ -634,6 +932,14 @@ export const searchProcurements = async (req, res) => {
   }
 };
 export const receivedOrder = async (req, res) => {
+  console.log("📦 receivedOrder called with:", {
+    id: req.params.id,
+    hasReceivedQuantities: !!req.body.receivedQuantities,
+    receivedQuantitiesKeys: req.body.receivedQuantities ? Object.keys(req.body.receivedQuantities) : [],
+    allowCloseWithDiscrepancy: req.body.allowCloseWithDiscrepancy,
+    supplierRating: req.body.supplierRating,
+  });
+
   const { id } = req.params;
   const {
     receivedQuantities,
@@ -644,6 +950,7 @@ export const receivedOrder = async (req, res) => {
 
   const token = req.cookies["auth_token"];
   if (!token) {
+    console.error("❌ No auth token found");
     return res.status(401).json({ success: false, message: "Unauthorized" });
   }
 
@@ -651,16 +958,27 @@ export const receivedOrder = async (req, res) => {
   try {
     decodedToken = jwt.verify(token, process.env.JWT_SECRET);
   } catch (err) {
+    console.error("❌ Invalid token:", err.message);
     return res.status(401).json({ success: false, message: "Invalid token" });
   }
 
   if (!decodedToken || !decodedToken.companyId) {
+    console.error("❌ No companyId in token");
     return res.status(401).json({ success: false, message: "Unauthorized" });
   }
 
   const companyId = decodedToken.companyId;
 
   try {
+    // בדיקה ש-receivedQuantities קיים וזה object
+    if (!receivedQuantities || typeof receivedQuantities !== "object") {
+      console.error("❌ receivedQuantities is missing or invalid");
+      return res.status(400).json({
+        success: false,
+        message: "Received quantities are required and must be an object",
+      });
+    }
+
     const procurement = await Procurement.findOne({
       _id: id,
       companyId,
@@ -669,6 +987,99 @@ export const receivedOrder = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Procurement not found" });
+    }
+
+    console.log("📦 Procurement found:", procurement._id);
+    console.log("📦 Procurement warehouseId:", procurement.warehouseId);
+    console.log("📦 Procurement warehouseId type:", typeof procurement.warehouseId);
+    console.log("📦 Procurement products count:", procurement.products?.length || 0);
+
+    // בדיקה שיש products
+    if (!procurement.products || procurement.products.length === 0) {
+      console.error("❌ No products found in procurement");
+      return res.status(400).json({
+        success: false,
+        message: "No products found in this procurement",
+      });
+    }
+
+    // ודא שיש warehouseId ב-procurement - אם חסר, ננסה למצוא מחסן ברירת מחדל
+    let targetWarehouseId = procurement.warehouseId;
+    
+    if (!targetWarehouseId) {
+      // ננסה למצוא מחסן ברירת מחדל של החברה
+      const defaultWarehouse = await Warehouse.findOne({
+        companyId: companyId,
+        status: "operational"
+      }).sort({ createdAt: 1 }); // המחסן הראשון שנוצר
+      
+      if (!defaultWarehouse) {
+        return res.status(400).json({
+          success: false,
+          message: "Warehouse ID is missing in procurement record and no default warehouse found. Please update the procurement record with a warehouse ID.",
+        });
+      }
+      
+      // עדכן את ה-procurement עם המחסן שנמצא
+      targetWarehouseId = defaultWarehouse._id;
+      procurement.warehouseId = targetWarehouseId;
+      await procurement.save();
+      
+      console.log(`⚠️ Procurement ${procurement._id} was missing warehouseId. Using default warehouse: ${defaultWarehouse.name}`);
+    }
+
+    // המרת targetWarehouseId ל-ObjectId אם צריך (לפני הלולאה)
+    let warehouseIdValue = targetWarehouseId;
+    try {
+      if (typeof targetWarehouseId === "string") {
+        warehouseIdValue = new mongoose.Types.ObjectId(targetWarehouseId);
+        console.log(`✅ Converted warehouseId from string to ObjectId: ${warehouseIdValue}`);
+      } else if (targetWarehouseId && targetWarehouseId.toString) {
+        // אם זה כבר ObjectId, נשתמש בו ישירות
+        warehouseIdValue = targetWarehouseId;
+        console.log(`✅ Using warehouseId as ObjectId: ${warehouseIdValue}`);
+      } else {
+        throw new Error(`Invalid warehouseId type: ${typeof targetWarehouseId}`);
+      }
+      
+      // בדיקה ש-warehouseIdValue תקין על ידי המרה ל-string
+      const warehouseIdStr = warehouseIdValue.toString();
+      console.log(`✅ WarehouseId validated: ${warehouseIdStr}`);
+      
+      // בדיקה שהמחסן קיים
+      const warehouseExists = await Warehouse.findById(warehouseIdValue);
+      if (!warehouseExists) {
+        console.error(`❌ Warehouse ${warehouseIdStr} not found`);
+        return res.status(400).json({
+          success: false,
+          message: `Warehouse with ID ${warehouseIdStr} not found`,
+        });
+      }
+      console.log(`✅ Warehouse exists: ${warehouseExists.name}`);
+    } catch (warehouseIdError) {
+      console.error("❌ Invalid warehouseId format:", warehouseIdError);
+      return res.status(400).json({
+        success: false,
+        message: `Invalid warehouse ID format: ${targetWarehouseId}. Error: ${warehouseIdError.message}`,
+      });
+    }
+
+    // המרת companyId ל-ObjectId אם צריך (לפני הלולאה)
+    let companyIdValue = companyId;
+    if (typeof companyId === "string") {
+      try {
+        companyIdValue = new mongoose.Types.ObjectId(companyId);
+        console.log(`✅ Converted companyId from string to ObjectId: ${companyIdValue}`);
+      } catch (companyIdError) {
+        console.error("❌ Invalid companyId format:", companyIdError);
+        return res.status(400).json({
+          success: false,
+          message: `Invalid company ID format: ${companyId}`,
+        });
+      }
+    } else if (companyId && companyId.toString) {
+      companyIdValue = companyId;
+      console.log(`✅ Using companyId as ObjectId: ${companyIdValue}`);
     }
 
     let hasDiscrepancy = false;
@@ -681,7 +1092,35 @@ export const receivedOrder = async (req, res) => {
         });
       }
 
-      const productIdStr = product.productId._id.toString();
+      // טיפול ב-productId - יכול להיות ObjectId או Object (אם populate)
+      let productIdValue;
+      try {
+        if (product.productId && typeof product.productId === "object") {
+          if (product.productId._id) {
+            // אם זה Object (populate)
+            productIdValue = product.productId._id;
+          } else if (product.productId.toString) {
+            // אם זה ObjectId ישיר
+            productIdValue = product.productId;
+          } else {
+            throw new Error("Invalid productId object structure");
+          }
+        } else if (product.productId && product.productId.toString) {
+          // אם זה ObjectId ישיר (לא populate)
+          productIdValue = product.productId;
+        } else {
+          throw new Error("productId is not a valid ObjectId or object");
+        }
+      } catch (productIdError) {
+        console.error(`❌ Error processing productId for ${product.productName}:`, productIdError);
+        return res.status(400).json({
+          success: false,
+          message: `Invalid productId format for product "${product.productName}": ${productIdError.message}`,
+        });
+      }
+
+      const productIdStr = productIdValue.toString();
+      console.log(`🔍 Processing product: ${product.productName}, productId: ${productIdStr}, productId type: ${typeof productIdValue}`);
       const receivedQty = receivedQuantities[productIdStr];
 
       if (receivedQty === undefined) {
@@ -712,30 +1151,141 @@ export const receivedOrder = async (req, res) => {
         hasDiscrepancy = true;
       }
 
-      const productDoc = await Product.findById(product.productId._id);
+      const productDoc = await Product.findById(productIdValue);
       if (!productDoc) {
         return res.status(400).json({
           success: false,
-          message: `Product with id "${product.productId._id}" not found.`,
+          message: `Product with id "${productIdStr}" not found.`,
         });
       }
 
+      // בדיקה ש-warehouseIdValue תקין (כבר הומר לפני הלולאה)
+      if (!warehouseIdValue) {
+        console.error("❌ warehouseIdValue is missing or invalid");
+        return res.status(400).json({
+          success: false,
+          message: "Warehouse ID is required to save inventory. Please update the procurement record with a warehouse ID.",
+        });
+      }
+
+      // companyIdValue כבר הומר לפני הלולאה
+      console.log(`🔍 Looking for inventory: productId=${productIdStr}, warehouseId=${warehouseIdValue}, companyId=${companyIdValue}`);
+      
+      // חיפוש ראשון: עם warehouseId המדויק
       let inventory = await Inventory.findOne({
-        companyId: companyId,
-        productId: product.productId._id,
+        companyId: companyIdValue,
+        productId: productIdValue,
+        warehouseId: warehouseIdValue,
       });
 
+      // אם לא נמצא, נחפש inventory בלי warehouseId (אולי יש inventory ישן בלי warehouseId)
       if (!inventory) {
-        inventory = new Inventory({
-          companyId: companyId,
-          productId: product.productId._id,
-          quantity: receivedQty,
+        console.log(`🔍 Inventory not found with exact warehouseId, searching for inventory without warehouseId...`);
+        inventory = await Inventory.findOne({
+          companyId: companyIdValue,
+          productId: productIdValue,
+          $or: [
+            { warehouseId: null },
+            { warehouseId: { $exists: false } }
+          ]
         });
-      } else {
-        inventory.quantity += receivedQty;
+        
+        if (inventory) {
+          console.log(`📦 Found existing inventory without warehouseId, updating with warehouseId: ${warehouseIdValue}`);
+          inventory.warehouseId = warehouseIdValue;
+        }
       }
 
-      await inventory.save();
+      let oldQuantity = 0;
+      if (!inventory) {
+        console.log(`📦 Creating new inventory item for product ${product.productName} in warehouse ${warehouseIdValue}`);
+        try {
+          oldQuantity = 0; // אין כמות קודמת
+        inventory = new Inventory({
+            companyId: companyIdValue,
+            productId: productIdValue,
+            warehouseId: warehouseIdValue,
+            quantity: Number(receivedQty),
+            minStockLevel: 10, // Default value as per schema
+            reorderQuantity: 20, // Default value as per schema
+          });
+          console.log(`📦 Inventory object created:`, {
+            companyId: inventory.companyId?.toString(),
+            productId: inventory.productId?.toString(),
+            warehouseId: inventory.warehouseId?.toString(),
+            quantity: inventory.quantity,
+          });
+        } catch (createError) {
+          console.error(`❌ Error creating inventory object:`, createError);
+          throw new Error(`Failed to create inventory object for product "${product.productName}": ${createError.message}`);
+        }
+      } else {
+        oldQuantity = Number(inventory.quantity); // שמירת הכמות הישנה לפני העדכון
+        console.log(`📦 Updating existing inventory for product ${product.productName}: ${oldQuantity} + ${receivedQty} = ${oldQuantity + Number(receivedQty)}`);
+        inventory.quantity = oldQuantity + Number(receivedQty);
+      }
+
+      try {
+        console.log(`💾 Attempting to save inventory for product ${product.productName}...`);
+        const savedInventory = await inventory.save();
+        console.log(`✅ Inventory saved successfully for product ${product.productName}:`, {
+          id: savedInventory._id,
+          quantity: savedInventory.quantity,
+          warehouseId: savedInventory.warehouseId,
+        });
+
+        // יצירת רשומת היסטוריה
+        try {
+          await InventoryHistory.create({
+            companyId: companyIdValue,
+            productId: productIdValue,
+            productName: product.productName,
+            oldQuantity: oldQuantity,
+            newQuantity: savedInventory.quantity,
+            changeAmount: receivedQty,
+            reason: "Procurement Received",
+            type: "in",
+            notes: `Received ${receivedQty} units from procurement order ${procurement.PurchaseOrder}`,
+          });
+          console.log(`✅ Inventory history created for product ${product.productName}`);
+        } catch (historyError) {
+          console.error(`⚠️ Error creating inventory history:`, historyError);
+          // לא נכשיל את הפעולה אם יצירת ההיסטוריה נכשלה
+        }
+      } catch (inventorySaveError) {
+        console.error(`❌ Error saving inventory for product ${product.productName}:`, inventorySaveError);
+        console.error("Inventory save error details:", {
+          message: inventorySaveError.message,
+          name: inventorySaveError.name,
+          errors: inventorySaveError.errors,
+          stack: inventorySaveError.stack,
+        });
+        
+        // נסה להבין מה הבעיה
+        if (inventorySaveError.name === "ValidationError") {
+          const validationErrors = Object.keys(inventorySaveError.errors || {}).map(key => ({
+            field: key,
+            message: inventorySaveError.errors[key].message,
+          }));
+          console.error("Validation errors:", validationErrors);
+        }
+        
+        throw new Error(`Failed to save inventory for product "${product.productName}": ${inventorySaveError.message}`);
+      }
+    }
+
+    // עדכן את ניצול המחסן (warehouseIdValue ו-companyIdValue כבר הומרו לפני הלולאה)
+    try {
+      const { updateWarehouseUtilization } = await import("../utils/warehouseUtilization.js");
+      await updateWarehouseUtilization(warehouseIdValue, companyIdValue);
+      console.log("✅ Warehouse utilization updated successfully");
+    } catch (utilizationError) {
+      console.error("⚠️ Error updating warehouse utilization:", utilizationError);
+      console.error("Utilization error details:", {
+        message: utilizationError.message,
+        name: utilizationError.name,
+      });
+      // לא נכשיל את כל הפעולה אם עדכון הניצול נכשל
     }
 
     const supplier = await Supplier.findById(procurement.supplierId);
@@ -790,20 +1340,48 @@ export const receivedOrder = async (req, res) => {
     procurement.notes = updatedNotes;
 
     // עדכון דירוג הספק: בדיקה והמרה למערך אם צריך
-    if (supplierRating >= 1 && supplierRating <= 5) {
-      if (!Array.isArray(supplier.Rating)) {
-        supplier.Rating =
-          supplier.Rating !== undefined && supplier.Rating !== null
-            ? [supplier.Rating]
-            : [];
+    if (supplierRating && supplierRating >= 1 && supplierRating <= 5) {
+      console.log(`📊 Updating supplier rating for ${supplier.SupplierName}`);
+      console.log(`📌 Current Rating array:`, supplier.Rating);
+      console.log(`⭐ New rating:`, supplierRating);
+      
+      // ודא שהשדה Rating קיים ומערך
+      if (!supplier.Rating) {
+        supplier.Rating = [];
+      } else if (!Array.isArray(supplier.Rating)) {
+        supplier.Rating = [supplier.Rating];
       }
-      supplier.Rating.push(supplierRating);
-      await supplier.save();
+      
+      // הוסף את הדירוג החדש
+      supplier.Rating.push(Number(supplierRating));
+      
+      // חישוב ממוצע הדירוגים
+      const totalRatings = supplier.Rating.reduce((sum, rating) => sum + Number(rating), 0);
+      const averageRating = totalRatings / supplier.Rating.length;
+      supplier.averageRating = Math.round(averageRating * 10) / 10; // עיגול לספרה אחת אחרי הנקודה
+      
+      console.log(`📈 New average rating: ${supplier.averageRating} (from ${supplier.Rating.length} ratings)`);
+      
+      try {
+      const savedSupplier = await supplier.save();
+      console.log(`✅ Supplier saved successfully. Average rating: ${savedSupplier.averageRating}`);
+      } catch (supplierSaveError) {
+        console.error("⚠️ Error saving supplier rating:", supplierSaveError);
+        console.error("Supplier save error details:", {
+          message: supplierSaveError.message,
+          name: supplierSaveError.name,
+          errors: supplierSaveError.errors,
+        });
+        // לא נכשיל את הפעולה אם שמירת הדירוג נכשלה
+      }
     } else if (supplierRating !== undefined && supplierRating !== 0) {
+      console.log(`⚠️ Invalid rating received: ${supplierRating}`);
       return res.status(400).json({
         success: false,
         message: "Supplier rating must be between 1 and 5.",
       });
+    } else {
+      console.log(`ℹ️ No rating provided or rating is 0`);
     }
 
     // לוגיקה לעדכון סטטוס והודעות
@@ -839,6 +1417,7 @@ export const receivedOrder = async (req, res) => {
             receivedQuantity: product.receivedQuantity,
           }));
 
+        try {
         await sendProcurementDiscrepancyEmail(
           supplier.Email,
           supplier.SupplierName,
@@ -846,6 +1425,11 @@ export const receivedOrder = async (req, res) => {
           procurement.PurchaseOrder,
           discrepanciesArray
         );
+          console.log("✅ Discrepancy email sent successfully");
+        } catch (emailError) {
+          console.error("⚠️ Error sending discrepancy email:", emailError);
+          // לא נכשיל את הפעולה אם האימייל נכשל
+        }
       }
     } else if (hasDiscrepancy && allowCloseWithDiscrepancy) {
       procurement.orderStatus = "Delivered";
@@ -870,6 +1454,7 @@ export const receivedOrder = async (req, res) => {
           receivedQuantity: product.receivedQuantity,
         }));
 
+      try {
       await sendProcurementDiscrepancyEmail(
         supplier.Email,
         supplier.SupplierName,
@@ -877,19 +1462,47 @@ export const receivedOrder = async (req, res) => {
         procurement.PurchaseOrder,
         discrepanciesArray
       );
+        console.log("✅ Discrepancy email sent successfully");
+      } catch (emailError) {
+        console.error("⚠️ Error sending discrepancy email:", emailError);
+        // לא נכשיל את הפעולה אם האימייל נכשל
+      }
     } else {
       procurement.orderStatus = "Delivered";
       procurement.receivedDate = new Date();
     }
 
+    console.log("💾 Saving procurement...");
+    try {
     await procurement.save();
+      console.log("✅ Procurement saved successfully");
+    } catch (procurementSaveError) {
+      console.error("❌ Error saving procurement:", procurementSaveError);
+      console.error("Procurement save error details:", {
+        message: procurementSaveError.message,
+        name: procurementSaveError.name,
+        errors: procurementSaveError.errors,
+      });
+      throw new Error(`Failed to save procurement: ${procurementSaveError.message}`);
+    }
 
     res.json({
       success: true,
       message: "Received quantities updated successfully!",
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "Server Error" });
+    console.error("❌ Error in receivedOrder:", err);
+    console.error("Error stack:", err.stack);
+    console.error("Error details:", {
+      message: err.message,
+      name: err.name,
+      errors: err.errors,
+    });
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+      details: process.env.NODE_ENV === "development" ? err.stack : undefined,
+    });
   }
 };

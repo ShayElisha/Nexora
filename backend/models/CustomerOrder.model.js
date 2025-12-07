@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import addressSchema from "./subschemas/address.schema.js";
 
 // סכימת פריט בהזמנה (Order Item)
 const OrderItemSchema = new mongoose.Schema({
@@ -67,6 +68,19 @@ const CustomerOrderSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    // אחוז מס (VAT/מע"מ)
+    taxRate: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100,
+    },
+    // סכום המס
+    taxAmount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
     status: {
       type: String,
       enum: [
@@ -82,6 +96,57 @@ const CustomerOrderSchema = new mongoose.Schema(
     notes: {
       type: String,
       trim: true,
+    },
+    // מועד תשלום
+    paymentTerms: {
+      type: String,
+      enum: ["Immediate", "Net 30", "Net 45", "Net 60", "Net 90"],
+      default: "Net 30",
+    },
+    deliveryTrackingId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DeliveryTracking",
+    },
+    shippingAddress: addressSchema,
+    contactPhone: {
+      type: String,
+    },
+    preparationStatus: {
+      type: String,
+      enum: ["Not Started", "In Progress", "Ready to Ship"],
+      default: "Not Started",
+    },
+    confirmedAt: {
+      type: Date,
+    },
+    preparationDate: {
+      type: Date,
+    },
+    shippedAt: {
+      type: Date,
+    },
+    deliveredAt: {
+      type: Date,
+    },
+    // Flag to prevent double inventory deduction
+    inventoryReserved: {
+      type: Boolean,
+      default: false,
+    },
+    inventoryReservedAt: {
+      type: Date,
+    },
+    // קישור לליד (אם ההזמנה נוצרה מליד)
+    leadId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Lead",
+      required: false,
+    },
+    // קישור לפרויקט
+    projectId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
+      required: false,
     },
   },
   {

@@ -1,14 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import axiosInstance from "../../../lib/axios";
-import { FaEdit, FaTimes } from "react-icons/fa";
 import toast from "react-hot-toast";
+import {
+  Settings,
+  Plus,
+  Trash2,
+  Edit2,
+  Save,
+  X,
+  Globe,
+  Percent,
+  DollarSign,
+  ChevronDown,
+  ChevronUp,
+  AlertCircle,
+} from "lucide-react";
 
 const TaxConfig = () => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     countryCode: "",
-    taxName: t("taxConfig.incomeTax"),
+    taxName: t("finance.taxConfig.incomeTax"),
     taxBrackets: [{ limit: "", rate: "" }],
     otherTaxes: [{ name: "", rate: "", fixedAmount: "" }],
     currency: "ILS",
@@ -19,7 +33,6 @@ const TaxConfig = () => {
   const [loading, setLoading] = useState(false);
   const [tableLoading, setTableLoading] = useState(false);
 
-  // Fetch all tax configs
   useEffect(() => {
     const fetchAllTaxConfigs = async () => {
       setTableLoading(true);
@@ -27,7 +40,7 @@ const TaxConfig = () => {
         const response = await axiosInstance.get("/tax-config");
         setTaxConfigs(response.data.data);
       } catch (err) {
-        toast.error(t("taxConfig.errorFetchingConfigs") + " " + err.message);
+        toast.error(t("finance.taxConfig.errorFetchingConfigs") + " " + err.message);
       } finally {
         setTableLoading(false);
       }
@@ -35,7 +48,6 @@ const TaxConfig = () => {
     fetchAllTaxConfigs();
   }, [t]);
 
-  // Handle input changes
   const handleInputChange = (e, field, index, subField) => {
     if (index !== undefined && subField) {
       const updatedArray = [...formData[field]];
@@ -46,7 +58,6 @@ const TaxConfig = () => {
     }
   };
 
-  // Add new tax bracket
   const addTaxBracket = () => {
     setFormData({
       ...formData,
@@ -54,67 +65,46 @@ const TaxConfig = () => {
     });
   };
 
-  // Remove tax bracket
   const removeTaxBracket = (index) => {
     if (formData.taxBrackets.length > 1) {
-      const updatedBrackets = formData.taxBrackets.filter(
-        (_, i) => i !== index
-      );
+      const updatedBrackets = formData.taxBrackets.filter((_, i) => i !== index);
       setFormData({ ...formData, taxBrackets: updatedBrackets });
     } else {
-      toast.error(t("taxConfig.minBracketRequired"));
+      toast.error(t("finance.taxConfig.minBracketRequired"));
     }
   };
 
-  // Add new other tax
   const addOtherTax = () => {
     setFormData({
       ...formData,
-      otherTaxes: [
-        ...formData.otherTaxes,
-        { name: "", rate: "", fixedAmount: "" },
-      ],
+      otherTaxes: [...formData.otherTaxes, { name: "", rate: "", fixedAmount: "" }],
     });
   };
 
-  // Remove other tax
   const removeOtherTax = (index) => {
     if (formData.otherTaxes.length > 1) {
       const updatedTaxes = formData.otherTaxes.filter((_, i) => i !== index);
       setFormData({ ...formData, otherTaxes: updatedTaxes });
     } else {
-      toast.error(t("taxConfig.minOtherTaxRequired"));
+      toast.error(t("finance.taxConfig.minOtherTaxRequired"));
     }
   };
 
-  // Validate form
   const validateForm = () => {
-    if (!formData.countryCode) return t("taxConfig.countryCodeRequired");
-    if (!/^[A-Z]{2}$/.test(formData.countryCode))
-      return t("taxConfig.invalidCountryCode");
-    if (
-      !formData.taxBrackets.every(
-        (b) =>
-          Number(b.limit) >= 0 && Number(b.rate) >= 0 && Number(b.rate) <= 1
-      )
-    ) {
-      return t("taxConfig.invalidTaxBrackets");
+    if (!formData.countryCode) return t("finance.taxConfig.countryCodeRequired");
+    if (!/^[A-Z]{2}$/.test(formData.countryCode)) return t("finance.taxConfig.invalidCountryCode");
+    if (!formData.taxBrackets.every((b) => Number(b.limit) >= 0 && Number(b.rate) >= 0 && Number(b.rate) <= 1)) {
+      return t("finance.taxConfig.invalidTaxBrackets");
     }
-    if (
-      !formData.otherTaxes.every(
-        (t) => t.name && (Number(t.rate) >= 0 || Number(t.fixedAmount) >= 0)
-      )
-    ) {
-      return t("taxConfig.invalidOtherTaxes");
+    if (!formData.otherTaxes.every((t) => t.name && (Number(t.rate) >= 0 || Number(t.fixedAmount) >= 0))) {
+      return t("finance.taxConfig.invalidOtherTaxes");
     }
-    if (!formData.currency) return t("taxConfig.currencyRequired");
+    if (!formData.currency) return t("finance.taxConfig.currencyRequired");
     return "";
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const validationError = validateForm();
     if (validationError) {
       toast.error(validationError);
@@ -140,60 +130,45 @@ const TaxConfig = () => {
 
       if (editId) {
         await axiosInstance.put(`/tax-config/${editId}`, payload);
-        toast.success(t("taxConfig.updatedSuccess"));
+        toast.success(t("finance.taxConfig.updatedSuccess"));
       } else {
         await axiosInstance.post("/tax-config", payload);
-        toast.success(t("taxConfig.createdSuccess"));
+        toast.success(t("finance.taxConfig.createdSuccess"));
       }
 
       const response = await axiosInstance.get("/tax-config");
       setTaxConfigs(response.data.data);
       setFormData({
         countryCode: "",
-        taxName: t("taxConfig.incomeTax"),
+        taxName: t("finance.taxConfig.incomeTax"),
         taxBrackets: [{ limit: "", rate: "" }],
         otherTaxes: [{ name: "", rate: "", fixedAmount: "" }],
         currency: "ILS",
       });
       setEditId(null);
     } catch (err) {
-      let errorMessage = "";
-      if (err.response?.status === 400) {
-        errorMessage =
-          t("taxConfig.invalidData") +
-          (err.response?.data?.message || t("taxConfig.checkData"));
-      } else if (err.response?.status === 404) {
-        errorMessage = t("taxConfig.configNotFound");
-      } else {
-        errorMessage =
-          t("taxConfig.errorSavingConfig") +
-          (err.response?.data?.message || err.message);
-      }
-      toast.error(errorMessage);
+      toast.error(t("finance.taxConfig.errorSavingConfig") + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle cancel
   const handleCancel = () => {
     setFormData({
       countryCode: "",
-      taxName: t("taxConfig.incomeTax"),
+      taxName: t("finance.taxConfig.incomeTax"),
       taxBrackets: [{ limit: "", rate: "" }],
       otherTaxes: [{ name: "", rate: "", fixedAmount: "" }],
       currency: "ILS",
     });
     setEditId(null);
-    toast(t("taxConfig.cancelled"));
+    toast(t("finance.taxConfig.cancelled"));
   };
 
-  // Handle row click to toggle details
   const toggleRow = (configId) => {
     setExpandedRow(expandedRow === configId ? null : configId);
   };
 
-  // Handle edit button click
   const handleEdit = (taxConfigId) => {
     const config = taxConfigs.find((c) => c._id === taxConfigId);
     if (config) {
@@ -201,395 +176,407 @@ const TaxConfig = () => {
         countryCode: config.countryCode,
         taxName: config.taxName,
         taxBrackets: config.taxBrackets.length
-          ? config.taxBrackets.map((b) => ({
-              limit: b.limit === Infinity ? "" : b.limit,
-              rate: b.rate,
-            }))
+          ? config.taxBrackets.map((b) => ({ limit: b.limit === Infinity ? "" : b.limit, rate: b.rate }))
           : [{ limit: "", rate: "" }],
-        otherTaxes: config.otherTaxes.length
-          ? config.otherTaxes
-          : [{ name: "", rate: "", fixedAmount: "" }],
+        otherTaxes: config.otherTaxes.length ? config.otherTaxes : [{ name: "", rate: "", fixedAmount: "" }],
         currency: config.currency,
       });
       setEditId(taxConfigId);
-
-      toast(t("taxConfig.editMode"));
+      toast(t("finance.taxConfig.editMode"));
     }
   };
 
+  const cardVariant = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-6 text-center">
-        {editId ? t("taxConfig.editTaxConfig") : t("taxConfig.createTaxConfig")}
-      </h2>
-
-      {loading ? (
-        <div className="text-center text-gray-500">
-          {t("taxConfig.loading")}
-        </div>
-      ) : (
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white shadow-md rounded-lg p-6 mb-8"
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
         >
-          {/* Country Code */}
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              {t("taxConfig.countryCode")}
-            </label>
-            <select
-              value={formData.countryCode}
-              onChange={(e) => handleInputChange(e, "countryCode")}
-              className="border p-2 rounded w-full"
-              required
-              disabled={editId}
-            >
-              <option value="">{t("taxConfig.selectCountry")}</option>
-              <option value="IL">{t("taxConfig.countries.IL")}</option>
-              <option value="US">{t("taxConfig.countries.US")}</option>
-              <option value="UK">{t("taxConfig.countries.UK")}</option>
-              <option value="EU">{t("taxConfig.countries.EU")}</option>
-            </select>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-orange-500 to-red-600">
+              <Settings size={28} color="white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
+                {editId ? t("finance.taxConfig.editTaxConfig") : t("finance.taxConfig.createTaxConfig")}
+              </h1>
+              <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
+                {t("finance.taxConfig.manageTaxSettings")}
+              </p>
+            </div>
           </div>
+        </motion.div>
 
-          {/* Tax Name */}
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              {t("taxConfig.taxName")}
-            </label>
-            <input
-              type="text"
-              value={formData.taxName}
-              onChange={(e) => handleInputChange(e, "taxName")}
-              className="border p-2 rounded w-full"
-              placeholder={t("taxConfig.taxNamePlaceholder")}
-            />
-          </div>
-
-          {/* Tax Brackets */}
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              {t("taxConfig.taxBrackets")}
-            </label>
-            {formData.taxBrackets.map((bracket, index) => (
-              <div key={index} className="flex gap-4 mb-2">
-                <input
-                  type="number"
-                  step="0.01"
-                  value={bracket.limit}
-                  onChange={(e) =>
-                    handleInputChange(e, "taxBrackets", index, "limit")
-                  }
-                  className="border p-2 rounded w-1/2"
-                  placeholder={t("taxConfig.limitPlaceholder")}
+        {/* Form */}
+        <motion.div
+          className="mb-8 rounded-2xl shadow-lg p-6 lg:p-8 border"
+          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          variants={cardVariant}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.2 }}
+        >
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Basic Info */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <Globe className="inline mr-2" size={16} />
+                  {t("finance.taxConfig.countryCode")}
+                </label>
+                <select
+                  value={formData.countryCode}
+                  onChange={(e) => handleInputChange(e, "countryCode")}
+                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                   required
-                />
-                <input
-                  type="number"
-                  step="0.01"
-                  value={bracket.rate}
-                  onChange={(e) =>
-                    handleInputChange(e, "taxBrackets", index, "rate")
-                  }
-                  className="border p-2 rounded w-1/2"
-                  placeholder={t("taxConfig.ratePlaceholder")}
-                  required
-                />
-                {formData.taxBrackets.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeTaxBracket(index)}
-                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                  >
-                    {t("taxConfig.remove")}
-                  </button>
-                )}
+                  disabled={editId}
+                >
+                  <option value="">{t("finance.taxConfig.selectCountry")}</option>
+                  <option value="IL">{t("finance.taxConfig.countries.IL")}</option>
+                  <option value="US">{t("finance.taxConfig.countries.US")}</option>
+                  <option value="UK">{t("finance.taxConfig.countries.UK")}</option>
+                  <option value="EU">{t("finance.taxConfig.countries.EU")}</option>
+                </select>
               </div>
-            ))}
-            <button
-              type="button"
-              onClick={addTaxBracket}
-              className="bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-600"
-            >
-              {t("taxConfig.addTaxBracket")}
-            </button>
-          </div>
 
-          {/* Other Taxes */}
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              {t("taxConfig.otherTaxes")}
-            </label>
-            {formData.otherTaxes.map((tax, index) => (
-              <div key={index} className="flex gap-4 mb-2">
+              <div>
+                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                  {t("finance.taxConfig.taxName")}
+                </label>
                 <input
                   type="text"
-                  value={tax.name}
-                  onChange={(e) =>
-                    handleInputChange(e, "otherTaxes", index, "name")
-                  }
-                  className="border p-2 rounded w-1/3"
-                  placeholder={t("taxConfig.otherTaxNamePlaceholder")}
-                  required
+                  value={formData.taxName}
+                  onChange={(e) => handleInputChange(e, "taxName")}
+                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+                  placeholder={t("finance.taxConfig.taxNamePlaceholder")}
                 />
-                <input
-                  type="number"
-                  step="0.01"
-                  value={tax.rate}
-                  onChange={(e) =>
-                    handleInputChange(e, "otherTaxes", index, "rate")
-                  }
-                  className="border p-2 rounded w-1/3"
-                  placeholder={t("taxConfig.otherTaxRatePlaceholder")}
-                />
-                <input
-                  type="number"
-                  step="0.01"
-                  value={tax.fixedAmount}
-                  onChange={(e) =>
-                    handleInputChange(e, "otherTaxes", index, "fixedAmount")
-                  }
-                  className="border p-2 rounded w-1/3"
-                  placeholder={t("taxConfig.fixedAmountPlaceholder")}
-                />
-                {formData.otherTaxes.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeOtherTax(index)}
-                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                  >
-                    {t("taxConfig.remove")}
-                  </button>
-                )}
               </div>
-            ))}
-            <button
-              type="button"
-              onClick={addOtherTax}
-              className="bg-blue-500 text-white px-4 py-2 rounded mt-2 hover:bg-blue-600"
-            >
-              {t("taxConfig.addOtherTax")}
-            </button>
-          </div>
 
-          {/* Currency */}
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              {t("taxConfig.currency")}
-            </label>
-            <select
-              value={formData.currency}
-              onChange={(e) => handleInputChange(e, "currency")}
-              className="border p-2 rounded w-full"
-              required
-            >
-              <option value="">{t("taxConfig.selectCurrency")}</option>
-              <option value="ILS">{t("taxConfig.currencies.ILS")}</option>
-              <option value="USD">{t("taxConfig.currencies.USD")}</option>
-              <option value="EUR">{t("taxConfig.currencies.EUR")}</option>
-              <option value="GBP">{t("taxConfig.currencies.GBP")}</option>
-            </select>
-          </div>
+              <div>
+                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <DollarSign className="inline mr-2" size={16} />
+                  {t("finance.taxConfig.currency")}
+                </label>
+                <select
+                  value={formData.currency}
+                  onChange={(e) => handleInputChange(e, "currency")}
+                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+                  required
+                >
+                  <option value="ILS">₪ ILS</option>
+                  <option value="USD">$ USD</option>
+                  <option value="EUR">€ EUR</option>
+                  <option value="GBP">£ GBP</option>
+                </select>
+              </div>
+            </div>
 
-          {/* Form Actions */}
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-              disabled={loading}
-            >
-              {loading ? t("taxConfig.saving") : t("taxConfig.save")}
-            </button>
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-            >
-              {t("taxConfig.cancel")}
-            </button>
-          </div>
-        </form>
-      )}
+            {/* Tax Brackets */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <label className="text-lg font-bold flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
+                  <Percent size={20} />
+                  {t("finance.taxConfig.taxBrackets")}
+                </label>
+                <button
+                  type="button"
+                  onClick={addTaxBracket}
+                  className="px-4 py-2 rounded-xl font-medium transition-all hover:scale-105 flex items-center gap-2"
+                  style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
+                >
+                  <Plus size={18} />
+                  {t("finance.taxConfig.addBracket")}
+                </button>
+              </div>
+              <div className="space-y-3">
+                {formData.taxBrackets.map((bracket, index) => (
+                  <motion.div
+                    key={index}
+                    className="flex gap-3 p-4 rounded-xl border"
+                    style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)' }}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={bracket.limit}
+                      onChange={(e) => handleInputChange(e, "taxBrackets", index, "limit")}
+                      className="flex-1 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+                      placeholder={t("finance.taxConfig.limitPlaceholder")}
+                      required
+                    />
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={bracket.rate}
+                      onChange={(e) => handleInputChange(e, "taxBrackets", index, "rate")}
+                      className="flex-1 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+                      placeholder={t("finance.taxConfig.ratePlaceholder")}
+                      required
+                    />
+                    {formData.taxBrackets.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeTaxBracket(index)}
+                        className="p-3 rounded-xl transition-all hover:scale-110 bg-red-500 text-white"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
 
-      {/* Tax Configs Table */}
-      <div className="mt-8">
-        <h3 className="text-xl font-bold mb-4">
-          {t("taxConfig.taxConfigsList")}
-        </h3>
-        {tableLoading ? (
-          <div className="text-center text-gray-500">
-            {t("taxConfig.loading")}
-          </div>
-        ) : taxConfigs.length === 0 ? (
-          <div className="text-center text-gray-500">
-            {t("taxConfig.noConfigsFound")}
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white shadow-md rounded-lg">
-              <thead>
-                <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                  <th className="py-3 px-6 text-right">
-                    {t("taxConfig.countryCode")}
-                  </th>
-                  <th className="py-3 px-6 text-right">
-                    {t("taxConfig.taxName")}
-                  </th>
-                  <th className="py-3 px-6 text-right">
-                    {t("taxConfig.currency")}
-                  </th>
-                  <th className="py-3 px-6 text-right">
-                    {t("taxConfig.active")}
-                  </th>
-                  <th className="py-3 px-6 text-right">
-                    {t("taxConfig.actions")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-600 text-sm font-light">
-                {taxConfigs.map((config) => (
-                  <React.Fragment key={config._id}>
-                    <tr
-                      onClick={() => toggleRow(config._id)}
-                      className="border-b border-gray-200 hover:bg-gray-100 cursor-pointer"
-                    >
-                      <td className="py-3 px-6 text-right">
-                        {config.countryCode}
-                      </td>
-                      <td className="py-3 px-6 text-right">{config.taxName}</td>
-                      <td className="py-3 px-6 text-right">
-                        {config.currency}
-                      </td>
-                      <td className="py-3 px-6 text-right">
-                        {config.isActive
-                          ? t("taxConfig.activeStatus")
-                          : t("taxConfig.inactiveStatus")}
-                      </td>
-                      <td className="py-3 px-6 text-right">
-                        <FaEdit
-                          className="text-blue-500 cursor-pointer hover:text-blue-700"
+            {/* Other Taxes */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <label className="text-lg font-bold" style={{ color: 'var(--text-color)' }}>
+                  {t("finance.taxConfig.otherTaxes")}
+                </label>
+                <button
+                  type="button"
+                  onClick={addOtherTax}
+                  className="px-4 py-2 rounded-xl font-medium transition-all hover:scale-105 flex items-center gap-2"
+                  style={{ backgroundColor: 'var(--color-accent)', color: 'var(--button-text)' }}
+                >
+                  <Plus size={18} />
+                  {t("finance.taxConfig.addOtherTax")}
+                </button>
+              </div>
+              <div className="space-y-3">
+                {formData.otherTaxes.map((tax, index) => (
+                  <motion.div
+                    key={index}
+                    className="flex gap-3 p-4 rounded-xl border"
+                    style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)' }}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <input
+                      type="text"
+                      value={tax.name}
+                      onChange={(e) => handleInputChange(e, "otherTaxes", index, "name")}
+                      className="flex-1 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+                      placeholder={t("finance.taxConfig.namePlaceholder")}
+                      required
+                    />
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={tax.rate}
+                      onChange={(e) => handleInputChange(e, "otherTaxes", index, "rate")}
+                      className="flex-1 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+                      placeholder={t("finance.taxConfig.ratePlaceholder")}
+                    />
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={tax.fixedAmount}
+                      onChange={(e) => handleInputChange(e, "otherTaxes", index, "fixedAmount")}
+                      className="flex-1 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+                      placeholder={t("finance.taxConfig.fixedAmountPlaceholder")}
+                    />
+                    {formData.otherTaxes.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeOtherTax(index)}
+                        className="p-3 rounded-xl transition-all hover:scale-110 bg-red-500 text-white"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4">
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 py-4 px-6 rounded-xl font-bold text-lg shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-3 disabled:opacity-50"
+                style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
+              >
+                {loading ? (
+                  <>
+                    <motion.div
+                      className="w-5 h-5 border-2 border-t-2 border-white rounded-full"
+                      animate={{ rotate: 360 }}
+                      transition={{ repeat: Infinity, duration: 1 }}
+                    />
+                    {t("finance.taxConfig.saving")}
+                  </>
+                ) : (
+                  <>
+                    <Save size={24} />
+                    {editId ? t("finance.taxConfig.update") : t("finance.taxConfig.create")}
+                  </>
+                )}
+              </button>
+              {editId && (
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="px-6 py-4 rounded-xl font-bold text-lg shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-3"
+                  style={{ backgroundColor: 'var(--color-accent)', color: 'var(--button-text)' }}
+                >
+                  <X size={24} />
+                  {t("finance.taxConfig.cancel")}
+                </button>
+              )}
+            </div>
+          </form>
+        </motion.div>
+
+        {/* Existing Configs */}
+        <motion.div
+          className="rounded-2xl shadow-lg p-6 border"
+          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          variants={cardVariant}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.4 }}
+        >
+          <h3 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-color)' }}>
+            {t("finance.taxConfig.existingConfigs")}
+          </h3>
+          {tableLoading ? (
+            <div className="flex items-center justify-center h-32">
+              <motion.div
+                className="w-12 h-12 border-4 border-t-4 rounded-full"
+                style={{ borderColor: 'var(--border-color)', borderTopColor: 'var(--color-primary)' }}
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 1 }}
+              />
+            </div>
+          ) : taxConfigs.length === 0 ? (
+            <div className="text-center py-16">
+              <AlertCircle size={64} className="mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
+              <p className="text-xl font-semibold" style={{ color: 'var(--text-color)' }}>
+                {t("finance.taxConfig.noConfigs")}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4">
+              {taxConfigs.map((config, index) => (
+                <motion.div
+                  key={config._id}
+                  variants={cardVariant}
+                  initial="hidden"
+                  animate="visible"
+                  transition={{ delay: index * 0.05 }}
+                  className="rounded-xl shadow-md overflow-hidden border hover:shadow-lg transition-all"
+                  style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                >
+                  <div
+                    className="p-6 cursor-pointer"
+                    onClick={() => toggleRow(config._id)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-orange-500 to-red-500">
+                          <Globe size={24} color="white" />
+                        </div>
+                        <div>
+                          <p className="text-xl font-bold" style={{ color: 'var(--text-color)' }}>
+                            {config.taxName}
+                          </p>
+                          <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
+                            {t(`taxConfig.countries.${config.countryCode}`)} ({config.currency})
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleEdit(config._id);
                           }}
-                        />
-                      </td>
-                    </tr>
-                    {expandedRow === config._id && (
-                      <tr>
-                        <td colSpan="5" className="bg-gray-50 p-4">
-                          <div className="relative bg-white shadow-md rounded-lg p-6">
-                            <button
-                              onClick={() => setExpandedRow(null)}
-                              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-                            >
-                              <FaTimes />
-                            </button>
-                            <h4 className="text-lg font-semibold mb-4">
-                              {t("taxConfig.taxConfigDetails")}
-                            </h4>
-                            {/* Tax Brackets Table */}
-                            <div className="mb-6">
-                              <h5 className="text-md font-bold mb-2">
-                                {t("taxConfig.taxBrackets")}
-                              </h5>
-                              {config.taxBrackets.length > 0 ? (
-                                <table className="w-full text-sm border">
-                                  <thead>
-                                    <tr className="bg-gray-100">
-                                      <th className="py-2 px-4 text-right border-b">
-                                        {t("taxConfig.limit")}
-                                      </th>
-                                      <th className="py-2 px-4 text-right border-b">
-                                        {t("taxConfig.rate")}
-                                      </th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {config.taxBrackets.map(
-                                      (bracket, index) => (
-                                        <tr
-                                          key={index}
-                                          className="border-b hover:bg-gray-50"
-                                        >
-                                          <td className="py-2 px-4 text-right">
-                                            {bracket.limit === Infinity
-                                              ? t("taxConfig.infinity")
-                                              : bracket.limit}
-                                          </td>
-                                          <td className="py-2 px-4 text-right">
-                                            {(bracket.rate * 100).toFixed(2)}%
-                                          </td>
-                                        </tr>
-                                      )
-                                    )}
-                                  </tbody>
-                                </table>
-                              ) : (
-                                <p className="text-gray-500">
-                                  {t("taxConfig.noTaxBrackets")}
-                                </p>
-                              )}
-                            </div>
-                            {/* Other Taxes Table */}
-                            <div>
-                              <h5 className="text-md font-bold mb-2">
-                                {t("taxConfig.otherTaxes")}
-                              </h5>
-                              {config.otherTaxes.length > 0 ? (
-                                <table className="w-full text-sm border">
-                                  <thead>
-                                    <tr className="bg-gray-100">
-                                      <th className="py-2 px-4 text-right border-b">
-                                        {t("taxConfig.name")}
-                                      </th>
-                                      <th className="py-2 px-4 text-right border-b">
-                                        {t("taxConfig.rate")}
-                                      </th>
-                                      <th className="py-2 px-4 text-right border-b">
-                                        {t("taxConfig.fixedAmount")}
-                                      </th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {config.otherTaxes.map((tax, index) => (
-                                      <tr
-                                        key={index}
-                                        className="border-b hover:bg-gray-50"
-                                      >
-                                        <td className="py-2 px-4 text-right">
-                                          {tax.name}
-                                        </td>
-                                        <td className="py-2 px-4 text-right">
-                                          {tax.rate
-                                            ? `${(tax.rate * 100).toFixed(2)}%`
-                                            : "-"}
-                                        </td>
-                                        <td className="py-2 px-4 text-right">
-                                          {tax.fixedAmount
-                                            ? `${tax.fixedAmount} ${config.currency}`
-                                            : "-"}
-                                        </td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              ) : (
-                                <p className="text-gray-500">
-                                  {t("taxConfig.noOtherTaxes")}
-                                </p>
-                              )}
-                            </div>
+                          className="p-2 rounded-lg hover:scale-110 transition-all"
+                          style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
+                        >
+                          <Edit2 size={20} />
+                        </button>
+                        {expandedRow === config._id ? (
+                          <ChevronUp size={24} style={{ color: 'var(--color-primary)' }} />
+                        ) : (
+                          <ChevronDown size={24} style={{ color: 'var(--color-primary)' }} />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {expandedRow === config._id && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="border-t p-6"
+                      style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)', opacity: 0.95 }}
+                    >
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <h4 className="text-lg font-bold mb-3" style={{ color: 'var(--text-color)' }}>
+                            {t("finance.taxConfig.taxBrackets")}
+                          </h4>
+                          <div className="space-y-2">
+                            {config.taxBrackets.map((bracket, idx) => (
+                              <div key={idx} className="flex justify-between p-3 rounded-lg" style={{ backgroundColor: 'var(--border-color)' }}>
+                                <span style={{ color: 'var(--text-color)' }}>
+                                  Up to {bracket.limit === Infinity ? '∞' : bracket.limit}
+                                </span>
+                                <span className="font-bold" style={{ color: 'var(--color-primary)' }}>
+                                  {(bracket.rate * 100).toFixed(1)}%
+                                </span>
+                              </div>
+                            ))}
                           </div>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                        </div>
+                        <div>
+                          <h4 className="text-lg font-bold mb-3" style={{ color: 'var(--text-color)' }}>
+                            {t("finance.taxConfig.otherTaxes")}
+                          </h4>
+                          <div className="space-y-2">
+                            {config.otherTaxes.map((tax, idx) => (
+                              <div key={idx} className="flex justify-between p-3 rounded-lg" style={{ backgroundColor: 'var(--border-color)' }}>
+                                <span style={{ color: 'var(--text-color)' }}>{tax.name}</span>
+                                <span className="font-bold" style={{ color: 'var(--color-accent)' }}>
+                                  {tax.rate > 0 && `${(tax.rate * 100).toFixed(1)}%`}
+                                  {tax.fixedAmount > 0 && ` ${tax.fixedAmount} ${config.currency}`}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </motion.div>
       </div>
     </div>
   );

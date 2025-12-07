@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getEmployeeById,
+  getEmployeeByIdParam,
   updateEmployee,
   deleteEmployee,
   getAllEmployees,
@@ -19,6 +20,7 @@ const router = express.Router();
 router.post("/", upload.single("profileImage"), createEmployee);
 router.get("/", getAllEmployees);
 router.get("/me", getEmployeeById);
+router.get("/:id", getEmployeeByIdParam);
 router.put("/:id", upload.single("profileImage"), updateEmployee);
 router.put("/:id/vacation", updateEmployeeVacation);
 router.post("/vacation/update", triggerMonthlyVacationUpdate);

@@ -6,6 +6,16 @@ import { useSupplierStore } from "../../../stores/useSupplierStore";
 import axiosInstance from "../../../lib/axios";
 import ProductForm from "../components/ProductForm";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
+import { 
+  Package, 
+  Plus, 
+  Trash2, 
+  Layers, 
+  AlertCircle,
+  CheckCircle,
+  Box
+} from "lucide-react";
 
 // רכיב משנה ל-BOM
 const BOMBuilder = ({
@@ -37,24 +47,43 @@ const BOMBuilder = ({
   };
 
   return (
-    <div className="col-span-full mt-8 bg-bg p-6 rounded-xl border border-border-color shadow-sm animate-fadeIn">
-      <h2 className="text-xl font-semibold text-text mb-4 tracking-tight">
-        {t("product.bom.title")}
-      </h2>
+    <motion.div
+      className="col-span-full mt-8 p-6 rounded-2xl border shadow-lg"
+      style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-3 rounded-lg" style={{ backgroundColor: "rgba(168, 85, 247, 0.1)" }}>
+          <Layers style={{ color: "#a855f7" }} size={24} />
+        </div>
+        <h2 className="text-2xl font-bold" style={{ color: "var(--text-color)" }}>
+          {t("product.bom.title")}
+        </h2>
+      </div>
       <button
         type="button"
         onClick={handleAddComponent}
-        className="mb-6 px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105"
+        className="mb-6 px-5 py-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 flex items-center gap-2 font-medium"
+        style={{
+          background: "linear-gradient(to right, var(--color-primary), #a855f7)",
+          color: "var(--button-text)",
+        }}
       >
+        <Plus size={20} />
         {t("product.bom.add_component")}
       </button>
       {bomComponents.map((component, index) => (
         <div
           key={index}
-          className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 bg-bg p-4 rounded-lg shadow-sm border border-border-color"
+          className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 p-5 rounded-xl shadow-md border transition-all duration-200"
+          style={{
+            backgroundColor: "var(--bg-color)",
+            borderColor: "var(--border-color)",
+          }}
         >
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-text">
+            <label className="block text-sm font-bold mb-2" style={{ color: "var(--text-color)" }}>
               {t("product.bom.component")}
             </label>
             <select
@@ -62,7 +91,12 @@ const BOMBuilder = ({
               onChange={(e) =>
                 handleComponentChange(index, "componentId", e.target.value)
               }
-              className="mt-1 w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200 disabled:bg-accent disabled:opacity-50"
+              className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-50"
+              style={{
+                borderColor: "var(--border-color)",
+                backgroundColor: "var(--bg-color)",
+                color: "var(--text-color)",
+              }}
               disabled={isLoadingProducts}
             >
               <option value="">{t("product.bom.select_product")}</option>
@@ -74,7 +108,7 @@ const BOMBuilder = ({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-text">
+            <label className="block text-sm font-bold mb-2" style={{ color: "var(--text-color)" }}>
               {t("product.bom.quantity")}
             </label>
             <input
@@ -87,12 +121,17 @@ const BOMBuilder = ({
                   parseFloat(e.target.value)
                 )
               }
-              className="mt-1 w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
+              className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-200"
+              style={{
+                borderColor: "var(--border-color)",
+                backgroundColor: "var(--bg-color)",
+                color: "var(--text-color)",
+              }}
               min={1}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-text">
+            <label className="block text-sm font-bold mb-2" style={{ color: "var(--text-color)" }}>
               {t("product.bom.unit_cost")}
             </label>
             <input
@@ -105,21 +144,32 @@ const BOMBuilder = ({
                   parseFloat(e.target.value)
                 )
               }
-              className="mt-1 w-full p-3 border border-border-color rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-bg text-text transition-all duration-200"
+              className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-200"
+              style={{
+                borderColor: "var(--border-color)",
+                backgroundColor: "var(--bg-color)",
+                color: "var(--text-color)",
+              }}
             />
           </div>
           <div className="flex items-end">
             <button
               type="button"
               onClick={() => handleRemoveComponent(index)}
-              className="px-4 py-2 bg-red-500 text-white rounded-full shadow-md hover:bg-red-600 transition-all duration-200 transform hover:scale-105"
+              className="w-full md:w-auto px-4 py-3 rounded-xl transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 font-medium border"
+              style={{
+                backgroundColor: "rgba(239, 68, 68, 0.1)",
+                color: "#ef4444",
+                borderColor: "rgba(239, 68, 68, 0.3)",
+              }}
             >
+              <Trash2 size={18} />
               {t("product.bom.remove")}
             </button>
           </div>
         </div>
       ))}
-    </div>
+    </motion.div>
   );
 };
 
@@ -351,19 +401,57 @@ const AddProduct = () => {
   ];
 
   return (
-    <div className="flex min-h-full  animate-fade-in">
-      <div className="container mx-auto max-w-4xl p-8 bg-bg rounded-2xl shadow-2xl border border-border-color transform transition-all duration-500 hover:shadow-3xl">
-        <h1 className="text-3xl font-extrabold text-text mb-6 text-center tracking-tight drop-shadow-md">
-          {t("product.add_new_product")}
-        </h1>
-
-        {suppliersError && (
-          <div className="mb-6 text-red-500 text-center font-medium bg-bg p-4 rounded-lg shadow-sm border border-border-color">
-            {t("product.errors.load_suppliers_failed")}: {suppliersError}
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }}>
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-purple-600">
+              <Package size={28} color="white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: "var(--text-color)" }}>
+                {t("product.add_new_product")}
+              </h1>
+              <p className="text-lg" style={{ color: "var(--color-secondary)" }}>
+                {t("product.add_new_product")}
+              </p>
+            </div>
           </div>
+        </motion.div>
+
+        {/* Error Alert */}
+        {suppliersError && (
+          <motion.div
+            className="mb-6 rounded-xl p-4 flex items-start gap-3 shadow-md border"
+            style={{
+              backgroundColor: "rgba(239, 68, 68, 0.1)",
+              borderColor: "rgba(239, 68, 68, 0.3)",
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <AlertCircle className="flex-shrink-0 mt-0.5" size={24} style={{ color: "#ef4444" }} />
+            <div>
+              <h3 className="font-semibold mb-1" style={{ color: "#991b1b" }}>שגיאה בטעינת ספקים</h3>
+              <p style={{ color: "#dc2626" }}>{suppliersError}</p>
+            </div>
+          </motion.div>
         )}
 
-        <ProductForm
+        {/* Main Form Card */}
+        <motion.div
+          className="rounded-2xl shadow-lg border p-6 sm:p-8"
+          style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <ProductForm
           fieldDefinitions={fieldDefinitions}
           formData={formData}
           errors={errors}
@@ -375,9 +463,28 @@ const AddProduct = () => {
           isSale={formData.productType === "sale"}
         />
 
-        <div className="mt-6 text-center text-text font-medium bg-secondary p-4 rounded-lg shadow-sm border border-border-color">
-          {t("product.fields.volume")}: {calculateVolume().toFixed(3)} m³
-        </div>
+          <div
+            className="mt-6 rounded-xl p-6 shadow-md border"
+            style={{
+              background: "linear-gradient(to right, rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.1))",
+              borderColor: "var(--border-color)",
+            }}
+          >
+            <div className="flex items-center justify-center gap-3">
+              <div className="p-3 rounded-lg shadow-sm" style={{ backgroundColor: "var(--bg-color)" }}>
+                <Box style={{ color: "var(--color-primary)" }} size={28} />
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-medium mb-1" style={{ color: "var(--color-secondary)" }}>
+                  {t("product.fields.volume")}
+                </p>
+                <p className="text-3xl font-bold" style={{ color: "var(--color-primary)" }}>
+                  {calculateVolume().toFixed(3)} m³
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
 
         {(formData.productType === "sale" ||
           formData.productType === "both") && (

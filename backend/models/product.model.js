@@ -10,12 +10,12 @@ const productSchema = new mongoose.Schema(
     sku: {
       type: String,
       required: [true, "SKU is required"],
-      unique: true,
+      trim: true,
     },
     barcode: {
       type: String,
       required: [true, "Barcode is required"],
-      unique: true,
+      trim: true,
     },
     productName: {
       type: String,
@@ -80,6 +80,9 @@ const productSchema = new mongoose.Schema(
 );
 
 // אם המודל כבר קיים, נשתמש בו; אם לא, ניצור אותו.
+productSchema.index({ companyId: 1, sku: 1 }, { unique: true });
+productSchema.index({ companyId: 1, barcode: 1 }, { unique: true });
+
 const Product =
   mongoose.models.Product || mongoose.model("Product", productSchema);
 

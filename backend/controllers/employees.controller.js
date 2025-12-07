@@ -1,6 +1,6 @@
 import Employee from "../models/employees.model.js";
 import SickDays from "../models/SickDays.models.js";
-import Shift from "../models/shifts.model.js";
+import Shift from "../models/Shifts.model.js";
 import PayRate from "../models/PayRates.model.js";
 import Salary from "../models/Salary.model.js";
 import Notification from "../models/notification.model.js";
@@ -121,6 +121,7 @@ export const createEmployee = async (req, res) => {
       .populate("projects.projectId", "name")
       .populate("department", "name");
 
+
     res.status(201).json({ success: true, data: populatedEmployee });
   } catch (error) {
     res.status(500).json({
@@ -159,7 +160,7 @@ export const getAllEmployees = async (req, res) => {
   }
 };
 
-// Pull employee by ID
+// Pull employee by ID (current user)
 export const getEmployeeById = async (req, res) => {
   try {
     const token = req.cookies["auth_token"];
@@ -176,6 +177,44 @@ export const getEmployeeById = async (req, res) => {
       .populate("companyId", "name")
       .populate("projects.projectId", "name")
       .populate("department", "name");
+
+    if (!employee) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Employee not found" });
+    }
+
+    res.status(200).json({ success: true, data: employee });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error retrieving employee",
+      error: error.message,
+    });
+  }
+};
+
+// Get employee by ID (for viewing other employees)
+export const getEmployeeByIdParam = async (req, res) => {
+  try {
+    const token = req.cookies["auth_token"];
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decodedToken || !decodedToken.companyId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const { id } = req.params;
+    const employee = await Employee.findOne({
+      _id: id,
+      companyId: decodedToken.companyId,
+    })
+      .populate("companyId", "name")
+      .populate("projects.projectId", "name")
+      .populate("department", "name")
+      .populate("roleId", "name");
 
     if (!employee) {
       return res
@@ -217,6 +256,8 @@ export const updateEmployee = async (req, res) => {
       "identity",
       "phone",
       "role",
+      "roleId",
+      "customPermissions",
       "department",
       "paymentType",
       "hourlySalary",
@@ -241,7 +282,12 @@ export const updateEmployee = async (req, res) => {
         for (const sub of Object.keys(req.body.bankDetails)) {
           flattened[`bankDetails.${sub}`] = req.body.bankDetails[sub];
         }
-
+      } else if (key === "customPermissions" && Array.isArray(req.body.customPermissions)) {
+        // Handle customPermissions as an array
+        flattened[key] = req.body.customPermissions;
+      } else if (key === "roleId") {
+        // Handle roleId - allow null to clear the role
+        flattened[key] = req.body.roleId || null;
       } else {
         flattened[key] = req.body[key];
       }

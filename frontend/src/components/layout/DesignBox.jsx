@@ -1,129 +1,185 @@
 import React, { useEffect, useState, useRef } from "react";
 import { FaPalette } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 const DesignBox = ({ setIsLanguageOpen, isRTL }) => {
+  const { t } = useTranslation();
   const themes = {
     default: {
-      "--color-primary": "#1D4ED8",
+      "--color-primary": "#2563EB",
+      "--color-secondary": "#64748B",
+      "--color-accent": "#059669",
+      "--bg-color": "#FFFFFF",
+      "--text-color": "#0F172A",
+      "--button-bg": "#2563EB",
+      "--button-text": "#FFFFFF",
+      "--border-color": "#E2E8F0",
+      "--footer-bg": "#F8FAFC",
+    },
+    royal: {
+      "--color-primary": "#7C3AED",
+      "--color-secondary": "#A855F7",
+      "--color-accent": "#EC4899",
+      "--bg-color": "#FEFBFF",
+      "--text-color": "#1E1B4B",
+      "--button-bg": "#7C3AED",
+      "--button-text": "#FFFFFF",
+      "--border-color": "#E9D5FF",
+      "--footer-bg": "#F3E8FF",
+    },
+    opulent: {
+      "--color-primary": "#DC2626",
+      "--color-secondary": "#F59E0B",
+      "--color-accent": "#059669",
+      "--bg-color": "#FFFBEB",
+      "--text-color": "#451A03",
+      "--button-bg": "#DC2626",
+      "--button-text": "#FFFFFF",
+      "--border-color": "#FED7AA",
+      "--footer-bg": "#FEF3C7",
+    },
+    elegant: {
+      "--color-primary": "#374151",
       "--color-secondary": "#6B7280",
-      "--color-accent": "#10B981",
-      "--bg-color": "#F9FAFB",
+      "--color-accent": "#9CA3AF",
+      "--bg-color": "#FAFAFA",
       "--text-color": "#111827",
-      "--button-bg": "#1D4ED8",
+      "--button-bg": "#374151",
       "--button-text": "#FFFFFF",
       "--border-color": "#E5E7EB",
       "--footer-bg": "#F3F4F6",
     },
-    royal: {
-      "--color-primary": "#283593",
-      "--color-secondary": "#9C27B0",
-      "--color-accent": "#FFC107",
-      "--bg-color": "#FFFFFF",
-      "--text-color": "#212121",
-      "--button-bg": "#283593",
-      "--button-text": "#FFFFFF",
-      "--border-color": "#E0E0E0",
-      "--footer-bg": "#F5F5F5",
-    },
-    opulent: {
-      "--color-primary": "#800020",
-      "--color-secondary": "#FFEB62",
-
-      "--color-accent": "#556B2F",
-      "--bg-color": "#FFF8E1",
-      "--text-color": "#3E2723",
-      "--button-bg": "#800020",
-      "--button-text": "#FFFFFF",
-      "--border-color": "#BCAAA4",
-      "--footer-bg": "#FBE9E7",
-    },
-    elegant: {
-      "--color-primary": "#424242",
-      "--color-secondary": "#757575",
-      "--color-accent": "#9E9E9E",
-      "--bg-color": "#FAFAFA",
-      "--text-color": "#212121",
-      "--button-bg": "#424242",
-      "--button-text": "#FFFFFF",
-      "--border-color": "#E0E0E0",
-      "--footer-bg": "#F5F5F5",
-    },
     modern: {
-      "--color-primary": "#1976D2",
-      "--color-secondary": "#0288D1",
-      "--color-accent": "#00ACC1",
+      "--color-primary": "#0EA5E9",
+      "--color-secondary": "#06B6D4",
+      "--color-accent": "#10B981",
       "--bg-color": "#FFFFFF",
-      "--text-color": "#212121",
-      "--button-bg": "#1976D2",
+      "--text-color": "#0F172A",
+      "--button-bg": "#0EA5E9",
       "--button-text": "#FFFFFF",
-      "--border-color": "#E0E0E0",
-      "--footer-bg": "#F1F1F1",
+      "--border-color": "#E0F2FE",
+      "--footer-bg": "#F0F9FF",
     },
     vintage: {
-      "--color-primary": "#6D4C41",
-      "--color-secondary": "#8D6E63",
-      "--color-accent": "#FFB74D",
-      "--bg-color": "#FFF3E0",
-      "--text-color": "#3E2723",
-      "--button-bg": "#6D4C41",
+      "--color-primary": "#92400E",
+      "--color-secondary": "#B45309",
+      "--color-accent": "#D97706",
+      "--bg-color": "#FFFBEB",
+      "--text-color": "#451A03",
+      "--button-bg": "#92400E",
       "--button-text": "#FFFFFF",
-      "--border-color": "#D7CCC8",
-      "--footer-bg": "#FBE9E7",
+      "--border-color": "#FED7AA",
+      "--footer-bg": "#FEF3C7",
     },
     midnight: {
-      "--color-primary": "#0D47A1",
-      "--color-secondary": "#1565C0",
-      "--color-accent": "#1976D2",
-      "--bg-color": "#121212",
-      "--text-color": "#E0E0E0",
-      "--button-bg": "#0D47A1",
+      "--color-primary": "#3B82F6",
+      "--color-secondary": "#6366F1",
+      "--color-accent": "#8B5CF6",
+      "--bg-color": "#0F172A",
+      "--text-color": "#F1F5F9",
+      "--button-bg": "#3B82F6",
       "--button-text": "#FFFFFF",
-      "--border-color": "#424242",
-      "--footer-bg": "#1E1E1E",
+      "--border-color": "#334155",
+      "--footer-bg": "#1E293B",
     },
     neon: {
-      "--color-primary": "#00FFDD",
-      "--color-secondary": "#FF10F0",
-      "--color-accent": "#7B42F6",
-      "--bg-color": "#0A0A0B",
+      "--color-primary": "#00F5FF",
+      "--color-secondary": "#FF00FF",
+      "--color-accent": "#00FF00",
+      "--bg-color": "#0A0A0A",
       "--text-color": "#FFFFFF",
-      "--button-bg": "#00FFDD",
-      "--button-text": "#0A0A0B",
-      "--border-color": "#7B42F6",
-      "--footer-bg": "#0F0F11",
+      "--button-bg": "#00F5FF",
+      "--button-text": "#0A0A0A",
+      "--border-color": "#FF00FF",
+      "--footer-bg": "#1A1A1A",
     },
     sunsetGold: {
-      "--color-primary": "#8E7D6B",
-      "--color-secondary": "#D9BF77",
-      "--color-accent": "#F4EAD5",
-      "--bg-color": "#FFFDF9",
-      "--text-color": "#2D2D2D",
-      "--button-bg": "#8E7D6B",
+      "--color-primary": "#D97706",
+      "--color-secondary": "#F59E0B",
+      "--color-accent": "#FCD34D",
+      "--bg-color": "#FFFBEB",
+      "--text-color": "#451A03",
+      "--button-bg": "#D97706",
       "--button-text": "#FFFFFF",
-      "--border-color": "#E8E2D9",
-      "--footer-bg": "#F5F3EF",
+      "--border-color": "#FED7AA",
+      "--footer-bg": "#FEF3C7",
     },
     glacier: {
-      "--color-primary": "#5f1a35",
-      "--color-secondary": "#ccbbae",
-      "--color-accent": "#a04e6a",
-      "--bg-color": "#f8f5f2",
-      "--text-color": "#2d1b1b",
-      "--button-bg": "#5f1a35",
-      "--button-text": "#ffffff",
-      "--border-color": "#ccbbae",
-      "--footer-bg": "#3b0f21",
+      "--color-primary": "#0F766E",
+      "--color-secondary": "#14B8A6",
+      "--color-accent": "#5EEAD4",
+      "--bg-color": "#F0FDFA",
+      "--text-color": "#134E4A",
+      "--button-bg": "#0F766E",
+      "--button-text": "#FFFFFF",
+      "--border-color": "#99F6E4",
+      "--footer-bg": "#CCFBF1",
     },
     coco: {
-      "--color-primary": "#5F1A35",
-      "--color-secondary": "#CCBBAE",
-      "--color-accent": "#8B5E73",
-      "--bg-color": "#F5EDED",
-      "--text-color": "#2E0D1B",
-      "--button-bg": "#5F1A35",
+      "--color-primary": "#7C2D12",
+      "--color-secondary": "#EA580C",
+      "--color-accent": "#FB923C",
+      "--bg-color": "#FFF7ED",
+      "--text-color": "#431407",
+      "--button-bg": "#7C2D12",
       "--button-text": "#FFFFFF",
-      "--border-color": "#A68F83",
-      "--footer-bg": "#3b0f21",
+      "--border-color": "#FED7AA",
+      "--footer-bg": "#FFEDD5",
+    },
+    ocean: {
+      "--color-primary": "#0369A1",
+      "--color-secondary": "#0284C7",
+      "--color-accent": "#0EA5E9",
+      "--bg-color": "#F0F9FF",
+      "--text-color": "#0C4A6E",
+      "--button-bg": "#0369A1",
+      "--button-text": "#FFFFFF",
+      "--border-color": "#BAE6FD",
+      "--footer-bg": "#E0F2FE",
+    },
+    forest: {
+      "--color-primary": "#166534",
+      "--color-secondary": "#16A34A",
+      "--color-accent": "#22C55E",
+      "--bg-color": "#F0FDF4",
+      "--text-color": "#14532D",
+      "--button-bg": "#166534",
+      "--button-text": "#FFFFFF",
+      "--border-color": "#BBF7D0",
+      "--footer-bg": "#DCFCE7",
+    },
+    lavender: {
+      "--color-primary": "#7C2D92",
+      "--color-secondary": "#A855F7",
+      "--color-accent": "#C084FC",
+      "--bg-color": "#FAF5FF",
+      "--text-color": "#581C87",
+      "--button-bg": "#7C2D92",
+      "--button-text": "#FFFFFF",
+      "--border-color": "#DDD6FE",
+      "--footer-bg": "#EDE9FE",
+    },
+    coral: {
+      "--color-primary": "#E11D48",
+      "--color-secondary": "#F43F5E",
+      "--color-accent": "#FB7185",
+      "--bg-color": "#FFF1F2",
+      "--text-color": "#881337",
+      "--button-bg": "#E11D48",
+      "--button-text": "#FFFFFF",
+      "--border-color": "#FECDD3",
+      "--footer-bg": "#FFE4E6",
+    },
+    slate: {
+      "--color-primary": "#475569",
+      "--color-secondary": "#64748B",
+      "--color-accent": "#94A3B8",
+      "--bg-color": "#F8FAFC",
+      "--text-color": "#1E293B",
+      "--button-bg": "#475569",
+      "--button-text": "#FFFFFF",
+      "--border-color": "#CBD5E1",
+      "--footer-bg": "#F1F5F9",
     },
   };
 
@@ -176,12 +232,13 @@ const DesignBox = ({ setIsLanguageOpen, isRTL }) => {
 
   return (
     <div
-      className={`absolute top-32 ${isRTL ? "left-4" : "right-4"} `}
+      className={`fixed bottom-4 ${isRTL ? "left-4" : "right-4"} z-50`}
       ref={containerRef}
     >
       <button
         onClick={toggleColorMenu}
-        className="p-2 bg-primary text-button-text rounded-full shadow-sm hover:shadow-md transition-all duration-200"
+        className="p-3 bg-gradient-to-r from-primary to-secondary text-button-text rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 backdrop-blur-sm"
+        title={t("design.color_palette")}
       >
         <FaPalette className="w-5 h-5" />
       </button>
@@ -189,27 +246,57 @@ const DesignBox = ({ setIsLanguageOpen, isRTL }) => {
         <div
           className={`absolute ${
             isRTL ? "left-0" : "right-0"
-          } top-full mt-1 bg-white shadow-2xl rounded-xl w-48 sm:w-56 xl:w-64 max-h-64 overflow-y-auto border border-border-color animate-slide-down z-[1000]`}
+          } bottom-full mb-2 bg-white/95 backdrop-blur-md shadow-2xl rounded-2xl w-64 sm:w-72 xl:w-80 max-h-80 overflow-y-auto border border-gray-200/50 animate-slide-up z-[1000]`}
         >
-          <h3 className="text-lg font-bold px-4 py-2">בחר פלטת עיצובים</h3>
-          <div className="flex flex-col">
+          <div className="p-4 border-b border-gray-200/50">
+            <h3 className="text-lg font-bold text-gray-800 text-center">{t("design.select_theme")}</h3>
+            <p className="text-sm text-gray-600 text-center mt-1">{t("design.choose_color_scheme")}</p>
+          </div>
+          <div className="p-2">
             {Object.keys(themes).map((themeName) => (
               <button
                 key={themeName}
                 onClick={() => handleSelectTheme(themeName)}
-                className={`flex items-center px-4 py-2 text-text hover:bg-accent hover:text-button-text w-full ${
+                className={`flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 hover:text-gray-900 w-full ${
                   isRTL ? "text-right" : "text-left"
-                } text-sm sm:text-base xl:text-lg transition-all duration-200`}
+                } text-sm sm:text-base transition-all duration-200 rounded-xl mb-1 group`}
               >
-                <div
-                  className={`w-5 h-5 sm:w-6 sm:h-6 xl:w-7 xl:h-7 ${
-                    isRTL ? "ml-2" : "mr-2"
-                  } rounded-full shadow-sm`}
-                  style={{
-                    backgroundColor: themes[themeName]["--color-primary"],
-                  }}
-                />
-                <span className="truncate">{themeName}</span>
+                <div className="flex items-center space-x-3">
+                  <div
+                    className={`w-6 h-6 sm:w-7 sm:h-7 ${
+                      isRTL ? "ml-3" : "mr-3"
+                    } rounded-full shadow-md ring-2 ring-white group-hover:ring-4 group-hover:ring-opacity-50 transition-all duration-200`}
+                    style={{
+                      backgroundColor: themes[themeName]["--color-primary"],
+                    }}
+                  />
+                  <div className="flex space-x-1">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{
+                        backgroundColor: themes[themeName]["--color-primary"],
+                      }}
+                    />
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{
+                        backgroundColor: themes[themeName]["--color-secondary"],
+                      }}
+                    />
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{
+                        backgroundColor: themes[themeName]["--color-accent"],
+                      }}
+                    />
+                  </div>
+                </div>
+                <span className="truncate font-medium capitalize">{t(`design.themes.${themeName}`)}</span>
+                {currentTheme === themeName && (
+                  <div className="ml-auto">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  </div>
+                )}
               </button>
             ))}
           </div>

@@ -20,7 +20,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import AddDepartmentModal from "../../pages/AdminPanel/departments/Add_Department.jsx";
+import { motion } from "framer-motion";
 
 // Utility functions for nested form handling
 const getNestedError = (errors, name) =>
@@ -44,6 +44,8 @@ const SignUpForm = () => {
   const [profileImageFile, setProfileImageFile] = useState(null);
   const [profileImageUrl, setProfileImageUrl] = useState("");
   const [isAddDeptModalOpen, setIsAddDeptModalOpen] = useState(false);
+  const [newDeptName, setNewDeptName] = useState("");
+  const [newDeptDescription, setNewDeptDescription] = useState("");
 
   const {
     data: departments = [],
@@ -254,11 +256,32 @@ const SignUpForm = () => {
     });
   };
 
+  const handleAddDepartment = async () => {
+    if (!newDeptName.trim()) {
+      toast.error("נא להזין שם מחלקה");
+      return;
+    }
+    try {
+      await axiosInstance.post("/departments", {
+        name: newDeptName,
+        description: newDeptDescription,
+        teamMembers: []
+      });
+      toast.success("המחלקה נוספה בהצלחה!");
+      setNewDeptName("");
+      setNewDeptDescription("");
+      setIsAddDeptModalOpen(false);
+      refetchDepartments();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "שגיאה בהוספת מחלקה");
+    }
+  };
+
   return (
     <>
       <form
         onSubmit={formik.handleSubmit}
-        className="space-y-8 bg-bg/95 backdrop-blur-lg rounded-2xl shadow-xl p-8 sm:p-6 max-w-full mx-auto"
+        className="space-y-8 max-w-full mx-auto"
       >
         {/* Personal Information */}
         <SectionHeader title={t("signUpForm.sections.personal_info")} />
@@ -317,15 +340,18 @@ const SignUpForm = () => {
             ariaRequired="true"
           />
 
-          <div className="space-y-2 animate-slideIn">
-            <label className="block text-sm font-medium text-text">
-              {t("signUpForm.form.gender")} <span aria-hidden="true">*</span>
+          <div className="space-y-3">
+            <label 
+              className="block text-sm font-semibold"
+              style={{ color: 'var(--text-color)' }}
+            >
+              {t("signUpForm.form.gender")} <span style={{ color: 'var(--color-accent)' }}>*</span>
             </label>
-            <div className="flex space-x-4">
+            <div className="flex gap-4">
               {["Male", "Female", "Other"].map((gender) => (
                 <label
                   key={gender}
-                  className="flex items-center space-x-2 group"
+                  className="flex items-center gap-2 cursor-pointer group"
                 >
                   <input
                     type="radio"
@@ -334,17 +360,23 @@ const SignUpForm = () => {
                     checked={formik.values.gender === gender}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className="h-4 w-4 text-primary focus:ring-primary border-secondary/50 transition-colors duration-300"
+                    className="w-5 h-5 transition-all duration-300"
+                    style={{
+                      accentColor: 'var(--color-primary)'
+                    }}
                     aria-label={t(`signUpForm.options.${gender.toLowerCase()}`)}
                   />
-                  <span className="text-secondary group-hover:text-text transition-colors duration-300">
+                  <span 
+                    className="text-sm font-medium transition-all duration-300"
+                    style={{ color: 'var(--text-color)' }}
+                  >
                     {t(`signUpForm.options.${gender.toLowerCase()}`)}
                   </span>
                 </label>
               ))}
             </div>
             {formik.touched.gender && formik.errors.gender && (
-              <p className="text-sm text-red-500 animate-fadeIn">
+              <p className="text-sm text-red-500">
                 {formik.errors.gender}
               </p>
             )}
@@ -460,17 +492,30 @@ const SignUpForm = () => {
               title={t("signUpForm.sections.employment_details")}
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="animate-slideIn">
-                <label className="block text-sm font-medium text-text">
+              <div>
+                <label 
+                  className="block text-sm font-semibold mb-2"
+                  style={{ color: 'var(--text-color)' }}
+                >
                   {t("signUpForm.form.department")}
                 </label>
-                <div className="flex items-center space-x-3 mt-2">
+                <div className="flex items-center gap-3">
                   <select
                     name="department"
                     value={formik.values.department}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className="w-full h-12 border border-border-color rounded-lg text-text placeholder-secondary/50 focus:ring-2 focus:ring-primary focus:border-primary bg-bg/50 transition-all duration-300"
+                    className="flex-1 h-12 rounded-xl shadow-md transition-all duration-300 focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 px-4"
+                    style={{
+                      backgroundColor: 'var(--bg-color)',
+                      color: 'var(--text-color)',
+                      border: '2px solid var(--border-color)'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+                    onBlur={(e) => {
+                      formik.handleBlur(e);
+                      e.target.style.borderColor = 'var(--border-color)';
+                    }}
                     aria-label={t("signUpForm.form.department")}
                   >
                     <option value="">
@@ -489,14 +534,18 @@ const SignUpForm = () => {
                   <button
                     type="button"
                     onClick={() => setIsAddDeptModalOpen(true)}
-                    className="p-2 bg-primary text-button-text rounded-lg hover:bg-accent focus:ring-2 focus:ring-primary transition-all duration-300 transform hover:scale-110"
+                    className="p-3 rounded-xl transition-all duration-300 transform hover:scale-110 shadow-lg"
+                    style={{
+                      backgroundColor: 'var(--color-primary)',
+                      color: 'var(--button-text)'
+                    }}
                     aria-label={t("signUpForm.buttons.add_department")}
                   >
                     <Plus className="w-5 h-5" />
                   </button>
                 </div>
                 {formik.touched.department && formik.errors.department && (
-                  <p className="text-sm text-red-500 mt-1 animate-fadeIn">
+                  <p className="text-sm text-red-500 mt-2">
                     {formik.errors.department}
                   </p>
                 )}
@@ -515,17 +564,30 @@ const SignUpForm = () => {
         {/* Payment Details */}
         <SectionHeader title={t("signUpForm.sections.payment_details")} />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="animate-slideIn">
-            <label className="block text-sm font-medium text-text">
+          <div>
+            <label 
+              className="block text-sm font-semibold mb-2"
+              style={{ color: 'var(--text-color)' }}
+            >
               {t("signUpForm.form.payment_type")}{" "}
-              <span aria-hidden="true">*</span>
+              <span style={{ color: 'var(--color-accent)' }}>*</span>
             </label>
             <select
               name="paymentType"
               value={formik.values.paymentType}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className="w-full h-12 mt-2 border border-border-color rounded-lg text-text placeholder-secondary/50 focus:ring-2 focus:ring-primary focus:border-primary bg-bg/50 transition-all duration-300"
+              className="w-full h-12 rounded-xl shadow-md transition-all duration-300 focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 px-4"
+              style={{
+                backgroundColor: 'var(--bg-color)',
+                color: 'var(--text-color)',
+                border: '2px solid var(--border-color)'
+              }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+              onBlur={(e) => {
+                formik.handleBlur(e);
+                e.target.style.borderColor = 'var(--border-color)';
+              }}
               aria-required="true"
               aria-label={t("signUpForm.form.payment_type")}
             >
@@ -536,7 +598,7 @@ const SignUpForm = () => {
               </option>
             </select>
             {formik.touched.paymentType && formik.errors.paymentType && (
-              <p className="text-sm text-red-500 mt-1 animate-fadeIn">
+              <p className="text-sm text-red-500 mt-2">
                 {formik.errors.paymentType}
               </p>
             )}
@@ -584,14 +646,21 @@ const SignUpForm = () => {
 
         {/* Profile Image */}
         <SectionHeader title={t("signUpForm.sections.profile_image")} />
-        <div className="animate-slideIn">
-          <label className="block text-sm font-medium text-text">
-            {t("signUpForm.form.profile_image")} ({t("optional")})
+        <div>
+          <label 
+            className="block text-sm font-semibold mb-3"
+            style={{ color: 'var(--text-color)' }}
+          >
+            {t("signUpForm.form.profile_image")} <span style={{ color: 'var(--color-secondary)', opacity: 0.7 }}>({t("optional")})</span>
           </label>
-          <div className="flex items-center gap-4 mt-2">
+          <div className="flex items-center gap-4">
             <button
               type="button"
-              className="p-3 bg-primary text-button-text rounded-lg hover:bg-accent focus:ring-2 focus:ring-primary transition-all duration-300 transform hover:scale-110"
+              className="p-4 rounded-xl transition-all duration-300 transform hover:scale-110 shadow-lg"
+              style={{
+                backgroundColor: 'var(--color-primary)',
+                color: 'var(--button-text)'
+              }}
               onClick={() => document.getElementById("fileInput").click()}
               aria-label={t("signUpForm.buttons.upload_image")}
             >
@@ -609,12 +678,25 @@ const SignUpForm = () => {
               placeholder={t("signUpForm.placeholders.upload_image_or_url")}
               value={profileImageUrl}
               onChange={(e) => setProfileImageUrl(e.target.value)}
-              className="flex-1 h-12 border border-border-color rounded-lg text-text placeholder-secondary/50 focus:ring-2 focus:ring-primary focus:border-primary bg-bg/50 transition-all duration-300"
+              className="flex-1 h-12 rounded-xl shadow-md transition-all duration-300 focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 px-4"
+              style={{
+                backgroundColor: 'var(--bg-color)',
+                color: 'var(--text-color)',
+                border: '2px solid var(--border-color)'
+              }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border-color)'}
               aria-label={t("signUpForm.form.profile_image_url")}
             />
           </div>
           {(profileImageFile || profileImageUrl) && (
-            <div className="relative inline-block mt-4 animate-fadeIn">
+            <div className="relative inline-block mt-6">
+              <div
+                className="relative w-24 h-24 rounded-full overflow-hidden shadow-xl"
+                style={{
+                  border: '4px solid var(--color-primary)'
+                }}
+              >
               <img
                 src={
                   profileImageFile
@@ -622,15 +704,16 @@ const SignUpForm = () => {
                     : profileImageUrl
                 }
                 alt={t("signUpForm.form.image_preview")}
-                className="w-16 h-16 rounded-full object-cover border-2 border-button-text shadow-md transform hover:scale-110 transition-transform duration-300"
+                  className="w-full h-full object-cover"
               />
+              </div>
               <button
                 type="button"
                 onClick={removeProfileImage}
-                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 focus:ring-2 focus:ring-red-500 transition-all duration-300"
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-all duration-300 shadow-lg transform hover:scale-110"
                 aria-label={t("signUpForm.buttons.remove_image")}
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
           )}
@@ -640,31 +723,164 @@ const SignUpForm = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 mt-8 bg-button-bg text-button-text font-semibold rounded-lg shadow-lg hover:bg-accent focus:ring-4 focus:ring-primary/50 disabled:bg-secondary/50 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-300 transform hover:scale-105"
+          className="w-full py-4 mt-8 font-bold rounded-xl shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2"
+          style={{
+            background: loading 
+              ? 'var(--border-color)'
+              : `linear-gradient(to right, var(--color-primary), var(--color-accent))`,
+            color: 'var(--button-text)'
+          }}
         >
           {loading ? (
             <>
-              <span className="inline-block w-6 h-6 border-2 border-button-text border-t-transparent rounded-full animate-spin mr-3"></span>
+              <span className="inline-block w-6 h-6 border-2 border-t-transparent rounded-full animate-spin mr-3"
+                style={{ borderColor: 'var(--button-text)' }}
+              ></span>
               {t("signUpForm.buttons.signing")}
             </>
           ) : (
-            t("signUpForm.buttons.sign_up")
+            <>
+              <span>{t("signUpForm.buttons.sign_up")}</span>
+              <span className="mr-2">✓</span>
+            </>
           )}
         </button>
       </form>
 
       {/* Add Department Modal */}
       {isAddDeptModalOpen && (
-        <AddDepartmentModal
-          onClose={() => setIsAddDeptModalOpen(false)}
-          onSuccess={() => {
-            setIsAddDeptModalOpen(false);
-            refetchDepartments();
-            toast.success(t("signUpForm.messages.department_added"), {
-              position: "top-center",
-            });
-          }}
-        />
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4"
+          onClick={() => setIsAddDeptModalOpen(false)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ duration: 0.3 }}
+            className="rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+            style={{
+              backgroundColor: 'var(--bg-color)',
+              border: '2px solid var(--border-color)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Decorative top border */}
+            <div
+              className="h-2"
+              style={{
+                background: `linear-gradient(to right, var(--color-primary), var(--color-secondary), var(--color-accent))`
+              }}
+            />
+            
+            <div className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <h3 
+                  className="text-2xl font-bold"
+                  style={{
+                    background: `linear-gradient(135deg, var(--color-primary), var(--color-secondary))`,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text'
+                  }}
+                >
+                  ➕ הוספת מחלקה
+                </h3>
+                <button
+                  onClick={() => setIsAddDeptModalOpen(false)}
+                  className="p-2 rounded-full transition-all duration-300 hover:scale-110"
+                  style={{
+                    backgroundColor: 'var(--border-color)',
+                    color: 'var(--text-color)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = 'var(--color-accent)';
+                    e.target.style.color = 'white';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = 'var(--border-color)';
+                    e.target.style.color = 'var(--text-color)';
+                  }}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <label 
+                    className="block text-sm font-semibold mb-2"
+                    style={{ color: 'var(--text-color)' }}
+                  >
+                    שם המחלקה <span style={{ color: 'var(--color-accent)' }}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newDeptName}
+                    onChange={(e) => setNewDeptName(e.target.value)}
+                    placeholder="לדוגמה: פיתוח, שיווק, מכירות..."
+                    className="w-full p-4 rounded-xl shadow-md transition-all duration-300 focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
+                    style={{
+                      backgroundColor: 'var(--bg-color)',
+                      color: 'var(--text-color)',
+                      border: '2px solid var(--border-color)'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+                    onBlur={(e) => e.target.style.borderColor = 'var(--border-color)'}
+                  />
+                </div>
+
+                <div>
+                  <label 
+                    className="block text-sm font-semibold mb-2"
+                    style={{ color: 'var(--text-color)' }}
+                  >
+                    תיאור <span style={{ color: 'var(--color-secondary)', opacity: 0.7 }}>(אופציונלי)</span>
+                  </label>
+                  <textarea
+                    value={newDeptDescription}
+                    onChange={(e) => setNewDeptDescription(e.target.value)}
+                    placeholder="תאר את המחלקה..."
+                    rows={3}
+                    className="w-full p-4 rounded-xl shadow-md transition-all duration-300 focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 resize-none"
+                    style={{
+                      backgroundColor: 'var(--bg-color)',
+                      color: 'var(--text-color)',
+                      border: '2px solid var(--border-color)'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+                    onBlur={(e) => e.target.style.borderColor = 'var(--border-color)'}
+                  />
+                </div>
+
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddDeptModalOpen(false)}
+                    className="flex-1 py-3 px-6 font-semibold rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105"
+                    style={{
+                      backgroundColor: 'var(--border-color)',
+                      color: 'var(--text-color)'
+                    }}
+                  >
+                    ביטול
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleAddDepartment}
+                    className="flex-1 py-3 px-6 font-bold rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105"
+                    style={{
+                      background: `linear-gradient(to right, var(--color-primary), var(--color-secondary))`,
+                      color: 'var(--button-text)'
+                    }}
+                  >
+                    ✓ הוסף מחלקה
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
       )}
     </>
   );
@@ -682,14 +898,20 @@ const InputField = ({
   min,
   step,
 }) => (
-  <div className="animate-slideIn">
-    <label className="block text-sm font-medium text-text">
+  <div className="group">
+    <label 
+      className="block text-sm font-semibold mb-2"
+      style={{ color: 'var(--text-color)' }}
+    >
       {label}
-      {ariaRequired && <span aria-hidden="true">*</span>}
+      {ariaRequired && <span style={{ color: 'var(--color-accent)' }}>*</span>}
     </label>
-    <div className="relative mt-2">
+    <div className="relative">
       {icon && (
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary">
+        <div 
+          className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300"
+          style={{ color: 'var(--color-secondary)' }}
+        >
           {icon}
         </div>
       )}
@@ -702,14 +924,29 @@ const InputField = ({
         value={getNestedValue(formik.values, name)}
         min={min}
         step={step}
-        className={`w-full h-12 border border-border-color rounded-lg text-text placeholder-secondary/50 focus:ring-2 focus:ring-primary focus:border-primary bg-bg/50 transition-all duration-300 ${
-          icon ? "pl-12" : "pl-4"
-        } ${
-          getNestedError(formik.touched, name) &&
-          getNestedError(formik.errors, name)
-            ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-            : ""
+        className={`w-full h-12 rounded-xl shadow-md transition-all duration-300 focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+          icon ? "pl-12 pr-4" : "px-4"
         }`}
+        style={{
+          backgroundColor: 'var(--bg-color)',
+          color: 'var(--text-color)',
+          borderWidth: '2px',
+          borderStyle: 'solid',
+          borderColor: getNestedError(formik.touched, name) && getNestedError(formik.errors, name)
+            ? '#ef4444'
+            : 'var(--border-color)'
+        }}
+        onFocus={(e) => {
+          if (!getNestedError(formik.errors, name)) {
+            e.target.style.borderColor = 'var(--color-primary)';
+          }
+        }}
+        onBlur={(e) => {
+          formik.handleBlur(e);
+          if (!getNestedError(formik.errors, name)) {
+            e.target.style.borderColor = 'var(--border-color)';
+          }
+        }}
         aria-required={ariaRequired}
         aria-invalid={
           getNestedError(formik.touched, name) &&
@@ -727,7 +964,7 @@ const InputField = ({
       getNestedError(formik.errors, name) && (
         <p
           id={`${name.replace(".", "-")}-error`}
-          className="text-sm text-red-500 mt-1 animate-fadeIn"
+          className="text-sm text-red-500 mt-2"
         >
           {getNestedError(formik.errors, name)}
         </p>
@@ -747,13 +984,19 @@ const PasswordField = ({
   ariaRequired,
   t,
 }) => (
-  <div className="animate-slideIn">
-    <label className="block text-sm font-medium text-text">
+  <div className="group">
+    <label 
+      className="block text-sm font-semibold mb-2"
+      style={{ color: 'var(--text-color)' }}
+    >
       {label}
-      {ariaRequired && <span aria-hidden="true">*</span>}
+      {ariaRequired && <span style={{ color: 'var(--color-accent)' }}>*</span>}
     </label>
-    <div className="relative mt-2">
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary">
+    <div className="relative">
+      <div 
+        className="absolute left-4 top-1/2 -translate-y-1/2"
+        style={{ color: 'var(--color-secondary)' }}
+      >
         {icon}
       </div>
       <input
@@ -763,11 +1006,27 @@ const PasswordField = ({
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
         value={formik.values[name]}
-        className={`w-full h-12 pl-12 pr-12 border border-border-color rounded-lg text-text placeholder-secondary/50 focus:ring-2 focus:ring-primary focus:border-primary bg-bg/50 transition-all duration-300 ${
-          formik.touched[name] && formik.errors[name]
-            ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-            : ""
-        }`}
+        className="w-full h-12 pl-12 pr-12 rounded-xl shadow-md transition-all duration-300 focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
+        style={{
+          backgroundColor: 'var(--bg-color)',
+          color: 'var(--text-color)',
+          borderWidth: '2px',
+          borderStyle: 'solid',
+          borderColor: formik.touched[name] && formik.errors[name]
+            ? '#ef4444'
+            : 'var(--border-color)'
+        }}
+        onFocus={(e) => {
+          if (!formik.errors[name]) {
+            e.target.style.borderColor = 'var(--color-primary)';
+          }
+        }}
+        onBlur={(e) => {
+          formik.handleBlur(e);
+          if (!formik.errors[name]) {
+            e.target.style.borderColor = 'var(--border-color)';
+          }
+        }}
         aria-required={ariaRequired}
         aria-invalid={formik.touched[name] && !!formik.errors[name]}
         aria-describedby={
@@ -779,7 +1038,10 @@ const PasswordField = ({
       <button
         type="button"
         onClick={() => setShowPassword(!showPassword)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 text-secondary hover:text-text focus:outline-none transition-colors duration-300"
+        className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors duration-300 focus:outline-none"
+        style={{ color: 'var(--color-secondary)' }}
+        onMouseEnter={(e) => e.target.style.color = 'var(--color-accent)'}
+        onMouseLeave={(e) => e.target.style.color = 'var(--color-secondary)'}
         aria-label={
           showPassword
             ? t("signUpForm.aria.hide_password")
@@ -796,7 +1058,7 @@ const PasswordField = ({
     {formik.touched[name] && formik.errors[name] && (
       <p
         id={`${name}-error`}
-        className="text-sm text-red-500 mt-1 animate-fadeIn"
+        className="text-sm text-red-500 mt-2"
       >
         {formik.errors[name]}
       </p>
@@ -806,10 +1068,25 @@ const PasswordField = ({
 
 // SectionHeader Component
 const SectionHeader = ({ title }) => (
-  <h3 className="text-xl font-semibold text-text mt-6 mb-4 relative animate-fadeIn">
+  <div className="relative pt-4 pb-2">
+    <h3 
+      className="text-2xl font-bold"
+      style={{
+        background: `linear-gradient(135deg, var(--color-primary), var(--color-secondary))`,
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text'
+      }}
+    >
     {title}
-    <span className="absolute -bottom-1 left-0 w-16 h-1 bg-gradient-to-r from-primary to-accent rounded-full animate-pulse" />
   </h3>
+    <div 
+      className="absolute -bottom-1 left-0 w-20 h-1 rounded-full"
+      style={{
+        background: `linear-gradient(to right, var(--color-primary), var(--color-accent))`
+      }}
+    />
+  </div>
 );
 
 export default SignUpForm;

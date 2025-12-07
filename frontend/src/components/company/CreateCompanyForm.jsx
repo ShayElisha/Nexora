@@ -55,17 +55,29 @@ const CreateCompanyForm = () => {
   // Mutation for creating company
   const { mutate: createCompanyMutation, isLoading } = useMutation({
     mutationFn: async (data) => {
-      const res = await axiosInstance.post("/company/create", data);
+      console.log("Creating company with data:", data);
+      const res = await axiosInstance.post("/company/create", data, {
+        withCredentials: true,
+      });
+      console.log("Company creation response:", res.data);
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("Company created successfully:", data);
       toast.success(t("company.success_message"));
-      navigate("/pricing-plans");
+      // Navigate to pricing plans after short delay to ensure cookie is set
+      setTimeout(() => {
+        navigate("/pricing-plans");
+      }, 500);
     },
     onError: (error) => {
-      console.log("Error details:", error.response?.data);
+      console.error("Error creating company:", error);
+      console.error("Error response:", error.response?.data);
       const errorMessage =
-        error.response?.data?.error || t("company.error_message");
+        error.response?.data?.error || 
+        error.response?.data?.message || 
+        error.message ||
+        t("company.error_message");
       toast.error(errorMessage);
     },
   });
@@ -106,52 +118,44 @@ const CreateCompanyForm = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-50 relative overflow-hidden py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-      {/* Particle Background */}
-      <div className="absolute inset-0">
-        {particles.map((p) => (
-          <div
-            key={p.id}
-            className="absolute rounded-full bg-blue-200/20 animate-pulse"
-            style={{
-              left: p.x,
-              top: p.y,
-              width: p.size,
-              height: p.size,
-              opacity: p.opacity,
-              transition: "all 0.05s linear",
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Form Container */}
-      <div className="max-w-4xl w-full bg-white rounded-3xl shadow-2xl p-8 space-y-8 transform transition-all duration-500 hover:shadow-3xl">
-        {/* Step Indicators */}
-        <div className="relative flex justify-between mb-10">
-          {steps.map((s, index) => (
-            <div key={index} className="flex flex-col items-center z-10">
-              <div
-                className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold transition-all duration-300 transform ${
-                  index + 1 <= step
-                    ? "bg-gradient-to-r from-blue-500 to-indigo-500 scale-110"
-                    : "bg-gray-200 text-gray-600"
-                }`}
-              >
-                {index + 1}
-              </div>
-              <span className="mt-3 text-sm font-medium text-gray-700">
-                {s.title}
-              </span>
-            </div>
-          ))}
-          <div className="absolute top-6 left-0 right-0 h-1 bg-gray-200 z-0">
+    <div className="space-y-8">
+      {/* Step Indicators */}
+      <div className="relative flex justify-between mb-10">
+        {steps.map((s, index) => (
+          <div key={index} className="flex flex-col items-center z-10">
             <div
-              className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-500 ease-in-out"
-              style={{ width: `${((step - 1) / (steps.length - 1)) * 100}%` }}
-            ></div>
+              className="w-12 h-12 rounded-full flex items-center justify-center font-bold transition-all duration-300 transform shadow-lg"
+              style={{
+                background: index + 1 <= step 
+                  ? `linear-gradient(135deg, var(--color-primary), var(--color-secondary))` 
+                  : 'var(--border-color)',
+                color: index + 1 <= step ? 'var(--button-text)' : 'var(--text-color)',
+                transform: index + 1 <= step ? 'scale(1.1)' : 'scale(1)',
+              }}
+            >
+              {index + 1}
+            </div>
+            <span 
+              className="mt-3 text-sm font-medium"
+              style={{ color: 'var(--text-color)' }}
+            >
+              {s.title}
+            </span>
           </div>
+        ))}
+        <div 
+          className="absolute top-6 left-0 right-0 h-1 z-0 rounded-full"
+          style={{ backgroundColor: 'var(--border-color)' }}
+        >
+          <div
+            className="h-full rounded-full transition-all duration-500 ease-in-out"
+            style={{ 
+              width: `${((step - 1) / (steps.length - 1)) * 100}%`,
+              background: `linear-gradient(to right, var(--color-primary), var(--color-secondary))`
+            }}
+          ></div>
         </div>
+      </div>
 
         {/* Form */}
         <div className="space-y-6">
@@ -270,17 +274,24 @@ const CreateCompanyForm = () => {
           {/* Step 3: Additional Details */}
           {step === 3 && (
             <div key="step3" className="grid grid-cols-1 gap-6 animate-fadeIn">
-              <div
-                className="flex flex-col gap-1"
-                style={{ animationDelay: "0.1s" }}
-              >
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <div className="flex flex-col gap-1">
+                <label 
+                  className="block text-sm font-semibold mb-2"
+                  style={{ color: 'var(--text-color)' }}
+                >
                   {t("company.industry")}
                 </label>
                 <select
                   value={industry}
                   onChange={(e) => setIndustry(e.target.value)}
-                  className="w-full p-4 border border-gray-300 rounded-xl bg-white text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 shadow-sm hover:shadow-md"
+                  className="w-full p-4 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  style={{
+                    backgroundColor: 'var(--bg-color)',
+                    color: 'var(--text-color)',
+                    border: '2px solid var(--border-color)',
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+                  onBlur={(e) => e.target.style.borderColor = 'var(--border-color)'}
                 >
                   <option value="">{t("company.select_industry")}</option>
                   {[
@@ -316,52 +327,61 @@ const CreateCompanyForm = () => {
             </div>
           )}
 
-          {/* Navigation Buttons */}
-          <div className="flex justify-between mt-10">
-            {step > 1 && (
-              <button
-                type="button"
-                onClick={handlePrevious}
-                className="w-full sm:w-auto px-8 py-3 bg-gray-100 text-gray-700 font-semibold rounded-full shadow-lg hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all duration-300 transform hover:scale-105"
-              >
-                {t("company.previous")}
-              </button>
-            )}
-            {step < 3 ? (
-              <button
-                type="button"
-                onClick={handleNext}
-                className="w-full sm:w-auto ml-auto px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-600 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-all duration-300 transform hover:scale-105"
-              >
-                {t("company.next")}
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={isLoading}
-                className="w-full sm:w-auto ml-auto px-8 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white font-semibold rounded-full shadow-lg hover:from-green-600 hover:to-teal-600 focus:outline-none focus:ring-4 focus:ring-green-300 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
-              >
-                {isLoading ? (
+        {/* Navigation Buttons */}
+        <div className="flex justify-between mt-10 gap-4">
+          {step > 1 && (
+            <button
+              type="button"
+              onClick={handlePrevious}
+              className="w-full sm:w-auto px-8 py-3 font-semibold rounded-xl shadow-lg focus:outline-none transition-all duration-300 transform hover:scale-105"
+              style={{
+                backgroundColor: 'var(--border-color)',
+                color: 'var(--text-color)',
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--color-secondary)'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--border-color)'}
+            >
+              ← {t("company.previous")}
+            </button>
+          )}
+          {step < 3 ? (
+            <button
+              type="button"
+              onClick={handleNext}
+              className="w-full sm:w-auto ml-auto px-8 py-3 font-semibold rounded-xl shadow-lg focus:outline-none transition-all duration-300 transform hover:scale-105"
+              style={{
+                background: `linear-gradient(to right, var(--color-primary), var(--color-secondary))`,
+                color: 'var(--button-text)'
+              }}
+            >
+              {t("company.next")} →
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className="w-full sm:w-auto ml-auto px-8 py-3 font-semibold rounded-xl shadow-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
+              style={{
+                background: `linear-gradient(to right, var(--color-primary), var(--color-accent))`,
+                color: 'var(--button-text)'
+              }}
+            >
+              {isLoading ? (
+                <>
                   <Loader className="size-5 animate-spin" />
-                ) : (
-                  t("company.create_button")
-                )}
-              </button>
-            )}
-          </div>
+                  <span>{t("company.creating")}</span>
+                </>
+              ) : (
+                <>
+                  <span>{t("company.create_button")}</span>
+                  <span>✓</span>
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
-
-      {/* Custom Animations */}
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(15px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn { animation: fadeIn 0.5s ease-out forwards; }
-        .shadow-3xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-      `}</style>
     </div>
   );
 };
@@ -375,11 +395,11 @@ const InputField = ({
   placeholder,
   animationDelay,
 }) => (
-  <div
-    className="flex flex-col gap-1 animate-fadeIn"
-    style={{ animationDelay: `${animationDelay}s` }}
-  >
-    <label className="block text-sm font-semibold text-gray-700 mb-2">
+  <div className="flex flex-col gap-1 group">
+    <label 
+      className="block text-sm font-semibold mb-2"
+      style={{ color: 'var(--text-color)' }}
+    >
       {label}
     </label>
     <input
@@ -387,7 +407,14 @@ const InputField = ({
       value={value}
       onChange={(e) => setValue(e.target.value)}
       placeholder={placeholder}
-      className="w-full p-4 border border-gray-300 rounded-xl bg-white text-gray-800 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300 shadow-sm hover:shadow-md"
+      className="w-full p-4 rounded-xl transition-all duration-300 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2"
+      style={{
+        backgroundColor: 'var(--bg-color)',
+        color: 'var(--text-color)',
+        border: '2px solid var(--border-color)',
+      }}
+      onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
+      onBlur={(e) => e.target.style.borderColor = 'var(--border-color)'}
     />
   </div>
 );

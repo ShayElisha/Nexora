@@ -1,0 +1,107 @@
+{
+  "en": {
+    "translation": {
+      "notifications": {
+        "title": "Notifications title",
+        "readAll": "Read all",
+        "notifications": "Notifications",
+        "loading_notifications": "Loading notifications...",
+        "no_notifications_found": "No notifications found.",
+        "mark_as_read": "Mark as Read",
+        "delete": "Delete Notification",
+        "notification_deleted": "Notification deleted successfully!",
+        "notification_marked_as_read": "Notification marked as read!"
+      }
+    }
+  },
+  "he": {
+    "translation": {
+      "notifications": {
+        "title": "כותרת התראות",
+        "readAll": "קרא הכל",
+        "notifications": "התראות",
+        "loading_notifications": "טוען התראות...",
+        "no_notifications_found": "לא נמצאו התראות.",
+        "mark_as_read": "סמן כנקרא",
+        "delete": "מחק התראה",
+        "notification_deleted": "ההתראה נמחקה בהצלחה!",
+        "notification_marked_as_read": "ההתראה סומנה כנקראה!"
+      }
+    }
+  },
+  "ru": {
+    "translation": {
+      "notifications": {
+        "title": "Заголовок уведомлений",
+        "readAll": "Прочитать все",
+        "notifications": "Уведомления",
+        "loading_notifications": "Загрузка уведомлений...",
+        "no_notifications_found": "Уведомления не найдены.",
+        "mark_as_read": "Отметить как прочитанное",
+        "delete": "Удалить уведомление",
+        "notification_deleted": "Уведомление успешно удалено!",
+        "notification_marked_as_read": "Уведомление отмечено как прочитанное!"
+      }
+    }
+  },
+  "ja": {
+    "translation": {
+      "notifications": {
+        "title": "通知のタイトル",
+        "readAll": "すべてを読む",
+        "notifications": "通知",
+        "loading_notifications": "通知を読み込み中...",
+        "no_notifications_found": "通知が見つかりません。",
+        "mark_as_read": "既読にする",
+        "delete": "通知を削除",
+        "notification_deleted": "通知が正常に削除されました！",
+        "notification_marked_as_read": "通知が既読としてマークされました！"
+      }
+    }
+  },
+  "fr": {
+    "translation": {
+      "notifications": {
+        "title": "Titre des notifications",
+        "readAll": "Tout lire",
+        "notifications": "Notifications",
+        "loading_notifications": "Chargement des notifications...",
+        "no_notifications_found": "Aucune notification trouvée.",
+        "mark_as_read": "Marquer comme lu",
+        "delete": "Supprimer la Notification",
+        "notification_deleted": "Notification supprimée avec succès !",
+        "notification_marked_as_read": "Notification marquée comme lue !"
+      }
+    }
+  },
+  "es": {
+    "translation": {
+      "notifications": {
+        "title": "Título de notificaciones",
+        "readAll": "Leer todo",
+        "notifications": "Notificaciones",
+        "loading_notifications": "Cargando notificaciones...",
+        "no_notifications_found": "No se han encontrado notificaciones.",
+        "mark_as_read": "Marcar como leído",
+        "delete": "Eliminar Notificación",
+        "notification_deleted": "¡Notificación eliminada con éxito!",
+        "notification_marked_as_read": "¡Notificación marcada como leída!"
+      }
+    }
+  },
+  "ar": {
+    "translation": {
+      "notifications": {
+        "title": "عنوان الإشعارات",
+        "readAll": "قراءة الكل",
+        "notifications": "الإشعارات",
+        "loading_notifications": "جار تحميل الإشعارات...",
+        "no_notifications_found": "لم يتم العثور على إشعارات.",
+        "mark_as_read": "وضع علامة مقروء",
+        "delete": "حذف الإشعار",
+        "notification_deleted": "تم حذف الإشعار بنجاح!",
+        "notification_marked_as_read": "تم وضع علامة مقروء على الإشعار!"
+      }
+    }
+  }
+}

@@ -396,8 +396,26 @@ export const createPriceList = async (req, res) => {
 export const getAllPriceLists = async (req, res) => {
   try {
     const decoded = verifyToken(req);
+    let companyId = decoded.companyId;
+    
+    // If companyId is not in token, try to get it from userId
+    if (!companyId && decoded.userId) {
+      const Employee = (await import("../models/employees.model.js")).default;
+      const user = await Employee.findById(decoded.userId);
+      if (user) {
+        companyId = user.companyId || user.company;
+      }
+    }
+
+    if (!companyId) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Company ID not found" 
+      });
+    }
+
     const { priceListType, status } = req.query;
-    const filter = { companyId: decoded.companyId };
+    const filter = { companyId };
     if (priceListType) filter.priceListType = priceListType;
     if (status) filter.status = status;
 
@@ -408,7 +426,13 @@ export const getAllPriceLists = async (req, res) => {
 
     res.status(200).json({ success: true, data: priceLists });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error("❌ Error in getAllPriceLists:", error);
+    console.error("❌ Error stack:", error.stack);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || "Internal server error",
+      error: process.env.NODE_ENV === "development" ? error.stack : undefined
+    });
   }
 };
 
@@ -951,17 +975,291 @@ export const createSupplySchedule = async (req, res) => {
 export const getAllSupplySchedules = async (req, res) => {
   try {
     const decoded = verifyToken(req);
-    const { supplierId, status } = req.query;
+    const { supplierId, status, startDate, endDate, procurementId, page = 1, limit = 20, sortBy = "startDate", sortOrder = "desc" } = req.query;
     const filter = { companyId: decoded.companyId };
     if (supplierId) filter.supplierId = supplierId;
     if (status) filter.status = status;
+    if (procurementId) filter.procurementId = procurementId;
+    if (startDate || endDate) {
+      filter.startDate = {};
+      if (startDate) filter.startDate.$gte = new Date(startDate);
+      if (endDate) filter.startDate.$lte = new Date(endDate);
+    }
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const sort = { [sortBy]: sortOrder === "asc" ? 1 : -1 };
+
+    const schedules = await SupplySchedule.find(filter)
+      .populate("supplierId", "SupplierName Email Phone")
+      .populate("procurementId", "PurchaseOrder totalCost currency")
+      .populate("createdBy", "name email")
+      .populate("managedBy", "name email")
+      .sort(sort)
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await SupplySchedule.countDocuments(filter);
+
+    res.status(200).json({ 
+      success: true, 
+      data: schedules,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / parseInt(limit))
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getSupplyScheduleById = async (req, res) => {
+  try {
+    const decoded = verifyToken(req);
+    const { id } = req.params;
+    
+    const schedule = await SupplySchedule.findOne({ 
+      _id: id, 
+      companyId: decoded.companyId 
+    })
+      .populate("supplierId")
+      .populate("procurementId")
+      .populate("createdBy", "name email")
+      .populate("managedBy", "name email")
+      .populate("items.productId")
+      .populate("schedule.items.productId");
+
+    if (!schedule) {
+      return res.status(404).json({ success: false, message: "Supply schedule not found" });
+    }
+
+    res.status(200).json({ success: true, data: schedule });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateSupplySchedule = async (req, res) => {
+  try {
+    const decoded = verifyToken(req);
+    const { id } = req.params;
+    
+    const schedule = await SupplySchedule.findOneAndUpdate(
+      { _id: id, companyId: decoded.companyId },
+      { ...req.body, updatedAt: new Date() },
+      { new: true, runValidators: true }
+    )
+      .populate("supplierId")
+      .populate("procurementId");
+
+    if (!schedule) {
+      return res.status(404).json({ success: false, message: "Supply schedule not found" });
+    }
+
+    res.status(200).json({ success: true, data: schedule });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const deleteSupplySchedule = async (req, res) => {
+  try {
+    const decoded = verifyToken(req);
+    const { id } = req.params;
+    
+    const schedule = await SupplySchedule.findOneAndDelete({ 
+      _id: id, 
+      companyId: decoded.companyId 
+    });
+
+    if (!schedule) {
+      return res.status(404).json({ success: false, message: "Supply schedule not found" });
+    }
+
+    res.status(200).json({ success: true, message: "Supply schedule deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateSupplyScheduleStatus = async (req, res) => {
+  try {
+    const decoded = verifyToken(req);
+    const { id } = req.params;
+    const { status } = req.body;
+    
+    if (!["Scheduled", "In Progress", "Partially Delivered", "Delivered", "Delayed", "Cancelled"].includes(status)) {
+      return res.status(400).json({ success: false, message: "Invalid status" });
+    }
+
+    const schedule = await SupplySchedule.findOneAndUpdate(
+      { _id: id, companyId: decoded.companyId },
+      { status, updatedAt: new Date() },
+      { new: true }
+    )
+      .populate("supplierId")
+      .populate("procurementId");
+
+    if (!schedule) {
+      return res.status(404).json({ success: false, message: "Supply schedule not found" });
+    }
+
+    res.status(200).json({ success: true, data: schedule });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const duplicateSupplySchedule = async (req, res) => {
+  try {
+    const decoded = verifyToken(req);
+    const { id } = req.params;
+    
+    const originalSchedule = await SupplySchedule.findOne({ 
+      _id: id, 
+      companyId: decoded.companyId 
+    });
+
+    if (!originalSchedule) {
+      return res.status(404).json({ success: false, message: "Supply schedule not found" });
+    }
+
+    const scheduleNumber = await generateScheduleNumber(decoded.companyId);
+    const scheduleData = originalSchedule.toObject();
+    delete scheduleData._id;
+    delete scheduleData.createdAt;
+    delete scheduleData.updatedAt;
+    scheduleData.scheduleNumber = scheduleNumber;
+    scheduleData.status = "Scheduled";
+    scheduleData.createdBy = decoded._id;
+    scheduleData.managedBy = decoded._id;
+
+    // Reset schedule items status
+    if (scheduleData.schedule) {
+      scheduleData.schedule = scheduleData.schedule.map(s => ({
+        ...s,
+        items: s.items.map(item => ({
+          ...item,
+          receivedQuantity: 0,
+          status: "Scheduled"
+        })),
+        tracking: {
+          ...s.tracking,
+          status: "Pending"
+        }
+      }));
+    }
+
+    const newSchedule = new SupplySchedule(scheduleData);
+    await newSchedule.save();
+
+    res.status(201).json({ success: true, data: newSchedule });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getSupplyScheduleStats = async (req, res) => {
+  try {
+    const decoded = verifyToken(req);
+    const { startDate, endDate } = req.query;
+    
+    const filter = { companyId: decoded.companyId };
+    if (startDate || endDate) {
+      filter.startDate = {};
+      if (startDate) filter.startDate.$gte = new Date(startDate);
+      if (endDate) filter.startDate.$lte = new Date(endDate);
+    }
 
     const schedules = await SupplySchedule.find(filter)
       .populate("supplierId", "SupplierName")
-      .populate("procurementId")
-      .sort({ startDate: -1 });
+      .populate("procurementId", "PurchaseOrder totalCost currency");
 
-    res.status(200).json({ success: true, data: schedules });
+    const now = new Date();
+    const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const fourteenDaysFromNow = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+    const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+    let totalActive = 0;
+    let upcoming7Days = 0;
+    let upcoming14Days = 0;
+    let upcoming30Days = 0;
+    let delayed = 0;
+    let totalDeliveries = 0;
+    let completedDeliveries = 0;
+    let totalAmount = 0;
+    const statusDistribution = {};
+    const supplierStats = {};
+
+    schedules.forEach(schedule => {
+      if (["Scheduled", "In Progress", "Partially Delivered"].includes(schedule.status)) {
+        totalActive++;
+      }
+
+      if (schedule.status === "Delayed") {
+        delayed++;
+      }
+
+      if (schedule.schedule && schedule.schedule.length > 0) {
+        schedule.schedule.forEach(delivery => {
+          totalDeliveries++;
+          const deliveryDate = new Date(delivery.deliveryDate);
+          
+          if (deliveryDate <= now && delivery.status !== "Delivered") {
+            delayed++;
+          } else if (deliveryDate <= sevenDaysFromNow && deliveryDate > now) {
+            upcoming7Days++;
+          } else if (deliveryDate <= fourteenDaysFromNow && deliveryDate > sevenDaysFromNow) {
+            upcoming14Days++;
+          } else if (deliveryDate <= thirtyDaysFromNow && deliveryDate > fourteenDaysFromNow) {
+            upcoming30Days++;
+          }
+
+          if (delivery.status === "Delivered") {
+            completedDeliveries++;
+          }
+        });
+      }
+
+      statusDistribution[schedule.status] = (statusDistribution[schedule.status] || 0) + 1;
+
+      if (schedule.procurementId && schedule.procurementId.totalCost) {
+        totalAmount += schedule.procurementId.totalCost;
+      }
+
+      const supplierName = schedule.supplierId?.SupplierName || "Unknown";
+      if (!supplierStats[supplierName]) {
+        supplierStats[supplierName] = { count: 0, totalAmount: 0 };
+      }
+      supplierStats[supplierName].count++;
+      if (schedule.procurementId && schedule.procurementId.totalCost) {
+        supplierStats[supplierName].totalAmount += schedule.procurementId.totalCost;
+      }
+    });
+
+    const completionRate = totalDeliveries > 0 ? (completedDeliveries / totalDeliveries) * 100 : 0;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalActive,
+        upcoming7Days,
+        upcoming14Days,
+        upcoming30Days,
+        delayed,
+        totalDeliveries,
+        completedDeliveries,
+        completionRate: Math.round(completionRate * 100) / 100,
+        totalAmount,
+        statusDistribution,
+        supplierStats: Object.entries(supplierStats)
+          .map(([name, stats]) => ({ name, ...stats }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 10)
+      }
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

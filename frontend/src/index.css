@@ -36,3 +36,107 @@
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
 }
+
+.font-hebrew {
+  font-family: "Heebo", "Inter", system-ui, sans-serif;
+}
+
+.landing-grid-bg {
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent,
+    transparent 40px,
+    rgba(249, 115, 22, 0.05) 40px,
+    rgba(249, 115, 22, 0.05) 41px
+  );
+}
+
+:root {
+  --surface-color: var(--surface-color, #ffffff);
+  --text-muted: var(--text-muted, var(--color-secondary));
+  --radius: var(--radius, 10px);
+  --shadow: var(--shadow, 0 20px 45px -22px rgba(15, 23, 42, 0.28));
+}
+
+body {
+  background: radial-gradient(
+      70rem 40rem at -10% -10%,
+      color-mix(in srgb, var(--color-primary) 12%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      70rem 40rem at 120% 110%,
+      color-mix(in srgb, var(--color-accent) 12%, transparent),
+      transparent 60%
+    ),
+    var(--bg-color);
+  color: var(--text-color);
+}
+
+.nx-page-shell {
+  width: 100%;
+  padding: 1.25rem;
+}
+
+.nx-page-shell--auth,
+.nx-page-shell--public {
+  padding-top: 5.5rem;
+}
+
+.nx-surface {
+  background: color-mix(in srgb, var(--surface-color) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-color) 88%, transparent);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.nx-card {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.nx-form-control {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background: var(--bg-color);
+  color: var(--text-color);
+  transition: all 0.2s ease-in-out;
+}
+
+.nx-form-control:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+
+.nx-table {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.nx-table thead tr {
+  background: color-mix(in srgb, var(--footer-bg) 70%, transparent);
+}
+
+.nx-table th,
+.nx-table td {
+  border-color: var(--border-color);
+}
+
+.nx-btn-primary {
+  border-radius: var(--radius);
+  color: var(--button-text);
+  background: linear-gradient(to right, var(--color-primary), var(--color-accent));
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.nx-btn-primary:hover {
+  transform: translateY(-1px);
+}
+
+.nx-btn-primary:active {
+  transform: scale(0.97);
+}

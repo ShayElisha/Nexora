@@ -757,6 +757,9 @@ export const updateShift = async (req, res) => {
     }
     shift.hoursWorked = effectiveHoursWorked;
 
+    // Get the shift date object (use updated date if provided, otherwise use existing)
+    const shiftDateObj = shift.shiftDate ? new Date(shift.shiftDate) : new Date();
+
     // Fetch pay rates
     const payRates = await PayRate.find({
       companyId: decodedToken.companyId,

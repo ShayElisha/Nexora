@@ -30,6 +30,12 @@ const taskSchema = new mongoose.Schema(
       default: "medium",
     },
     dueDate: { type: Date, required: true },
+    startDate: { type: Date, required: false },
+    estimatedHours: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
     assignedTo: [
       {
         type: mongoose.Schema.Types.ObjectId,

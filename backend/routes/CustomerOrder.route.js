@@ -419,21 +419,27 @@ router.post("/:id/ready-to-ship", async (req, res) => {
   const session = await mongoose.startSession();
   
   try {
+    console.log(`🚀 [READY-TO-SHIP] Route called for order ID: ${req.params.id}`);
     session.startTransaction();
+    console.log(`✅ [READY-TO-SHIP] Transaction started`);
     
     const CustomerOrder = (await import("../models/CustomerOrder.model.js")).default;
     const Inventory = (await import("../models/inventory.model.js")).default;
     const Product = (await import("../models/product.model.js")).default;
     const { checkAndReserveInventory } = await import("../utils/inventoryHelper.js");
     
+    console.log(`🔍 [READY-TO-SHIP] Fetching order ${req.params.id}...`);
     const order = await CustomerOrder.findById(req.params.id)
       .populate("items.product")
       .session(session);
       
     if (!order) {
+      console.log(`❌ [READY-TO-SHIP] Order ${req.params.id} not found`);
       await session.abortTransaction();
       return res.status(404).json({ success: false, message: "Order not found" });
     }
+    
+    console.log(`✅ [READY-TO-SHIP] Order found: ${order._id}, Status: ${order.status}, Items: ${order.items?.length || 0}`);
     
     // Always check inventory before marking as ready to ship
     // Check current stock levels for all items
@@ -441,10 +447,16 @@ router.post("/:id/ready-to-ship", async (req, res) => {
     
     for (const item of order.items || []) {
       const productId = item.product?._id || item.productId;
-      if (!productId) continue;
+      if (!productId) {
+        console.log(`⚠️ [READY-TO-SHIP] Skipping item - no productId`);
+        continue;
+      }
       
       const requiredQuantity = item.quantity || 0;
-      if (requiredQuantity <= 0) continue;
+      if (requiredQuantity <= 0) {
+        console.log(`⚠️ [READY-TO-SHIP] Skipping item - invalid quantity: ${requiredQuantity}`);
+        continue;
+      }
       
       const inventory = await Inventory.findOne({
         companyId: order.companyId,
@@ -454,6 +466,7 @@ router.post("/:id/ready-to-ship", async (req, res) => {
       if (!inventory) {
         // No inventory record - treat as zero stock
         const product = await Product.findById(productId).session(session);
+        console.log(`⚠️ [READY-TO-SHIP] No inventory record for product ${productId}`);
         inventoryIssues.push({
           productId: productId.toString(),
           productName: product?.productName || item.product?.productName || "מוצר לא ידוע",
@@ -464,6 +477,7 @@ router.post("/:id/ready-to-ship", async (req, res) => {
       } else if (inventory.quantity < requiredQuantity) {
         // Not enough stock
         const product = await Product.findById(productId).session(session);
+        console.log(`⚠️ [READY-TO-SHIP] Insufficient stock for product ${productId}: Available ${inventory.quantity}, Required ${requiredQuantity}`);
         inventoryIssues.push({
           productId: productId.toString(),
           productName: product?.productName || item.product?.productName || "מוצר לא ידוע",
@@ -471,11 +485,14 @@ router.post("/:id/ready-to-ship", async (req, res) => {
           available: inventory.quantity,
           missing: requiredQuantity - inventory.quantity
         });
+      } else {
+        console.log(`✅ [READY-TO-SHIP] Sufficient stock for product ${productId}: Available ${inventory.quantity}, Required ${requiredQuantity}`);
       }
     }
     
     // If there are inventory issues, don't allow marking as ready to ship
     if (inventoryIssues.length > 0) {
+      console.log(`❌ [READY-TO-SHIP] Inventory issues found: ${inventoryIssues.length} products`);
       await session.abortTransaction();
       const issuesText = inventoryIssues.map(issue =>
         `${issue.productName}: נדרש ${issue.required}, זמין ${issue.available}, חסר ${issue.missing}`
@@ -491,6 +508,7 @@ router.post("/:id/ready-to-ship", async (req, res) => {
     
     // If order is still Pending or inventory not reserved, reserve it now
     if (order.status === "Pending" || !order.inventoryReserved) {
+      console.log(`🔄 [READY-TO-SHIP] Order status is ${order.status}, inventoryReserved: ${order.inventoryReserved} - reserving inventory...`);
       const token = req.cookies["auth_token"];
       let userId = null;
       if (token) {
@@ -499,6 +517,7 @@ router.post("/:id/ready-to-ship", async (req, res) => {
           const decoded = jwt.verify(token, process.env.JWT_SECRET);
           userId = decoded.userId || decoded._id;
         } catch (e) {
+          console.warn(`⚠️ [READY-TO-SHIP] Token invalid, continuing without userId`);
           // Token invalid, continue without userId
         }
       }
@@ -510,6 +529,7 @@ router.post("/:id/ready-to-ship", async (req, res) => {
       });
       
       if (!result.success) {
+        console.log(`❌ [READY-TO-SHIP] Failed to reserve inventory`);
         await session.abortTransaction();
         const issuesText = result.inventoryIssues.map(issue =>
           `${issue.productName}: נדרש ${issue.required}, זמין ${issue.available}, חסר ${issue.missing}`
@@ -523,21 +543,37 @@ router.post("/:id/ready-to-ship", async (req, res) => {
         });
       }
       
+      console.log(`✅ [READY-TO-SHIP] Inventory reserved successfully`);
       order.status = "Confirmed";
       order.confirmedAt = new Date();
       order.inventoryReserved = true;
       order.inventoryReservedAt = new Date();
+    } else {
+      console.log(`ℹ️ [READY-TO-SHIP] Order already has inventory reserved`);
     }
     
     order.preparationStatus = "Ready to Ship";
     await order.save({ session });
+    console.log(`✅ [READY-TO-SHIP] Order saved with preparationStatus: Ready to Ship`);
     
     await session.commitTransaction();
+    console.log(`✅ [READY-TO-SHIP] Transaction committed successfully`);
+    
     res.json({ success: true, data: order, message: "ההזמנה מוכנה למשלוח" });
   } catch (error) {
     await session.abortTransaction();
-    console.error("Error marking order as ready to ship:", error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error("❌ [READY-TO-SHIP] Error marking order as ready to ship:", error);
+    console.error("❌ [READY-TO-SHIP] Error name:", error.name);
+    console.error("❌ [READY-TO-SHIP] Error message:", error.message);
+    console.error("❌ [READY-TO-SHIP] Error stack:", error.stack);
+    if (error.errors) {
+      console.error("❌ [READY-TO-SHIP] Validation errors:", JSON.stringify(error.errors, null, 2));
+    }
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || "Internal server error",
+      error: process.env.NODE_ENV === "development" ? error.stack : undefined
+    });
   } finally {
     session.endSession();
   }
@@ -659,7 +695,7 @@ router.post("/:id/prepare", async (req, res) => {
       
       await notifyAdminsAndManagers({
         companyId: order.companyId,
-        title: "⚠️ מלאי חסר להזמנה",
+        title: " מלאי חסר להזמנה",
         content: `הזמנה #${order._id.toString().slice(-6)} דורשת מוצרים שאינם במלאי:\n${issuesText}`,
         type: "Warning",
         category: "inventory",
@@ -698,6 +734,14 @@ router.post("/:id/prepare", async (req, res) => {
     // Check inventory and create production orders for missing stock
     console.log(`🔍 [PREPARE ROUTE] Starting production order check section...`);
     const productionOrdersCreated = [];
+    const skippedReasons = {
+      sufficientStock: [],
+      noBOM: [],
+      notForSale: [],
+      noProductId: [],
+      productNotFound: [],
+    };
+    
     try {
       console.log(`🏭 [PREPARE] Starting production order check for order ${order._id}`);
       console.log(`🏭 [PREPARE] Order has ${order.items?.length || 0} items`);
@@ -706,6 +750,7 @@ router.post("/:id/prepare", async (req, res) => {
         const productId = orderItem.product?._id || orderItem.productId;
         if (!productId) {
           console.log(`⚠️ [PREPARE] Skipping item - no productId`);
+          skippedReasons.noProductId.push("מוצר ללא מזהה");
           continue;
         }
 
@@ -715,6 +760,7 @@ router.post("/:id/prepare", async (req, res) => {
         const product = await Product.findById(productId).session(session);
         if (!product) {
           console.log(`⚠️ [PREPARE] Product ${productId} not found`);
+          skippedReasons.productNotFound.push("מוצר לא נמצא");
           continue;
         }
 
@@ -723,6 +769,7 @@ router.post("/:id/prepare", async (req, res) => {
         // Only check products for sale (sale or both)
         if (product.productType !== "sale" && product.productType !== "both") {
           console.log(`⏭️ [PREPARE] Product ${product.productName} is not for sale (type: ${product.productType}) - skipping`);
+          skippedReasons.notForSale.push(`${product.productName} (סוג: ${product.productType})`);
           continue;
         }
 
@@ -738,19 +785,7 @@ router.post("/:id/prepare", async (req, res) => {
         console.log(`📊 [PREPARE] Product ${product.productName}: Required ${requiredQuantity}, Available ${availableQuantity}`);
         console.log(`📊 [PREPARE] Inventory record exists: ${!!finishedProductInventory}, Inventory ID: ${finishedProductInventory?._id || 'N/A'}`);
 
-        // Always check if we need to produce (even if we have some stock)
-        // Calculate how many we need to produce
-        let quantityToProduce = 0;
-        
-        if (availableQuantity < requiredQuantity) {
-          quantityToProduce = requiredQuantity - availableQuantity;
-          console.log(`🔨 [PREPARE] Need to produce ${quantityToProduce} units of ${product.productName} (Available: ${availableQuantity}, Required: ${requiredQuantity})`);
-        } else {
-          console.log(`✅ [PREPARE] Product ${product.productName} has enough stock (${availableQuantity} >= ${requiredQuantity}) - skipping production`);
-          continue;
-        }
-
-        // Check if product has a BOM (Bill of Materials)
+        // Check if product has a BOM (Bill of Materials) first
         const bom = await productTree
           .findOne({ productId: productId, companyId: order.companyId })
           .session(session);
@@ -760,7 +795,21 @@ router.post("/:id/prepare", async (req, res) => {
           console.log(
             `⚠️ [PREPARE] Product ${product.productName} has no BOM - skipping production order`
           );
+          skippedReasons.noBOM.push(`${product.productName}`);
           continue;
+        }
+
+        // If product has BOM, always create production order (even if there's enough stock)
+        // Calculate how many we need to produce
+        let quantityToProduce = 0;
+        
+        if (availableQuantity < requiredQuantity) {
+          quantityToProduce = requiredQuantity - availableQuantity;
+          console.log(`🔨 [PREPARE] Need to produce ${quantityToProduce} units of ${product.productName} (Available: ${availableQuantity}, Required: ${requiredQuantity})`);
+        } else {
+          // Even if we have enough stock, create production order for the full required quantity
+          quantityToProduce = requiredQuantity;
+          console.log(`🏭 [PREPARE] Product ${product.productName} has enough stock (${availableQuantity} >= ${requiredQuantity}), but creating production order for full quantity (${quantityToProduce} units) as requested`);
         }
 
         console.log(`✅ [PREPARE] Product ${product.productName} has BOM with ${bom.components.length} components`);
@@ -793,7 +842,7 @@ router.post("/:id/prepare", async (req, res) => {
             estimatedCost: availabilityCheck.totalEstimatedCost
           });
 
-          // Create production order for the missing quantity
+          // Create production order (for missing quantity or full quantity if enough stock)
           console.log(`🏭 [PREPARE] Creating production order for ${quantityToProduce} units of ${product.productName}...`);
           productionOrder = new ProductionOrder({
             companyId: order.companyId,
@@ -808,14 +857,65 @@ router.post("/:id/prepare", async (req, res) => {
             estimatedCost: availabilityCheck.totalEstimatedCost,
             priority: availabilityCheck.allComponentsAvailable ? "high" : "urgent",
             status: availabilityCheck.allComponentsAvailable ? "Pending" : "On Hold",
-            notes: `נוצר אוטומטית מהזמנה #${order._id.toString().slice(-6)} - הפרש חסר במלאי (${quantityToProduce} יחידות)`,
+            notes: availableQuantity < requiredQuantity 
+              ? `נוצר אוטומטית מהזמנה #${order._id.toString().slice(-6)} - הפרש חסר במלאי (${quantityToProduce} יחידות)`
+              : `נוצר אוטומטית מהזמנה #${order._id.toString().slice(-6)} - כמות מלאה (${quantityToProduce} יחידות)`,
           });
 
           console.log(`💾 [PREPARE] Saving production order to database...`);
-          await productionOrder.save({ session });
-          console.log(`✅ [PREPARE] Production order saved with ID: ${productionOrder._id}, Order Number: ${productionOrder.orderNumber}`);
+          console.log(`💾 [PREPARE] Production order details before save:`, {
+            companyId: productionOrder.companyId?.toString(),
+            productId: productionOrder.productId?.toString(),
+            productName: productionOrder.productName,
+            quantity: productionOrder.quantity,
+            status: productionOrder.status,
+            orderNumber: productionOrder.orderNumber,
+          });
           
-          productionOrdersCreated.push(productionOrder);
+          try {
+            await productionOrder.save({ session });
+            console.log(`✅ [PREPARE] Production order saved with ID: ${productionOrder._id}, Order Number: ${productionOrder.orderNumber}`);
+            
+            // Verify the production order was saved by querying it
+            const verifyOrder = await ProductionOrder.findById(productionOrder._id).session(session);
+            if (verifyOrder) {
+              console.log(`✅ [PREPARE] Verified production order exists:`, {
+                id: verifyOrder._id.toString(),
+                orderNumber: verifyOrder.orderNumber,
+                status: verifyOrder.status,
+                companyId: verifyOrder.companyId?.toString(),
+                productName: verifyOrder.productName,
+                quantity: verifyOrder.quantity,
+              });
+            } else {
+              console.error(`❌ [PREPARE] Production order was not saved! ID: ${productionOrder._id}`);
+              throw new Error(`Production order was not saved - verification failed`);
+            }
+            
+            // Also verify it can be found by companyId
+            const verifyByCompany = await ProductionOrder.findOne({
+              _id: productionOrder._id,
+              companyId: order.companyId
+            }).session(session);
+            
+            if (verifyByCompany) {
+              console.log(`✅ [PREPARE] Production order found by companyId: ${order.companyId.toString()}`);
+            } else {
+              console.error(`❌ [PREPARE] Production order NOT found by companyId: ${order.companyId.toString()}`);
+              console.error(`❌ [PREPARE] Production order companyId: ${productionOrder.companyId?.toString()}, Order companyId: ${order.companyId.toString()}`);
+            }
+            
+            productionOrdersCreated.push(productionOrder);
+          } catch (saveError) {
+            console.error(`❌ [PREPARE] Error saving production order:`, saveError);
+            console.error(`❌ [PREPARE] Save error details:`, {
+              message: saveError.message,
+              name: saveError.name,
+              errors: saveError.errors,
+              stack: saveError.stack
+            });
+            throw saveError; // Re-throw to be caught by outer catch
+          }
 
           console.log(
             `✅ [PREPARE] Created production order ${productionOrder.orderNumber} for ${quantityToProduce} units of ${product.productName} (missing from inventory)`
@@ -987,25 +1087,111 @@ router.post("/:id/prepare", async (req, res) => {
       // Continue even if task creation fails
     }
     
-    await session.commitTransaction();
+    // Log production orders before commit
+    console.log(`📋 [PREPARE] About to commit transaction. Production orders created: ${productionOrdersCreated.length}`);
+    if (productionOrdersCreated.length > 0) {
+      productionOrdersCreated.forEach((po, index) => {
+        console.log(`📋 [PREPARE] Production Order ${index + 1} before commit:`, {
+          id: po._id?.toString() || 'NO ID',
+          orderNumber: po.orderNumber || 'NO ORDER NUMBER',
+          productName: po.productName || 'NO PRODUCT NAME',
+          quantity: po.quantity || 0,
+          status: po.status || 'NO STATUS',
+          companyId: po.companyId?.toString() || 'NO COMPANY ID',
+        });
+      });
+    }
     
+    await session.commitTransaction();
+    console.log(`✅ [PREPARE] Transaction committed successfully`);
+    console.log(`✅ [PREPARE] Created ${productionOrdersCreated.length} production order(s)`);
+    
+    // Log production order details for debugging
+    if (productionOrdersCreated.length > 0) {
+      productionOrdersCreated.forEach((po, index) => {
+        console.log(`✅ [PREPARE] Production Order ${index + 1}:`, {
+          id: po._id.toString(),
+          orderNumber: po.orderNumber,
+          productName: po.productName,
+          quantity: po.quantity,
+          status: po.status,
+          companyId: po.companyId.toString(),
+        });
+      });
+      
+      // Verify orders exist after commit (without session)
+      console.log(`🔍 [PREPARE] Verifying production orders exist after commit...`);
+      for (const po of productionOrdersCreated) {
+        const ProductionOrder = (await import("../models/ProductionOrder.model.js")).default;
+        const verifyAfterCommit = await ProductionOrder.findById(po._id);
+        if (verifyAfterCommit) {
+          console.log(`✅ [PREPARE] Production order ${po.orderNumber} verified after commit:`, {
+            id: verifyAfterCommit._id.toString(),
+            orderNumber: verifyAfterCommit.orderNumber,
+            companyId: verifyAfterCommit.companyId.toString(),
+            status: verifyAfterCommit.status,
+          });
+          
+          // Also check if it can be found by companyId
+          const verifyByCompany = await ProductionOrder.findOne({
+            _id: po._id,
+            companyId: order.companyId
+          });
+          
+          if (verifyByCompany) {
+            console.log(`✅ [PREPARE] Production order ${po.orderNumber} found by companyId ${order.companyId.toString()}`);
+          } else {
+            console.error(`❌ [PREPARE] Production order ${po.orderNumber} NOT found by companyId ${order.companyId.toString()}`);
+            console.error(`❌ [PREPARE] Order companyId: ${verifyAfterCommit.companyId.toString()}, Expected: ${order.companyId.toString()}`);
+          }
+        } else {
+          console.error(`❌ [PREPARE] Production order ${po.orderNumber} NOT found after commit!`);
+        }
+      }
+    }
+    
+    // Build skipped reasons message from the already collected reasons
+    const reasons = [];
+    if (skippedReasons.sufficientStock.length > 0) {
+      reasons.push(`מספיק מלאי: ${skippedReasons.sufficientStock.join(", ")}`);
+    }
+    if (skippedReasons.noBOM.length > 0) {
+      reasons.push(`אין BOM: ${skippedReasons.noBOM.join(", ")}`);
+    }
+    if (skippedReasons.notForSale.length > 0) {
+      reasons.push(`לא למכירה: ${skippedReasons.notForSale.join(", ")}`);
+    }
+    if (skippedReasons.noProductId.length > 0) {
+      reasons.push(`ללא מזהה מוצר: ${skippedReasons.noProductId.length} מוצרים`);
+    }
+    if (skippedReasons.productNotFound.length > 0) {
+      reasons.push(`מוצר לא נמצא: ${skippedReasons.productNotFound.length} מוצרים`);
+    }
+
     res.json({ 
       success: true, 
       data: order,
       productionOrdersCreated: productionOrdersCreated.length,
       productionOrderDetails: productionOrdersCreated.map(po => ({
-        orderNumber: po.orderNumber,
-        productName: po.productName,
-        quantity: po.quantity,
-        status: po.status,
+        orderNumber: po.orderNumber || "N/A",
+        productName: po.productName || "Unknown",
+        quantity: po.quantity || 0,
+        status: po.status || "Pending",
         id: po._id.toString()
       })),
+      skippedReasons: reasons.length > 0 ? reasons : undefined,
       inventoryIssues: inventoryIssues.length > 0 ? inventoryIssues : undefined,
       lowStockProducts: lowStockProducts.length > 0 ? lowStockProducts : undefined
     });
   } catch (error) {
     await session.abortTransaction();
-    console.error("Error preparing order:", error);
+    console.error("❌ [PREPARE] Error preparing order:", error);
+    console.error("❌ [PREPARE] Error name:", error.name);
+    console.error("❌ [PREPARE] Error message:", error.message);
+    console.error("❌ [PREPARE] Error stack:", error.stack);
+    if (error.errors) {
+      console.error("❌ [PREPARE] Validation errors:", JSON.stringify(error.errors, null, 2));
+    }
     res.status(500).json({ success: false, message: error.message });
   } finally {
     session.endSession();

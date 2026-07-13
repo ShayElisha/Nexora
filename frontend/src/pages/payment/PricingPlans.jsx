@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { CheckIcon } from "@heroicons/react/24/outline";
 import { axiosInstance } from "../../lib/axios";
-import React from "react";
 import { plans } from "../../../../backend/config/lib/payment.js";
-import { Loader2, Sparkles } from "lucide-react";
+import { Check, Loader2, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
+import PublicPageHero from "../../components/home/PublicPageHero";
+import PublicPageLayout from "../../components/home/PublicPageLayout";
+import { usePageLocale } from "../../hooks/usePageLocale";
 
 const groupPlansByDuration = (plansArray) => {
   const grouped = { Monthly: [], Yearly: [] };
@@ -23,6 +24,7 @@ const groupPlansByDuration = (plansArray) => {
 };
 
 const PricingPlans = ({ currentPlan: propCurrentPlan, onPlanUpdate }) => {
+  const { t } = usePageLocale();
   const [isLoading, setIsLoading] = useState(true);
   const [duration, setDuration] = useState("Monthly");
   const [currentPlan, setCurrentPlan] = useState(propCurrentPlan || null);
@@ -122,10 +124,10 @@ const PricingPlans = ({ currentPlan: propCurrentPlan, onPlanUpdate }) => {
           { withCredentials: true }
         );
         if (response.data.success && response.data.session?.url) {
-          toast.success("Redirecting to payment page...");
+          toast.success(t("public.pricing.toasts.redirecting"));
           window.location.href = response.data.session.url;
         } else {
-          const errorMsg = response.data.message || "No payment URL received";
+          const errorMsg = response.data.message || t("public.pricing.toasts.genericError");
           toast.error(errorMsg);
           throw new Error(errorMsg);
         }
@@ -139,13 +141,13 @@ const PricingPlans = ({ currentPlan: propCurrentPlan, onPlanUpdate }) => {
           { withCredentials: true }
         );
         if (response.data.success) {
-          toast.success("Plan updated successfully!");
+          toast.success(t("public.pricing.toasts.updated"));
           setCurrentPlan({ planName, duration });
           if (onPlanUpdate) {
             onPlanUpdate();
           }
         } else {
-          const errorMsg = response.data.message || "Update failed";
+          const errorMsg = response.data.message || t("public.pricing.toasts.genericError");
           toast.error(errorMsg);
           throw new Error(errorMsg);
         }
@@ -155,10 +157,14 @@ const PricingPlans = ({ currentPlan: propCurrentPlan, onPlanUpdate }) => {
         "Error handling payment:",
         error.response?.data || error.message
       );
-      const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || "Failed to process payment";
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        t("public.pricing.toasts.genericError");
       
       if (error.response?.status === 401) {
-        toast.error("You need to log in to update your subscription. Redirecting...");
+        toast.error(t("public.pricing.toasts.loginRequired"));
         setTimeout(() => {
           window.location.href = "/login";
         }, 2000);
@@ -171,12 +177,12 @@ const PricingPlans = ({ currentPlan: propCurrentPlan, onPlanUpdate }) => {
   };
 
   const getButtonText = (planName) => {
-    if (!currentPlan) return "Get Started";
+    if (!currentPlan) return t("public.pricing.actions.getStarted");
     if (
       currentPlan.planName === planName &&
       currentPlan.duration === duration
     ) {
-      return "Current Plan";
+      return t("public.pricing.actions.currentPlan");
     }
     const currentPrice = tiers[currentPlan.duration]
       ?.find((p) => p.planName === currentPlan.planName)
@@ -185,143 +191,169 @@ const PricingPlans = ({ currentPlan: propCurrentPlan, onPlanUpdate }) => {
       .find((p) => p.planName === planName)
       ?.price.replace("$", "");
     return parseInt(newPrice) > parseInt(currentPrice)
-      ? "Upgrade Now"
-      : "Switch Plan";
+      ? t("public.pricing.actions.upgrade")
+      : t("public.pricing.actions.switch");
   };
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
-      </div>
+      <PublicPageLayout>
+        <PublicPageHero
+          badge={t("public.pricing.badge")}
+          title={t("public.pricing.title")}
+          subtitle={t("public.pricing.subtitle")}
+        />
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-12 h-12 animate-spin" style={{ color: "var(--color-primary)" }} />
+        </div>
+      </PublicPageLayout>
     );
   }
 
   return (
-    <div className="py-8 px-4">
-      {/* Header Section - Compact */}
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-extrabold text-gray-900 flex items-center justify-center gap-2">
-          <Sparkles className="w-8 h-8 text-blue-600" />
-          Choose Your Plan
-        </h2>
-        <p className="mt-2 text-base text-gray-600">
-          Flexible plans designed to grow with your business
-        </p>
-        
-        {/* Duration Toggle - Compact */}
-        <div className="mt-4 flex justify-center">
-          <div className="inline-flex rounded-full shadow-md bg-gray-100 p-1">
-            <button
-              onClick={() => setDuration("Monthly")}
-              className={`px-6 py-2 text-sm font-bold rounded-full transition-all duration-200 ${
-                duration === "Monthly"
-                  ? "bg-blue-600 text-white shadow-lg"
-                  : "text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setDuration("Yearly")}
-              className={`px-6 py-2 text-sm font-bold rounded-full transition-all duration-200 ${
-                duration === "Yearly"
-                  ? "bg-blue-600 text-white shadow-lg"
-                  : "text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              Yearly
-              <span className="ml-1 text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">
-                Save 20%
-              </span>
-            </button>
-          </div>
-        </div>
-      </div>
+    <PublicPageLayout>
+      <PublicPageHero
+        badge={t("public.pricing.badge")}
+        title={t("public.pricing.title")}
+        subtitle={t("public.pricing.subtitle")}
+      />
 
-      {/* Pricing Cards - Compact Grid */}
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 px-2">
-        {tiers[duration].map((plan, index) => {
-          const isCurrentPlan =
-            currentPlan?.planName === plan.planName &&
-            currentPlan?.duration === duration;
-          return (
+      <section className="py-8 px-4 pb-16 md:pb-20">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-extrabold flex items-center justify-center gap-2" style={{ color: "var(--text-color)" }}>
+            <Sparkles className="w-7 h-7" style={{ color: "var(--color-primary)" }} />
+            {t("public.pricing.heading")}
+          </h2>
+          <p className="mt-2 text-base" style={{ color: "var(--color-secondary)" }}>
+            {t("public.pricing.description")}
+          </p>
+
+          <div className="mt-4 flex justify-center">
             <div
-              key={plan.id}
-              className={`relative bg-white rounded-xl shadow-lg p-5 flex flex-col transition-all duration-300 border-2 ${
-                plan.isFeatured
-                  ? "border-blue-600 transform scale-105"
-                  : "border-gray-200 hover:border-blue-300"
-              } ${isCurrentPlan ? "ring-2 ring-green-500" : ""}`}
+              className="inline-flex rounded-full p-1 border"
+              style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)" }}
             >
-              {plan.isFeatured && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">
-                    ⭐ Most Popular
-                  </span>
-                </div>
-              )}
-              
-              {isCurrentPlan && (
-                <div className="absolute -top-3 right-4">
-                  <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                    ✓ Active
-                  </span>
-                </div>
-              )}
-
-              <div className="text-center mb-4">
-                <h3 className="text-2xl font-bold text-gray-900">
-                  {plan.planName}
-                </h3>
-                <div className="mt-3">
-                  <span className="text-4xl font-extrabold text-gray-900">
-                    {plan.price}
-                  </span>
-                  <span className="text-base font-medium text-gray-500">
-                    /{duration === "Monthly" ? "mo" : "yr"}
-                  </span>
-                </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  Billed {duration.toLowerCase()}
-                </p>
-              </div>
-
-              {/* Features - Compact List */}
-              <ul className="space-y-2 text-sm flex-grow mb-4">
-                {plan.features.slice(0, 6).map((feature, idx) => (
-                  <li key={idx} className="flex items-start">
-                    <CheckIcon className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">{feature}</span>
-                  </li>
-                ))}
-                {plan.features.length > 6 && (
-                  <li className="text-xs text-gray-500 text-center pt-1">
-                    +{plan.features.length - 6} more features
-                  </li>
-                )}
-              </ul>
-
               <button
-                onClick={() => handlePayment(plan.planName)}
-                disabled={isCurrentPlan || isProcessing}
-                className={`w-full py-3 px-4 rounded-xl font-bold text-white transition-all duration-200 ${
-                  isCurrentPlan || isProcessing
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : plan.isFeatured
-                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-lg hover:scale-105"
-                    : "bg-blue-500 hover:bg-blue-600 hover:shadow-lg"
-                }`}
+                onClick={() => setDuration("Monthly")}
+                className="px-6 py-2 text-sm font-bold rounded-full transition-all duration-200"
+                style={{
+                  backgroundColor: duration === "Monthly" ? "var(--color-primary)" : "transparent",
+                  color: duration === "Monthly" ? "var(--button-text)" : "var(--text-color)",
+                }}
               >
-                {isProcessing
-                  ? "Processing..."
-                  : getButtonText(plan.planName)}
+                {t("public.pricing.duration.monthly")}
+              </button>
+              <button
+                onClick={() => setDuration("Yearly")}
+                className="px-6 py-2 text-sm font-bold rounded-full transition-all duration-200"
+                style={{
+                  backgroundColor: duration === "Yearly" ? "var(--color-primary)" : "transparent",
+                  color: duration === "Yearly" ? "var(--button-text)" : "var(--text-color)",
+                }}
+              >
+                {t("public.pricing.duration.yearly")}
+                <span className="ml-1 text-xs px-2 py-0.5 rounded-full border" style={{ borderColor: "var(--border-color)" }}>
+                  {t("public.pricing.duration.save")}
+                </span>
               </button>
             </div>
-          );
-        })}
-      </div>
-    </div>
+          </div>
+        </div>
+
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 px-2">
+          {tiers[duration].map((plan) => {
+            const isCurrentPlan = currentPlan?.planName === plan.planName && currentPlan?.duration === duration;
+            return (
+              <div
+                key={plan.id}
+                className={`relative rounded-xl p-5 flex flex-col transition-all duration-300 border-2 ${
+                  plan.isFeatured ? "scale-[1.02]" : ""
+                }`}
+                style={{
+                  borderColor: plan.isFeatured ? "var(--color-primary)" : "var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  boxShadow: isCurrentPlan ? "0 0 0 2px var(--color-primary)" : "none",
+                }}
+              >
+                {plan.isFeatured && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span
+                      className="text-xs font-bold px-4 py-1 rounded-full border inline-flex items-center gap-1"
+                      style={{
+                        borderColor: "var(--color-primary)",
+                        backgroundColor: "var(--color-primary)",
+                        color: "var(--button-text)",
+                      }}
+                    >
+                      <Sparkles size={12} />
+                      {t("public.pricing.labels.mostPopular")}
+                    </span>
+                  </div>
+                )}
+
+                {isCurrentPlan && (
+                  <div className="absolute -top-3 right-4">
+                    <span
+                      className="text-xs font-bold px-3 py-1 rounded-full border"
+                      style={{
+                        borderColor: "var(--color-primary)",
+                        backgroundColor: "var(--color-primary)",
+                        color: "var(--button-text)",
+                      }}
+                    >
+                      {t("public.pricing.labels.active")}
+                    </span>
+                  </div>
+                )}
+
+                <div className="text-center mb-4">
+                  <h3 className="text-2xl font-bold" style={{ color: "var(--text-color)" }}>
+                    {plan.planName}
+                  </h3>
+                  <div className="mt-3">
+                    <span className="text-4xl font-extrabold" style={{ color: "var(--text-color)" }}>
+                      {plan.price}
+                    </span>
+                    <span className="text-base font-medium" style={{ color: "var(--color-secondary)" }}>
+                      /{duration === "Monthly" ? t("public.pricing.labels.perMonth") : t("public.pricing.labels.perYear")}
+                    </span>
+                  </div>
+                  <p className="text-xs mt-1" style={{ color: "var(--color-secondary)" }}>
+                    {duration === "Monthly" ? t("public.pricing.labels.billedMonthly") : t("public.pricing.labels.billedYearly")}
+                  </p>
+                </div>
+
+                <ul className="space-y-2 text-sm flex-grow mb-4">
+                  {plan.features.slice(0, 6).map((feature, index) => (
+                    <li key={`${plan.id}-${index}`} className="flex items-start">
+                      <Check className="w-4 h-4 mr-2 flex-shrink-0 mt-0.5" style={{ color: "var(--color-primary)" }} />
+                      <span style={{ color: "var(--text-color)" }}>{feature}</span>
+                    </li>
+                  ))}
+                  {plan.features.length > 6 && (
+                    <li className="text-xs text-center pt-1" style={{ color: "var(--color-secondary)" }}>
+                      {t("public.pricing.labels.moreFeatures", { count: plan.features.length - 6 })}
+                    </li>
+                  )}
+                </ul>
+
+                <button
+                  onClick={() => handlePayment(plan.planName)}
+                  disabled={isCurrentPlan || isProcessing}
+                  className="w-full py-3 px-4 rounded-xl font-bold transition-all duration-200 disabled:opacity-60"
+                  style={{
+                    backgroundColor: isCurrentPlan || isProcessing ? "var(--border-color)" : "var(--color-primary)",
+                    color: isCurrentPlan || isProcessing ? "var(--text-color)" : "var(--button-text)",
+                  }}
+                >
+                  {isProcessing ? t("public.pricing.actions.processing") : getButtonText(plan.planName)}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    </PublicPageLayout>
   );
 };
 

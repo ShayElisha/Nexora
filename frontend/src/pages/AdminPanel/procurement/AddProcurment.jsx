@@ -403,18 +403,36 @@ const AddProcurement = () => {
         supplierProducts.map(async (product) => {
           const basePrice = product.baseUnitPrice || product.unitPrice;
           const qty = product.quantity;
+          const hasDiscountFromPriceList = product.originalBasePrice && product.originalBasePrice !== product.baseUnitPrice;
+          
           if (supplierBaseCurrency === selectedCurrency) {
             return { ...product, unitPrice: basePrice, total: basePrice * qty };
           }
+          
           const rate = await fetchExchangeRate(
             supplierBaseCurrency,
             selectedCurrency
           );
           const convertedPrice = (basePrice * rate).toFixed(2);
+          
+          // If there's a discount from price list, convert originalBasePrice too
+          // Otherwise, keep originalBasePrice as is (or set it to baseUnitPrice if not exists)
+          let convertedOriginalBasePrice = product.originalBasePrice;
+          if (hasDiscountFromPriceList && product.originalBasePrice) {
+            convertedOriginalBasePrice = parseFloat((product.originalBasePrice * rate).toFixed(2));
+          } else if (!product.originalBasePrice) {
+            convertedOriginalBasePrice = parseFloat(convertedPrice);
+          }
+          
           return {
             ...product,
             unitPrice: parseFloat(convertedPrice),
             total: parseFloat((convertedPrice * qty).toFixed(2)),
+            baseUnitPrice: parseFloat(convertedPrice), // Update baseUnitPrice to converted price
+            // Only update originalBasePrice if there's a discount from price list
+            originalBasePrice: hasDiscountFromPriceList ? convertedOriginalBasePrice : (product.originalBasePrice || parseFloat(convertedPrice)),
+            // Keep discountPercent unchanged - it should only come from price list
+            discountPercent: product.discountPercent || 0,
           };
         })
       );
@@ -458,13 +476,27 @@ const AddProcurement = () => {
     const shippingCost = Number(formData.shippingCost) || 0;
     const grandTotal = productsSubtotal + shippingCost;
     
-    // Calculate total discount
+    // Calculate total discount - only if there's a discount from price list
+    // A discount exists only if originalBasePrice is different from baseUnitPrice (meaning it came from price list)
     const totalOriginal = products.reduce((acc, p) => {
-      const originalPrice = p.originalBasePrice || p.baseUnitPrice || p.unitPrice;
+      // Only use originalBasePrice if it's different from baseUnitPrice (discount from price list)
+      // Otherwise, use baseUnitPrice (no discount)
+      const hasDiscountFromPriceList = p.originalBasePrice && 
+                                       p.originalBasePrice !== p.baseUnitPrice && 
+                                       p.discountPercent > 0;
+      const originalPrice = hasDiscountFromPriceList 
+        ? (p.originalBasePrice || p.baseUnitPrice || p.unitPrice)
+        : (p.baseUnitPrice || p.unitPrice);
       return acc + (originalPrice * p.quantity);
     }, 0);
-    const totalDiscount = totalOriginal > 0 ? ((totalOriginal - productsSubtotal) / totalOriginal * 100) : 0;
-    const totalDiscountAmount = totalOriginal - productsSubtotal;
+    
+    // Only calculate discount if there's actually a discount (totalOriginal > productsSubtotal)
+    const totalDiscount = totalOriginal > productsSubtotal && totalOriginal > 0 
+      ? ((totalOriginal - productsSubtotal) / totalOriginal * 100) 
+      : 0;
+    const totalDiscountAmount = totalOriginal > productsSubtotal 
+      ? (totalOriginal - productsSubtotal) 
+      : 0;
     
     // Format dates
     const generatedDate = new Date().toLocaleDateString(i18n.language || "en", { 
@@ -955,18 +987,21 @@ const AddProcurement = () => {
     
     try {
       // Use html2canvas to capture the HTML as an image
+      // Reduced scale to 1.5 to reduce file size (was 2)
       const canvas = await html2canvas(tempDiv, {
-        scale: 2,
+        scale: 1.5, // Reduced from 2 to reduce file size
         useCORS: true,
-        logging: true, // Enable logging to debug
+        logging: false, // Disabled logging to reduce overhead
         letterRendering: true,
         allowTaint: false,
         backgroundColor: '#ffffff',
         width: tempDiv.scrollWidth,
-        height: tempDiv.scrollHeight
+        height: tempDiv.scrollHeight,
+        quality: 0.8 // Reduce quality slightly to reduce file size
       });
       
-      const imgData = canvas.toDataURL('image/png');
+      // Use JPEG instead of PNG for better compression (quality 0.85)
+      const imgData = canvas.toDataURL('image/jpeg', 0.85);
       
       // Create PDF using jsPDF
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -977,19 +1012,28 @@ const AddProcurement = () => {
       let position = 0;
       
       // Add first page
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
       
       // Add additional pages if needed
       while (heightLeft > 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
       }
       
       // Get PDF as blob
       const pdfBlob = pdf.output('blob');
+      
+      // Check file size and warn if too large
+      const fileSizeMB = pdfBlob.size / (1024 * 1024);
+      console.log(`📄 PDF generated - Size: ${fileSizeMB.toFixed(2)} MB`);
+      
+      if (fileSizeMB > 9) {
+        console.warn(`⚠️ PDF is large (${fileSizeMB.toFixed(2)} MB). Consider reducing content.`);
+        toast.warning(`PDF size is ${fileSizeMB.toFixed(2)} MB. Uploading may take longer.`);
+      }
       
       // Convert to base64
       const reader = new FileReader();
@@ -1002,6 +1046,16 @@ const AddProcurement = () => {
     });
       
       const base64PDF = await base64Promise;
+      
+      // Check base64 size
+      const base64SizeMB = (base64PDF.length * 3) / 4 / (1024 * 1024);
+      console.log(`📦 Base64 size: ${base64SizeMB.toFixed(2)} MB`);
+      
+      if (base64SizeMB > 9.5) {
+        toast.error(`PDF is too large (${base64SizeMB.toFixed(2)} MB). Maximum is 10 MB. Please reduce content or contact support.`);
+        return null;
+      }
+      
     setFormData((prev) => ({ ...prev, summeryProcurement: base64PDF }));
       
       // Clean up
@@ -1832,12 +1886,21 @@ const AddProcurement = () => {
                 <p className="text-lg font-bold" style={{ color: 'var(--color-primary)' }}>
                   {(() => {
                     const totalOriginal = products.reduce((acc, p) => {
-                      const originalPrice = p.originalBasePrice || p.baseUnitPrice || p.unitPrice;
+                      // Only use originalBasePrice if it's different from baseUnitPrice (discount from price list)
+                      // Otherwise, use baseUnitPrice (no discount)
+                      const hasDiscountFromPriceList = p.originalBasePrice && 
+                                                       p.originalBasePrice !== p.baseUnitPrice && 
+                                                       p.discountPercent > 0;
+                      const originalPrice = hasDiscountFromPriceList 
+                        ? (p.originalBasePrice || p.baseUnitPrice || p.unitPrice)
+                        : (p.baseUnitPrice || p.unitPrice);
                       return acc + (originalPrice * p.quantity);
                     }, 0);
                     const totalCurrent = products.reduce((acc, p) => acc + (p.total || 0), 0);
-                    const totalDiscount = totalOriginal > 0 ? ((totalOriginal - totalCurrent) / totalOriginal * 100) : 0;
-                    return `${totalDiscount.toFixed(2)}%`;
+                    // Only calculate discount if there's actually a discount from price list
+                    const hasDiscount = totalOriginal > totalCurrent && totalOriginal > 0;
+                    const totalDiscount = hasDiscount ? ((totalOriginal - totalCurrent) / totalOriginal * 100) : 0;
+                    return totalDiscount > 0 ? `${totalDiscount.toFixed(2)}%` : '0%';
                   })()}
                 </p>
               </div>

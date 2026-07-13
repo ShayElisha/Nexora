@@ -20,6 +20,12 @@ import {
   sendSupplierInvoiceEmail,
   createSupplySchedule,
   getAllSupplySchedules,
+  getSupplyScheduleById,
+  updateSupplySchedule,
+  deleteSupplySchedule,
+  updateSupplyScheduleStatus,
+  duplicateSupplySchedule,
+  getSupplyScheduleStats,
 } from "../controllers/procurementAdvanced.controller.js";
 
 const router = express.Router();
@@ -56,6 +62,12 @@ router.post("/supplier-invoices/:id/send-email", sendSupplierInvoiceEmail);
 // Supply Schedule Routes
 router.post("/supply-schedules", createSupplySchedule);
 router.get("/supply-schedules", getAllSupplySchedules);
+router.get("/supply-schedules/stats", getSupplyScheduleStats);
+router.get("/supply-schedules/:id", getSupplyScheduleById);
+router.put("/supply-schedules/:id", updateSupplySchedule);
+router.delete("/supply-schedules/:id", deleteSupplySchedule);
+router.patch("/supply-schedules/:id/status", updateSupplyScheduleStatus);
+router.post("/supply-schedules/:id/duplicate", duplicateSupplySchedule);
 
 export default router;
 

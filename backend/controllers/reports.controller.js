@@ -1364,14 +1364,20 @@ export const getFinanceReport = async (req, res) => {
 
     const income = cashFlow.find(item => item._id === "Income")?.total || 0;
     const expense = cashFlow.find(item => item._id === "Expense")?.total || 0;
+    const netProfit = income - expense;
+    let profitMargin = 0;
+    if (income > 0) {
+      const calculatedMargin = ((netProfit / income) * 100);
+      profitMargin = Math.max(-100, Math.min(100, calculatedMargin)).toFixed(2);
+    }
 
     const report = {
       summary: {
         transactions: transactionsSummary,
         totalIncome: income,
         totalExpense: expense,
-        netProfit: income - expense,
-        profitMargin: income > 0 ? ((income - expense) / income * 100).toFixed(2) : 0,
+        netProfit: netProfit,
+        profitMargin: profitMargin,
       },
       trends: monthlyTrends,
       categoryBreakdown,

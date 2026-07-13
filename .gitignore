@@ -34,3 +34,6 @@ AI/venv/
 uploads/
 *.MP4
 *.mp4
+
+# Vercel
+.vercel

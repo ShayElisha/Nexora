@@ -11,6 +11,10 @@ import {
   createProcurementDiscrepancyEmail,
   createPaymentFailedEmail,
   createSupplierInvoiceEmail,
+  createBirthdayEmail,
+  createMonthlyCashFlowSummary,
+  createProcurementCancellationEmail,
+  createWeeklySummaryEmail,
 } from "./emailHandlers.js";
 
 // Load environment variables
@@ -254,6 +258,125 @@ export const sendSupplierInvoiceEmail = async (
     console.log("Supplier invoice email sent: " + info.response);
   } catch (error) {
     console.error("Error sending supplier invoice email:", error);
+    throw error;
+  }
+};
+
+/**
+ * שליחת ברכת יום הולדת
+ */
+export const sendBirthdayEmail = async (
+  email,
+  employeeName,
+  companyName,
+  profileImageUrl = null
+) => {
+  try {
+    const emailData = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: `יום הולדת שמח! 🎉 - ${companyName}`,
+      html: createBirthdayEmail(employeeName, companyName, profileImageUrl),
+      category: "HR Notifications",
+    };
+
+    const info = await transporter.sendMail(emailData);
+    console.log("Birthday email sent: " + info.response);
+    return info;
+  } catch (error) {
+    console.error("Error sending birthday email:", error);
+    throw error;
+  }
+};
+
+/**
+ * שליחת סיכום תזרים מזומנים חודשי
+ */
+export const sendMonthlyCashFlowSummary = async (
+  email,
+  companyName,
+  month,
+  year,
+  cashFlowData,
+  baseCurrency = "ILS"
+) => {
+  try {
+    const emailData = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: `סיכום תזרים מזומנים חודשי - ${month}/${year} - ${companyName}`,
+      html: createMonthlyCashFlowSummary(companyName, month, year, cashFlowData, baseCurrency),
+      category: "Finance Notifications",
+    };
+
+    const info = await transporter.sendMail(emailData);
+    console.log("Monthly cash flow summary email sent: " + info.response);
+    return info;
+  } catch (error) {
+    console.error("Error sending monthly cash flow summary email:", error);
+    throw error;
+  }
+};
+
+/**
+ * שליחת הודעה על ביטול הזמנה לספק
+ */
+export const sendProcurementCancellationEmail = async (
+  email,
+  supplierName,
+  companyName,
+  orderNumber,
+  orderDate,
+  cancellationReason = null
+) => {
+  try {
+    const emailData = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: `ביטול הזמנת רכש #${orderNumber} - ${companyName}`,
+      html: createProcurementCancellationEmail(
+        supplierName,
+        companyName,
+        orderNumber,
+        orderDate,
+        cancellationReason
+      ),
+      category: "Procurement Notifications",
+    };
+
+    const info = await transporter.sendMail(emailData);
+    console.log("Procurement cancellation email sent: " + info.response);
+    return info;
+  } catch (error) {
+    console.error("Error sending procurement cancellation email:", error);
+    throw error;
+  }
+};
+
+/**
+ * שליחת סיכום שבועי
+ */
+export const sendWeeklySummaryEmail = async (
+  email,
+  companyName,
+  weekStart,
+  weekEnd,
+  summaryData
+) => {
+  try {
+    const emailData = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: `סיכום שבועי - ${companyName}`,
+      html: createWeeklySummaryEmail(companyName, weekStart, weekEnd, summaryData),
+      category: "System Notifications",
+    };
+
+    const info = await transporter.sendMail(emailData);
+    console.log("Weekly summary email sent: " + info.response);
+    return info;
+  } catch (error) {
+    console.error("Error sending weekly summary email:", error);
     throw error;
   }
 };

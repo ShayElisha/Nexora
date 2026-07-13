@@ -6,6 +6,9 @@ import Employee from "../models/employees.model.js";
 import Department from "../models/department.model.js";
 import ProjectTemplate from "../models/ProjectTemplate.model.js";
 import ProjectRisk from "../models/ProjectRisk.model.js";
+import Shift from "../models/Shifts.model.js";
+import Company from "../models/companies.model.js";
+import Budget from "../models/Budget.model.js";
 
 // Helper function to verify token and get companyId
 const verifyToken = (req) => {
@@ -118,48 +121,158 @@ export const getResourceCapacity = async (req, res) => {
     const decoded = verifyToken(req);
     const companyId = new mongoose.Types.ObjectId(decoded.companyId);
 
+    // Calculate current week dates (Sunday to Saturday)
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    const dayOfWeek = now.getDay(); // 0 = Sunday, 6 = Saturday
+    startOfWeek.setDate(now.getDate() - dayOfWeek);
+    startOfWeek.setHours(0, 0, 0, 0);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
     // Get all employees
     const employees = await Employee.find({ companyId, status: "active" })
       .populate("department", "name")
-      .select("name lastName email department hourlySalary expectedHours");
+      .select("name lastName email department hourlySalary expectedHours paymentType");
 
-    // Get all active projects
+    // Get all tasks (not just from active projects) that are relevant for this week
+    // Include tasks that:
+    // 1. Are due this week or earlier (and not completed)
+    // 2. Start this week or earlier (and not completed)
+    // 3. Are in progress and overlap with this week
+    const tasks = await Task.find({
+      companyId,
+      status: { $ne: "completed" },
+      $or: [
+        { dueDate: { $lte: endOfWeek, $gte: startOfWeek } }, // Tasks due this week
+        { dueDate: { $lte: endOfWeek } }, // Tasks due before this week (overdue)
+        { startDate: { $lte: endOfWeek, $gte: startOfWeek, $exists: true } }, // Tasks starting this week
+        { startDate: { $lte: startOfWeek, $exists: true }, dueDate: { $gte: startOfWeek } }, // Tasks spanning this week
+      ],
+    })
+      .populate("assignedTo", "name lastName")
+      .select("assignedTo dueDate startDate title status priority estimatedHours projectId");
+
+    // Get shifts for current week to calculate actual hours worked
+    const shifts = await Shift.find({
+      companyId,
+      shiftDate: { $gte: startOfWeek, $lte: endOfWeek },
+    }).select("employeeId hoursWorked shiftDate");
+
+    // Get all projects for counting
     const projects = await Project.find({
       companyId,
       status: { $in: ["Active", "On Hold"] },
     })
       .populate("teamMembers.employeeId", "name lastName")
-      .populate("tasks", "assignedTo");
-
-    // Get all tasks for active projects
-    const projectIds = projects.map((p) => p._id);
-    const tasks = await Task.find({
-      companyId,
-      projectId: { $in: projectIds },
-      status: { $ne: "completed" },
-    }).populate("assignedTo", "name lastName");
+      .select("teamMembers");
 
     // Calculate capacity for each employee
     const employeeCapacity = employees.map((employee) => {
+      const employeeId = employee._id.toString();
+
       // Find tasks assigned to this employee
-      const employeeTasks = tasks.filter((task) =>
-        task.assignedTo.some(
-          (assigned) => assigned._id.toString() === employee._id.toString()
-        )
+      const employeeTasks = tasks.filter((task) => {
+        if (!task.assignedTo) return false;
+        
+        // Handle both array and single value
+        if (Array.isArray(task.assignedTo)) {
+          return task.assignedTo.some((assigned) => {
+            const assignedId = assigned?._id?.toString() || assigned?.toString();
+            return assignedId === employeeId;
+          });
+        } else {
+          // Single value
+          const assignedId = task.assignedTo?._id?.toString() || task.assignedTo?.toString();
+          return assignedId === employeeId;
+        }
+      });
+
+      // Calculate allocated hours from shifts (actual hours worked this week)
+      const employeeShifts = shifts.filter((shift) => {
+        if (!shift.employeeId) return false;
+        const shiftEmployeeId = shift.employeeId?._id?.toString() || shift.employeeId?.toString();
+        return shiftEmployeeId === employeeId;
+      });
+      
+      const actualHoursWorked = employeeShifts.reduce(
+        (sum, shift) => sum + (shift.hoursWorked || 0),
+        0
       );
 
-      // Calculate allocated hours (assuming 8 hours per day, 5 days per week)
-      const weeklyHours = employee.expectedHours || 40;
-      const allocatedHours = employeeTasks.length * 8; // Rough estimate
+      // Calculate estimated hours from tasks
+      // Use estimatedHours if available, otherwise estimate based on priority and task type
+      const estimatedTaskHours = employeeTasks.reduce((sum, task) => {
+        if (task.estimatedHours && task.estimatedHours > 0) {
+          return sum + task.estimatedHours;
+        }
+        // Default estimate based on priority:
+        // High priority: 8 hours, Medium: 4 hours, Low: 2 hours
+        const priorityMultiplier = {
+          high: 8,
+          medium: 4,
+          low: 2,
+        };
+        const taskPriority = (task.priority || "medium").toLowerCase();
+        const estimatedHours = priorityMultiplier[taskPriority] || 4;
+        return sum + estimatedHours;
+      }, 0);
+
+      // Use actual hours from shifts if available (more accurate)
+      // Otherwise use estimated task hours
+      // Priority: actualHoursWorked > estimatedTaskHours > 0
+      let allocatedHours = 0;
+      if (actualHoursWorked > 0) {
+        // Use actual hours worked from shifts (most accurate)
+        allocatedHours = actualHoursWorked;
+      } else if (estimatedTaskHours > 0) {
+        // Use estimated hours from tasks
+        allocatedHours = estimatedTaskHours;
+      }
+      // If both are 0, allocatedHours stays 0 (employee has no work assigned)
+
+      // Calculate weekly capacity
+      // Priority: expectedHours > paymentType-based default
+      let weeklyHours = 40; // Default fallback
+      
+      // First check if employee has expectedHours set (regardless of payment type)
+      if (employee.expectedHours && employee.expectedHours > 0) {
+        weeklyHours = employee.expectedHours;
+      } else {
+        // If no expectedHours, use paymentType-based defaults
+        if (employee.paymentType === "Global") {
+          // Global employees typically work full-time
+          weeklyHours = 40;
+        } else if (employee.paymentType === "Hourly") {
+          // Hourly employees - standard 40 hours per week
+          weeklyHours = 40;
+        } else if (employee.paymentType === "Commission-Based") {
+          // Commission-based - variable, default to 40
+          weeklyHours = 40;
+        }
+      }
+
+      // Calculate utilization percentage
+      // If no capacity defined, utilization is 0
       const utilization = weeklyHours > 0 ? (allocatedHours / weeklyHours) * 100 : 0;
 
       // Find projects this employee is assigned to
       const employeeProjects = projects.filter((project) =>
-        project.teamMembers.some(
-          (member) =>
-            member.employeeId?._id?.toString() === employee._id.toString()
-        )
+        project.teamMembers.some((member) => {
+          const memberId = member.employeeId?._id?.toString() || member.employeeId?.toString();
+          return memberId === employeeId;
+        })
       );
+
+      // Debug logging (can be removed in production)
+      if (process.env.NODE_ENV === "development") {
+        console.log(`Employee: ${employee.name} ${employee.lastName}`);
+        console.log(`  - Tasks: ${employeeTasks.length}, Shifts: ${employeeShifts.length}`);
+        console.log(`  - Actual Hours: ${actualHoursWorked}, Estimated Task Hours: ${estimatedTaskHours}`);
+        console.log(`  - Allocated Hours: ${allocatedHours}, Weekly Capacity: ${weeklyHours}`);
+        console.log(`  - Utilization: ${utilization.toFixed(1)}%`);
+      }
 
       return {
         employee: {
@@ -170,8 +283,8 @@ export const getResourceCapacity = async (req, res) => {
           department: employee.department?.name || "No Department",
         },
         weeklyCapacity: weeklyHours,
-        allocatedHours,
-        utilization: Math.round(utilization),
+        allocatedHours: Math.round(allocatedHours * 10) / 10, // Round to 1 decimal
+        utilization: Math.round(utilization * 10) / 10,
         tasksCount: employeeTasks.length,
         projectsCount: employeeProjects.length,
         isOverloaded: utilization > 100,
@@ -194,7 +307,7 @@ export const getResourceCapacity = async (req, res) => {
         statistics: {
           totalEmployees,
           overloadedEmployees,
-          averageUtilization: Math.round(averageUtilization),
+          averageUtilization: Math.round(averageUtilization * 10) / 10,
         },
       },
     });
@@ -525,6 +638,243 @@ export const deleteProjectRisk = async (req, res) => {
       message: "Failed to delete project risk",
       error: error.message,
     });
+  }
+};
+
+// ==================== AUTOMATIC RISK DETECTION ====================
+
+/**
+ * Check and create project risks automatically
+ * This function runs periodically to detect and create risks based on project status
+ */
+export const checkAndCreateProjectRisks = async () => {
+  try {
+    console.log("🔍 Checking for project risks...");
+    const companies = await Company.find({});
+    let totalRisksCreated = 0;
+
+    for (const company of companies) {
+      try {
+        const companyId = company._id;
+        
+        // Get all active projects
+        const activeProjects = await Project.find({
+          companyId,
+          status: { $in: ["Active", "On Hold"] },
+        }).populate("projectManager", "name lastName");
+
+        for (const project of activeProjects) {
+          const today = new Date();
+          const projectId = project._id;
+
+          // 1. Check for overdue projects (Schedule Risk)
+          if (project.endDate && new Date(project.endDate) < today) {
+            const existingRisk = await ProjectRisk.findOne({
+              companyId,
+              projectId,
+              category: "Schedule",
+              title: { $regex: /.*איחור.*|.*overdue.*|.*behind schedule.*/i },
+              status: { $in: ["Open", "In Progress"] },
+            });
+
+            if (!existingRisk) {
+              await ProjectRisk.create({
+                companyId,
+                projectId,
+                title: `פרויקט באיחור - ${project.name}`,
+                description: `הפרויקט חרג מתאריך הסיום המתוכנן (${new Date(project.endDate).toLocaleDateString('he-IL')}).`,
+                category: "Schedule",
+                probability: "High",
+                impact: "High",
+                status: "Open",
+                owner: project.projectManager?._id,
+                identifiedDate: today,
+              });
+              totalRisksCreated++;
+              console.log(`⚠️ Created Schedule Risk for overdue project: ${project.name}`);
+            }
+          }
+
+          // 2. Check for low progress with approaching deadline (Schedule Risk)
+          if (project.endDate && project.progress !== undefined) {
+            const daysUntilDeadline = Math.ceil(
+              (new Date(project.endDate) - today) / (1000 * 60 * 60 * 24)
+            );
+            
+            if (project.progress < 50 && daysUntilDeadline <= 14 && daysUntilDeadline > 0) {
+              const existingRisk = await ProjectRisk.findOne({
+                companyId,
+                projectId,
+                category: "Schedule",
+                title: { $regex: /.*התקדמות נמוכה.*|.*low progress.*/i },
+                status: { $in: ["Open", "In Progress"] },
+              });
+
+              if (!existingRisk) {
+                await ProjectRisk.create({
+                  companyId,
+                  projectId,
+                  title: `התקדמות נמוכה - ${project.name}`,
+                  description: `הפרויקט נמצא ב-${project.progress || 0}% התקדמות, עם ${daysUntilDeadline} ימים עד תאריך הסיום.`,
+                  category: "Schedule",
+                  probability: "Medium",
+                  impact: "High",
+                  status: "Open",
+                  owner: project.projectManager?._id,
+                  identifiedDate: today,
+                });
+                totalRisksCreated++;
+                console.log(`⚠️ Created Schedule Risk for low progress: ${project.name}`);
+              }
+            }
+          }
+
+          // 3. Check for budget overrun (Financial Risk)
+          if (project.budget) {
+            const projectBudget = await Budget.findOne({
+              companyId,
+              projectId: project._id,
+            });
+
+            if (projectBudget && projectBudget.spentAmount > project.budget) {
+              const overrunPercentage = ((projectBudget.spentAmount - project.budget) / project.budget) * 100;
+              
+              const existingRisk = await ProjectRisk.findOne({
+                companyId,
+                projectId,
+                category: "Financial",
+                title: { $regex: /.*חריגה מתקציב.*|.*budget overrun.*/i },
+                status: { $in: ["Open", "In Progress"] },
+              });
+
+              if (!existingRisk) {
+                await ProjectRisk.create({
+                  companyId,
+                  projectId,
+                  title: `חריגה מתקציב - ${project.name}`,
+                  description: `הפרויקט חרג מהתקציב ב-${overrunPercentage.toFixed(1)}% (${projectBudget.spentAmount.toFixed(2)} מתוך ${project.budget.toFixed(2)}).`,
+                  category: "Financial",
+                  probability: "High",
+                  impact: overrunPercentage > 20 ? "High" : "Medium",
+                  status: "Open",
+                  owner: project.projectManager?._id,
+                  identifiedDate: today,
+                });
+                totalRisksCreated++;
+                console.log(`⚠️ Created Financial Risk for budget overrun: ${project.name}`);
+              }
+            }
+          }
+
+          // 4. Check for tasks with high delay (Task Delay Risk)
+          const tasks = await Task.find({
+            companyId,
+            projectId,
+            status: { $ne: "completed" },
+            dueDate: { $lt: today },
+          });
+
+          if (tasks.length > 0) {
+            const delayedTasksCount = tasks.length;
+            const allTasks = await Task.find({ companyId, projectId });
+            const delayPercentage = (delayedTasksCount / allTasks.length) * 100;
+
+            if (delayPercentage > 30) {
+              const existingRisk = await ProjectRisk.findOne({
+                companyId,
+                projectId,
+                category: "Schedule",
+                title: { $regex: /.*משימות באיחור.*|.*delayed tasks.*/i },
+                status: { $in: ["Open", "In Progress"] },
+              });
+
+              if (!existingRisk) {
+                await ProjectRisk.create({
+                  companyId,
+                  projectId,
+                  title: `משימות באיחור - ${project.name}`,
+                  description: `${delayedTasksCount} מתוך ${allTasks.length} משימות (${delayPercentage.toFixed(1)}%) נמצאות באיחור.`,
+                  category: "Schedule",
+                  probability: delayPercentage > 50 ? "High" : "Medium",
+                  impact: "Medium",
+                  status: "Open",
+                  owner: project.projectManager?._id,
+                  identifiedDate: today,
+                });
+                totalRisksCreated++;
+                console.log(`⚠️ Created Schedule Risk for delayed tasks: ${project.name}`);
+              }
+            }
+          }
+
+          // 5. Check for resource overload (Resource Risk)
+          const teamMembers = project.teamMembers || [];
+          if (teamMembers.length > 0) {
+            // Get shifts for team members in the last week
+            const oneWeekAgo = new Date(today);
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+            const teamMemberIds = teamMembers.map((m) => m.employeeId);
+            const shifts = await Shift.find({
+              companyId,
+              employeeId: { $in: teamMemberIds },
+              shiftDate: { $gte: oneWeekAgo },
+            });
+
+            // Check if any team member has excessive hours (more than 45 hours per week)
+            const employeeHours = {};
+            shifts.forEach((shift) => {
+              const empId = shift.employeeId.toString();
+              if (!employeeHours[empId]) {
+                employeeHours[empId] = 0;
+              }
+              employeeHours[empId] += shift.hoursWorked || 0;
+            });
+
+            const overloadedEmployees = Object.entries(employeeHours).filter(
+              ([_, hours]) => hours > 45
+            );
+
+            if (overloadedEmployees.length > 0 && overloadedEmployees.length >= teamMembers.length * 0.5) {
+              const existingRisk = await ProjectRisk.findOne({
+                companyId,
+                projectId,
+                category: "Resource",
+                title: { $regex: /.*עומס יתר.*|.*resource overload.*/i },
+                status: { $in: ["Open", "In Progress"] },
+              });
+
+              if (!existingRisk) {
+                await ProjectRisk.create({
+                  companyId,
+                  projectId,
+                  title: `עומס יתר על המשאבים - ${project.name}`,
+                  description: `${overloadedEmployees.length} מתוך ${teamMembers.length} חברי צוות עובדים מעל 45 שעות בשבוע, מה שעלול להוביל לשחיקה ולבעיות איכות.`,
+                  category: "Resource",
+                  probability: "Medium",
+                  impact: "Medium",
+                  status: "Open",
+                  owner: project.projectManager?._id,
+                  identifiedDate: today,
+                });
+                totalRisksCreated++;
+                console.log(`⚠️ Created Resource Risk for overloaded team: ${project.name}`);
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error(`Error checking risks for company ${company._id}:`, error.message);
+      }
+    }
+
+    if (totalRisksCreated > 0) {
+      console.log(`✅ Created ${totalRisksCreated} new project risks`);
+    } else {
+      console.log("✅ No new risks detected");
+    }
+  } catch (error) {
+    console.error("Error in checkAndCreateProjectRisks:", error);
   }
 };
 

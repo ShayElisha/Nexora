@@ -20,12 +20,28 @@ const getUserFromToken = (req) => {
 // Get comprehensive HR analytics
 export const getHRAnalytics = async (req, res) => {
   try {
-    const user = getUserFromToken(req);
-    if (!user) {
+    const decodedToken = getUserFromToken(req);
+    if (!decodedToken) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    const companyId = user.companyId || req.query.companyId;
+    let companyId = decodedToken.companyId || req.query.companyId;
+    
+    // If it's a user token (userId), we need to fetch the user's company
+    if (!companyId && decodedToken.userId) {
+      const user = await Employee.findById(decodedToken.userId);
+      if (user) {
+        companyId = user.companyId || user.company;
+      }
+    }
+
+    if (!companyId) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Company ID is required",
+        error: "Token does not contain company ID and no associated user found"
+      });
+    }
     const { startDate, endDate } = req.query;
 
     const dateFilter = {};
@@ -293,7 +309,7 @@ export const getHRAnalytics = async (req, res) => {
           absences,
         },
         leave: {
-          totalRequests,
+          totalRequests: totalLeaveRequests,
           byType: leaveRequestsByType,
           byStatus: leaveRequestsByStatus,
           averageDays: averageLeaveDays[0]?.avgDays || 0,

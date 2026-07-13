@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
+import { useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +15,7 @@ import DesignBox from "./DesignBox";
 import toast from "react-hot-toast";
 import AiChat from "../Ai/AiChat";
 import PaymentStatusBanner from "../PaymentStatusBanner";
+import { isPublicMarketingRoute } from "../../lib/publicRoutes";
 
 // Function to format address object into a string (kept for potential future use)
 const formatAddress = (addressObj = false, useEnglish = false) => {
@@ -36,6 +38,7 @@ const formatAddress = (addressObj = false, useEnglish = false) => {
 };
 
 const Layout = ({ children }) => {
+  const location = useLocation();
   const queryClient = useQueryClient();
   const { data: authData } = useQuery({
     queryKey: ["authUser"],
@@ -58,6 +61,10 @@ const Layout = ({ children }) => {
   });
   const authUser = authData?.user;
   const isAdmin = authUser?.role === "Admin";
+  const isPublicPage = isPublicMarketingRoute(location.pathname) && !authUser;
+  const isAuthPage = ["/login", "/signup", "/create-company", "/forgot-password", "/reset-password"].includes(location.pathname);
+  const isWorkspacePage =
+    location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/employee");
   
   // Fetch current subscription plan
   const { data: currentPlanData } = useQuery({
@@ -566,18 +573,29 @@ const Layout = ({ children }) => {
     setIsModalOpen(isOpen);
   };
 
+  const shellClass = isWorkspacePage
+    ? "nx-page-shell nx-page-shell--workspace"
+    : isAuthPage
+      ? "nx-page-shell nx-page-shell--auth"
+      : isPublicPage
+        ? "nx-page-shell nx-page-shell--public"
+        : "nx-page-shell";
+
   return (
     <div
       className={`flex flex-col min-h-screen w-full animate-fade-in ${
         isRTL ? "font-hebrew" : "font-sans"
       } ${isMenuOpen || isModalOpen ? "bg-gray-900 bg-opacity-70" : ""}`}
+      style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
     >
-      <Navbar
-        isRTL={isRTL}
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        onModalStateChange={handleModalStateChange}
-      />
+      {!isPublicPage && (
+        <Navbar
+          isRTL={isRTL}
+          isMenuOpen={isMenuOpen}
+          setIsMenuOpen={setIsMenuOpen}
+          onModalStateChange={handleModalStateChange}
+        />
+      )}
 
       {/* Payment Status Banner - shows when payment failed */}
       <div className="w-full">
@@ -641,6 +659,30 @@ const Layout = ({ children }) => {
         document.body
       )}
 
+      {isPricingModalOpen && ReactDOM.createPortal(
+        <>
+          <div className="fixed inset-0 bg-black bg-opacity-60 z-[9999]"></div>
+          <div className="fixed left-1/2 transform -translate-x-1/2 bg-white rounded-2xl w-full max-w-6xl max-h-[calc(90vh-200px)] overflow-hidden shadow-2xl flex flex-col z-[10000] p-4" style={{ top: "200px" }}>
+            <button
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 z-10 bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-110"
+              onClick={() => setIsPricingModalOpen(false)}
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="overflow-y-auto flex-1">
+              <PricingPlans 
+                currentPlan={currentPlanData} 
+                onPlanUpdate={() => {
+                  queryClient.invalidateQueries(["currentPlan"]);
+                  setIsPricingModalOpen(false);
+                }}
+              />
+            </div>
+          </div>
+        </>,
+        document.body
+      )}
+
       <div className="flex flex-grow h-auto w-full relative z-10">
         <main className="flex-grow w-full relative transition-all duration-300">
           {/* Overlay for main content when modal is open */}
@@ -680,27 +722,6 @@ const Layout = ({ children }) => {
               </div>
             )}
 
-            {isPricingModalOpen && (
-              <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[9999] p-4 overflow-hidden">
-                <div className="bg-white rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden relative shadow-2xl flex flex-col">
-                  <button
-                    className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 z-10 bg-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:shadow-xl transition-all hover:scale-110"
-                    onClick={() => setIsPricingModalOpen(false)}
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                  <div className="overflow-y-auto flex-1">
-                    <PricingPlans 
-                      currentPlan={currentPlanData} 
-                      onPlanUpdate={() => {
-                        queryClient.invalidateQueries(["currentPlan"]);
-                        setIsPricingModalOpen(false);
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Shift Button and Timer */}
             {authUser && (
@@ -742,12 +763,12 @@ const Layout = ({ children }) => {
               </div>
             )}
 
-            <div className={isRTL ? "text-right" : "text-left"}>{children}</div>
+            <div className={`${shellClass} ${isRTL ? "text-right" : "text-left"}`}>{children}</div>
           </div>
         </main>
       </div>
 
-      <Footer isRTL={isRTL} />
+      {!isPublicPage && <Footer isRTL={isRTL} />}
 
       <style>{`
         @keyframes fadeIn {

@@ -23,19 +23,19 @@ import InventoryManagement from "./pages/AdminPanel/Inventory/InventoryManagemen
 import WarehouseManagement from "./pages/AdminPanel/Inventory/WarehouseManagement.jsx";
 import WarehouseInventoryView from "./pages/AdminPanel/Inventory/WarehouseInventoryView.jsx";
 import InventoryTransfer from "./pages/AdminPanel/Inventory/InventoryTransfer.jsx";
-import Supplier from "./pages/AdminPanel/Supplier/Supplier";
-import AddSupplier from "./pages/AdminPanel/Supplier/AddSupplier";
+import Supplier from "./pages/AdminPanel/Supplier/supplier";
+import AddSupplier from "./pages/AdminPanel/Supplier/addSupplier";
 import Finance from "./pages/AdminPanel/finance/Finance";
 import CashFlow from "./pages/AdminPanel/finance/CashFlow";
-import AddFinance from "./pages/AdminPanel/Finance/AddFinance";
-import Users from "./pages/AdminPanel/Users/Users";
+import AddFinance from "./pages/AdminPanel/finance/AddFinance";
+import Users from "./pages/AdminPanel/users/Users";
 import EmployeeDirectory from "./pages/AdminPanel/employees/EmployeeDirectory";
 import EmployeeDetails from "./pages/AdminPanel/employees/EmployeeDetails";
 import AddProcurment from "./pages/AdminPanel/procurement/AddProcurment";
 import Procurement from "./pages/AdminPanel/procurement/Procurment";
 import ReceiptPurchase from "./pages/AdminPanel/procurement/ReceiptPurchase.jsx";
-import HistorySignature from "./pages/AdminPanel/HistorySignature/HistorySignature";
-import AllSignatures from "./pages/AdminPanel/HistorySignature/AllSignatures";
+import HistorySignature from "./pages/AdminPanel/historySignature/historySignature";
+import AllSignatures from "./pages/AdminPanel/historySignature/AllSignatures";
 import UpdateForSupplier from "./pages/SupplierPage/updateForSupplier";
 import Budgets from "./pages/AdminPanel/finance/Budgets";
 import AddOrEditBudget from "./pages/AdminPanel/finance/AddOrEditBudget";
@@ -120,6 +120,7 @@ import RolesManagement from "./pages/AdminPanel/roles/RolesManagement.jsx";
 import ProductionOrdersList from "./pages/AdminPanel/production/ProductionOrdersList.jsx";
 import CreateProductionOrder from "./pages/AdminPanel/production/CreateProductionOrder.jsx";
 import ProductionOrderDetails from "./pages/AdminPanel/production/ProductionOrderDetails.jsx";
+import MissingComponentsManagement from "./pages/AdminPanel/production/MissingComponentsManagement.jsx";
 import AssetList from "./pages/AdminPanel/Assets/AssetList.jsx";
 import AddAsset from "./pages/AdminPanel/Assets/AddAsset.jsx";
 import AssetDetails from "./pages/AdminPanel/Assets/AssetDetails.jsx";
@@ -130,30 +131,30 @@ import BankAccountList from "./pages/AdminPanel/Banks/BankAccountList.jsx";
 import SalesOpportunitiesList from "./pages/AdminPanel/Sales/SalesOpportunitiesList.jsx";
 import ContractsList from "./pages/AdminPanel/Contracts/ContractsList.jsx";
 import StockCountsList from "./pages/AdminPanel/Inventory/StockCountsList.jsx";
-import PurchaseRequestsList from "./pages/AdminPanel/Procurement/PurchaseRequestsList.jsx";
-import TendersList from "./pages/AdminPanel/Procurement/TendersList.jsx";
-import SupplierContractsList from "./pages/AdminPanel/Procurement/SupplierContractsList.jsx";
+import PurchaseRequestsList from "./pages/AdminPanel/procurement/PurchaseRequestsList.jsx";
+import TendersList from "./pages/AdminPanel/procurement/TendersList.jsx";
+import SupplierContractsList from "./pages/AdminPanel/procurement/SupplierContractsList.jsx";
 import ServiceTicketsList from "./pages/AdminPanel/CustomerService/ServiceTicketsList.jsx";
 import InventoryMovementsList from "./pages/AdminPanel/Inventory/InventoryMovementsList.jsx";
 import InventoryQualityList from "./pages/AdminPanel/Inventory/InventoryQualityList.jsx";
-import PriceListsList from "./pages/AdminPanel/Procurement/PriceListsList.jsx";
-import SupplierInvoicesList from "./pages/AdminPanel/Procurement/SupplierInvoicesList.jsx";
-import SupplySchedulesList from "./pages/AdminPanel/Procurement/SupplySchedulesList.jsx";
+import PriceListsList from "./pages/AdminPanel/procurement/PriceListsList.jsx";
+import SupplierInvoicesList from "./pages/AdminPanel/procurement/SupplierInvoicesList.jsx";
+import SupplySchedulesList from "./pages/AdminPanel/procurement/SupplySchedulesList.jsx";
 import AddBankAccount from "./pages/AdminPanel/Banks/AddBankAccount.jsx";
 import BankTransactionsList from "./pages/AdminPanel/Banks/BankTransactionsList.jsx";
 import AddSalesOpportunity from "./pages/AdminPanel/Sales/AddSalesOpportunity.jsx";
 import SalesPipeline from "./pages/AdminPanel/Sales/SalesPipeline.jsx";
 import AddStockCount from "./pages/AdminPanel/Inventory/AddStockCount.jsx";
-import AddPurchaseRequest from "./pages/AdminPanel/Procurement/AddPurchaseRequest.jsx";
+import AddPurchaseRequest from "./pages/AdminPanel/procurement/AddPurchaseRequest.jsx";
 import AddContract from "./pages/AdminPanel/Contracts/AddContract.jsx";
 import AddServiceTicket from "./pages/AdminPanel/CustomerService/AddServiceTicket.jsx";
 import AddInventoryMovement from "./pages/AdminPanel/Inventory/AddInventoryMovement.jsx";
 import AddInventoryQuality from "./pages/AdminPanel/Inventory/AddInventoryQuality.jsx";
-import AddTender from "./pages/AdminPanel/Procurement/AddTender.jsx";
-import AddSupplierContract from "./pages/AdminPanel/Procurement/AddSupplierContract.jsx";
-import AddPriceList from "./pages/AdminPanel/Procurement/AddPriceList.jsx";
-import AddSupplierInvoice from "./pages/AdminPanel/Procurement/AddSupplierInvoice.jsx";
-import AddSupplySchedule from "./pages/AdminPanel/Procurement/AddSupplySchedule.jsx";
+import AddTender from "./pages/AdminPanel/procurement/AddTender.jsx";
+import AddSupplierContract from "./pages/AdminPanel/procurement/AddSupplierContract.jsx";
+import AddPriceList from "./pages/AdminPanel/procurement/AddPriceList.jsx";
+import AddSupplierInvoice from "./pages/AdminPanel/procurement/AddSupplierInvoice.jsx";
+import AddSupplySchedule from "./pages/AdminPanel/procurement/AddSupplySchedule.jsx";
 // HR Module Imports
 import JobPostingsList from "./pages/AdminPanel/HR/ATS/JobPostingsList.jsx";
 import CreateJobPosting from "./pages/AdminPanel/HR/ATS/CreateJobPosting.jsx";
@@ -484,6 +485,7 @@ const App = () => {
             <Route path="projects" element={<ProjectsList />} />
             <Route path="production" element={<ProductionOrdersList />} />
             <Route path="production/create" element={<CreateProductionOrder />} />
+            <Route path="production/missing-components" element={<MissingComponentsManagement />} />
             <Route path="production/:id" element={<ProductionOrderDetails />} />
             <Route path="roles" element={<RolesManagement />} />
             <Route

@@ -6,6 +6,7 @@ import Inventory from "../models/inventory.model.js";
 import InventoryHistory from "../models/InventoryHistory.model.js";
 import Finance from "../models/finance.model.js";
 import Warehouse from "../models/warehouse.model.js";
+import SupplySchedule from "../models/SupplySchedule.model.js";
 import {
   sendProcurementEmailWithPDF,
   sendProcurementDiscrepancyEmail,
@@ -46,8 +47,51 @@ const normalizeShippingAddress = (
   return hasValue ? normalized : null;
 };
 
+// פונקציה ליצירת מספר schedule ייחודי
+const generateScheduleNumber = async (companyId) => {
+  try {
+    const year = new Date().getFullYear();
+    const prefix = `SS-${year}-`;
+    
+    // המרת companyId ל-ObjectId אם צריך
+    const companyIdObj = mongoose.Types.ObjectId.isValid(companyId) 
+      ? (typeof companyId === 'string' ? new mongoose.Types.ObjectId(companyId) : companyId)
+      : companyId;
+    
+    const lastSchedule = await SupplySchedule.findOne({
+      companyId: companyIdObj,
+      scheduleNumber: new RegExp(`^${prefix}`),
+    })
+      .sort({ scheduleNumber: -1 })
+      .limit(1);
+    
+    let sequence = 1;
+    if (lastSchedule && lastSchedule.scheduleNumber) {
+      const parts = lastSchedule.scheduleNumber.split("-");
+      const lastSeq = parseInt(parts[2] || "0");
+      sequence = lastSeq + 1;
+    }
+    
+    return `${prefix}${sequence.toString().padStart(6, "0")}`;
+  } catch (error) {
+    console.error("❌ Error generating schedule number:", error);
+    // Fallback - use timestamp if generation fails
+    const year = new Date().getFullYear();
+    const timestamp = Date.now().toString().slice(-6);
+    return `SS-${year}-${timestamp}`;
+  }
+};
+
 // Create a new procurement
 export const createProcurementRecord = async (req, res) => {
+  // בדיקה ש-req.user קיים
+  if (!req.user || !req.user.companyId) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized - User not authenticated",
+    });
+  }
+  
   const companyId = req.user.companyId;
 
   const {
@@ -148,13 +192,68 @@ export const createProcurementRecord = async (req, res) => {
     // Upload PDF
     let summeryProcurementUrl = "";
     try {
-      const uploadResult = await uploadToCloudinaryFile(summeryProcurement);
+      // בדיקה שהקובץ קיים ולא ריק
+      if (!summeryProcurement) {
+        console.error("❌ Error: summeryProcurement is missing");
+        return res.status(400).json({
+          success: false,
+          message: "PDF summary is required and cannot be empty.",
+        });
+      }
+
+      // בדיקה שהקובץ הוא string
+      if (typeof summeryProcurement !== 'string') {
+        console.error("❌ Error: summeryProcurement is not a string, type:", typeof summeryProcurement);
+        return res.status(400).json({
+          success: false,
+          message: "PDF summary must be a string in base64 format.",
+        });
+      }
+
+      // בדיקה שהקובץ לא ריק
+      const trimmedProcurement = summeryProcurement.trim();
+      if (trimmedProcurement.length === 0) {
+        console.error("❌ Error: summeryProcurement is empty after trim");
+        return res.status(400).json({
+          success: false,
+          message: "PDF summary is required and cannot be empty.",
+        });
+      }
+
+      // בדיקה שהקובץ בפורמט base64 או data URL
+      const isBase64OrDataUrl = trimmedProcurement.startsWith('data:') || trimmedProcurement.length > 100;
+      
+      if (!isBase64OrDataUrl) {
+        console.error("❌ Error: summeryProcurement is not in valid format. Length:", trimmedProcurement.length);
+        return res.status(400).json({
+          success: false,
+          message: "PDF summary must be in base64 format.",
+        });
+      }
+
+      console.log("📤 Attempting to upload PDF to Cloudinary...");
+      console.log("📊 PDF data info:", {
+        length: trimmedProcurement.length,
+        startsWithData: trimmedProcurement.startsWith('data:'),
+        firstChars: trimmedProcurement.substring(0, 50)
+      });
+
+      const uploadResult = await uploadToCloudinaryFile(trimmedProcurement);
       summeryProcurementUrl = uploadResult.secure_url;
+      console.log("✅ PDF uploaded successfully:", summeryProcurementUrl);
     } catch (uploadError) {
-      console.error("Error uploading summary:", uploadError);
+      console.error("❌ Error uploading summary:", uploadError);
+      console.error("Upload error details:", {
+        message: uploadError.message,
+        stack: uploadError.stack,
+        name: uploadError.name,
+        http_code: uploadError.http_code,
+        response: uploadError.response
+      });
       return res.status(500).json({
         success: false,
-        message: "Failed to upload PDF summary.",
+        message: `Failed to upload PDF summary: ${uploadError.message || 'Unknown error'}`,
+        error: process.env.NODE_ENV === 'development' ? uploadError.message : undefined
       });
     }
 
@@ -250,13 +349,164 @@ export const createProcurementRecord = async (req, res) => {
       // לא נכשיל את כל הפעולה אם הרשומה הפיננסית נכשלה
     }
 
+    // יצירת רשומה בלוח זמנים לאספקה
+    try {
+      console.log("🔄 Starting supply schedule creation...");
+      
+      // בדיקות לפני יצירה
+      if (!savedProcurementRecord || !savedProcurementRecord._id) {
+        throw new Error("Procurement record was not saved properly");
+      }
+      
+      if (!supplierId || !supplierName) {
+        throw new Error("Supplier information is missing");
+      }
+      
+      if (!validatedProducts || validatedProducts.length === 0) {
+        throw new Error("No products to schedule");
+      }
+      
+      // יצירת מספר schedule ייחודי
+      const scheduleNumber = await generateScheduleNumber(companyId);
+      console.log("✅ Generated schedule number:", scheduleNumber);
+      
+      // הכנת פריטים ל-SupplySchedule
+      const scheduleItems = validatedProducts.map((product) => {
+        // המרת productId ל-ObjectId אם צריך
+        let productIdValue = product.productId;
+        if (mongoose.Types.ObjectId.isValid(product.productId)) {
+          productIdValue = typeof product.productId === 'string' 
+            ? new mongoose.Types.ObjectId(product.productId) 
+            : product.productId;
+        } else {
+          console.warn("⚠️ Invalid productId format:", product.productId);
+        }
+        
+        return {
+          productId: productIdValue,
+          productName: product.productName,
+          quantity: product.quantity,
+          unitPrice: product.unitPrice,
+          totalPrice: product.total,
+        };
+      });
+      
+      console.log(`✅ Prepared ${scheduleItems.length} schedule items`);
+      
+      // הכנת תאריך אספקה
+      const effectiveDeliveryDate = deliveryDate 
+        ? new Date(deliveryDate) 
+        : (purchaseDate ? new Date(purchaseDate) : new Date());
+      
+      // הכנת פריטים ללוח הזמנים
+      const scheduleEntryItems = validatedProducts.map((product) => {
+        let productIdValue = product.productId;
+        if (mongoose.Types.ObjectId.isValid(product.productId)) {
+          productIdValue = typeof product.productId === 'string' 
+            ? new mongoose.Types.ObjectId(product.productId) 
+            : product.productId;
+        }
+        
+        return {
+          productId: productIdValue,
+          productName: product.productName,
+          quantity: product.quantity,
+          receivedQuantity: 0,
+          status: "Scheduled",
+        };
+      });
+      
+      // יצירת entry בלוח הזמנים
+      const scheduleEntry = {
+        deliveryDate: effectiveDeliveryDate,
+        items: scheduleEntryItems,
+        tracking: {
+          carrier: ShippingMethod || null,
+          trackingNumber: null,
+          estimatedDelivery: deliveryDate ? new Date(deliveryDate) : null,
+          actualDelivery: null,
+          status: "Pending",
+        },
+        alerts: [],
+      };
+      
+      console.log("✅ Prepared schedule entry with", scheduleEntryItems.length, "items");
+      
+      // הכנת נתונים ל-SupplySchedule
+      const supplyScheduleData = {
+        companyId: mongoose.Types.ObjectId.isValid(companyId) 
+          ? (typeof companyId === 'string' ? new mongoose.Types.ObjectId(companyId) : companyId)
+          : companyId,
+        scheduleNumber,
+        procurementId: savedProcurementRecord._id,
+        supplierId: mongoose.Types.ObjectId.isValid(supplierId) 
+          ? (typeof supplierId === 'string' ? new mongoose.Types.ObjectId(supplierId) : supplierId)
+          : supplierId,
+        supplierName,
+        items: scheduleItems,
+        schedule: [scheduleEntry],
+        status: "Scheduled",
+        startDate: purchaseDate ? new Date(purchaseDate) : new Date(),
+        endDate: deliveryDate ? new Date(deliveryDate) : null,
+        notes: notes || `נוצר אוטומטית מתעודת רכש ${PurchaseOrder}`,
+      };
+      
+      // הוספת createdBy ו-managedBy אם קיימים
+      if (req.user?._id) {
+        supplyScheduleData.createdBy = req.user._id;
+        supplyScheduleData.managedBy = req.user._id;
+      }
+      
+      console.log("🔄 Creating SupplySchedule with data:", {
+        companyId: supplyScheduleData.companyId?.toString(),
+        scheduleNumber: supplyScheduleData.scheduleNumber,
+        procurementId: supplyScheduleData.procurementId?.toString(),
+        supplierId: supplyScheduleData.supplierId?.toString(),
+        itemsCount: supplyScheduleData.items?.length,
+        scheduleCount: supplyScheduleData.schedule?.length,
+      });
+      
+      // יצירת SupplySchedule
+      const supplySchedule = new SupplySchedule(supplyScheduleData);
+      
+      // בדיקת validation לפני שמירה
+      const validationError = supplySchedule.validateSync();
+      if (validationError) {
+        console.error("❌ SupplySchedule validation error:", validationError);
+        throw validationError;
+      }
+      
+      // שמירה
+      await supplySchedule.save();
+      console.log(`✅ Created supply schedule ${scheduleNumber} for procurement ${PurchaseOrder}`);
+      
+    } catch (scheduleError) {
+      console.error("⚠️  Error creating supply schedule:", scheduleError);
+      console.error("Schedule error details:", {
+        message: scheduleError.message,
+        name: scheduleError.name,
+        code: scheduleError.code,
+        errors: scheduleError.errors,
+        stack: scheduleError.stack
+      });
+      // לא נכשיל את כל הפעולה אם יצירת לוח הזמנים נכשלה
+      // המשתמש עדיין יקבל את תעודת הרכש
+    }
+
     res.status(201).json({ success: true, data: savedProcurementRecord });
   } catch (error) {
-    console.error("Error creating procurement record:", error);
+    console.error("❌ Error creating procurement record:", error);
+    console.error("Error details:", {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      code: error.code
+    });
     res.status(500).json({
       success: false,
       message: "Error creating procurement record",
-      error: error.message,
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
+      ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
     });
   }
 };

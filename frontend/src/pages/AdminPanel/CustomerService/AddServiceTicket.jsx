@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
+import { motion } from "framer-motion";
 import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
-import { Save, X } from "lucide-react";
+import { Save, X, ArrowLeft } from "lucide-react";
 
 const AddServiceTicket = () => {
   const { t } = useTranslation();
@@ -94,146 +95,272 @@ const AddServiceTicket = () => {
 
   return (
     <div className="p-6" style={{ backgroundColor: "var(--bg-color)", minHeight: "100vh" }}>
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6" style={{ color: "var(--text-color)" }}>
-          {isEdit
-            ? t("customerService.edit_ticket") || "Edit Service Ticket"
-            : t("customerService.add_ticket") || "Add Service Ticket"}
-        </h1>
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <motion.div
+          className="mb-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <button
+            onClick={() => navigate("/dashboard/customer-service/tickets")}
+            className="flex items-center gap-2 mb-4 text-sm hover:underline"
+            style={{ color: "var(--color-secondary)" }}
+          >
+            <ArrowLeft size={18} />
+            {t("common.back") || "Back"}
+          </button>
+          <h1
+            className="text-3xl font-bold mb-2"
+            style={{
+              background: "linear-gradient(135deg, var(--color-primary), var(--color-secondary))",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            {isEdit
+              ? t("customerService.edit_ticket") || "Edit Service Ticket"
+              : t("customerService.add_ticket") || "Add Service Ticket"}
+          </h1>
+          <p className="text-sm" style={{ color: "var(--color-secondary)" }}>
+            {isEdit
+              ? t("customerService.update_ticket_desc") || "Update ticket details"
+              : t("customerService.create_ticket_desc") || "Create a new service ticket"}
+          </p>
+        </motion.div>
 
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="md:col-span-2">
-              <label className="block mb-2">{t("customerService.title") || "Title"} *</label>
-              <input
-                type="text"
-                required
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block mb-2">{t("customerService.customer") || "Customer"} *</label>
-              <select
-                required
-                value={formData.customerId}
-                onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg"
-              >
-                <option value="">Select Customer</option>
-                {customers.map((customer) => (
-                  <option key={customer._id} value={customer._id}>
-                    {customer.name} - {customer.email}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block mb-2">{t("customerService.category") || "Category"} *</label>
-              <select
-                required
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg"
-              >
-                <option value="Technical">Technical</option>
-                <option value="Billing">Billing</option>
-                <option value="Sales">Sales</option>
-                <option value="Support">Support</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-            <div>
-              <label className="block mb-2">{t("customerService.priority") || "Priority"} *</label>
-              <select
-                required
-                value={formData.priority}
-                onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg"
-              >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-                <option value="Urgent">Urgent</option>
-              </select>
-            </div>
-            <div>
-              <label className="block mb-2">{t("customerService.status") || "Status"} *</label>
-              <select
-                required
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg"
-              >
-                <option value="Open">Open</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Waiting for Customer">Waiting for Customer</option>
-                <option value="Resolved">Resolved</option>
-                <option value="Closed">Closed</option>
-              </select>
-            </div>
-            <div>
-              <label className="block mb-2">{t("customerService.assigned_to") || "Assigned To"}</label>
-              <select
-                value={formData.assignedTo}
-                onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg"
-              >
-                <option value="">Unassigned</option>
-                {employees.map((emp) => (
-                  <option key={emp._id} value={emp._id}>
-                    {emp.name} {emp.lastName}
-                  </option>
-                ))}
-              </select>
+        {/* Form Card */}
+        <motion.form
+          onSubmit={handleSubmit}
+          className="rounded-2xl shadow-lg border p-6 md:p-8"
+          style={{
+            backgroundColor: "var(--bg-color)",
+            borderColor: "var(--border-color)",
+          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          {/* Basic Information */}
+          <div className="mb-8">
+            <h2 className="text-xl font-bold mb-4 pb-2 border-b" style={{ color: "var(--text-color)", borderColor: "var(--border-color)" }}>
+              {t("customerService.basic_information") || "Basic Information"}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("customerService.title") || "Title"} *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                  placeholder={t("customerService.enter_title") || "Enter ticket title"}
+                />
+              </div>
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("customerService.customer") || "Customer"} *
+                </label>
+                <select
+                  required
+                  value={formData.customerId}
+                  onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  <option value="">{t("customerService.select_customer") || "Select Customer"}</option>
+                  {customers.map((customer) => (
+                    <option key={customer._id} value={customer._id}>
+                      {customer.name} - {customer.email}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("customerService.category") || "Category"} *
+                </label>
+                <select
+                  required
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  <option value="Technical">{t("customerService.technical") || "Technical"}</option>
+                  <option value="Billing">{t("customerService.billing") || "Billing"}</option>
+                  <option value="Sales">{t("customerService.sales") || "Sales"}</option>
+                  <option value="Support">{t("customerService.support") || "Support"}</option>
+                  <option value="Other">{t("customerService.other") || "Other"}</option>
+                </select>
+              </div>
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("customerService.priority") || "Priority"} *
+                </label>
+                <select
+                  required
+                  value={formData.priority}
+                  onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  <option value="Low">{t("customerService.low") || "Low"}</option>
+                  <option value="Medium">{t("customerService.medium") || "Medium"}</option>
+                  <option value="High">{t("customerService.high") || "High"}</option>
+                  <option value="Urgent">{t("customerService.urgent") || "Urgent"}</option>
+                </select>
+              </div>
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("customerService.status") || "Status"} *
+                </label>
+                <select
+                  required
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  <option value="Open">{t("customerService.open") || "Open"}</option>
+                  <option value="In Progress">{t("customerService.in_progress") || "In Progress"}</option>
+                  <option value="Waiting for Customer">{t("customerService.waiting_for_customer") || "Waiting for Customer"}</option>
+                  <option value="Resolved">{t("customerService.resolved") || "Resolved"}</option>
+                  <option value="Closed">{t("customerService.closed") || "Closed"}</option>
+                </select>
+              </div>
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("customerService.assigned_to") || "Assigned To"}
+                </label>
+                <select
+                  value={formData.assignedTo}
+                  onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  <option value="">{t("customerService.unassigned") || "Unassigned"}</option>
+                  {employees.map((emp) => (
+                    <option key={emp._id} value={emp._id}>
+                      {emp.name} {emp.lastName}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
-          <div className="mb-4">
-            <label className="block mb-2">{t("customerService.description") || "Description"} *</label>
-            <textarea
-              required
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg"
-              rows={5}
-            />
+          {/* Ticket Details */}
+          <div className="mb-8">
+            <h2 className="text-xl font-bold mb-4 pb-2 border-b" style={{ color: "var(--text-color)", borderColor: "var(--border-color)" }}>
+              {t("customerService.ticket_details") || "Ticket Details"}
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("customerService.description") || "Description"} *
+                </label>
+                <textarea
+                  required
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                  rows={5}
+                  placeholder={t("customerService.enter_description") || "Enter ticket description..."}
+                />
+              </div>
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("customerService.notes") || "Notes"}
+                </label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                  rows={3}
+                  placeholder={t("customerService.enter_notes") || "Enter any additional notes..."}
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="mb-4">
-            <label className="block mb-2">{t("customerService.notes") || "Notes"}</label>
-            <textarea
-              value={formData.notes}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg"
-              rows={3}
-            />
-          </div>
-
-          <div className="flex gap-4">
-            <button
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t" style={{ borderColor: "var(--border-color)" }}>
+            <motion.button
               type="submit"
               disabled={mutation.isLoading}
-              className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                backgroundColor: "var(--button-bg)",
+                color: "var(--button-text)",
+              }}
+              whileHover={{ scale: mutation.isLoading ? 1 : 1.02 }}
+              whileTap={{ scale: mutation.isLoading ? 1 : 0.98 }}
             >
               <Save size={20} />
-              {mutation.isLoading ? "Saving..." : t("customerService.save") || "Save"}
-            </button>
-            <button
+              {mutation.isLoading
+                ? t("common.saving") || "Saving..."
+                : t("customerService.save") || "Save"}
+            </motion.button>
+            <motion.button
               type="button"
               onClick={() => navigate("/dashboard/customer-service/tickets")}
-              className="flex items-center gap-2 px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+              className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl border shadow-md hover:shadow-lg transition-all"
+              style={{
+                borderColor: "var(--border-color)",
+                backgroundColor: "var(--bg-color)",
+                color: "var(--text-color)",
+              }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <X size={20} />
               {t("customerService.cancel") || "Cancel"}
-            </button>
+            </motion.button>
           </div>
-        </form>
+        </motion.form>
       </div>
     </div>
   );
 };
 
 export default AddServiceTicket;
-

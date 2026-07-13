@@ -17,7 +17,7 @@ import {
 } from "../emails/emailService.js";
 import { transporter } from "../config/lib/nodemailer.js";
 import { createPaymentInvoiceEmail } from "../emails/emailHandlers.js";
-import puppeteer from "puppeteer";
+import { launchBrowser } from "../config/lib/browser.js";
 import cron from "node-cron";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -245,10 +245,7 @@ const sendPaymentInvoiceEmail = async (company, invoice) => {
     try {
       const html = await generateInvoiceHTMLForPayment(invoice);
       
-      const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
+      const browser = await launchBrowser();
       
       const page = await browser.newPage();
       await page.setContent(html, { waitUntil: 'networkidle0' });

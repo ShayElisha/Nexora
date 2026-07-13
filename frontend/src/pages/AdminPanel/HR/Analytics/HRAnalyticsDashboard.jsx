@@ -277,7 +277,26 @@ const HRAnalyticsDashboard = () => {
           <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--text-color)" }}>
             {t("hr.analytics.employees_by_department") || "Employees by Department"}
           </h3>
-          <Bar data={employeesByDeptData} options={{ responsive: true, maintainAspectRatio: false }} />
+          <div style={{ height: "350px", position: "relative" }}>
+            <Bar 
+              data={employeesByDeptData} 
+              options={{ 
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    display: true,
+                    position: "top",
+                  },
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                  },
+                },
+              }} 
+            />
+          </div>
         </motion.div>
 
         <motion.div
@@ -293,7 +312,21 @@ const HRAnalyticsDashboard = () => {
           <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--text-color)" }}>
             {t("hr.analytics.applicants_by_status") || "Applicants by Status"}
           </h3>
-          <Pie data={applicantsByStatusData} options={{ responsive: true, maintainAspectRatio: false }} />
+          <div style={{ height: "350px", position: "relative" }}>
+            <Pie 
+              data={applicantsByStatusData} 
+              options={{ 
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    display: true,
+                    position: "bottom",
+                  },
+                },
+              }} 
+            />
+          </div>
         </motion.div>
       </div>
 
@@ -312,7 +345,21 @@ const HRAnalyticsDashboard = () => {
           <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--text-color)" }}>
             {t("hr.analytics.leave_by_type") || "Leave Requests by Type"}
           </h3>
-          <Pie data={leaveByTypeData} options={{ responsive: true, maintainAspectRatio: false }} />
+          <div style={{ height: "350px", position: "relative" }}>
+            <Pie 
+              data={leaveByTypeData} 
+              options={{ 
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    display: true,
+                    position: "bottom",
+                  },
+                },
+              }} 
+            />
+          </div>
         </motion.div>
 
         <motion.div

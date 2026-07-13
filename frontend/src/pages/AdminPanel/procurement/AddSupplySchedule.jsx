@@ -8,11 +8,15 @@ import toast from "react-hot-toast";
 import { Save, X, Plus, Trash2, Loader2, ArrowLeft } from "lucide-react";
 
 const AddSupplySchedule = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();
   const isEdit = !!id;
+  
+  // Detect RTL languages
+  const isRTL = ['he', 'ar', 'iw'].includes(i18n.language);
+  const direction = isRTL ? 'rtl' : 'ltr';
 
   const [formData, setFormData] = useState({
     supplierId: "",
@@ -132,7 +136,7 @@ const AddSupplySchedule = () => {
   };
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--bg-color)' }}>
+    <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--bg-color)' }} dir={direction}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -140,15 +144,15 @@ const AddSupplySchedule = () => {
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
+          <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <button
               onClick={() => navigate("/dashboard/procurement/supply-schedules")}
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
               style={{ color: 'var(--text-color)' }}
             >
-              <ArrowLeft size={24} />
+              <ArrowLeft size={24} className={isRTL ? 'rotate-180' : ''} />
             </button>
-            <div>
+            <div className={isRTL ? 'text-right' : 'text-left'}>
               <h1 className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
                 {isEdit
                   ? t("procurement.edit_supply_schedule") || "Edit Supply Schedule"
@@ -257,7 +261,7 @@ const AddSupplySchedule = () => {
 
             {/* Schedule Items Section */}
             <div>
-              <div className="flex justify-between items-center mb-4">
+              <div className={`flex ${isRTL ? 'flex-row-reverse' : ''} justify-between items-center mb-4`}>
                 <h2 className="text-xl font-semibold" style={{ color: 'var(--text-color)' }}>
                   {t("procurement.schedule") || "Schedule"} *
                 </h2>
@@ -412,7 +416,7 @@ const AddSupplySchedule = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4 pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
+            <div className={`flex ${isRTL ? 'flex-row-reverse' : ''} gap-4 pt-4 border-t`} style={{ borderColor: 'var(--border-color)' }}>
               <button
                 type="submit"
                 disabled={mutation.isLoading}

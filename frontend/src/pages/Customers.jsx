@@ -1,296 +1,157 @@
-import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { Briefcase, Building2, GraduationCap, HeartPulse, Laptop, Quote, Star, Store } from "lucide-react";
+import PublicPageHero from "../components/home/PublicPageHero";
+import PublicPageLayout from "../components/home/PublicPageLayout";
+import { usePageLocale } from "../hooks/usePageLocale";
 
 const Customers = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = usePageLocale();
   const navigate = useNavigate();
-  const isRTL = ["he", "ar"].includes(i18n.language);
-
-  const testimonials = [
-    {
-      company: "טכנולוגיות מתקדמות בע\"מ",
-      logo: "🚀",
-      name: "דוד כהן",
-      role: "מנכ\"ל",
-      text: "Nexora שינתה לנו את המשחק. חסכנו 30% מהזמן בניהול היומיומי!",
-      industry: "היי-טק",
-      size: "150 עובדים"
-    },
-    {
-      company: "רשת חנויות שלום",
-      logo: "🏪",
-      name: "שרה לוי",
-      role: "בעלים",
-      text: "סוף סוף מערכת שמבינה את הצרכים שלנו. ממליצה בחום!",
-      industry: "קמעונאות",
-      size: "80 עובדים"
-    },
-    {
-      company: "בניה ופיתוח מודרני",
-      logo: "🏗️",
-      name: "מיכאל ברק",
-      role: "סמנכ\"ל",
-      text: "השליטה והשקיפות שקיבלנו חסרות תקדים. מעולה!",
-      industry: "בנייה",
-      size: "200 עובדים"
-    },
-    {
-      company: "יועצים פיננסיים",
-      logo: "💼",
-      name: "רונית אבני",
-      role: "שותפה",
-      text: "מערכת אינטואיטיבית ותמיכה מצוינת. ממש מרוצים!",
-      industry: "שירותים",
-      size: "25 עובדים"
-    }
-  ];
-
-  const stats = [
-    { number: "1,200+", label: "לקוחות פעילים" },
-    { number: "50,000+", label: "משתמשים יומיים" },
-    { number: "99.9%", label: "שביעות רצון" },
-    { number: "24/7", label: "תמיכה" }
-  ];
-
-  const industries = [
-    { icon: "💻", name: "היי-טק", count: "250+" },
-    { icon: "🏪", name: "קמעונאות", count: "180+" },
-    { icon: "🏗️", name: "בנייה", count: "120+" },
-    { icon: "🏥", name: "בריאות", count: "90+" },
-    { icon: "🎓", name: "חינוך", count: "150+" },
-    { icon: "💼", name: "שירותים", count: "200+" }
-  ];
+  const stats = t("public.customers.stats", { returnObjects: true }) || [];
+  const industries = t("public.customers.industries", { returnObjects: true }) || [];
+  const testimonials = t("public.customers.testimonials", { returnObjects: true }) || [];
+  const industryIcons = [Laptop, Store, Building2, HeartPulse, GraduationCap, Briefcase];
 
   return (
-    <div
-      className="min-h-screen flex flex-col font-sans"
-      style={{ backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
-      dir={isRTL ? "rtl" : "ltr"}
-    >
-      {/* Hero */}
-      <section 
-        className="py-20 relative overflow-hidden"
-        style={{
-          background: `linear-gradient(135deg, var(--color-primary), var(--color-secondary))`
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-6xl font-extrabold mb-6 text-white"
-          >
-            הלקוחות שלנו
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-xl text-white max-w-3xl mx-auto"
-            style={{ opacity: 0.9 }}
-          >
-            עסקים מובילים בוחרים ב-Nexora לניהול יומיומי
-          </motion.p>
+    <PublicPageLayout>
+      <PublicPageHero
+        badge={t("public.customers.badge")}
+        title={t("public.customers.title")}
+        subtitle={t("public.customers.subtitle")}
+      />
+
+      <section className="py-14">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className="p-5 rounded-xl border text-center"
+              style={{
+                borderColor: "var(--border-color)",
+                backgroundColor: "var(--bg-color)",
+              }}
+            >
+              <h3 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: "var(--color-primary)" }}>
+                {stat.number}
+              </h3>
+              <p className="text-sm" style={{ color: "var(--color-secondary)" }}>
+                {stat.label}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="py-16">
+      <section className="py-14">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="p-6 rounded-xl shadow-lg text-center"
-                style={{
-                  backgroundColor: 'var(--bg-color)',
-                  border: '2px solid var(--border-color)'
-                }}
-              >
-                <h3 
-                  className="text-4xl font-bold mb-2"
-                  style={{ color: 'var(--color-primary)' }}
-                >
-                  {stat.number}
-                </h3>
-                <p 
-                  className="text-sm"
-                  style={{ color: 'var(--text-color)', opacity: 0.8 }}
-                >
-                  {stat.label}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Industries */}
-      <section className="py-20" style={{ backgroundColor: 'var(--bg-color)' }}>
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 
-            className="text-3xl font-bold mb-12 text-center"
-            style={{
-              background: `linear-gradient(135deg, var(--color-primary), var(--color-secondary))`,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}
-          >
-            תעשיות שאנחנו משרתים
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8" style={{ color: "var(--text-color)" }}>
+            {t("public.customers.industriesTitle")}
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {industries.map((industry, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="p-6 rounded-xl shadow-lg text-center hover:scale-105 transition-transform duration-300"
-                style={{
-                  backgroundColor: 'var(--bg-color)',
-                  border: '2px solid var(--border-color)'
-                }}
-              >
-                <div className="text-5xl mb-3">{industry.icon}</div>
-                <h3 
-                  className="font-bold mb-1"
-                  style={{ color: 'var(--color-primary)' }}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {industries.map((industry, index) => {
+              const Icon = industryIcons[index % industryIcons.length];
+              return (
+                <div
+                  key={industry.name}
+                  className="p-4 rounded-xl border text-center"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                  }}
                 >
-                  {industry.name}
-                </h3>
-                <p 
-                  className="text-xs"
-                  style={{ color: 'var(--text-color)', opacity: 0.7 }}
-                >
-                  {industry.count} לקוחות
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 
-            className="text-3xl font-bold mb-12 text-center"
-            style={{
-              background: `linear-gradient(135deg, var(--color-primary), var(--color-secondary))`,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}
-          >
-            מה הלקוחות אומרים
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="p-8 rounded-2xl shadow-lg"
-                style={{
-                  backgroundColor: 'var(--bg-color)',
-                  border: '2px solid var(--border-color)'
-                }}
-              >
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="text-6xl">{testimonial.logo}</div>
-                  <div>
-                    <h3 
-                      className="font-bold text-lg"
-                      style={{ color: 'var(--color-primary)' }}
-                    >
-                      {testimonial.company}
-                    </h3>
-                    <div className="flex gap-2 text-xs mt-1">
-                      <span 
-                        className="px-2 py-1 rounded"
-                        style={{ backgroundColor: 'var(--color-secondary)', color: 'white' }}
-                      >
-                        {testimonial.industry}
-                      </span>
-                      <span 
-                        className="px-2 py-1 rounded"
-                        style={{ border: '1px solid var(--border-color)', color: 'var(--text-color)' }}
-                      >
-                        {testimonial.size}
-                      </span>
-                    </div>
-                  </div>
+                  <Icon size={24} className="mx-auto mb-3" style={{ color: "var(--color-primary)" }} />
+                  <h3 className="font-semibold text-sm mb-1" style={{ color: "var(--text-color)" }}>
+                    {industry.name}
+                  </h3>
+                  <p className="text-xs" style={{ color: "var(--color-secondary)" }}>
+                    {industry.count}
+                  </p>
                 </div>
-                <p 
-                  className="text-lg mb-6 leading-relaxed"
-                  style={{ color: 'var(--text-color)' }}
-                >
-                  "{testimonial.text}"
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-14">
+        <div className="max-w-7xl mx-auto px-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8" style={{ color: "var(--text-color)" }}>
+            {t("public.customers.testimonialsTitle")}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {testimonials.map((testimonial) => (
+              <article
+                key={testimonial.company}
+                className="p-6 rounded-2xl border"
+                style={{
+                  borderColor: "var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                }}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-bold text-lg" style={{ color: "var(--text-color)" }}>
+                    {testimonial.company}
+                  </h3>
+                  <Quote size={18} style={{ color: "var(--color-primary)" }} />
+                </div>
+                <div className="flex gap-2 mb-4">
+                  <span className="text-xs px-2 py-1 rounded-full border" style={{ borderColor: "var(--border-color)" }}>
+                    {testimonial.industry}
+                  </span>
+                  <span className="text-xs px-2 py-1 rounded-full border" style={{ borderColor: "var(--border-color)" }}>
+                    {testimonial.size}
+                  </span>
+                </div>
+                <p className="text-sm leading-relaxed mb-4" style={{ color: "var(--color-secondary)" }}>
+                  {testimonial.text}
                 </p>
                 <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i} style={{ color: 'var(--color-accent)' }}>⭐</span>
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <Star key={`${testimonial.company}-${index}`} size={14} fill="currentColor" style={{ color: "var(--color-primary)" }} />
                   ))}
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-4xl">👤</div>
-                  <div>
-                    <p 
-                      className="font-semibold"
-                      style={{ color: 'var(--text-color)' }}
-                    >
-                      {testimonial.name}
-                    </p>
-                    <p 
-                      className="text-sm"
-                      style={{ color: 'var(--text-color)', opacity: 0.7 }}
-                    >
-                      {testimonial.role}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
+                <p className="font-semibold text-sm" style={{ color: "var(--text-color)" }}>
+                  {testimonial.name}
+                </p>
+                <p className="text-xs" style={{ color: "var(--color-secondary)" }}>
+                  {testimonial.role}
+                </p>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section 
-        className="py-20"
-        style={{
-          background: `linear-gradient(135deg, var(--color-secondary), var(--color-accent))`
-        }}
-      >
+      <section className="pb-16 md:pb-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-6 text-white">
-            הצטרף ללקוחות המרוצים שלנו
-          </h2>
-          <p className="text-lg text-white mb-8" style={{ opacity: 0.9 }}>
-            התחל את המסע שלך עם Nexora עוד היום
-          </p>
-          <button
-            onClick={() => navigate('/create-company')}
-            className="py-4 px-10 font-bold rounded-xl transition-all duration-300 shadow-xl hover:scale-105"
+          <div
+            className="rounded-2xl border p-8 md:p-10"
             style={{
-              backgroundColor: 'white',
-              color: 'var(--color-primary)'
+              borderColor: "var(--border-color)",
+              backgroundColor: "var(--bg-color)",
             }}
           >
-            התחל עכשיו בחינם ✨
-          </button>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: "var(--text-color)" }}>
+              {t("public.customers.ctaTitle")}
+            </h2>
+            <p className="mb-7" style={{ color: "var(--color-secondary)" }}>
+              {t("public.customers.ctaSubtitle")}
+            </p>
+            <button
+              onClick={() => navigate("/create-company")}
+              className="py-3 px-7 rounded-xl font-semibold border"
+              style={{
+                borderColor: "var(--color-primary)",
+                backgroundColor: "var(--color-primary)",
+                color: "var(--button-text)",
+              }}
+            >
+              {t("public.customers.ctaButton")}
+            </button>
+          </div>
         </div>
       </section>
-    </div>
+    </PublicPageLayout>
   );
 };
 

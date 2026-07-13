@@ -50,7 +50,7 @@ const CreateCourse = () => {
       navigate("/dashboard/hr/lms/courses");
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "Failed to create course");
+      toast.error(error.response?.data?.message || t("hr.lms.failed_to_create_course") || "Failed to create course");
     },
   });
 

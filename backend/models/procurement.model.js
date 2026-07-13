@@ -147,6 +147,13 @@ const procurementSchema = new mongoose.Schema(
         addedAt: { type: Date, default: Date.now },
       },
     ],
+    // קישור להזמנות ייצור שנוצרה עבורן ההזמנת רכש (מחוסרים)
+    relatedProductionOrderIds: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ProductionOrder",
+      },
+    ],
   },
   { timestamps: true }
 );

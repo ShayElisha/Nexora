@@ -176,25 +176,26 @@ app.post("/save-pdf", (req, res) => {
 import { errorHandler } from "./middleware/errorHandler.js";
 app.use(errorHandler);
 
-// Local / long-running server startup only. On Vercel the app is invoked as a
-// serverless function (see /api/index.js) and must NOT call app.listen(),
-// run node-cron schedulers, or block on index creation.
-if (!isServerless) {
-  const { addPerformanceIndexes } = await import("./config/addIndexes.js");
-  connectDB().then(async () => {
-    try {
-      await addPerformanceIndexes();
-    } catch (error) {
-      console.error("Error adding indexes (non-critical):", error.message);
-    }
-  });
+// Connect to the database (connection is cached across invocations). Mongoose
+// buffers queries until the connection is ready.
+connectDB();
 
-  // Load existing cron jobs (persistent process required)
+// Performance indexes run in the background and are non-critical.
+import("./config/addIndexes.js")
+  .then(({ addPerformanceIndexes }) => addPerformanceIndexes())
+  .catch((error) =>
+    console.error("Error adding indexes (non-critical):", error.message)
+  );
+
+// In-process cron jobs require a persistent process. They run locally by
+// default, and on Vercel only when ENABLE_CRON=true (otherwise use Vercel Cron,
+// since Fluid compute can scale to zero).
+if (!isServerless || process.env.ENABLE_CRON === "true") {
   await import("./CronJob.js");
-
-  app.listen(PORT, () => {
-    console.log(`Server started at http://localhost:${PORT}`);
-  });
 }
+
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
+});
 
 export default app;

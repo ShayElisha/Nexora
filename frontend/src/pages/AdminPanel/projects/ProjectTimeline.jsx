@@ -215,17 +215,23 @@ const ProjectTimeline = () => {
           </div>
 
           {/* Controls */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <div className="rounded-2xl shadow-lg p-6 mb-6 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
             <div className="flex flex-wrap items-center justify-between gap-4">
               {/* Project Filter */}
               <div className="flex-1 min-w-[200px]">
-                <label className="block text-sm font-semibold mb-2 text-gray-700">
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   {t("projects.select_project")}
                 </label>
                 <select
                   value={selectedProject || ""}
                   onChange={(e) => setSelectedProject(e.target.value || null)}
-                  className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-800"
+                  className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 transition-all duration-200"
+                  style={{ 
+                    borderColor: 'var(--border-color)', 
+                    backgroundColor: 'var(--bg-color)', 
+                    color: 'var(--text-color)',
+                    '--tw-ring-color': 'var(--color-primary)'
+                  }}
                 >
                   <option value="">{t("projects.all_projects")}</option>
                   {projects.map((project) => (
@@ -238,13 +244,19 @@ const ProjectTimeline = () => {
 
               {/* Status Filter */}
               <div className="flex-1 min-w-[200px]">
-                <label className="block text-sm font-semibold mb-2 text-gray-700">
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   {t("projects.status")}
                 </label>
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-800"
+                  className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 transition-all duration-200"
+                  style={{ 
+                    borderColor: 'var(--border-color)', 
+                    backgroundColor: 'var(--bg-color)', 
+                    color: 'var(--text-color)',
+                    '--tw-ring-color': 'var(--color-primary)'
+                  }}
                 >
                   <option value="all">{t("projects.all_status")}</option>
                   <option value="Active">{t("projects.active")}</option>
@@ -256,13 +268,19 @@ const ProjectTimeline = () => {
 
               {/* View Range */}
               <div className="flex-1 min-w-[200px]">
-                <label className="block text-sm font-semibold mb-2 text-gray-700">
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   {t("projects.view_range")}
                 </label>
                 <select
                   value={viewRange}
                   onChange={(e) => setViewRange(Number(e.target.value))}
-                  className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-800"
+                  className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 transition-all duration-200"
+                  style={{ 
+                    borderColor: 'var(--border-color)', 
+                    backgroundColor: 'var(--bg-color)', 
+                    color: 'var(--text-color)',
+                    '--tw-ring-color': 'var(--color-primary)'
+                  }}
                 >
                   <option value={7}>{t("projects.week")}</option>
                   <option value={30}>{t("projects.month")}</option>
@@ -275,28 +293,31 @@ const ProjectTimeline = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => navigateDate(-1)}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+                  className="p-2 rounded-lg transition"
+                  style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
                 >
-                  <ChevronLeft className="size-5 text-gray-700" />
+                  <ChevronLeft className="size-5" />
                 </button>
                 <button
                   onClick={() => setCurrentDate(new Date())}
-                  className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+                  className="px-4 py-2 rounded-lg transition"
+                  style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
                 >
                   {t("projects.today")}
                 </button>
                 <button
                   onClick={() => navigateDate(1)}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+                  className="p-2 rounded-lg transition"
+                  style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
                 >
-                  <ChevronRight className="size-5 text-gray-700" />
+                  <ChevronRight className="size-5" />
                 </button>
               </div>
             </div>
 
             {/* Date Range Display */}
             <div className="mt-4 text-center">
-              <p className="text-lg font-semibold text-gray-800">
+              <p className="text-lg font-semibold" style={{ color: 'var(--text-color)' }}>
                 {format(startDate, "MMM d", { locale: isRTL ? he : undefined })} -{" "}
                 {format(endDate, "MMM d, yyyy", { locale: isRTL ? he : undefined })}
               </p>
@@ -305,16 +326,16 @@ const ProjectTimeline = () => {
         </motion.div>
 
         {/* Timeline */}
-        <div className="bg-white rounded-2xl shadow-lg p-6">
+        <div className="rounded-2xl shadow-lg p-6 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
           {timelineEvents.length === 0 ? (
             <div className="text-center py-12">
-              <Calendar className="size-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-600">{t("projects.no_events")}</p>
+              <Calendar className="size-12 mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
+              <p style={{ color: 'var(--color-secondary)' }}>{t("projects.no_events")}</p>
             </div>
           ) : (
             <div className="relative">
               {/* Timeline Line */}
-              <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gray-300" />
+              <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full" style={{ backgroundColor: 'var(--border-color)' }} />
 
               {/* Events */}
               <div className="space-y-8">
@@ -330,19 +351,22 @@ const ProjectTimeline = () => {
                         style={{ marginLeft: isLeft ? `${position}%` : "auto", marginRight: !isLeft ? `${100 - position}%` : "auto" }}
                       >
                         <div className={`flex-1 ${isLeft ? "text-right pr-4" : "text-left pl-4"}`}>
-                          <div className="bg-white rounded-lg shadow-md p-4 border-l-4" style={{ borderColor: event.color === "blue" ? "#3b82f6" : event.color === "green" ? "#10b981" : event.color === "yellow" ? "#f59e0b" : "#ef4444" }}>
+                          <div className="rounded-lg shadow-md p-4 border-l-4" style={{ 
+                            backgroundColor: 'var(--bg-color)', 
+                            borderColor: event.color === "blue" ? "var(--color-primary)" : event.color === "green" ? "var(--color-accent)" : event.color === "yellow" ? "#f59e0b" : "#ef4444" 
+                          }}>
                             <div className="flex items-center gap-2 mb-2">
                               <div className={`p-2 rounded-lg ${getStatusColor(event.project?.status || event.task?.status)} text-white`}>
                                 {getStatusIcon(event.project?.status || event.task?.status)}
                               </div>
                               <div>
-                                <h3 className="font-semibold text-gray-800">{event.label}</h3>
+                                <h3 className="font-semibold" style={{ color: 'var(--text-color)' }}>{event.label}</h3>
                                 {event.project && (
-                                  <p className="text-sm text-gray-600">{event.project.name}</p>
+                                  <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>{event.project.name}</p>
                                 )}
                               </div>
                             </div>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs" style={{ color: 'var(--color-secondary)' }}>
                               {format(event.date, "MMM d, yyyy 'at' HH:mm", {
                                 locale: isRTL ? he : undefined,
                               })}
@@ -351,15 +375,11 @@ const ProjectTimeline = () => {
                         </div>
                         <div className="relative z-10">
                           <div
-                            className={`w-4 h-4 rounded-full border-4 border-white shadow-lg ${
-                              event.color === "blue"
-                                ? "bg-blue-500"
-                                : event.color === "green"
-                                ? "bg-green-500"
-                                : event.color === "yellow"
-                                ? "bg-yellow-500"
-                                : "bg-red-500"
-                            }`}
+                            className="w-4 h-4 rounded-full border-4 shadow-lg"
+                            style={{
+                              backgroundColor: event.color === "blue" ? "var(--color-primary)" : event.color === "green" ? "var(--color-accent)" : event.color === "yellow" ? "#f59e0b" : "#ef4444",
+                              borderColor: 'var(--bg-color)'
+                            }}
                           />
                         </div>
                         <div className="flex-1" />

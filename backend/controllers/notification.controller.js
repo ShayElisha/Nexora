@@ -2,7 +2,7 @@
 // מרכז כל פונקציות ההתראות במערכת
 import Procurement from "../models/procurement.model.js";
 import Notification from "../models/notification.model.js";
-import Budget from "../models/budget.model.js";
+import Budget from "../models/Budget.model.js";
 import Event from "../models/events.model.js";
 import Company from "../models/companies.model.js";
 import Employee from "../models/employees.model.js";
@@ -16,6 +16,9 @@ import PerformanceReview from "../models/performanceReview.model.js";
 import Lead from "../models/Lead.model.js";
 import ProductionOrder from "../models/ProductionOrder.model.js";
 import Warehouse from "../models/warehouse.model.js";
+import productTree from "../models/productTree.model.js";
+import Product from "../models/product.model.js";
+import { checkComponentAvailability } from "./ProductionOrder.controller.js";
 import Shift from "../models/Shifts.model.js";
 import Salary from "../models/Salary.model.js";
 import Invoice from "../models/invoice.model.js";
@@ -24,6 +27,12 @@ import Customer from "../models/customers.model.js";
 import Activity from "../models/Activity.model.js";
 import jwt from "jsonwebtoken";
 import cron from "node-cron";
+import {
+  sendBirthdayEmail,
+  sendMonthlyCashFlowSummary,
+  sendProcurementCancellationEmail,
+  sendWeeklySummaryEmail,
+} from "../emails/emailService.js";
 
 // ========================
 // HELPER FUNCTIONS
@@ -2353,6 +2362,146 @@ export const checkQualityIssues = async () => {
   }
 };
 
+/**
+ * בדיקת חוסרים והתראות כשהמלאי מתחדש
+ * בודקת הזמנות ייצור עם חוסרים ומעדכנת אם המלאי התחדש
+ */
+export const checkMissingComponentsAvailability = async () => {
+  try {
+    console.log("🔍 Checking missing components availability...");
+    const companies = await Company.find();
+    let totalNotifications = 0;
+    let totalUpdated = 0;
+
+    for (const company of companies) {
+      // מצא כל הזמנות ייצור עם חוסרים
+      const ordersWithMissing = await ProductionOrder.find({
+        companyId: company._id,
+        status: { $in: ["On Hold", "Pending"] },
+        missingComponents: { $exists: true, $ne: [] },
+      })
+        .populate("bomId")
+        .populate("productId");
+
+      for (const order of ordersWithMissing) {
+        if (!order.bomId) continue;
+
+        try {
+          // בדוק זמינות מחדש
+          const availabilityCheck = await checkComponentAvailability(
+            order.bomId,
+            order.quantity,
+            company._id,
+            null
+          );
+
+          // אם כל הרכיבים כעת זמינים
+          if (availabilityCheck.allComponentsAvailable && order.missingComponents?.length > 0) {
+            // עדכן את ההזמנה
+            order.components = availabilityCheck.components;
+            order.missingComponents = [];
+            order.estimatedCost = availabilityCheck.totalEstimatedCost;
+            
+            if (order.status === "On Hold") {
+              order.status = "Pending";
+              order.priority = order.priority === "urgent" ? "high" : order.priority;
+            }
+
+            await order.save();
+            totalUpdated++;
+
+            // שלח התראה
+            const skip = await shouldSkipNotification({
+              companyId: company._id,
+              category: "production",
+              title: "✅ כל הרכיבים זמינים",
+              relatedEntity: {
+                entityType: "ProductionOrder",
+                entityId: order._id.toString(),
+              },
+              hours: 24,
+            });
+
+            if (!skip) {
+              await notifyAdminsAndManagers({
+                companyId: company._id,
+                title: "✅ כל הרכיבים זמינים",
+                content: `הזמנת ייצור ${order.orderNumber} (${order.productName}) - כל הרכיבים כעת זמינים וניתן להתחיל בייצור`,
+                type: "Success",
+                category: "production",
+                priority: "medium",
+                relatedEntity: {
+                  entityType: "ProductionOrder",
+                  entityId: order._id.toString(),
+                },
+                actionUrl: `/dashboard/production/${order._id}`,
+                actionLabel: "צפה בהזמנת ייצור",
+                dedupe: {
+                  enabled: true,
+                  hours: 24,
+                },
+              });
+              totalNotifications++;
+            }
+          } else if (availabilityCheck.missingComponents.length < (order.missingComponents?.length || 0)) {
+            // יש שיפור אבל עדיין יש חוסרים
+            const previousMissing = order.missingComponents?.length || 0;
+            const currentMissing = availabilityCheck.missingComponents.length;
+            
+            // עדכן את ההזמנה
+            order.components = availabilityCheck.components;
+            order.missingComponents = availabilityCheck.missingComponents;
+            order.estimatedCost = availabilityCheck.totalEstimatedCost;
+            await order.save();
+            totalUpdated++;
+
+            // שלח התראה על שיפור
+            const skip = await shouldSkipNotification({
+              companyId: company._id,
+              category: "production",
+              title: "📈 שיפור בזמינות רכיבים",
+              relatedEntity: {
+                entityType: "ProductionOrder",
+                entityId: order._id.toString(),
+              },
+              hours: 24,
+            });
+
+            if (!skip) {
+              await notifyAdminsAndManagers({
+                companyId: company._id,
+                title: "📈 שיפור בזמינות רכיבים",
+                content: `הזמנת ייצור ${order.orderNumber} (${order.productName}) - מספר הרכיבים החסרים ירד מ-${previousMissing} ל-${currentMissing}`,
+                type: "Info",
+                category: "production",
+                priority: "low",
+                relatedEntity: {
+                  entityType: "ProductionOrder",
+                  entityId: order._id.toString(),
+                },
+                actionUrl: `/dashboard/production/${order._id}`,
+                actionLabel: "צפה בהזמנת ייצור",
+                dedupe: {
+                  enabled: true,
+                  hours: 24,
+                },
+              });
+              totalNotifications++;
+            }
+          }
+        } catch (orderError) {
+          console.error(`❌ Error checking order ${order._id}:`, orderError);
+          // Continue with next order
+        }
+      }
+    }
+
+    console.log(`✅ Checked missing components: ${totalUpdated} orders updated, ${totalNotifications} notifications sent`);
+  } catch (error) {
+    console.error("❌ Error in checkMissingComponentsAvailability:", error);
+  }
+};
+
 // ========================
 // SHIFTS & SALARY NOTIFICATIONS
 // ========================
@@ -4132,7 +4281,7 @@ export const checkCashFlowAlerts = async () => {
           await notifyAdminsAndManagers({
             companyId: company._id,
             title: "💰 אזהרת תזרים מזומנים",
-            content: `תזרים המזומנים נמוך: \${cashFlow.toLocaleString()} \${company.baseCurrency || "ILS"}. סף מינימום: \${minThreshold.toLocaleString()}`,
+            content: `תזרים המזומנים נמוך: ${cashFlow.toLocaleString()} ${company.baseCurrency || "ILS"}. סף מינימום: ${minThreshold.toLocaleString()}`,
             type: cashFlow < 0 ? "Error" : "Warning",
             category: "finance",
             priority: cashFlow < 0 ? "critical" : "high",
@@ -4490,5 +4639,383 @@ export const checkProcurementQualityIssues = async () => {
     console.log(`✅ Created \${totalNotifications} procurement quality issue notifications`);
   } catch (error) {
     console.error("❌ Error in checkProcurementQualityIssues:", error);
+  }
+};
+
+// ========================
+// EMAIL NOTIFICATIONS
+// ========================
+
+/**
+ * בדיקת ימי הולדת ושליחת ברכות
+ */
+export const checkBirthdays = async () => {
+  try {
+    console.log("🎂 Checking birthdays...");
+    const today = new Date();
+    const todayMonth = today.getMonth() + 1; // 1-12
+    const todayDay = today.getDate();
+
+    const companies = await Company.find();
+    let totalEmails = 0;
+
+    for (const company of companies) {
+      const employees = await Employee.find({
+        companyId: company._id,
+        status: "active",
+        dateOfBirth: { $exists: true, $ne: null },
+      });
+
+      for (const employee of employees) {
+        if (employee.dateOfBirth) {
+          const birthDate = new Date(employee.dateOfBirth);
+          const birthMonth = birthDate.getMonth() + 1;
+          const birthDay = birthDate.getDate();
+
+          if (birthMonth === todayMonth && birthDay === todayDay) {
+            try {
+              await sendBirthdayEmail(
+                employee.email,
+                `${employee.name} ${employee.lastName || ""}`.trim(),
+                company.name,
+                employee.profileImage
+              );
+              
+              // יצירת התראה במערכת
+              await createNotification({
+                companyId: company._id,
+                employeeId: employee._id,
+                title: "🎉 יום הולדת שמח!",
+                content: `יום הולדת שמח ל-${employee.name}!`,
+                type: "Success",
+                category: "hr",
+                priority: "low",
+              });
+              
+              totalEmails++;
+              console.log(`✅ Birthday email sent to ${employee.email}`);
+            } catch (error) {
+              console.error(`❌ Error sending birthday email to ${employee.email}:`, error.message);
+            }
+          }
+        }
+      }
+    }
+    console.log(`✅ Sent ${totalEmails} birthday emails`);
+  } catch (error) {
+    console.error("❌ Error in checkBirthdays:", error);
+  }
+};
+
+/**
+ * שליחת סיכום תזרים מזומנים חודשי
+ */
+export const sendMonthlyCashFlowSummaryToAdmins = async () => {
+  try {
+    console.log("💰 Sending monthly cash flow summaries...");
+    const today = new Date();
+    const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    const month = lastMonth.getMonth() + 1;
+    const year = lastMonth.getFullYear();
+
+    // רק ביום הראשון של החודש
+    if (today.getDate() !== 1) {
+      return;
+    }
+
+    const companies = await Company.find();
+    let totalEmails = 0;
+
+    for (const company of companies) {
+      const allRecords = await Finance.find({
+        companyId: company._id,
+        createdAt: {
+          $gte: new Date(year, month - 1, 1),
+          $lt: new Date(year, month, 1),
+        },
+      });
+
+      let totalIncome = 0;
+      let totalExpense = 0;
+
+      for (const record of allRecords) {
+        if (record.transactionType === "Income") {
+          totalIncome += record.amount || 0;
+        } else if (record.transactionType === "Expense") {
+          totalExpense += record.amount || 0;
+        }
+      }
+
+      const netCashFlow = totalIncome - totalExpense;
+
+      // חישוב החודש הקודם להשוואה
+      const previousMonthRecords = await Finance.find({
+        companyId: company._id,
+        createdAt: {
+          $gte: new Date(year, month - 2, 1),
+          $lt: new Date(year, month - 1, 1),
+        },
+      });
+
+      let prevIncome = 0;
+      let prevExpense = 0;
+      for (const record of previousMonthRecords) {
+        if (record.transactionType === "Income") {
+          prevIncome += record.amount || 0;
+        } else if (record.transactionType === "Expense") {
+          prevExpense += record.amount || 0;
+        }
+      }
+
+      const previousMonthFlow = prevIncome - prevExpense;
+      const trend = netCashFlow - previousMonthFlow;
+
+      const cashFlowData = {
+        totalIncome,
+        totalExpense,
+        netCashFlow,
+        previousMonthFlow,
+        trend,
+      };
+
+      // שליחה לכל המנהלים והמנהלים
+      const adminsAndManagers = await Employee.find({
+        companyId: company._id,
+        role: { $in: ["Admin", "Manager"] },
+        status: "active",
+      });
+
+      for (const admin of adminsAndManagers) {
+        try {
+          await sendMonthlyCashFlowSummary(
+            admin.email,
+            company.name,
+            month,
+            year,
+            cashFlowData,
+            company.baseCurrency || "ILS"
+          );
+          totalEmails++;
+        } catch (error) {
+          console.error(`❌ Error sending cash flow summary to ${admin.email}:`, error.message);
+        }
+      }
+    }
+    console.log(`✅ Sent ${totalEmails} monthly cash flow summary emails`);
+  } catch (error) {
+    console.error("❌ Error in sendMonthlyCashFlowSummaryToAdmins:", error);
+  }
+};
+
+/**
+ * שליחת סיכום שבועי
+ */
+export const sendWeeklySummaryToAdmins = async () => {
+  try {
+    console.log("📊 Sending weekly summaries...");
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+
+    // רק ביום ראשון
+    if (dayOfWeek !== 0) {
+      return;
+    }
+
+    const weekEnd = new Date(today);
+    weekEnd.setDate(today.getDate() - 1); // אתמול (שבת)
+    const weekStart = new Date(weekEnd);
+    weekStart.setDate(weekEnd.getDate() - 6); // שבוע לפני
+
+    const companies = await Company.find();
+    let totalEmails = 0;
+
+    for (const company of companies) {
+      // מכירות
+      const salesOrders = await CustomerOrder.find({
+        companyId: company._id,
+        orderDate: {
+          $gte: weekStart,
+          $lte: weekEnd,
+        },
+      });
+
+      const totalSales = salesOrders.reduce((sum, order) => sum + (order.orderTotal || 0), 0);
+      const previousWeekStart = new Date(weekStart);
+      previousWeekStart.setDate(previousWeekStart.getDate() - 7);
+      const previousWeekEnd = new Date(weekEnd);
+      previousWeekEnd.setDate(previousWeekEnd.getDate() - 7);
+
+      const previousWeekOrders = await CustomerOrder.find({
+        companyId: company._id,
+        orderDate: {
+          $gte: previousWeekStart,
+          $lte: previousWeekEnd,
+        },
+      });
+
+      const previousWeekSales = previousWeekOrders.reduce((sum, order) => sum + (order.orderTotal || 0), 0);
+      const salesGrowth = previousWeekSales > 0 ? ((totalSales - previousWeekSales) / previousWeekSales) * 100 : 0;
+
+      const sales = {
+        totalSales,
+        totalOrders: salesOrders.length,
+        averageOrderValue: salesOrders.length > 0 ? totalSales / salesOrders.length : 0,
+        growth: salesGrowth,
+        currency: company.baseCurrency || "ILS",
+      };
+
+      // פרויקטים
+      const activeProjects = await Project.find({
+        companyId: company._id,
+        status: { $in: ["In Progress", "Active"] },
+      }).countDocuments();
+
+      const completedProjects = await Project.find({
+        companyId: company._id,
+        status: "Completed",
+        updatedAt: {
+          $gte: weekStart,
+          $lte: weekEnd,
+        },
+      }).countDocuments();
+
+      const newProjects = await Project.find({
+        companyId: company._id,
+        createdAt: {
+          $gte: weekStart,
+          $lte: weekEnd,
+        },
+      }).countDocuments();
+
+      const overdueProjects = await Project.find({
+        companyId: company._id,
+        status: { $in: ["In Progress", "Active"] },
+        dueDate: { $lt: today },
+      }).countDocuments();
+
+      const projects = {
+        activeProjects,
+        completedProjects,
+        newProjects,
+        overdueProjects,
+      };
+
+      // הזמנות
+      const newOrders = await CustomerOrder.find({
+        companyId: company._id,
+        createdAt: {
+          $gte: weekStart,
+          $lte: weekEnd,
+        },
+      }).countDocuments();
+
+      const inProgressOrders = await CustomerOrder.find({
+        companyId: company._id,
+        status: { $in: ["Processing", "In Progress"] },
+      }).countDocuments();
+
+      const completedOrders = await CustomerOrder.find({
+        companyId: company._id,
+        status: "Completed",
+        updatedAt: {
+          $gte: weekStart,
+          $lte: weekEnd,
+        },
+      }).countDocuments();
+
+      const orders = {
+        newOrders,
+        inProgress: inProgressOrders,
+        completed: completedOrders,
+        totalValue: totalSales,
+        currency: company.baseCurrency || "ILS",
+      };
+
+      const summaryData = { sales, projects, orders };
+
+      // שליחה לכל המנהלים והמנהלים
+      const adminsAndManagers = await Employee.find({
+        companyId: company._id,
+        role: { $in: ["Admin", "Manager"] },
+        status: "active",
+      });
+
+      for (const admin of adminsAndManagers) {
+        try {
+          await sendWeeklySummaryEmail(
+            admin.email,
+            company.name,
+            weekStart,
+            weekEnd,
+            summaryData
+          );
+          totalEmails++;
+        } catch (error) {
+          console.error(`❌ Error sending weekly summary to ${admin.email}:`, error.message);
+        }
+      }
+    }
+    console.log(`✅ Sent ${totalEmails} weekly summary emails`);
+  } catch (error) {
+    console.error("❌ Error in sendWeeklySummaryToAdmins:", error);
+  }
+};
+
+/**
+ * HTTP Controller לשליחת הודעת ביטול לספק
+ */
+export const sendProcurementCancellation = async (req, res) => {
+  try {
+    const { procurementId, cancellationReason } = req.body;
+    const companyId = req.user.companyId;
+
+    const procurement = await Procurement.findOne({
+      _id: procurementId,
+      companyId,
+    }).populate("supplierId");
+
+    if (!procurement) {
+      return res.status(404).json({
+        success: false,
+        message: "Procurement order not found",
+      });
+    }
+
+    if (!procurement.supplierId || !procurement.supplierId.email) {
+      return res.status(400).json({
+        success: false,
+        message: "Supplier email not found",
+      });
+    }
+
+    const company = await Company.findById(companyId);
+
+    await sendProcurementCancellationEmail(
+      procurement.supplierId.email,
+      procurement.supplierId.SupplierName || "Supplier",
+      company.name,
+      procurement.PurchaseOrder,
+      procurement.createdAt,
+      cancellationReason
+    );
+
+    // עדכון סטטוס ההזמנה
+    procurement.orderStatus = "Cancelled";
+    if (cancellationReason) {
+      procurement.notes = (procurement.notes || "") + `\nCancelled: ${cancellationReason}`;
+    }
+    await procurement.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Cancellation email sent successfully",
+    });
+  } catch (error) {
+    console.error("Error in sendProcurementCancellation:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error sending cancellation email",
+      error: error.message,
+    });
   }
 };

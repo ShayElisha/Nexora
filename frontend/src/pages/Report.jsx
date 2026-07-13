@@ -1,13 +1,14 @@
-import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AlertTriangle, Bug, CircleDot, Database, Gauge, Palette, Shield, Wrench } from "lucide-react";
 import axiosInstance from "../lib/axios";
 import toast from "react-hot-toast";
+import PublicPageHero from "../components/home/PublicPageHero";
+import PublicPageLayout from "../components/home/PublicPageLayout";
+import { usePageLocale } from "../hooks/usePageLocale";
 
 const Report = () => {
-  const { t, i18n } = useTranslation();
-  const isRTL = ["he", "ar"].includes(i18n.language);
+  const { t } = usePageLocale();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -21,21 +22,24 @@ const Report = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const bugTypes = [
-    { value: "ui", label: "בעיית תצוגה", icon: "🎨" },
-    { value: "functionality", label: "תקלה תפקודית", icon: "⚙️" },
-    { value: "performance", label: "בעיית ביצועים", icon: "🐌" },
-    { value: "security", label: "בעיית אבטחה", icon: "🔒" },
-    { value: "data", label: "בעיית נתונים", icon: "💾" },
-    { value: "other", label: "אחר", icon: "❓" }
-  ];
+  const bugTypes = t("public.report.bugTypes", { returnObjects: true }) || [];
+  const severityLevels = t("public.report.severityLevels", { returnObjects: true }) || [];
 
-  const severityLevels = [
-    { value: "low", label: "נמוכה", color: "#10B981", icon: "🟢" },
-    { value: "medium", label: "בינונית", color: "#F59E0B", icon: "🟡" },
-    { value: "high", label: "גבוהה", color: "#EF4444", icon: "🔴" },
-    { value: "critical", label: "קריטית", color: "#991B1B", icon: "🚨" }
-  ];
+  const bugTypeIcons = {
+    ui: Palette,
+    functionality: Wrench,
+    performance: Gauge,
+    security: Shield,
+    data: Database,
+    other: Bug,
+  };
+
+  const severityColor = {
+    low: "var(--color-primary)",
+    medium: "var(--color-accent)",
+    high: "var(--color-secondary)",
+    critical: "var(--text-color)",
+  };
 
   // Map bug types to support ticket categories
   const mapBugTypeToCategory = (type) => {
@@ -65,7 +69,7 @@ const Report = () => {
     e.preventDefault();
     
     if (!formData.type || !formData.severity || !formData.title || !formData.description) {
-      toast.error("אנא מלא את כל השדות הנדרשים");
+      toast.error(t("public.report.errors.required"));
       return;
     }
 
@@ -88,7 +92,7 @@ const Report = () => {
       const response = await axiosInstance.post("/support-tickets", ticketData);
       
       if (response.data.success) {
-        toast.success("הדיווח נשלח בהצלחה! נחזור אליך בהקדם.");
+        toast.success(t("public.report.messages.success"));
         
         // Reset form
         setFormData({
@@ -114,7 +118,7 @@ const Report = () => {
       console.error("Error creating support ticket:", error);
       
       if (error.response?.status === 401) {
-        toast.error("אנא התחבר כדי לשלוח דיווח");
+        toast.error(t("public.report.errors.auth"));
         // Optionally redirect to login
         setTimeout(() => {
           navigate("/login");
@@ -122,7 +126,7 @@ const Report = () => {
       } else {
         toast.error(
           error.response?.data?.message || 
-          "שגיאה בשליחת הדיווח. אנא נסה שוב מאוחר יותר."
+          t("public.report.errors.generic")
         );
       }
     } finally {
@@ -131,248 +135,177 @@ const Report = () => {
   };
 
   return (
-    <div
-      className="min-h-screen flex flex-col font-sans"
-      style={{ backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
-      dir={isRTL ? "rtl" : "ltr"}
-    >
-      {/* Hero */}
-      <section 
-        className="py-20 relative overflow-hidden"
-        style={{
-          background: `linear-gradient(135deg, var(--color-primary), var(--color-secondary))`
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-7xl mb-6"
-          >
-            🐛
-          </motion.div>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-6xl font-extrabold mb-6 text-white"
-          >
-            דווח על באג
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-xl text-white max-w-3xl mx-auto"
-            style={{ opacity: 0.9 }}
-          >
-            עזור לנו לשפר את Nexora - דווח על בעיה שמצאת
-          </motion.p>
-        </div>
-      </section>
+    <PublicPageLayout>
+      <PublicPageHero badge={t("public.report.badge")} title={t("public.report.title")} subtitle={t("public.report.subtitle")} />
 
-      {/* Form */}
-      <section className="py-20">
+      <section className="py-16">
         <div className="max-w-4xl mx-auto px-6">
           <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Bug Type */}
             <div>
-              <label 
-                className="block text-lg font-bold mb-4"
-                style={{ color: 'var(--text-color)' }}
-              >
-                סוג הבעיה
+              <label className="block text-lg font-bold mb-4" style={{ color: "var(--text-color)" }}>
+                {t("public.report.form.typeLabel")}
               </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {bugTypes.map((type) => (
-                  <motion.button
-                    key={type.value}
-                    type="button"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setFormData({ ...formData, type: type.value })}
-                    className={`p-4 rounded-xl transition-all duration-300 ${
-                      formData.type === type.value ? 'shadow-xl' : 'shadow-lg'
-                    }`}
-                    style={{
-                      backgroundColor: formData.type === type.value 
-                        ? 'var(--color-primary)' 
-                        : 'var(--bg-color)',
-                      color: formData.type === type.value 
-                        ? 'var(--button-text)' 
-                        : 'var(--text-color)',
-                      border: `2px solid ${formData.type === type.value ? 'var(--color-primary)' : 'var(--border-color)'}`
-                    }}
-                  >
-                    <div className="text-4xl mb-2">{type.icon}</div>
-                    <div className="font-semibold">{type.label}</div>
-                  </motion.button>
-                ))}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {bugTypes.map((type) => {
+                  const Icon = bugTypeIcons[type.value] || Bug;
+                  const selected = formData.type === type.value;
+                  return (
+                    <button
+                      key={type.value}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, type: type.value })}
+                      className="p-3 rounded-xl border text-sm"
+                      style={{
+                        borderColor: selected ? "var(--color-primary)" : "var(--border-color)",
+                        backgroundColor: selected ? "var(--color-primary)" : "var(--bg-color)",
+                        color: selected ? "var(--button-text)" : "var(--text-color)",
+                      }}
+                    >
+                      <Icon size={18} className="mx-auto mb-2" />
+                      {type.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Severity */}
             <div>
-              <label 
-                className="block text-lg font-bold mb-4"
-                style={{ color: 'var(--text-color)' }}
-              >
-                רמת חומרה
+              <label className="block text-lg font-bold mb-4" style={{ color: "var(--text-color)" }}>
+                {t("public.report.form.severityLabel")}
               </label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {severityLevels.map((level) => (
-                  <motion.button
-                    key={level.value}
-                    type="button"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setFormData({ ...formData, severity: level.value })}
-                    className={`p-4 rounded-xl transition-all duration-300 ${
-                      formData.severity === level.value ? 'shadow-xl' : 'shadow-lg'
-                    }`}
-                    style={{
-                      backgroundColor: formData.severity === level.value 
-                        ? level.color 
-                        : 'var(--bg-color)',
-                      color: formData.severity === level.value 
-                        ? 'white' 
-                        : 'var(--text-color)',
-                      border: `2px solid ${formData.severity === level.value ? level.color : 'var(--border-color)'}`
-                    }}
-                  >
-                    <div className="text-4xl mb-2">{level.icon}</div>
-                    <div className="font-semibold">{level.label}</div>
-                  </motion.button>
-                ))}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {severityLevels.map((level) => {
+                  const selected = formData.severity === level.value;
+                  return (
+                    <button
+                      key={level.value}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, severity: level.value })}
+                      className="p-3 rounded-xl border text-sm"
+                      style={{
+                        borderColor: selected ? severityColor[level.value] : "var(--border-color)",
+                        backgroundColor: selected ? severityColor[level.value] : "var(--bg-color)",
+                        color: selected ? "var(--button-text)" : "var(--text-color)",
+                      }}
+                    >
+                      <CircleDot size={16} className="mx-auto mb-2" />
+                      {level.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Title */}
             <div>
-              <label 
-                className="block text-lg font-bold mb-3"
-                style={{ color: 'var(--text-color)' }}
-              >
-                כותרת הבעיה
+              <label className="block text-lg font-bold mb-2" style={{ color: "var(--text-color)" }}>
+                {t("public.report.form.titleLabel")}
               </label>
               <input
                 type="text"
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(event) => setFormData({ ...formData, title: event.target.value })}
                 required
-                placeholder="תאר את הבעיה בקצרה..."
-                className="w-full p-4 rounded-xl shadow-lg transition-all duration-300 focus:shadow-xl"
+                placeholder={t("public.report.form.titlePlaceholder")}
+                className="w-full p-3 rounded-xl border"
                 style={{
-                  backgroundColor: 'var(--bg-color)',
-                  color: 'var(--text-color)',
-                  border: '2px solid var(--border-color)'
+                  borderColor: "var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
                 }}
               />
             </div>
 
-            {/* Description */}
             <div>
-              <label 
-                className="block text-lg font-bold mb-3"
-                style={{ color: 'var(--text-color)' }}
-              >
-                תיאור מפורט
+              <label className="block text-lg font-bold mb-2" style={{ color: "var(--text-color)" }}>
+                {t("public.report.form.descriptionLabel")}
               </label>
               <textarea
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(event) => setFormData({ ...formData, description: event.target.value })}
                 required
                 rows={6}
-                placeholder="תאר את הבעיה בפירוט..."
-                className="w-full p-4 rounded-xl shadow-lg transition-all duration-300 focus:shadow-xl"
+                placeholder={t("public.report.form.descriptionPlaceholder")}
+                className="w-full p-3 rounded-xl border"
                 style={{
-                  backgroundColor: 'var(--bg-color)',
-                  color: 'var(--text-color)',
-                  border: '2px solid var(--border-color)'
+                  borderColor: "var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
                 }}
               />
             </div>
 
-            {/* Steps to Reproduce */}
             <div>
-              <label 
-                className="block text-lg font-bold mb-3"
-                style={{ color: 'var(--text-color)' }}
-              >
-                שלבים לשחזור הבעיה
+              <label className="block text-lg font-bold mb-2" style={{ color: "var(--text-color)" }}>
+                {t("public.report.form.stepsLabel")}
               </label>
               <textarea
                 value={formData.steps}
-                onChange={(e) => setFormData({ ...formData, steps: e.target.value })}
+                onChange={(event) => setFormData({ ...formData, steps: event.target.value })}
                 rows={4}
-                placeholder="1. עשה כך...&#10;2. לחץ על...&#10;3. הבעיה מתרחשת..."
-                className="w-full p-4 rounded-xl shadow-lg transition-all duration-300 focus:shadow-xl"
+                placeholder={t("public.report.form.stepsPlaceholder")}
+                className="w-full p-3 rounded-xl border"
                 style={{
-                  backgroundColor: 'var(--bg-color)',
-                  color: 'var(--text-color)',
-                  border: '2px solid var(--border-color)'
+                  borderColor: "var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
                 }}
               />
             </div>
 
-            {/* Email */}
             <div>
-              <label 
-                className="block text-lg font-bold mb-3"
-                style={{ color: 'var(--text-color)' }}
-              >
-                המייל שלך (לעדכונים)
+              <label className="block text-lg font-bold mb-2" style={{ color: "var(--text-color)" }}>
+                {t("public.report.form.emailLabel")}
               </label>
               <input
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="email@example.com (אופציונלי)"
-                className="w-full p-4 rounded-xl shadow-lg transition-all duration-300 focus:shadow-xl"
+                onChange={(event) => setFormData({ ...formData, email: event.target.value })}
+                placeholder={t("public.report.form.emailPlaceholder")}
+                className="w-full p-3 rounded-xl border"
                 style={{
-                  backgroundColor: 'var(--bg-color)',
-                  color: 'var(--text-color)',
-                  border: '2px solid var(--border-color)'
+                  borderColor: "var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
                 }}
               />
             </div>
 
-            {/* Submit */}
             <div className="text-center">
-              <motion.button
+              <button
                 type="submit"
                 disabled={isSubmitting}
-                whileHover={!isSubmitting ? { scale: 1.05 } : {}}
-                whileTap={!isSubmitting ? { scale: 0.95 } : {}}
-                className="py-4 px-12 font-bold rounded-xl shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="py-3 px-8 rounded-xl font-semibold border disabled:opacity-60"
                 style={{
-                  background: `linear-gradient(to right, var(--color-primary), var(--color-secondary))`,
-                  color: 'var(--button-text)'
+                  borderColor: "var(--color-primary)",
+                  backgroundColor: "var(--color-primary)",
+                  color: "var(--button-text)",
                 }}
               >
-                {isSubmitting ? "שולח..." : "שלח דיווח 🚀"}
-              </motion.button>
+                {isSubmitting ? t("public.report.messages.sending") : t("public.report.form.submit")}
+              </button>
             </div>
           </form>
         </div>
       </section>
 
-      {/* Thank You Note */}
-      <section 
-        className="py-20"
-        style={{
-          background: `linear-gradient(135deg, var(--color-secondary), var(--color-accent))`
-        }}
-      >
+      <section className="pb-16 md:pb-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-6 text-white">
-            תודה על העזרה! 🙏
-          </h2>
-          <p className="text-lg text-white" style={{ opacity: 0.9 }}>
-            הדיווח שלך עוזר לנו לשפר את Nexora ולספק שירות טוב יותר לכולם
-          </p>
+          <div
+            className="rounded-2xl border p-8 md:p-10"
+            style={{
+              borderColor: "var(--border-color)",
+              backgroundColor: "var(--bg-color)",
+            }}
+          >
+            <AlertTriangle size={26} className="mx-auto mb-4" style={{ color: "var(--color-primary)" }} />
+            <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: "var(--text-color)" }}>
+              {t("public.report.messages.thanksTitle")}
+            </h2>
+            <p style={{ color: "var(--color-secondary)" }}>{t("public.report.messages.thanksSubtitle")}</p>
+          </div>
         </div>
       </section>
-    </div>
+    </PublicPageLayout>
   );
 };
 

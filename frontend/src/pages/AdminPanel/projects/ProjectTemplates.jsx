@@ -52,27 +52,28 @@ const ProjectTemplates = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <div className="flex items-center justify-center h-screen" style={{ backgroundColor: 'var(--bg-color)' }}>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: 'var(--color-primary)' }}></div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-6" style={{ backgroundColor: 'var(--bg-color)' }}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
             {t("projects.templates")}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="mt-1" style={{ color: 'var(--color-secondary)' }}>
             {t("projects.templates_description")}
           </p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg transition"
+          style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
         >
           <Plus className="w-5 h-5" />
           {t("projects.create_template")}
@@ -80,24 +81,36 @@ const ProjectTemplates = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+      <div className="rounded-lg shadow p-4 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
               <input
                 type="text"
                 placeholder={t("projects.search_templates")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2"
+                style={{ 
+                  borderColor: 'var(--border-color)', 
+                  backgroundColor: 'var(--bg-color)', 
+                  color: 'var(--text-color)',
+                  '--tw-ring-color': 'var(--color-primary)'
+                }}
               />
             </div>
           </div>
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            className="px-4 py-2 border rounded-lg focus:ring-2"
+            style={{ 
+              borderColor: 'var(--border-color)', 
+              backgroundColor: 'var(--bg-color)', 
+              color: 'var(--text-color)',
+              '--tw-ring-color': 'var(--color-primary)'
+            }}
           >
             <option value="All">{t("projects.all_categories")}</option>
             <option value="Development">Development</option>
@@ -117,14 +130,15 @@ const ProjectTemplates = () => {
             key={template._id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition"
+            className="rounded-lg shadow p-6 hover:shadow-lg transition border"
+            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-color)' }}>
                   {template.name}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <p className="text-sm mt-1" style={{ color: 'var(--color-secondary)' }}>
                   {template.category}
                 </p>
               </div>
@@ -135,18 +149,19 @@ const ProjectTemplates = () => {
                     className={`w-4 h-4 ${
                       i < Math.round(template.rating || 0)
                         ? "text-yellow-400 fill-yellow-400"
-                        : "text-gray-300"
+                        : ""
                     }`}
+                    style={i >= Math.round(template.rating || 0) ? { color: 'var(--border-color)' } : {}}
                   />
                 ))}
               </div>
             </div>
 
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+            <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--color-secondary)' }}>
               {template.description || "No description"}
             </p>
 
-            <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-4">
+            <div className="flex items-center justify-between text-sm mb-4" style={{ color: 'var(--color-secondary)' }}>
               <div className="flex items-center gap-2">
                 <FileText className="w-4 h-4" />
                 <span>{template.tasks?.length || 0} tasks</span>
@@ -158,7 +173,8 @@ const ProjectTemplates = () => {
 
             <div className="flex gap-2">
               <button
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm"
+                className="flex-1 px-4 py-2 rounded-lg transition text-sm"
+                style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
                 onClick={() => {
                   // TODO: Implement create project from template
                   toast.success(t("projects.creating_project"));
@@ -168,7 +184,12 @@ const ProjectTemplates = () => {
                 {t("projects.use_template")}
               </button>
               <button
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                className="px-4 py-2 border rounded-lg transition"
+                style={{ 
+                  borderColor: 'var(--border-color)', 
+                  color: 'var(--text-color)',
+                  backgroundColor: 'var(--bg-color)'
+                }}
                 onClick={() => {
                   // TODO: Implement edit template
                   toast.info(t("projects.edit_template"));
@@ -177,7 +198,12 @@ const ProjectTemplates = () => {
                 <Edit className="w-4 h-4" />
               </button>
               <button
-                className="px-4 py-2 border border-red-300 dark:border-red-600 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition text-red-600 dark:text-red-400"
+                className="px-4 py-2 border rounded-lg transition"
+                style={{ 
+                  borderColor: '#ef4444', 
+                  color: '#ef4444',
+                  backgroundColor: 'var(--bg-color)'
+                }}
                 onClick={() => {
                   if (window.confirm(t("projects.confirm_delete_template"))) {
                     deleteMutation.mutate(template._id);
@@ -193,8 +219,8 @@ const ProjectTemplates = () => {
 
       {filteredTemplates.length === 0 && (
         <div className="text-center py-12">
-          <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">
+          <FileText className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
+          <p style={{ color: 'var(--color-secondary)' }}>
             {t("projects.no_templates")}
           </p>
         </div>

@@ -85,7 +85,11 @@ export const getRevenueVsExpenses = async (req, res) => {
     const totalIncome = income.reduce((a, b) => a + b, 0);
     const totalExpenses = expenses.reduce((a, b) => a + b, 0);
     const netProfit = totalIncome - totalExpenses;
-    const profitMargin = totalIncome > 0 ? ((netProfit / totalIncome) * 100).toFixed(2) : 0;
+    let profitMargin = 0;
+    if (totalIncome > 0) {
+      const calculatedMargin = ((netProfit / totalIncome) * 100);
+      profitMargin = Math.max(-100, Math.min(100, calculatedMargin)).toFixed(2);
+    }
 
     res.json({
       success: true,
@@ -409,7 +413,11 @@ export const getAdvancedKPIs = async (req, res) => {
     const income = financeSummary.find((f) => f._id === "Income")?.total || 0;
     const expenses = financeSummary.find((f) => f._id === "Expense")?.total || 0;
     const netProfit = income - expenses;
-    const profitMargin = income > 0 ? ((netProfit / income) * 100).toFixed(2) : 0;
+    let profitMargin = 0;
+    if (income > 0) {
+      const calculatedMargin = ((netProfit / income) * 100);
+      profitMargin = Math.max(-100, Math.min(100, calculatedMargin)).toFixed(2);
+    }
 
     const revenue = salesSummary[0]?.totalRevenue || 0;
     const orders = salesSummary[0]?.totalOrders || 0;

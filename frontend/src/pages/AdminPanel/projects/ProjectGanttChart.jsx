@@ -156,17 +156,23 @@ const ProjectGanttChart = () => {
           </div>
 
           {/* Controls */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <div className="rounded-2xl shadow-lg p-6 mb-6 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
             <div className="flex flex-wrap items-center justify-between gap-4">
               {/* Project Filter */}
               <div className="flex-1 min-w-[200px]">
-                <label className="block text-sm font-semibold mb-2 text-gray-700">
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   {t("projects.select_project")}
                 </label>
                 <select
                   value={selectedProject || ""}
                   onChange={(e) => setSelectedProject(e.target.value || null)}
-                  className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-800"
+                  className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 transition-all duration-200"
+                  style={{ 
+                    borderColor: 'var(--border-color)', 
+                    backgroundColor: 'var(--bg-color)', 
+                    color: 'var(--text-color)',
+                    '--tw-ring-color': 'var(--color-primary)'
+                  }}
                 >
                   <option value="">{t("projects.all_projects")}</option>
                   {projects.map((project) => (
@@ -181,31 +187,31 @@ const ProjectGanttChart = () => {
               <div className="flex gap-2">
                 <button
                   onClick={() => setViewMode("day")}
-                  className={`px-4 py-2 rounded-xl font-medium transition-all ${
-                    viewMode === "day"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                  className="px-4 py-2 rounded-xl font-medium transition-all"
+                  style={viewMode === "day" 
+                    ? { backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }
+                    : { backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }
+                  }
                 >
                   {t("projects.day")}
                 </button>
                 <button
                   onClick={() => setViewMode("week")}
-                  className={`px-4 py-2 rounded-xl font-medium transition-all ${
-                    viewMode === "week"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                  className="px-4 py-2 rounded-xl font-medium transition-all"
+                  style={viewMode === "week" 
+                    ? { backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }
+                    : { backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }
+                  }
                 >
                   {t("projects.week")}
                 </button>
                 <button
                   onClick={() => setViewMode("month")}
-                  className={`px-4 py-2 rounded-xl font-medium transition-all ${
-                    viewMode === "month"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                  className="px-4 py-2 rounded-xl font-medium transition-all"
+                  style={viewMode === "month" 
+                    ? { backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }
+                    : { backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }
+                  }
                 >
                   {t("projects.month")}
                 </button>
@@ -215,21 +221,24 @@ const ProjectGanttChart = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => navigateDate(-1)}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+                  className="p-2 rounded-lg transition"
+                  style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
                 >
-                  <ChevronLeft className="size-5 text-gray-700" />
+                  <ChevronLeft className="size-5" />
                 </button>
                 <button
                   onClick={() => setCurrentDate(new Date())}
-                  className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+                  className="px-4 py-2 rounded-lg transition"
+                  style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
                 >
                   {t("projects.today")}
                 </button>
                 <button
                   onClick={() => navigateDate(1)}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+                  className="p-2 rounded-lg transition"
+                  style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
                 >
-                  <ChevronRight className="size-5 text-gray-700" />
+                  <ChevronRight className="size-5" />
                 </button>
               </div>
 
@@ -237,23 +246,25 @@ const ProjectGanttChart = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setZoom(Math.max(0.5, zoom - 0.1))}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+                  className="p-2 rounded-lg transition"
+                  style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
                 >
-                  <ZoomOut className="size-5 text-gray-700" />
+                  <ZoomOut className="size-5" />
                 </button>
-                <span className="text-sm font-medium text-gray-700">{Math.round(zoom * 100)}%</span>
+                <span className="text-sm font-medium" style={{ color: 'var(--text-color)' }}>{Math.round(zoom * 100)}%</span>
                 <button
                   onClick={() => setZoom(Math.min(2, zoom + 0.1))}
-                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition"
+                  className="p-2 rounded-lg transition"
+                  style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
                 >
-                  <ZoomIn className="size-5 text-gray-700" />
+                  <ZoomIn className="size-5" />
                 </button>
               </div>
             </div>
 
             {/* Date Display */}
             <div className="mt-4 text-center">
-              <p className="text-lg font-semibold text-gray-800">
+              <p className="text-lg font-semibold" style={{ color: 'var(--text-color)' }}>
                 {format(currentDate, "MMMM yyyy", { locale: isRTL ? he : undefined })}
               </p>
             </div>
@@ -261,14 +272,14 @@ const ProjectGanttChart = () => {
         </motion.div>
 
         {/* Gantt Chart */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="rounded-2xl shadow-lg overflow-hidden border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
           {filteredProjects.length === 0 ? (
             <div className="p-12 text-center">
-              <Calendar className="size-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-600 text-lg">
+              <Calendar className="size-12 mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
+              <p className="text-lg" style={{ color: 'var(--text-color)' }}>
                 {t("projects.no_projects")}
               </p>
-              <p className="text-gray-500 text-sm mt-2">
+              <p className="text-sm mt-2" style={{ color: 'var(--color-secondary)' }}>
                 {t("projects.create_project_first")}
               </p>
             </div>
@@ -276,18 +287,18 @@ const ProjectGanttChart = () => {
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-gradient-to-r from-gray-50 to-gray-100">
-                    <th className={`px-6 py-4 text-sm font-semibold text-gray-700 border-r border-gray-200 ${isRTL ? 'text-right' : 'text-left'}`} style={{ minWidth: "200px" }}>
+                  <tr style={{ backgroundColor: 'var(--footer-bg)' }}>
+                    <th className={`px-6 py-4 text-sm font-semibold border-r ${isRTL ? 'text-right' : 'text-left'}`} style={{ minWidth: "200px", color: 'var(--text-color)', borderColor: 'var(--border-color)' }}>
                       {t("projects.project_task")}
                     </th>
                     {getDaysInView().map((day, index) => (
                       <th
                         key={index}
-                        className="px-4 py-4 text-sm font-semibold text-gray-700 border-r border-gray-200 text-center"
-                        style={{ minWidth: `${100 * zoom}px` }}
+                        className="px-4 py-4 text-sm font-semibold border-r text-center"
+                        style={{ minWidth: `${100 * zoom}px`, color: 'var(--text-color)', borderColor: 'var(--border-color)' }}
                       >
                         <div>{format(day, "EEE", { locale: isRTL ? he : undefined })}</div>
-                        <div className="text-xs text-gray-500">{format(day, "d/M")}</div>
+                        <div className="text-xs" style={{ color: 'var(--color-secondary)' }}>{format(day, "d/M")}</div>
                       </th>
                     ))}
                   </tr>
@@ -295,31 +306,32 @@ const ProjectGanttChart = () => {
                 <tbody>
                   {filteredProjects.map((project) => (
                   <>
-                    <tr key={project._id} className="border-b border-gray-200 hover:bg-gray-50">
-                      <td className={`px-6 py-4 font-semibold text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <tr key={project._id} className="border-b hover:opacity-80" style={{ borderColor: 'var(--border-color)' }}>
+                      <td className={`px-6 py-4 font-semibold ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                         <div className="flex items-center gap-2">
-                          <Briefcase className="size-4 text-blue-600" />
+                          <Briefcase className="size-4" style={{ color: 'var(--color-primary)' }} />
                           {project.name}
                         </div>
                         {project.startDate && project.endDate && (
-                          <div className="text-xs text-gray-500 mt-1">
+                          <div className="text-xs mt-1" style={{ color: 'var(--color-secondary)' }}>
                             {format(new Date(project.startDate), "MMM d")} -{" "}
                             {format(new Date(project.endDate), "MMM d, yyyy")}
                           </div>
                         )}
                       </td>
                       {getDaysInView().map((day, index) => (
-                        <td key={index} className="px-4 py-4 border-r border-gray-200 relative">
+                        <td key={index} className="px-4 py-4 border-r relative" style={{ borderColor: 'var(--border-color)' }}>
                           <div className="relative h-full" style={{ minHeight: "60px" }}>
                             {project.startDate &&
                               project.endDate &&
                               new Date(day) >= new Date(project.startDate) &&
                               new Date(day) <= new Date(project.endDate) && (
                                 <div
-                                  className="absolute top-2 bottom-2 rounded-lg bg-blue-500 opacity-20"
+                                  className="absolute top-2 bottom-2 rounded-lg opacity-20"
                                   style={{
                                     left: "0",
                                     right: "0",
+                                    backgroundColor: 'var(--color-primary)'
                                   }}
                                 />
                               )}
@@ -332,20 +344,21 @@ const ProjectGanttChart = () => {
                       .map((task) => {
                         const position = getTaskPosition(task);
                         return (
-                          <tr key={task._id} className="border-b border-gray-200 hover:bg-gray-50">
-                            <td className={`px-6 py-4 pl-12 text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                          <tr key={task._id} className="border-b hover:opacity-80" style={{ borderColor: 'var(--border-color)' }}>
+                            <td className={`px-6 py-4 pl-12 ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                               {task.title || task.name}
                             </td>
                             {getDaysInView().map((day, index) => (
-                              <td key={index} className="px-4 py-4 border-r border-gray-200 relative">
+                              <td key={index} className="px-4 py-4 border-r relative" style={{ borderColor: 'var(--border-color)' }}>
                                 <div className="relative h-full" style={{ minHeight: "40px" }}>
                                   {index === 0 && position.left >= 0 && (
                                     <div
-                                      className="absolute top-1 bottom-1 rounded-lg bg-green-500 text-white text-xs flex items-center justify-center px-2"
+                                      className="absolute top-1 bottom-1 rounded-lg text-white text-xs flex items-center justify-center px-2"
                                       style={{
                                         left: `${position.left}%`,
                                         width: `${position.width}%`,
                                         minWidth: "60px",
+                                        backgroundColor: 'var(--color-accent)'
                                       }}
                                     >
                                       {task.title || task.name}

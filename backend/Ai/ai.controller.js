@@ -920,7 +920,11 @@ const handleFinanceQueries = async (intent, entities, companyId) => {
       const revenue = sums.find(s => s._id === 'income')?.total || 0;
       const expenses = sums.find(s => s._id === 'expense')?.total || 0;
       const profit = revenue - expenses;
-      const margin = revenue > 0 ? ((profit / revenue) * 100).toFixed(2) : '0.00';
+      let margin = '0.00';
+      if (revenue > 0) {
+        const calculatedMargin = ((profit / revenue) * 100);
+        margin = Math.max(-100, Math.min(100, calculatedMargin)).toFixed(2);
+      }
       return { revenue, expenses, profit, margin: `${margin}%` };
     }
     case 'budget': {

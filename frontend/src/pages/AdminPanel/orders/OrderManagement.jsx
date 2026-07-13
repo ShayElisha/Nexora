@@ -102,16 +102,35 @@ const OrderManagement = () => {
             `${po.productName}: ${po.quantity} יחידות (${po.orderNumber})`
           ).join("\n");
           toast.success(message, { duration: 5000 });
-          console.log("Production orders created:", details);
+          console.log("✅ Production orders created:", details);
+          console.log("✅ Production order IDs:", data.productionOrderDetails.map(po => po.id));
         } else {
           toast.success(message, { duration: 5000 });
         }
       } else {
-        toast.success(message);
+        // Show why no production orders were created
+        if (data.skippedReasons && data.skippedReasons.length > 0) {
+          const reasonsText = data.skippedReasons.join("\n");
+          toast.info(
+            `ההזמנה הוכנה למשלוח\nלא נוצרו הזמנות ייצור:\n${reasonsText}`,
+            { duration: 8000 }
+          );
+          console.log("ℹ️ No production orders created. Reasons:", data.skippedReasons);
+        } else {
+          toast.success(message);
+          console.log("ℹ️ No production orders created - all products have sufficient stock or no BOM");
+        }
       }
       
+      // Invalidate all production order queries to refresh the list
       queryClient.invalidateQueries(["order", actualOrderId]);
       queryClient.invalidateQueries(["production-orders"]);
+      queryClient.invalidateQueries(["production-order"]);
+      
+      // Force refetch after a short delay to ensure data is saved
+      setTimeout(() => {
+        queryClient.refetchQueries(["production-orders"]);
+      }, 500);
     },
     onError: (error) => {
       const errorMessage = error.response?.data?.message || "שגיאה בהכנת ההזמנה";

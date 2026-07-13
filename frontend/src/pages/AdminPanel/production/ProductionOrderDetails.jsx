@@ -16,6 +16,9 @@ import {
   Loader2,
   TrendingUp,
   AlertCircle,
+  RefreshCw,
+  ShoppingCart,
+  X,
 } from "lucide-react";
 
 const ProductionOrderDetails = () => {
@@ -23,6 +26,30 @@ const ProductionOrderDetails = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [showProcurementModal, setShowProcurementModal] = useState(false);
+  const [procurementData, setProcurementData] = useState({
+    supplierId: "",
+    warehouseId: "",
+    deliveryDate: "",
+    notes: "",
+  });
+
+  // Fetch suppliers and warehouses
+  const { data: suppliers = [] } = useQuery({
+    queryKey: ["suppliers"],
+    queryFn: async () => {
+      const response = await axiosInstance.get("/suppliers");
+      return response.data.data || [];
+    },
+  });
+
+  const { data: warehouses = [] } = useQuery({
+    queryKey: ["warehouses"],
+    queryFn: async () => {
+      const response = await axiosInstance.get("/warehouses");
+      return response.data?.data || [];
+    },
+  });
 
   // Fetch production order
   const { data: order, isLoading } = useQuery({
@@ -39,14 +66,75 @@ const ProductionOrderDetails = () => {
     mutationFn: async (status) => {
       return axiosInstance.put(`/production-orders/${id}/status`, { status });
     },
-    onSuccess: () => {
-      toast.success("סטטוס ההזמנה עודכן");
+    onSuccess: (response) => {
+      const data = response.data?.data;
+      if (data && data.componentsReserved !== undefined) {
+        // Detailed success message for In Progress
+        toast.success(
+          `ייצור התחיל בהצלחה! ${data.componentsReserved} רכיבים נשמרו מהמלאי${data.tasksCreated > 0 ? `, ${data.tasksCreated} משימות נוצרו` : ""}`,
+          { duration: 5000 }
+        );
+      } else {
+        toast.success("סטטוס ההזמנה עודכן");
+      }
       queryClient.invalidateQueries(["production-order", id]);
       queryClient.invalidateQueries(["production-orders"]);
+      queryClient.invalidateQueries(["tasks"]);
       setSelectedStatus("");
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || "שגיאה בעדכון סטטוס");
+      const errorMessage = error.response?.data?.message || "שגיאה בעדכון סטטוס";
+      toast.error(errorMessage, { duration: 6000 });
+      
+      // Show missing components if available
+      if (error.response?.data?.missingComponents) {
+        const missingList = error.response.data.missingComponents
+          .map((m) => `${m.componentName} (חסר: ${m.missing})`)
+          .join(", ");
+        toast.error(`רכיבים חסרים: ${missingList}`, { duration: 8000 });
+      }
+    },
+  });
+
+  // Recheck availability mutation
+  const recheckAvailabilityMutation = useMutation({
+    mutationFn: async () => {
+      return axiosInstance.post(`/production-orders/${id}/recheck-availability`);
+    },
+    onSuccess: (response) => {
+      toast.success("זמינות הרכיבים נבדקה מחדש");
+      queryClient.invalidateQueries(["production-order", id]);
+      queryClient.invalidateQueries(["production-orders"]);
+      if (response.data.data.statusChanged) {
+        toast.success("כל הרכיבים כעת זמינים!");
+      }
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "שגיאה בבדיקת זמינות");
+    },
+  });
+
+  // Create procurement mutation
+  const createProcurementMutation = useMutation({
+    mutationFn: async (data) => {
+      return axiosInstance.post(`/production-orders/${id}/create-procurement`, data);
+    },
+    onSuccess: (response) => {
+      toast.success(`הזמנת רכש ${response.data.data.procurement.PurchaseOrder} נוצרה בהצלחה`);
+      queryClient.invalidateQueries(["production-order", id]);
+      queryClient.invalidateQueries(["production-orders"]);
+      queryClient.invalidateQueries(["procurements"]);
+      setShowProcurementModal(false);
+      setProcurementData({
+        supplierId: "",
+        warehouseId: "",
+        deliveryDate: "",
+        notes: "",
+      });
+      navigate(`/dashboard/procurement/${response.data.data.procurement._id}`);
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || "שגיאה ביצירת הזמנת רכש");
     },
   });
 
@@ -284,9 +372,34 @@ const ProductionOrderDetails = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <div className="flex items-center gap-2 mb-4">
-                  <AlertTriangle size={24} className="text-red-600" />
-                  <h2 className="text-xl font-semibold text-red-800">רכיבים חסרים</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle size={24} className="text-red-600" />
+                    <h2 className="text-xl font-semibold text-red-800">רכיבים חסרים</h2>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => recheckAvailabilityMutation.mutate()}
+                      disabled={recheckAvailabilityMutation.isPending}
+                      className="px-4 py-2 rounded-lg font-medium transition-all hover:opacity-80 flex items-center gap-2 bg-blue-600 text-white"
+                    >
+                      {recheckAvailabilityMutation.isPending ? (
+                        <Loader2 className="animate-spin" size={18} />
+                      ) : (
+                        <>
+                          <RefreshCw size={18} />
+                          בדוק זמינות מחדש
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setShowProcurementModal(true)}
+                      className="px-4 py-2 rounded-lg font-medium transition-all hover:opacity-80 flex items-center gap-2 bg-green-600 text-white"
+                    >
+                      <ShoppingCart size={18} />
+                      צור הזמנת רכש
+                    </button>
+                  </div>
                 </div>
                 <div className="space-y-3">
                   {order.missingComponents.map((component, index) => (
@@ -420,6 +533,145 @@ const ProductionOrderDetails = () => {
           </div>
         </div>
       </div>
+
+      {/* Procurement Modal */}
+      {showProcurementModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
+            style={{ backgroundColor: "var(--bg-color)" }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold" style={{ color: "var(--text-color)" }}>
+                צור הזמנת רכש מהחוסרים
+              </h2>
+              <button
+                onClick={() => setShowProcurementModal(false)}
+                className="p-2 rounded-lg hover:bg-gray-100"
+              >
+                <X size={20} style={{ color: "var(--text-color)" }} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-color)" }}>
+                  ספק *
+                </label>
+                <select
+                  value={procurementData.supplierId}
+                  onChange={(e) => setProcurementData({ ...procurementData, supplierId: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  <option value="">בחר ספק</option>
+                  {suppliers.map((supplier) => (
+                    <option key={supplier._id} value={supplier._id}>
+                      {supplier.SupplierName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-color)" }}>
+                  מחסן *
+                </label>
+                <select
+                  value={procurementData.warehouseId}
+                  onChange={(e) => setProcurementData({ ...procurementData, warehouseId: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  <option value="">בחר מחסן</option>
+                  {warehouses.map((warehouse) => (
+                    <option key={warehouse._id} value={warehouse._id}>
+                      {warehouse.name || warehouse.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-color)" }}>
+                  תאריך אספקה
+                </label>
+                <input
+                  type="date"
+                  value={procurementData.deliveryDate}
+                  onChange={(e) => setProcurementData({ ...procurementData, deliveryDate: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-color)" }}>
+                  הערות
+                </label>
+                <textarea
+                  value={procurementData.notes}
+                  onChange={(e) => setProcurementData({ ...procurementData, notes: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2 rounded-lg border"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setShowProcurementModal(false)}
+                  className="flex-1 px-4 py-2 rounded-lg font-medium border"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  ביטול
+                </button>
+                <button
+                  onClick={() => {
+                    if (!procurementData.supplierId || !procurementData.warehouseId) {
+                      toast.error("יש למלא ספק ומחסן");
+                      return;
+                    }
+                    createProcurementMutation.mutate(procurementData);
+                  }}
+                  disabled={createProcurementMutation.isPending}
+                  className="flex-1 px-4 py-2 rounded-lg font-medium bg-green-600 text-white hover:opacity-80 flex items-center justify-center gap-2"
+                >
+                  {createProcurementMutation.isPending ? (
+                    <Loader2 className="animate-spin" size={18} />
+                  ) : (
+                    <>
+                      <ShoppingCart size={18} />
+                      צור הזמנת רכש
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };

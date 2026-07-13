@@ -10,6 +10,7 @@ import {
   getAllSignatures,
   receivedOrder,
 } from "../controllers/procurement.controller.js";
+import { sendProcurementCancellation } from "../controllers/notification.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
@@ -24,6 +25,7 @@ router.get("/by/:purchaseOrder", getProcurementRecordById);
 // Specific routes before /:id
 router.put("/:id/receive", receivedOrder);
 router.post("/:id/sign", signProcurement);
+router.post("/:id/cancel", sendProcurementCancellation);
 router.post("/:id/prepare", protectRoute, async (req, res) => {
   try {
     const Procurement = (await import("../models/procurement.model.js")).default;

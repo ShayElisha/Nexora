@@ -1,6 +1,7 @@
 import Course from "../models/Course.model.js";
 import CourseEnrollment from "../models/CourseEnrollment.model.js";
 import Employee from "../models/employees.model.js";
+import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 
 // Helper to get user from token
@@ -24,10 +25,31 @@ export const createCourse = async (req, res) => {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
+    const courseData = { ...req.body };
+    const companyId = user.companyId || req.body.companyId;
+    const createdBy = user.userId || user.id;
+
+    // Handle instructor field - if it's a string, treat it as external instructor name
+    if (courseData.instructor && typeof courseData.instructor === "string") {
+      // If instructor is a string (not a valid ObjectId), treat it as external instructor
+      if (!mongoose.Types.ObjectId.isValid(courseData.instructor)) {
+        courseData.externalInstructor = {
+          name: courseData.instructor,
+          email: courseData.instructorEmail || "",
+          organization: courseData.instructorOrganization || "",
+        };
+        delete courseData.instructor;
+      }
+    }
+
+    // Clean up any instructor-related fields that shouldn't be in the model
+    delete courseData.instructorEmail;
+    delete courseData.instructorOrganization;
+
     const course = new Course({
-      ...req.body,
-      companyId: user.companyId || req.body.companyId,
-      createdBy: user.userId || user.id,
+      ...courseData,
+      companyId,
+      createdBy,
     });
 
     await course.save();

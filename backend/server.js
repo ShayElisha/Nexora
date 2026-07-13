@@ -5,6 +5,10 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Import route files
 import companyRoutes from "./routes/companies.route.js";
@@ -69,18 +73,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-
-// Connect to the database and add performance indexes
-import { addPerformanceIndexes } from "./config/addIndexes.js";
-
-connectDB().then(async () => {
-  // הוספת indexes לשיפור ביצועים (רק בהפעלה ראשונה)
-  try {
-    await addPerformanceIndexes();
-  } catch (error) {
-    console.error("Error adding indexes (non-critical):", error.message);
-  }
-});
+const isServerless = Boolean(process.env.VERCEL);
 
 // IMPORTANT: Webhook route MUST be before express.json() middleware
 // Stripe webhooks require raw body for signature verification
@@ -164,7 +157,14 @@ app.post("/save-pdf", (req, res) => {
       .json({ message: "PDF data and file name are required." });
   }
 
-  const filePath = path.join(__dirname, "uploads", fileName);
+  // On serverless the filesystem is read-only except for /tmp.
+  const uploadsDir = isServerless
+    ? "/tmp"
+    : path.join(__dirname, "uploads");
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+  const filePath = path.join(uploadsDir, fileName);
 
   const buffer = Buffer.from(pdfData, "base64");
   fs.writeFileSync(filePath, buffer);
@@ -172,13 +172,29 @@ app.post("/save-pdf", (req, res) => {
   res.status(200).json({ url: `/uploads/${fileName}` });
 });
 
-// Load existing cron jobs
-import "./CronJob.js";
-
 // Error handling middleware (must be last)
 import { errorHandler } from "./middleware/errorHandler.js";
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server started at http://localhost:${PORT}`);
-});
+// Local / long-running server startup only. On Vercel the app is invoked as a
+// serverless function (see /api/index.js) and must NOT call app.listen(),
+// run node-cron schedulers, or block on index creation.
+if (!isServerless) {
+  const { addPerformanceIndexes } = await import("./config/addIndexes.js");
+  connectDB().then(async () => {
+    try {
+      await addPerformanceIndexes();
+    } catch (error) {
+      console.error("Error adding indexes (non-critical):", error.message);
+    }
+  });
+
+  // Load existing cron jobs (persistent process required)
+  await import("./CronJob.js");
+
+  app.listen(PORT, () => {
+    console.log(`Server started at http://localhost:${PORT}`);
+  });
+}
+
+export default app;

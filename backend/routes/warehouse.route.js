@@ -9,8 +9,12 @@ import {
   updateWarehouse,
   updateWarehouseLocation,
 } from "../controllers/warehouse.controller.js";
+import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
+
+// כל ה-routes מוגנים ב-middleware
+router.use(protectRoute);
 
 router.get("/", getWarehouses);
 router.post("/", createWarehouse);

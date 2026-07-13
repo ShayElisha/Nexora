@@ -274,17 +274,23 @@ const ProjectResourcesAllocation = () => {
           </div>
 
           {/* Controls */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <div className="rounded-2xl shadow-lg p-6 mb-6 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
             <div className="flex flex-wrap items-center justify-between gap-4">
               {/* Project Filter */}
               <div className="flex-1 min-w-[200px]">
-                <label className="block text-sm font-semibold mb-2 text-gray-700">
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   {t("projects.select_project")}
                 </label>
                 <select
                   value={selectedProject || ""}
                   onChange={(e) => setSelectedProject(e.target.value || null)}
-                  className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-800"
+                  className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 transition-all duration-200"
+                  style={{ 
+                    borderColor: 'var(--border-color)', 
+                    backgroundColor: 'var(--bg-color)', 
+                    color: 'var(--text-color)',
+                    '--tw-ring-color': 'var(--color-primary)'
+                  }}
                 >
                   <option value="">{t("projects.all_projects")}</option>
                   {projects.map((project) => (
@@ -297,13 +303,19 @@ const ProjectResourcesAllocation = () => {
 
               {/* Department Filter */}
               <div className="flex-1 min-w-[200px]">
-                <label className="block text-sm font-semibold mb-2 text-gray-700">
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   {t("projects.department")}
                 </label>
                 <select
                   value={selectedDepartment}
                   onChange={(e) => setSelectedDepartment(e.target.value)}
-                  className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-800"
+                  className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 transition-all duration-200"
+                  style={{ 
+                    borderColor: 'var(--border-color)', 
+                    backgroundColor: 'var(--bg-color)', 
+                    color: 'var(--text-color)',
+                    '--tw-ring-color': 'var(--color-primary)'
+                  }}
                 >
                   <option value="all">{t("projects.all_departments")}</option>
                   {departments.map((dept) => (
@@ -319,30 +331,36 @@ const ProjectResourcesAllocation = () => {
                 <button
                   onClick={() => setViewMode("grid")}
                   className={`px-4 py-2 rounded-xl font-medium transition-all ${
-                    viewMode === "grid"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    viewMode === "grid" ? "" : ""
                   }`}
+                  style={viewMode === "grid" 
+                    ? { backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }
+                    : { backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }
+                  }
                 >
                   {t("projects.grid")}
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
                   className={`px-4 py-2 rounded-xl font-medium transition-all ${
-                    viewMode === "list"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    viewMode === "list" ? "" : ""
                   }`}
+                  style={viewMode === "list" 
+                    ? { backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }
+                    : { backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }
+                  }
                 >
                   {t("projects.list")}
                 </button>
                 <button
                   onClick={() => setViewMode("chart")}
                   className={`px-4 py-2 rounded-xl font-medium transition-all ${
-                    viewMode === "chart"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    viewMode === "chart" ? "" : ""
                   }`}
+                  style={viewMode === "chart" 
+                    ? { backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }
+                    : { backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }
+                  }
                 >
                   {t("projects.chart")}
                 </button>
@@ -357,17 +375,22 @@ const ProjectResourcesAllocation = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border-blue-500"
+            className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border"
+            style={{ 
+              backgroundColor: 'var(--bg-color)', 
+              borderColor: 'var(--color-primary)',
+              borderRightColor: 'var(--color-primary)'
+            }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium mb-1">
+                <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
                   {t("projects.total_projects")}
                 </p>
-                <p className="text-3xl font-bold text-gray-800">{filteredProjects.length}</p>
+                <p className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>{filteredProjects.length}</p>
               </div>
-              <div className="bg-blue-100 p-3 rounded-full">
-                <Briefcase className="text-blue-600" size={24} />
+              <div className="p-3 rounded-full" style={{ backgroundColor: 'rgba(var(--color-primary-rgb), 0.1)' || 'var(--border-color)' }}>
+                <Briefcase size={24} style={{ color: 'var(--color-primary)' }} />
               </div>
             </div>
           </motion.div>
@@ -376,19 +399,24 @@ const ProjectResourcesAllocation = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border-green-500"
+            className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border"
+            style={{ 
+              backgroundColor: 'var(--bg-color)', 
+              borderColor: 'var(--color-accent)',
+              borderRightColor: 'var(--color-accent)'
+            }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium mb-1">
+                <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
                   {t("projects.total_resources")}
                 </p>
-                <p className="text-3xl font-bold text-gray-800">
+                <p className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
                   {resourceAllocation.reduce((sum, a) => sum + a.totalMembers, 0)}
                 </p>
               </div>
-              <div className="bg-green-100 p-3 rounded-full">
-                <Users className="text-green-600" size={24} />
+              <div className="p-3 rounded-full" style={{ backgroundColor: 'rgba(var(--color-accent-rgb), 0.1)' || 'var(--border-color)' }}>
+                <Users size={24} style={{ color: 'var(--color-accent)' }} />
               </div>
             </div>
           </motion.div>
@@ -397,19 +425,24 @@ const ProjectResourcesAllocation = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border-orange-500"
+            className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4"
+            style={{ 
+              backgroundColor: 'var(--bg-color)', 
+              borderRightColor: '#f59e0b',
+              borderColor: '#f59e0b'
+            }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium mb-1">
+                <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
                   {t("projects.total_hours")}
                 </p>
-                <p className="text-3xl font-bold text-gray-800">
+                <p className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
                   {resourceAllocation.reduce((sum, a) => sum + a.totalHours, 0)}
                 </p>
               </div>
-              <div className="bg-orange-100 p-3 rounded-full">
-                <Clock className="text-orange-600" size={24} />
+              <div className="p-3 rounded-full" style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)' }}>
+                <Clock size={24} style={{ color: '#f59e0b' }} />
               </div>
             </div>
           </motion.div>
@@ -418,14 +451,19 @@ const ProjectResourcesAllocation = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border-purple-500"
+            className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4"
+            style={{ 
+              backgroundColor: 'var(--bg-color)', 
+              borderRightColor: '#a855f7',
+              borderColor: '#a855f7'
+            }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium mb-1">
+                <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
                   {t("projects.completion_rate")}
                 </p>
-                <p className="text-3xl font-bold text-gray-800">
+                <p className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
                   {resourceAllocation.reduce((sum, a) => sum + a.totalHours, 0) > 0
                     ? Math.round(
                         (resourceAllocation.reduce((sum, a) => sum + a.completedHours, 0) /
@@ -436,8 +474,8 @@ const ProjectResourcesAllocation = () => {
                   %
                 </p>
               </div>
-              <div className="bg-purple-100 p-3 rounded-full">
-                <TrendingUp className="text-purple-600" size={24} />
+              <div className="p-3 rounded-full" style={{ backgroundColor: 'rgba(168, 85, 247, 0.1)' }}>
+                <TrendingUp size={24} style={{ color: '#a855f7' }} />
               </div>
             </div>
           </motion.div>
@@ -445,12 +483,12 @@ const ProjectResourcesAllocation = () => {
 
         {/* Resource Allocation */}
         {resourceAllocation.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-            <Users className="size-12 mx-auto mb-4 text-gray-400" />
-            <p className="text-gray-600 text-lg">
+          <div className="rounded-2xl shadow-lg p-12 text-center border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+            <Users className="size-12 mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
+            <p className="text-lg" style={{ color: 'var(--text-color)' }}>
               {t("projects.no_projects")}
             </p>
-            <p className="text-gray-500 text-sm mt-2">
+            <p className="text-sm mt-2" style={{ color: 'var(--color-secondary)' }}>
               {t("projects.create_project_first")}
             </p>
           </div>
@@ -463,15 +501,16 @@ const ProjectResourcesAllocation = () => {
                 key={allocation.project._id}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all"
+                className="rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all border"
+                style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
               >
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="bg-blue-100 p-2 rounded-lg">
-                    <Briefcase className="text-blue-600" size={20} />
+                  <div className="p-2 rounded-lg" style={{ backgroundColor: 'rgba(var(--color-primary-rgb), 0.1)' || 'var(--border-color)' }}>
+                    <Briefcase size={20} style={{ color: 'var(--color-primary)' }} />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-800">{allocation.project.name}</h3>
-                    <p className="text-sm text-gray-500">
+                    <h3 className="font-semibold" style={{ color: 'var(--text-color)' }}>{allocation.project.name}</h3>
+                    <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
                       {allocation.totalMembers} {t("projects.members")}
                       {" • "}
                       {allocation.completedTasks || 0}/{allocation.totalTasks || 0}{" "}
@@ -481,12 +520,12 @@ const ProjectResourcesAllocation = () => {
                 </div>
 
                 {/* Project-level task statistics */}
-                <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="mb-4 p-3 rounded-lg border" style={{ backgroundColor: 'var(--footer-bg)', borderColor: 'var(--border-color)' }}>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium" style={{ color: 'var(--text-color)' }}>
                       {t("projects.project_tasks")}:
                     </span>
-                    <span className="text-sm font-semibold text-blue-700">
+                    <span className="text-sm font-semibold" style={{ color: 'var(--color-primary)' }}>
                       {allocation.completedTasks || 0}/{allocation.totalTasks || 0}
                     </span>
                   </div>
@@ -501,32 +540,32 @@ const ProjectResourcesAllocation = () => {
                         : 0;
 
                     return (
-                      <div key={member.employee._id} className="border border-gray-200 rounded-lg p-3">
+                      <div key={member.employee._id} className="border rounded-lg p-3" style={{ borderColor: 'var(--border-color)' }}>
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            <div className="bg-gray-100 p-1.5 rounded-full">
-                              <User className="size-4 text-gray-600" />
+                            <div className="p-1.5 rounded-full" style={{ backgroundColor: 'var(--border-color)' }}>
+                              <User className="size-4" style={{ color: 'var(--text-color)' }} />
                             </div>
-                            <span className="text-sm font-medium text-gray-800">
+                            <span className="text-sm font-medium" style={{ color: 'var(--text-color)' }}>
                               {member.employee.name} {member.employee.lastName}
                             </span>
                           </div>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs" style={{ color: 'var(--color-secondary)' }}>
                             {member.workload.completedTasks}/{member.workload.taskCount}{" "}
                             {t("projects.tasks")}
                           </span>
                         </div>
                         <div className="mb-2">
-                          <div className="flex justify-between text-xs text-gray-600 mb-1">
+                          <div className="flex justify-between text-xs mb-1" style={{ color: 'var(--color-secondary)' }}>
                             <span>
                               {member.workload.completedHours}h / {member.workload.totalHours}h
                             </span>
                             <span>{Math.round(progress)}%</span>
                           </div>
-                          <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--border-color)' }}>
                             <div
-                              className="h-full bg-blue-500 transition-all"
-                              style={{ width: `${progress}%` }}
+                              className="h-full transition-all"
+                              style={{ width: `${progress}%`, backgroundColor: 'var(--color-primary)' }}
                             />
                           </div>
                         </div>
@@ -540,29 +579,29 @@ const ProjectResourcesAllocation = () => {
             )}
 
             {viewMode === "list" && (
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="rounded-2xl shadow-lg overflow-hidden border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                <thead style={{ backgroundColor: 'var(--footer-bg)' }}>
                   <tr>
-                    <th className={`px-6 py-4 text-sm font-semibold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <th className={`px-6 py-4 text-sm font-semibold ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                       {t("projects.project")}
                     </th>
-                    <th className={`px-6 py-4 text-sm font-semibold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <th className={`px-6 py-4 text-sm font-semibold ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                       {t("projects.resource")}
                     </th>
-                    <th className={`px-6 py-4 text-sm font-semibold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <th className={`px-6 py-4 text-sm font-semibold ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                       {t("projects.tasks")}
                     </th>
-                    <th className={`px-6 py-4 text-sm font-semibold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <th className={`px-6 py-4 text-sm font-semibold ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                       {t("projects.hours")}
                     </th>
-                    <th className={`px-6 py-4 text-sm font-semibold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <th className={`px-6 py-4 text-sm font-semibold ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                       {t("projects.progress")}
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
                   {resourceAllocation.map((allocation) =>
                     allocation.teamMembers.map((member) => {
                       if (!member.employee) return null;
@@ -572,36 +611,36 @@ const ProjectResourcesAllocation = () => {
                           : 0;
 
                       return (
-                        <tr key={`${allocation.project._id}-${member.employee._id}`} className="hover:bg-gray-50">
+                        <tr key={`${allocation.project._id}-${member.employee._id}`} style={{ borderColor: 'var(--border-color)' }} className="hover:opacity-80">
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
-                              <Briefcase className="size-4 text-blue-600" />
-                              <span className="font-medium text-gray-800">{allocation.project.name}</span>
+                              <Briefcase className="size-4" style={{ color: 'var(--color-primary)' }} />
+                              <span className="font-medium" style={{ color: 'var(--text-color)' }}>{allocation.project.name}</span>
                             </div>
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
-                              <User className="size-4 text-gray-600" />
-                              <span className="text-gray-800">
+                              <User className="size-4" style={{ color: 'var(--color-secondary)' }} />
+                              <span style={{ color: 'var(--text-color)' }}>
                                 {member.employee.name} {member.employee.lastName}
                               </span>
                             </div>
                           </td>
-                          <td className="px-6 py-4 text-gray-600">
+                          <td className="px-6 py-4" style={{ color: 'var(--text-color)' }}>
                             {member.workload.completedTasks}/{member.workload.taskCount}
                           </td>
-                          <td className="px-6 py-4 text-gray-600">
+                          <td className="px-6 py-4" style={{ color: 'var(--text-color)' }}>
                             {member.workload.completedHours}h / {member.workload.totalHours}h
                           </td>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
-                              <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--border-color)' }}>
                                 <div
-                                  className="h-full bg-blue-500 transition-all"
-                                  style={{ width: `${progress}%` }}
+                                  className="h-full transition-all"
+                                  style={{ width: `${progress}%`, backgroundColor: 'var(--color-primary)' }}
                                 />
                               </div>
-                              <span className="text-sm text-gray-600 w-12">{Math.round(progress)}%</span>
+                              <span className="text-sm w-12" style={{ color: 'var(--text-color)' }}>{Math.round(progress)}%</span>
                             </div>
                           </td>
                         </tr>
@@ -615,22 +654,22 @@ const ProjectResourcesAllocation = () => {
             )}
 
             {viewMode === "chart" && (
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-6">
+          <div className="rounded-2xl shadow-lg p-6 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+            <h2 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-color)' }}>
               {t("projects.department_allocation")}
             </h2>
             <div className="space-y-4">
               {departmentStats.map((stat) => (
-                <div key={stat.department?._id} className="border border-gray-200 rounded-lg p-4">
+                <div key={stat.department?._id} className="border rounded-lg p-4" style={{ borderColor: 'var(--border-color)' }}>
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-semibold text-gray-800">{stat.department?.name || "Unknown"}</h3>
-                    <span className="text-sm text-gray-600">
+                    <h3 className="font-semibold" style={{ color: 'var(--text-color)' }}>{stat.department?.name || "Unknown"}</h3>
+                    <span className="text-sm" style={{ color: 'var(--color-secondary)' }}>
                       {stat.projects} {t("projects.projects")}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Users className="size-4 text-gray-600" />
-                    <span className="text-sm text-gray-600">
+                    <Users className="size-4" style={{ color: 'var(--color-secondary)' }} />
+                    <span className="text-sm" style={{ color: 'var(--color-secondary)' }}>
                       {stat.members} {t("projects.members")}
                     </span>
                   </div>

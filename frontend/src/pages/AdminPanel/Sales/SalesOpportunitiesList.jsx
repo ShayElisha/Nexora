@@ -16,6 +16,7 @@ import {
   User,
   Filter,
   Target,
+  AlertCircle,
 } from "lucide-react";
 
 const SalesOpportunitiesList = () => {
@@ -68,49 +69,99 @@ const SalesOpportunitiesList = () => {
 
   const getStageColor = (stage) => {
     const colors = {
-      Prospecting: "bg-gray-100 text-gray-800",
-      Qualification: "bg-blue-100 text-blue-800",
-      "Needs Analysis": "bg-yellow-100 text-yellow-800",
-      Proposal: "bg-orange-100 text-orange-800",
-      Negotiation: "bg-purple-100 text-purple-800",
-      "Closed Won": "bg-green-100 text-green-800",
-      "Closed Lost": "bg-red-100 text-red-800",
+      Prospecting: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+      Qualification: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+      "Needs Analysis": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+      Proposal: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
+      Negotiation: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+      "Closed Won": "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+      "Closed Lost": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
     };
-    return colors[stage] || "bg-gray-100 text-gray-800";
+    return colors[stage] || colors.Prospecting;
   };
 
   return (
     <div className="p-6" style={{ backgroundColor: "var(--bg-color)", minHeight: "100vh" }}>
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>
+        {/* Header */}
+        <motion.div
+          className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div>
+            <h1
+              className="text-3xl font-bold mb-2"
+              style={{
+                color: "var(--text-color)",
+                background: "linear-gradient(135deg, var(--color-primary), var(--color-secondary))",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
             {t("sales.opportunities") || "Sales Opportunities"}
           </h1>
-          <button
+            <p className="text-sm" style={{ color: "var(--color-secondary)" }}>
+              {t("sales.manage_opportunities") || "Manage and track your sales opportunities"}
+            </p>
+          </div>
+          <motion.button
             onClick={() => navigate("/dashboard/sales/opportunities/add")}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            className="flex items-center gap-2 px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            style={{
+              backgroundColor: "var(--button-bg)",
+              color: "var(--button-text)",
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             <Plus size={20} />
             {t("sales.add_opportunity") || "Add Opportunity"}
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
-          <div className="flex gap-4 mb-4">
+        {/* Filters Card */}
+        <motion.div
+          className="rounded-2xl shadow-lg border p-6 mb-6"
+          style={{
+            backgroundColor: "var(--bg-color)",
+            borderColor: "var(--border-color)",
+          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Search
+                className="absolute left-4 top-1/2 transform -translate-y-1/2"
+                style={{ color: "var(--color-secondary)" }}
+                size={20}
+              />
               <input
                 type="text"
                 placeholder={t("sales.search_opportunities") || "Search opportunities..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border rounded-lg"
+                className="w-full pl-12 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                style={{
+                  borderColor: "var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
+                  focusRingColor: "var(--color-primary)",
+                }}
               />
             </div>
             <select
               value={filterStage}
               onChange={(e) => setFilterStage(e.target.value)}
-              className="px-4 py-2 border rounded-lg"
+              className="px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+              style={{
+                borderColor: "var(--border-color)",
+                backgroundColor: "var(--bg-color)",
+                color: "var(--text-color)",
+              }}
             >
               <option value="all">{t("sales.all_stages") || "All Stages"}</option>
               {stages.map((stage) => (
@@ -122,7 +173,12 @@ const SalesOpportunitiesList = () => {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-2 border rounded-lg"
+              className="px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+              style={{
+                borderColor: "var(--border-color)",
+                backgroundColor: "var(--bg-color)",
+                color: "var(--text-color)",
+              }}
             >
               <option value="all">{t("sales.all_statuses") || "All Statuses"}</option>
               <option value="Open">Open</option>
@@ -130,74 +186,66 @@ const SalesOpportunitiesList = () => {
               <option value="Lost">Lost</option>
             </select>
           </div>
+        </motion.div>
 
+        {/* Opportunities Grid */}
           {isLoading ? (
-            <div className="text-center py-8">Loading...</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-3">{t("sales.opportunity_name") || "Opportunity"}</th>
-                    <th className="text-left p-3">{t("sales.customer") || "Customer"}</th>
-                    <th className="text-left p-3">{t("sales.stage") || "Stage"}</th>
-                    <th className="text-left p-3">{t("sales.amount") || "Amount"}</th>
-                    <th className="text-left p-3">{t("sales.probability") || "Probability"}</th>
-                    <th className="text-left p-3">{t("sales.close_date") || "Close Date"}</th>
-                    <th className="text-left p-3">{t("sales.actions") || "Actions"}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredOpportunities.map((opp) => (
-                    <motion.tr
-                      key={opp._id}
-                      className="border-b hover:bg-gray-50 dark:hover:bg-gray-700"
+          <div className="text-center py-16">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderColor: "var(--color-primary)" }}></div>
+            <p className="mt-4" style={{ color: "var(--text-color)" }}>
+              {t("common.loading") || "Loading..."}
+            </p>
+          </div>
+        ) : filteredOpportunities.length === 0 ? (
+          <motion.div
+            className="text-center py-16"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
+          >
+            <AlertCircle size={64} className="mx-auto mb-4" style={{ color: "var(--color-secondary)" }} />
+            <p className="text-xl mb-2" style={{ color: "var(--text-color)" }}>
+              {t("sales.no_opportunities") || "No opportunities found"}
+            </p>
+            <p className="text-sm" style={{ color: "var(--color-secondary)" }}>
+              {t("sales.create_first_opportunity") || "Create your first opportunity to get started"}
+            </p>
+          </motion.div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredOpportunities.map((opp, index) => (
+              <motion.div
+                key={opp._id}
+                className="rounded-2xl shadow-lg border overflow-hidden hover:shadow-xl transition-all duration-300"
+                style={{
+                  backgroundColor: "var(--bg-color)",
+                  borderColor: "var(--border-color)",
+                }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                whileHover={{ scale: 1.02, y: -5 }}
+              >
+                {/* Card Header */}
+                <div
+                  className="p-5 border-b"
+                  style={{
+                    background: `linear-gradient(135deg, var(--color-primary), var(--color-secondary))`,
+                    borderColor: "var(--border-color)",
+                  }}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <h3
+                      className="text-lg font-bold text-white line-clamp-2 flex-1"
                     >
-                      <td className="p-3">
-                        <div className="font-semibold">{opp.opportunityName}</div>
-                        {opp.assignedTo && (
-                          <div className="text-sm text-gray-500">
-                            <User size={14} className="inline mr-1" />
-                            {opp.assignedTo?.name} {opp.assignedTo?.lastName}
-                          </div>
-                        )}
-                      </td>
-                      <td className="p-3">{opp.customerId?.name || opp.leadId?.name || "-"}</td>
-                      <td className="p-3">
-                        <span className={`px-2 py-1 rounded text-sm ${getStageColor(opp.stage)}`}>
-                          {opp.stage}
-                        </span>
-                      </td>
-                      <td className="p-3">
-                        <span className="font-semibold">
-                          {opp.amount?.toLocaleString()} {opp.currency}
-                        </span>
-                      </td>
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-16 bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-blue-600 h-2 rounded-full"
-                              style={{ width: `${opp.probability || 0}%` }}
-                            />
-                          </div>
-                          <span className="text-sm">{opp.probability || 0}%</span>
-                        </div>
-                      </td>
-                      <td className="p-3">
-                        {opp.expectedCloseDate
-                          ? new Date(opp.expectedCloseDate).toLocaleDateString()
-                          : "-"}
-                      </td>
-                      <td className="p-3">
-                        <div className="flex gap-2">
+                      {opp.opportunityName}
+                    </h3>
+                    <div className="flex gap-2 ml-2">
                           <button
                             onClick={() => navigate(`/dashboard/sales/opportunities/${opp._id}`)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                        className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all"
+                        title={t("common.edit") || "Edit"}
                           >
-                            <Edit size={18} />
+                        <Edit size={16} className="text-white" />
                           </button>
                           <button
                             onClick={() => {
@@ -205,23 +253,82 @@ const SalesOpportunitiesList = () => {
                                 deleteMutation.mutate(opp._id);
                               }
                             }}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded"
+                        className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all"
+                        title={t("common.delete") || "Delete"}
                           >
-                            <Trash2 size={18} />
+                        <Trash2 size={16} className="text-white" />
                           </button>
                         </div>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
+                  </div>
+                  <span
+                    className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${getStageColor(opp.stage)}`}
+                  >
+                    {opp.stage}
+                  </span>
+                </div>
+
+                {/* Card Body */}
+                <div className="p-5 space-y-4">
+                  <div className="flex items-center gap-2 text-sm" style={{ color: "var(--text-color)" }}>
+                    <User size={16} style={{ color: "var(--color-secondary)" }} />
+                    <span className="truncate">
+                      {opp.customerId?.name || opp.leadId?.name || t("sales.no_customer") || "No Customer"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-sm" style={{ color: "var(--text-color)" }}>
+                    <DollarSign size={16} style={{ color: "var(--color-accent)" }} />
+                    <span className="font-bold">
+                      {opp.amount?.toLocaleString() || 0} {opp.currency || "ILS"}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span style={{ color: "var(--color-secondary)" }}>
+                        {t("sales.probability") || "Probability"}:
+                      </span>
+                      <span className="font-bold" style={{ color: "var(--text-color)" }}>
+                        {opp.probability || 0}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                      <motion.div
+                        className="h-2 rounded-full"
+                        style={{ backgroundColor: "var(--color-primary)" }}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${opp.probability || 0}%` }}
+                        transition={{ duration: 0.5 }}
+                      />
+                    </div>
+                  </div>
+
+                  {opp.expectedCloseDate && (
+                    <div className="flex items-center gap-2 text-sm" style={{ color: "var(--text-color)" }}>
+                      <Calendar size={16} style={{ color: "var(--color-secondary)" }} />
+                      <span>
+                        {t("sales.close_date") || "Close Date"}:{" "}
+                        {new Date(opp.expectedCloseDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
+
+                  {opp.assignedTo && (
+                    <div className="flex items-center gap-2 text-sm" style={{ color: "var(--text-color)" }}>
+                      <Target size={16} style={{ color: "var(--color-secondary)" }} />
+                      <span className="truncate">
+                        {opp.assignedTo?.name} {opp.assignedTo?.lastName}
+                      </span>
             </div>
           )}
         </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default SalesOpportunitiesList;
-

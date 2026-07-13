@@ -1,0 +1,218 @@
+{
+  "en": {
+    "translation": {
+      "landing": {
+        "nav": {
+          "products": "Products",
+          "solutions": "Solutions",
+          "enterprise": "Enterprise",
+          "pricing": "Pricing",
+          "resources": "Resources",
+          "sign_in": "Sign In",
+          "request_demo": "Request Demo",
+          "erp_core": "ERP Core",
+          "crm_suite": "CRM Suite",
+          "hr_payroll": "HR & Payroll",
+          "inventory": "Inventory Control"
+        },
+        "hero": {
+          "badge": "Nexora ERP Platform",
+          "title": "The Operating System for Modern Enterprise.",
+          "subtitle": "Streamline fragmented workflows, automate financial compliance, and scale operations with Nexora's predictive ERP engine.",
+          "cta_trial": "Start Free Trial",
+          "cta_expert": "Talk to an Expert"
+        },
+        "values": {
+          "title": "Engineered for absolute efficiency.",
+          "support_title": "24/7 Support",
+          "support_desc": "Dedicated enterprise specialists available around the clock for mission-critical operations.",
+          "analytics_title": "Predictive Analytics",
+          "analytics_desc": "AI-driven forecasting surfaces risks and opportunities before they impact your bottom line.",
+          "security_title": "Military-Grade Security",
+          "security_desc": "SOC 2 compliant infrastructure with end-to-end encryption and granular access controls.",
+          "deploy_title": "Instant Deployment",
+          "deploy_desc": "Go live in days, not months. Pre-built modules and guided onboarding accelerate time-to-value."
+        },
+        "modules": {
+          "title": "Enterprise product modules",
+          "subtitle": "Purpose-built systems that integrate seamlessly into your operational backbone.",
+          "crm_title": "Advanced CRM",
+          "crm_desc": "Unified customer intelligence with predictive scoring, pipeline automation, and real-time collaboration.",
+          "hr_title": "Intelligent HR",
+          "hr_desc": "Workforce analytics, automated payroll, and compliance tracking in a single command center.",
+          "inventory_title": "Automated Inventory Control",
+          "inventory_desc": "Real-time stock visibility, smart reorder triggers, and multi-warehouse orchestration."
+        },
+        "testimonials": {
+          "title": "Trusted by industry leaders",
+          "quote1": "Nexora transformed our financial close from a two-week ordeal into a two-day sprint.",
+          "quote2": "We consolidated six legacy systems into Nexora. Inventory accuracy went from 78% to 99.4%.",
+          "quote3": "The modularity is extraordinary. Our team configured three custom workflows without backend code."
+        },
+        "theme_section": {
+          "title": "A workspace built around you.",
+          "subtitle": "Nexora adapts to your team's workflow. Choose a color scheme — changes apply across the entire site.",
+          "panel_label": "Color Scheme",
+          "preview_hint": "Live preview — select a theme to update the whole interface"
+        },
+        "integrations": {
+          "title": "Integrates with the tools you already use",
+          "subtitle": "Smart integrations with your core systems"
+        },
+        "cta": {
+          "title": "Ready to upgrade your business?",
+          "subtitle": "Join businesses already benefiting from an ERP solution that increases profitability and control.",
+          "try": "Try Now",
+          "login": "Sign In"
+        },
+        "stats": {
+          "efficiency": "85%",
+          "efficiency_label": "Efficiency improvement",
+          "clients": "1,200+",
+          "clients_label": "Enterprise clients",
+          "support": "24/7",
+          "support_label": "Expert support",
+          "uptime": "99.9%",
+          "uptime_label": "Platform uptime"
+        },
+        "trust": {
+          "badge": "Enterprise grade",
+          "title": "Trusted by leading organizations worldwide",
+          "client1": "Vertex Dynamics",
+          "client2": "Apex Manufacturing",
+          "client3": "NovaScale",
+          "client4": "GlobalFin",
+          "client5": "TechBridge",
+          "soc2_title": "SOC 2 Type II",
+          "soc2_desc": "Audited security controls",
+          "iso_title": "ISO 27001",
+          "iso_desc": "Information security certified",
+          "gdpr_title": "GDPR Ready",
+          "gdpr_desc": "Privacy by design",
+          "uptime_title": "99.9% SLA",
+          "uptime_desc": "Guaranteed availability"
+        },
+        "process": {
+          "title": "From onboarding to ROI in weeks",
+          "subtitle": "A proven enterprise deployment methodology designed for minimal disruption.",
+          "step1_title": "Discovery",
+          "step1_desc": "Map workflows, stakeholders, and integration requirements with our solutions architects.",
+          "step2_title": "Configuration",
+          "step2_desc": "Deploy modules, migrate data securely, and configure role-based access controls.",
+          "step3_title": "Training",
+          "step3_desc": "Hands-on enablement for admins and end-users with localized documentation.",
+          "step4_title": "Go-live",
+          "step4_desc": "Launch with dedicated hypercare support and continuous optimization."
+        }
+      }
+    }
+  },
+  "he": {
+    "translation": {
+      "landing": {
+        "nav": {
+          "products": "מוצרים",
+          "solutions": "פתרונות",
+          "enterprise": "ארגוני",
+          "pricing": "מחירים",
+          "resources": "משאבים",
+          "sign_in": "התחברות",
+          "request_demo": "בקש הדגמה",
+          "erp_core": "ליבת ERP",
+          "crm_suite": "חבילת CRM",
+          "hr_payroll": "משאבי אנוש ושכר",
+          "inventory": "ניהול מלאי"
+        },
+        "hero": {
+          "badge": "פלטפורמת Nexora ERP",
+          "title": "ממשק ERP יוקרתי לעסק המודרני",
+          "subtitle": "פלטפורמה חכמה לניהול עובדים, לקוחות ותהליכים — הכול במקום אחד. ייעול תהליכים, אוטומציה פיננסית וצמיחה עם מנוע ERP חכם.",
+          "cta_trial": "התחלה מהירה",
+          "cta_expert": "דבר עם מומחה"
+        },
+        "values": {
+          "title": "למה לבחור ב-Nexora?",
+          "support_title": "תמיכה 24/7",
+          "support_desc": "צוות מקצועי זמין תמיד לתמיכה במערכות קריטיות.",
+          "analytics_title": "דוחות חכמים",
+          "analytics_desc": "תובנות עסקיות בזמן אמת וחיזוי מגמות לפני שהן משפיעות על הרווחיות.",
+          "security_title": "אבטחה מלאה",
+          "security_desc": "הצפנה ברמת בנקאות, גיבויים יומיים ובקרת גישה מדורגת.",
+          "deploy_title": "התחלה מהירה",
+          "deploy_desc": "התקנה והטמעה ב-24 שעות בלבד. מודולים מוכנים וליווי מקצועי."
+        },
+        "modules": {
+          "title": "נהל את העסק שלך בסטייל",
+          "subtitle": "כל הכלים הדרושים לניהול מתקדם — עובדים, לקוחות, מלאי ורכש.",
+          "crm_title": "ניהול לקוחות",
+          "crm_desc": "CRM מובנה לשירות טוב יותר, מעקב אחר לקוחות ושיפור חווית הלקוח.",
+          "hr_title": "ניהול עובדים",
+          "hr_desc": "מעקב אחר ביצועים, שעות עבודה ומשמרות. נהל את הצוות ביעילות מרבית.",
+          "inventory_title": "רכש והזמנות",
+          "inventory_desc": "אוטומציה של תהליכי רכש, מעקב אחר הזמנות וניהול מלאי חכם."
+        },
+        "testimonials": {
+          "title": "מה הלקוחות שלנו אומרים",
+          "quote1": "Nexora שינתה לנו את המשחק! ניהול העובדים והפרויקטים הפך להיות פשוט ויעיל פי 3.",
+          "quote2": "הדוחות הפיננסיים והתובנות בזמן אמת חוסכות לי שעות עבודה כל יום.",
+          "quote3": "מערכת אינטואיטיבית, תמיכה מעולה וחיסכון אמיתי בעלויות. ממליץ בחום!"
+        },
+        "theme_section": {
+          "title": "סביבת עבודה שמתאימה לך",
+          "subtitle": "בחר ערכת צבעים — השינוי חל על כל האתר בזמן אמת, כולל תצוגה מקדימה של לוח הבקרה.",
+          "panel_label": "ערכת עיצוב",
+          "preview_hint": "תצוגה חיה — בחר ערכת צבעים לעדכון כל הממשק"
+        },
+        "integrations": {
+          "title": "משתלב עם הכלים שאתה כבר משתמש בהם",
+          "subtitle": "אינטגרציות חכמות עם מערכות הליבה שלך"
+        },
+        "cta": {
+          "title": "מוכן לשדרג את העסק שלך?",
+          "subtitle": "הצטרף לעסקים שכבר נהנים מפתרון ERP שמגדיל רווחיות ומשפר שליטה.",
+          "try": "נסה עכשיו",
+          "login": "התחבר"
+        },
+        "stats": {
+          "efficiency": "85%",
+          "efficiency_label": "שיפור ביעילות",
+          "clients": "1,200+",
+          "clients_label": "לקוחות ארגוניים",
+          "support": "24/7",
+          "support_label": "תמיכה מקצועית",
+          "uptime": "99.9%",
+          "uptime_label": "זמינות מערכת"
+        },
+        "trust": {
+          "badge": "רמת ארגון",
+          "title": "מובילים בתעשייה סומכים על Nexora",
+          "client1": "Vertex Dynamics",
+          "client2": "Apex Manufacturing",
+          "client3": "NovaScale",
+          "client4": "GlobalFin",
+          "client5": "TechBridge",
+          "soc2_title": "SOC 2 Type II",
+          "soc2_desc": "בקרות אבטחה מבוקרות",
+          "iso_title": "ISO 27001",
+          "iso_desc": "תקן אבטחת מידע",
+          "gdpr_title": "תואם GDPR",
+          "gdpr_desc": "פרטיות מהיסוד",
+          "uptime_title": "SLA 99.9%",
+          "uptime_desc": "זמינות מובטחת"
+        },
+        "process": {
+          "title": "מההטמעה ל-ROI תוך שבועות",
+          "subtitle": "מתודולוגיית הטמעה ארגונית מוכחת עם הפרעה מינימלית לעסק.",
+          "step1_title": "אפיון",
+          "step1_desc": "מיפוי תהליכים, בעלי עניין ודרישות אינטגרציה עם ארכיטקטי הפתרון שלנו.",
+          "step2_title": "הגדרה",
+          "step2_desc": "פריסת מודולים, העברת נתונים מאובטחת והגדרת הרשאות מדורגות.",
+          "step3_title": "הדרכה",
+          "step3_desc": "הכשרה מעשית למנהלים ומשתמשים עם תיעוד מקומי.",
+          "step4_title": "עלייה לאוויר",
+          "step4_desc": "השקה עם ליווי צמוד ואופטימיזציה מתמשכת."
+        }
+      }
+    }
+  }
+}

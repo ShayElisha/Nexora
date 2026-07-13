@@ -547,23 +547,23 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
         }
       } else {
         // Fallback to old format (extract from content)
-        const productNameMatch = notification?.content.match(
-          /The quantity of the product "?([^"]*)"?(?= is below the minimum stock level)/
-        );
-        const productName = productNameMatch ? productNameMatch[1] : null;
-        if (!productName) {
-          throw new Error("לא ניתן לחלץ את שם המוצר מההתראה");
-        }
-        
+      const productNameMatch = notification?.content.match(
+        /The quantity of the product "?([^"]*)"?(?= is below the minimum stock level)/
+      );
+      const productName = productNameMatch ? productNameMatch[1] : null;
+      if (!productName) {
+        throw new Error("לא ניתן לחלץ את שם המוצר מההתראה");
+      }
+
         // Search for product by name
-        const productSearchResp = await axiosInstance.get(
-          `/product/search-by-name`,
+      const productSearchResp = await axiosInstance.get(
+        `/product/search-by-name`,
           { params: { name: productName } }
         );
         
         if (!productSearchResp.data.success || !productSearchResp.data.data?.length) {
-          throw new Error("לא נמצא מוצר עם השם הזה");
-        }
+        throw new Error("לא נמצא מוצר עם השם הזה");
+      }
         
         const product = productSearchResp.data.data[0];
         productData = {
@@ -596,7 +596,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
             `/suppliers/${productData.supplierId}`
           );
           if (supplierResponse.data.success) {
-            supplier = supplierResponse.data.data;
+          supplier = supplierResponse.data.data;
           } else {
             throw new Error("נכשל בהבאת פרטי הספק");
           }
@@ -849,6 +849,11 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
           to: "/dashboard/production/create", 
           text: "יצירת הזמנת ייצור",
           requiredPermission: { module: "products", action: "create" },
+        },
+        { 
+          to: "/dashboard/production/missing-components", 
+          text: "ניהול חוסרים",
+          requiredPermission: { module: "products", action: "view" },
         },
       ],
     },
@@ -1444,16 +1449,6 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
               text: t("navbar.add_service_ticket", { defaultValue: "Add Service Ticket" }),
               requiredPermission: { module: "customers", action: "create" },
             },
-            {
-              to: "/dashboard/sales/opportunities/add",
-              text: t("navbar.add_opportunity", { defaultValue: "Add Opportunity" }),
-              requiredPermission: { module: "customers", action: "create" },
-            },
-            {
-              to: "/dashboard/contracts/add",
-              text: t("navbar.add_contract", { defaultValue: "Add Contract" }),
-              requiredPermission: { module: "customers", action: "create" },
-            },
           ],
         },
       ],
@@ -1537,6 +1532,11 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
           to: "/dashboard/production/create", 
           text: "יצירת הזמנת ייצור",
           requiredPermission: { module: "products", action: "create" },
+        },
+        { 
+          to: "/dashboard/production/missing-components", 
+          text: "ניהול חוסרים",
+          requiredPermission: { module: "products", action: "view" },
         },
       ],
     },
@@ -1888,6 +1888,11 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
           to: "/dashboard/production/create", 
           text: "יצירת הזמנת ייצור",
           requiredPermission: { module: "products", action: "create" },
+        },
+        { 
+          to: "/dashboard/production/missing-components", 
+          text: "ניהול חוסרים",
+          requiredPermission: { module: "products", action: "view" },
         },
       ],
     },
@@ -2361,7 +2366,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
     let baseLinks = [];
     if (authUser?.role === "Manager") {
       baseLinks = managerLinks;
-    } else if (authUser?.role === "Employee") {
+  } else if (authUser?.role === "Employee") {
       baseLinks = employeeLinks;
     } else {
       baseLinks = [];
@@ -2567,7 +2572,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                           setOpenDropdown(index);
                           // Only reset subdropdown if switching to a different main menu item
                           if (openDropdown !== null && openDropdown !== index) {
-                            setOpenSubDropdown(null);
+                          setOpenSubDropdown(null);
                           }
                         }
                         setShowPopup(false);
@@ -2807,7 +2812,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                       <div className="flex justify-between items-center mb-3 pb-3 border-b-2 border-gray-200">
                         <h3 className="font-bold text-base flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
                           <FaBell className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
-                          {t("notifications.title")}
+                        {t("notifications.title")}
                         </h3>
                         <button
                           className="text-xs px-3 py-1 rounded-full font-medium transition-all hover:scale-105"
@@ -2847,7 +2852,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                           const priorityStyle = priorityConfig[priority] || priorityConfig.medium;
 
                           // Check for inventory notification 
-                          const isInventoryNotification = 
+                          const isInventoryNotification =
                             notification.category === "inventory" || 
                             notification.PurchaseOrder === "Inventory";
                           
@@ -2876,15 +2881,15 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                               }`}
                             >
                               {/* Delete Button */}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  deleteNotification(notification._id);
-                                }}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    deleteNotification(notification._id);
+                                  }}
                                 className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full hover:bg-red-600 flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110 z-10"
-                              >
-                                ×
-                              </button>
+                                >
+                                  ×
+                                </button>
 
                               {/* Unread indicator */}
                               {!notification.isRead && (
@@ -2903,7 +2908,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                                     {notification.priority === "critical" && (
                                       <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">
                                         דחוף!
-                                      </span>
+                              </span>
                                     )}
                                   </div>
                                 )}
@@ -3110,7 +3115,7 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                         setOpenDropdown(index);
                         // Only reset subdropdown if switching to a different main menu item
                         if (openDropdown !== null && openDropdown !== index) {
-                          setOpenSubDropdown(null);
+                        setOpenSubDropdown(null);
                         }
                       }
                     }}
@@ -3192,10 +3197,10 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                 <FaEdit className="w-8 h-8 text-white" />
               </div>
               <h2 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-                {selectedDocumentType === "budget"
-                  ? t("navbar.Signatures.budgetDocument")
+              {selectedDocumentType === "budget"
+                ? t("navbar.Signatures.budgetDocument")
                   : t("navbar.Signatures.procurementDocument")}
-              </h2>
+            </h2>
               <p className="text-sm text-gray-600 font-medium">
                 {t("navbar.Signatures.digital-Signature")}
               </p>
@@ -3216,8 +3221,8 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                   <div className="flex items-center gap-2">
                     <strong className="text-indigo-600">{t("navbar.Signatures.department")}:</strong>
                     <span className="text-gray-700">
-                      {selectedBudget.departmentId?.name ||
-                        selectedBudget.departmentId}
+                  {selectedBudget.departmentId?.name ||
+                    selectedBudget.departmentId}
                     </span>
                   </div>
                   <div className="sm:col-span-2">
@@ -3229,9 +3234,9 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
             )}
             {selectedPDF && (
               <div className="mb-6 rounded-xl overflow-hidden shadow-lg border-2 border-gray-200">
-                <iframe
-                  src={selectedPDF}
-                  title="Document PDF"
+              <iframe
+                src={selectedPDF}
+                title="Document PDF"
                   className="w-full h-32 sm:h-48 lg:h-64"
                 />
               </div>
@@ -3242,22 +3247,22 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                 {t("navbar.Signatures.digital-Signature")}:
               </label>
               <div className="rounded-xl border-2 border-indigo-200 shadow-lg p-2 bg-white">
-                <SignatureCanvas
-                  ref={signaturePadRef}
-                  penColor="black"
-                  canvasProps={{
-                    width:
-                      window.innerWidth < 640
-                        ? 250
-                        : window.innerWidth < 1024
-                        ? 350
-                        : 500,
-                    height:
-                      window.innerWidth < 640
-                        ? 100
-                        : window.innerWidth < 1024
-                        ? 120
-                        : 150,
+            <SignatureCanvas
+              ref={signaturePadRef}
+              penColor="black"
+              canvasProps={{
+                width:
+                  window.innerWidth < 640
+                    ? 250
+                    : window.innerWidth < 1024
+                    ? 350
+                    : 500,
+                height:
+                  window.innerWidth < 640
+                    ? 100
+                    : window.innerWidth < 1024
+                    ? 120
+                    : 150,
                     className: "border-2 border-gray-300 rounded-lg w-full shadow-inner bg-white",
                   }}
                 />
@@ -3302,8 +3307,8 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-5 flex items-center justify-between">
               <h2 className="text-xl font-bold flex items-center gap-2">
                 <FaUserEdit className="w-5 h-5" />
-                {t("navbar.profile.updatePersonal")}
-              </h2>
+              {t("navbar.profile.updatePersonal")}
+            </h2>
               <button
                 onClick={handleClosePersonalModal}
                 className="p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-all"
@@ -3318,23 +3323,23 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                 <div className="flex flex-col items-center">
                   <div className="relative group">
                     <div className="w-32 h-32 rounded-full border-4 border-blue-200 overflow-hidden shadow-lg mb-3 ring-4 ring-blue-100 transition-all duration-300 group-hover:scale-105 group-hover:ring-blue-300">
-                      {personalForm.profileImage || authUser?.profileImage ? (
-                        <img
-                          src={
-                            personalForm.profileImage || authUser?.profileImage
-                          }
-                          alt="Profile"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div
+                    {personalForm.profileImage || authUser?.profileImage ? (
+                      <img
+                        src={
+                          personalForm.profileImage || authUser?.profileImage
+                        }
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div
                           className={`w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600`}
-                        >
+                      >
                           <span className="text-white text-4xl font-bold">
-                            {authUser?.name?.charAt(0)?.toUpperCase() || "U"}
-                          </span>
-                        </div>
-                      )}
+                          {authUser?.name?.charAt(0)?.toUpperCase() || "U"}
+                        </span>
+                      </div>
+                    )}
                     </div>
                     <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 cursor-pointer">
                       <FaUserEdit className="w-5 h-5 text-white" />
@@ -3425,43 +3430,43 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                     <div key={field.name}>
                       <label className="block text-xs font-semibold text-gray-600 mb-1.5 flex items-center gap-1">
                         {field.label}
-                        {field.required && (
+                          {field.required && (
                           <span className="text-red-500 text-sm">*</span>
-                        )}
-                      </label>
-                      {field.type === "select" ? (
-                        <select
-                          name={field.name}
-                          value={personalForm[field.name]}
-                          onChange={handlePersonalFormChange}
-                          disabled={!editableFields[field.name]}
-                          required={field.required}
-                          aria-label={field.label}
-                          tabIndex={0}
+                          )}
+                        </label>
+                        {field.type === "select" ? (
+                          <select
+                            name={field.name}
+                            value={personalForm[field.name]}
+                            onChange={handlePersonalFormChange}
+                            disabled={!editableFields[field.name]}
+                            required={field.required}
+                            aria-label={field.label}
+                            tabIndex={0}
                           className={`block w-full px-4 py-2.5 border-2 rounded-xl text-sm font-medium transition-all duration-200 text-gray-900 ${
-                            editableFields[field.name]
+                              editableFields[field.name]
                               ? "border-blue-300 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                               : "border-gray-200 bg-gray-50 cursor-not-allowed"
                           }`}
-                        >
-                          {field.options.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <input
-                          type={field.type}
-                          name={field.name}
-                          value={personalForm[field.name]}
-                          onChange={handlePersonalFormChange}
-                          disabled={!editableFields[field.name]}
-                          required={field.required}
-                          aria-label={field.label}
-                          tabIndex={0}
+                          >
+                            {field.options.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type={field.type}
+                            name={field.name}
+                            value={personalForm[field.name]}
+                            onChange={handlePersonalFormChange}
+                            disabled={!editableFields[field.name]}
+                            required={field.required}
+                            aria-label={field.label}
+                            tabIndex={0}
                           className={`block w-full px-4 py-2.5 border-2 rounded-xl text-sm font-medium transition-all duration-200 text-gray-900 ${
-                            editableFields[field.name]
+                              editableFields[field.name]
                               ? "border-blue-300 bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                               : "border-gray-200 bg-gray-50 cursor-not-allowed"
                           }`}
@@ -3509,23 +3514,23 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                       <div key={field.name}>
                         <label className="block text-xs font-semibold text-gray-600 mb-1.5 flex items-center gap-1">
                           {field.label}
-                          {field.required && (
+                            {field.required && (
                             <span className="text-red-500 text-sm">*</span>
-                          )}
-                        </label>
-                        <input
-                          type={field.type}
-                          name={field.name}
-                          value={
-                            personalForm.address[field.name.split(".")[1]]
-                          }
-                          onChange={handlePersonalFormChange}
-                          disabled={!editableFields[field.name]}
-                          required={field.required}
-                          aria-label={field.label}
-                          tabIndex={0}
+                            )}
+                          </label>
+                          <input
+                            type={field.type}
+                            name={field.name}
+                            value={
+                              personalForm.address[field.name.split(".")[1]]
+                            }
+                            onChange={handlePersonalFormChange}
+                            disabled={!editableFields[field.name]}
+                            required={field.required}
+                            aria-label={field.label}
+                            tabIndex={0}
                           className={`block w-full px-4 py-2.5 border-2 rounded-xl text-sm font-medium transition-all duration-200 text-gray-900 ${
-                            editableFields[field.name]
+                              editableFields[field.name]
                               ? "border-purple-300 bg-white focus:border-purple-500 focus:ring-4 focus:ring-purple-100"
                               : "border-gray-200 bg-gray-50 cursor-not-allowed"
                           }`}
@@ -3540,13 +3545,13 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                     <FaEdit className="w-4 h-4 text-green-600" />
                     {t("navbar.profile.passwordInfo")}
                   </h3>
-                  <button
-                    onClick={() => setShowPasswordFields(!showPasswordFields)}
+                    <button
+                      onClick={() => setShowPasswordFields(!showPasswordFields)}
                     className="w-full py-3 px-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl text-sm font-bold hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
-                  >
+                    >
                     <FaEdit className="w-4 h-4" />
-                    {t("navbar.profile.updatePassword")}
-                  </button>
+                      {t("navbar.profile.updatePassword")}
+                    </button>
                   {showPasswordFields && (
                     <div className="space-y-3 mt-3">
                       {[
@@ -3572,10 +3577,10 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
                         <div key={field.name}>
                           <label className="block text-xs font-semibold text-gray-600 mb-1.5 flex items-center gap-1">
                             {field.label}
-                            {field.required && (
+                              {field.required && (
                               <span className="text-red-500 text-sm">*</span>
-                            )}
-                          </label>
+                              )}
+                            </label>
                           <div className="relative">
                             <input
                               type={showPasswords[field.name] ? "text" : "password"}
@@ -3635,8 +3640,8 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
             <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-5 flex items-center justify-between">
               <h2 className="text-xl font-bold flex items-center gap-2">
                 <FaBuilding className="w-5 h-5" />
-                {t("navbar.profile.updateCompany")}
-              </h2>
+              {t("navbar.profile.updateCompany")}
+            </h2>
               <button
                 onClick={handleCloseCompanyModal}
                 className="p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-all"
@@ -3778,47 +3783,47 @@ const Navbar = ({ isRTL, isMenuOpen, setIsMenuOpen, onModalStateChange }) => {
               ].map((field) => (
                 <div key={field.name} className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-xl border-2 border-purple-100 relative">
                   <label className="block text-xs font-semibold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-                    {field.label}
-                  </label>
-                  {field.type === "select" ? (
-                    <select
-                      name={field.name}
-                      value={
-                        field.name.includes("address.")
-                          ? companyForm.address[field.name.split(".")[1]]
-                          : companyForm[field.name]
-                      }
-                      onChange={handleCompanyFormChange}
-                      disabled={!editableFields[field.name]}
-                      aria-label={field.label}
-                      tabIndex={0}
+                      {field.label}
+                    </label>
+                    {field.type === "select" ? (
+                      <select
+                        name={field.name}
+                        value={
+                          field.name.includes("address.")
+                            ? companyForm.address[field.name.split(".")[1]]
+                            : companyForm[field.name]
+                        }
+                        onChange={handleCompanyFormChange}
+                        disabled={!editableFields[field.name]}
+                        aria-label={field.label}
+                        tabIndex={0}
                       className={`block w-full px-4 py-2.5 border-2 rounded-xl text-sm font-medium transition-all duration-200 text-gray-900 ${
-                        editableFields[field.name]
+                          editableFields[field.name]
                           ? "border-purple-300 bg-white focus:border-purple-500 focus:ring-4 focus:ring-purple-100"
                           : "border-gray-200 bg-gray-50 cursor-not-allowed"
                       }`}
-                    >
-                      {field.options.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <input
-                      type={field.type}
-                      name={field.name}
-                      value={
-                        field.name.includes("address.")
-                          ? companyForm.address[field.name.split(".")[1]]
-                          : companyForm[field.name]
-                      }
-                      onChange={handleCompanyFormChange}
-                      disabled={!editableFields[field.name]}
-                      aria-label={field.label}
-                      tabIndex={0}
+                      >
+                        {field.options.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type={field.type}
+                        name={field.name}
+                        value={
+                          field.name.includes("address.")
+                            ? companyForm.address[field.name.split(".")[1]]
+                            : companyForm[field.name]
+                        }
+                        onChange={handleCompanyFormChange}
+                        disabled={!editableFields[field.name]}
+                        aria-label={field.label}
+                        tabIndex={0}
                       className={`block w-full px-4 py-2.5 border-2 rounded-xl text-sm font-medium transition-all duration-200 text-gray-900 ${
-                        editableFields[field.name]
+                          editableFields[field.name]
                           ? "border-purple-300 bg-white focus:border-purple-500 focus:ring-4 focus:ring-purple-100"
                           : "border-gray-200 bg-gray-50 cursor-not-allowed"
                       }`}

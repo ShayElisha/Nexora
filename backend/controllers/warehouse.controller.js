@@ -3,11 +3,13 @@ import Warehouse from "../models/warehouse.model.js";
 import WarehouseLocation from "../models/warehouseLocation.model.js";
 
 const getCompanyIdFromRequest = (req) => {
-  if (req.companyId) return req.companyId;
+  // עדיפות ל-req.user מה-middleware
   if (req.user?.companyId) return req.user.companyId;
+  if (req.companyId) return req.companyId;
   if (req.query?.companyId) return req.query.companyId;
 
-  const token = req.cookies?.auth_token;
+  // Fallback - חילוץ מהטוקן (אם middleware לא עבד)
+  const token = req.cookies?.auth_token || req.cookies?.company_jwt;
   if (!token) return null;
 
   try {

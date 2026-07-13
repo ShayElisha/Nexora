@@ -29,6 +29,13 @@ import crmTranslations from "./translations/modules/crm.json";
 import projectsTranslations from "./translations/modules/projects.json";
 import accountingTranslations from "./translations/modules/accounting.json";
 import hrTranslations from "./translations/modules/hr.json";
+import salesTranslations from "./translations/modules/sales.json";
+import customerServiceTranslations from "./translations/modules/customerService.json";
+import contractsTranslations from "./translations/modules/contracts.json";
+import jobPercentagesTranslations from "./translations/modules/jobPercentages.json";
+import landingTranslations from "./translations/modules/landing.json";
+import landingLocalesTranslations from "./translations/modules/landing-locales.json";
+import publicPagesTranslations from "./translations/modules/publicPages.json";
 
 // Merge all translation modules
 // IMPORTANT: projectsTranslations must come AFTER crmTranslations to avoid conflicts
@@ -59,6 +66,13 @@ const translationModules = [
   projectsTranslations, // Must be last to override any conflicts
   accountingTranslations,
   hrTranslations,
+  salesTranslations,
+  customerServiceTranslations,
+  contractsTranslations,
+  jobPercentagesTranslations,
+  landingTranslations,
+  landingLocalesTranslations,
+  publicPagesTranslations,
 ];
 
 // Helper function for deep merge
@@ -125,6 +139,7 @@ const directionMap = {
   zh: "ltr",
   fr: "ltr",
   es: "ltr",
+  ar: "rtl",
 };
 
 i18n

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { useLocation } from "react-router-dom";
 import axiosInstance from "../../lib/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +10,7 @@ import { useTranslation } from "react-i18next";
 const CreateCompanyForm = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Form state
   const [step, setStep] = useState(1);
@@ -81,6 +83,11 @@ const CreateCompanyForm = () => {
       toast.error(errorMessage);
     },
   });
+
+  useEffect(() => {
+    if (location.state?.email) setEmail(location.state.email);
+    if (location.state?.adminName) setName(location.state.adminName);
+  }, [location.state]);
 
   const handleAddressChange = (field, value) => {
     setAddress((prevAddress) => ({
@@ -397,8 +404,8 @@ const InputField = ({
 }) => (
   <div className="flex flex-col gap-1 group">
     <label 
-      className="block text-sm font-semibold mb-2"
-      style={{ color: 'var(--text-color)' }}
+      className="block text-sm font-medium mb-1.5"
+      style={{ color: 'var(--text-muted)' }}
     >
       {label}
     </label>

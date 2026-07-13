@@ -28,6 +28,7 @@ import {
   checkProductionOrderDeadlines,
   checkBlockedProductionOrders,
   checkQualityIssues,
+  checkMissingComponentsAvailability,
   // Shifts & Salary
   checkUnapprovedShifts,
   checkSalaryApprovalDeadline,
@@ -73,9 +74,13 @@ import {
   checkProcurementApprovalDeadline,
   checkSupplierInvoiceMismatch,
   checkProcurementQualityIssues,
+  checkBirthdays,
+  sendMonthlyCashFlowSummaryToAdmins,
+  sendWeeklySummaryToAdmins,
 } from "./controllers/notification.controller.js";
 import { addMonthlyVacationDays } from "./controllers/employees.controller.js";
 import { sendInvoiceReminders } from "./controllers/invoiceReminder.controller.js";
+import { checkAndCreateProjectRisks } from "./controllers/advancedProject.controller.js";
 import Company from "./models/companies.model.js";
 import Salary from "./models/Salary.model.js";
 import Employee from "./models/employees.model.js";
@@ -123,6 +128,7 @@ cron.schedule("0 9,17 * * *", async () => {
     // Existing
     await checkLowInventory();
     await checkExpiringProducts();
+    await checkMissingComponentsAvailability();
     
     // New notifications
     await checkWarehouseCapacityAlerts();
@@ -158,6 +164,7 @@ cron.schedule("0 8 * * *", async () => {
     await checkUnsentInvoices();
     await checkEmployeeBirthdays();
     await checkEmployeeAnniversaries();
+    await checkBirthdays(); // שליחת מיילי יום הולדת
     await checkCashFlowAlerts();
     await checkLargeTransactions();
     await checkProcurementApprovalDeadline();
@@ -195,11 +202,22 @@ cron.schedule("*/30 * * * *", async () => {
   }
 });
 
+// ⏰ פעם ביום (9:00 בבוקר) - בדיקת סיכונים בפרויקטים
+cron.schedule("0 9 * * *", async () => {
+  console.log("\n🔍 Running daily project risk detection (9:00 AM)...");
+  try {
+    await checkAndCreateProjectRisks();
+  } catch (error) {
+    console.error("Error in automatic project risk detection:", error);
+  }
+});
+
 // ⏰ שבועי - ראשון בבוקר (9:00)
 cron.schedule("0 9 * * 0", async () => {
   console.log("\n⏰ Running weekly reports...");
   try {
     await sendWeeklyReports();
+    await sendWeeklySummaryToAdmins(); // סיכום שבועי - מכירות, פרויקטים, הזמנות
   } catch (error) {
     console.error("Error in weekly reports:", error);
   }
@@ -211,6 +229,7 @@ cron.schedule("0 8 1 * *", async () => {
   try {
     await sendMonthlyReports();
     await addMonthlyVacationDays();
+    await sendMonthlyCashFlowSummaryToAdmins(); // סיכום תזרים מזומנים חודשי
   } catch (error) {
     console.error("Error in monthly tasks:", error);
   }

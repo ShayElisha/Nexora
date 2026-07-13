@@ -120,6 +120,7 @@ import RolesManagement from "./pages/AdminPanel/roles/RolesManagement.jsx";
 import ProductionOrdersList from "./pages/AdminPanel/production/ProductionOrdersList.jsx";
 import CreateProductionOrder from "./pages/AdminPanel/production/CreateProductionOrder.jsx";
 import ProductionOrderDetails from "./pages/AdminPanel/production/ProductionOrderDetails.jsx";
+import MissingComponentsManagement from "./pages/AdminPanel/production/MissingComponentsManagement.jsx";
 import AssetList from "./pages/AdminPanel/Assets/AssetList.jsx";
 import AddAsset from "./pages/AdminPanel/Assets/AddAsset.jsx";
 import AssetDetails from "./pages/AdminPanel/Assets/AssetDetails.jsx";
@@ -484,6 +485,7 @@ const App = () => {
             <Route path="projects" element={<ProjectsList />} />
             <Route path="production" element={<ProductionOrdersList />} />
             <Route path="production/create" element={<CreateProductionOrder />} />
+            <Route path="production/missing-components" element={<MissingComponentsManagement />} />
             <Route path="production/:id" element={<ProductionOrderDetails />} />
             <Route path="roles" element={<RolesManagement />} />
             <Route

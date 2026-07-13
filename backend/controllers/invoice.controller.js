@@ -10,7 +10,7 @@ import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import { transporter } from "../config/lib/nodemailer.js";
 import { createPaymentInvoiceEmail } from "../emails/emailHandlers.js";
-import puppeteer from "puppeteer";
+import { launchBrowser } from "../config/lib/browser.js";
 import { uploadToCloudinary } from "../config/lib/cloudinary.js";
 
 /**
@@ -1718,10 +1718,7 @@ const generateInvoicePDFBuffer = async (invoice, uploadToCloud = true) => {
     const html = generateInvoiceHTML(invoice);
     
     // Launch puppeteer
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+    const browser = await launchBrowser();
     
     const page = await browser.newPage();
     

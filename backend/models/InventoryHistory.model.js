@@ -40,6 +40,7 @@ const inventoryHistorySchema = new mongoose.Schema(
       enum: [
         "Order Confirmation",
         "Order Preparation",
+        "Order Ready to Ship",
         "Order Cancelled",
         "Order Returned",
         "Manual Update",

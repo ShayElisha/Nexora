@@ -1,10 +1,11 @@
-import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
 import { useState } from "react";
+import { BarChart3, Megaphone, Settings, Shield } from "lucide-react";
+import PublicPageHero from "../components/home/PublicPageHero";
+import PublicPageLayout from "../components/home/PublicPageLayout";
+import { usePageLocale } from "../hooks/usePageLocale";
 
 const Cookies = () => {
-  const { t, i18n } = useTranslation();
-  const isRTL = ["he", "ar"].includes(i18n.language);
+  const { t } = usePageLocale();
 
   const [preferences, setPreferences] = useState({
     necessary: true,
@@ -13,36 +14,13 @@ const Cookies = () => {
     marketing: false
   });
 
-  const cookieTypes = [
-    {
-      id: "necessary",
-      icon: "🔒",
-      title: "עוגיות הכרחיות",
-      description: "עוגיות חיוניות לתפקוד המערכת. לא ניתן לבטל.",
-      required: true
-    },
-    {
-      id: "functional",
-      icon: "⚙️",
-      title: "עוגיות תפקודיות",
-      description: "עוזרות לשמור העדפות ולשפר חוויית משתמש.",
-      required: false
-    },
-    {
-      id: "analytics",
-      icon: "📊",
-      title: "עוגיות אנליטיות",
-      description: "עוזרות לנו להבין כיצד משתמשים במערכת ולשפר אותה.",
-      required: false
-    },
-    {
-      id: "marketing",
-      icon: "📢",
-      title: "עוגיות שיווקיות",
-      description: "משמשות להצגת פרסומות רלוונטיות.",
-      required: false
-    }
-  ];
+  const cookieTypes = t("public.cookies.cookieTypes", { returnObjects: true }) || [];
+  const cookieIcons = {
+    necessary: Shield,
+    functional: Settings,
+    analytics: BarChart3,
+    marketing: Megaphone,
+  };
 
   const handleToggle = (id) => {
     if (id !== "necessary") {
@@ -55,218 +33,143 @@ const Cookies = () => {
 
   const handleSavePreferences = () => {
     localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
-    alert('העדפות נשמרו בהצלחה!');
+    alert(t("public.cookies.savedMessage"));
   };
 
   return (
-    <div
-      className="min-h-screen flex flex-col font-sans"
-      style={{ backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
-      dir={isRTL ? "rtl" : "ltr"}
-    >
-      {/* Hero Section */}
-      <section 
-        className="py-20 relative overflow-hidden"
-        style={{
-          background: `linear-gradient(135deg, var(--color-primary), var(--color-secondary))`
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-7xl mb-6"
-          >
-            🍪
-          </motion.div>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 text-white"
-          >
-            מדיניות עוגיות
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-xl text-white max-w-3xl mx-auto"
-            style={{ opacity: 0.9 }}
-          >
-            שקיפות מלאה לגבי העוגיות שאנו משתמשים בהן ואיך הן עוזרות לנו
-          </motion.p>
-        </div>
-      </section>
+    <PublicPageLayout>
+      <PublicPageHero badge={t("public.cookies.badge")} title={t("public.cookies.title")} subtitle={t("public.cookies.subtitle")} />
 
-      {/* What are Cookies */}
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="p-8 rounded-xl shadow-lg"
+          <div
+            className="p-6 rounded-xl border"
             style={{
-              backgroundColor: 'var(--bg-color)',
-              border: '2px solid var(--border-color)'
+              borderColor: "var(--border-color)",
+              backgroundColor: "var(--bg-color)",
             }}
           >
-            <h2 
-              className="text-3xl font-bold mb-4"
-              style={{ color: 'var(--color-primary)' }}
-            >
-              מה הן עוגיות?
+            <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--text-color)" }}>
+              {t("public.cookies.introTitle")}
             </h2>
-            <p 
-              className="text-lg leading-relaxed mb-4"
-              style={{ color: 'var(--text-color)', opacity: 0.9 }}
-            >
-              עוגיות הן קבצי טקסט קטנים שנשמרים במכשיר שלך כאשר אתה מבקר באתר.
-              הן עוזרות לאתר "לזכור" אותך ואת ההעדפות שלך, ומשפרות את חוויית הגלישה.
+            <p className="mb-3" style={{ color: "var(--color-secondary)" }}>
+              {t("public.cookies.introParagraphOne")}
             </p>
-            <p 
-              className="text-lg leading-relaxed"
-              style={{ color: 'var(--text-color)', opacity: 0.9 }}
-            >
-              אנו משתמשים בעוגיות כדי לספק לך חוויה מותאמת אישית, להבין כיצד
-              המערכת שלנו משמשת, ולשפר את השירות שלנו.
-            </p>
-          </motion.div>
+            <p style={{ color: "var(--color-secondary)" }}>{t("public.cookies.introParagraphTwo")}</p>
+          </div>
         </div>
       </section>
 
-      {/* Cookie Types and Preferences */}
-      <section className="py-16">
+      <section className="py-6">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 
-            className="text-3xl font-bold mb-12 text-center"
-            style={{
-              background: `linear-gradient(135deg, var(--color-primary), var(--color-secondary))`,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}
-          >
-            סוגי העוגיות והעדפות
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8" style={{ color: "var(--text-color)" }}>
+            {t("public.cookies.typesTitle")}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {cookieTypes.map((cookie, index) => (
-              <motion.div
-                key={cookie.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="p-6 rounded-xl shadow-lg"
-                style={{
-                  backgroundColor: 'var(--bg-color)',
-                  border: '2px solid var(--border-color)'
-                }}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="text-5xl">{cookie.icon}</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {cookieTypes.map((cookie) => {
+              const Icon = cookieIcons[cookie.id] || Settings;
+              return (
+                <article
+                  key={cookie.id}
+                  className="p-5 rounded-xl border"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                  }}
+                >
+                  <div className="flex items-start justify-between gap-3 mb-4">
                     <div>
-                      <h3 
-                        className="text-xl font-bold mb-1"
-                        style={{ color: 'var(--color-primary)' }}
-                      >
+                      <Icon size={18} className="mb-2" style={{ color: "var(--color-primary)" }} />
+                      <h3 className="font-semibold mb-1" style={{ color: "var(--text-color)" }}>
                         {cookie.title}
                       </h3>
                       {cookie.required && (
-                        <span 
-                          className="text-xs px-2 py-1 rounded"
-                          style={{ 
-                            backgroundColor: 'var(--color-accent)',
-                            color: 'white'
-                          }}
-                        >
-                          חובה
+                        <span className="text-xs px-2 py-1 rounded-full border" style={{ borderColor: "var(--border-color)" }}>
+                          {t("public.cookies.requiredLabel")}
                         </span>
                       )}
                     </div>
-                  </div>
-                  <label className="relative inline-block w-14 h-8">
-                    <input
-                      type="checkbox"
-                      checked={preferences[cookie.id]}
-                      onChange={() => handleToggle(cookie.id)}
-                      disabled={cookie.required}
-                      className="sr-only peer"
-                    />
-                    <div 
-                      className={`w-14 h-8 rounded-full transition-all duration-300 ${
-                        preferences[cookie.id] 
-                          ? 'bg-primary' 
-                          : 'bg-gray-300'
-                      } ${cookie.required ? 'opacity-50' : 'cursor-pointer'}`}
-                    >
-                      <div 
-                        className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-transform duration-300 ${
-                          preferences[cookie.id] ? 'translate-x-7' : 'translate-x-1'
-                        }`}
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={preferences[cookie.id]}
+                        onChange={() => handleToggle(cookie.id)}
+                        disabled={cookie.required}
+                        className="sr-only peer"
                       />
-                    </div>
-                  </label>
-                </div>
-                <p 
-                  className="text-sm leading-relaxed"
-                  style={{ color: 'var(--text-color)', opacity: 0.8 }}
-                >
-                  {cookie.description}
-                </p>
-              </motion.div>
-            ))}
+                      <div
+                        className="w-11 h-6 rounded-full peer"
+                        style={{
+                          backgroundColor: preferences[cookie.id] ? "var(--color-primary)" : "var(--border-color)",
+                          opacity: cookie.required ? 0.6 : 1,
+                        }}
+                      />
+                      <span
+                        className="absolute left-[2px] top-[2px] w-5 h-5 rounded-full transition-transform"
+                        style={{
+                          backgroundColor: "var(--bg-color)",
+                          transform: preferences[cookie.id] ? "translateX(20px)" : "translateX(0)",
+                        }}
+                      />
+                    </label>
+                  </div>
+                  <p className="text-sm" style={{ color: "var(--color-secondary)" }}>
+                    {cookie.description}
+                  </p>
+                </article>
+              );
+            })}
           </div>
-
-          {/* Save Preferences Button */}
-          <div className="text-center mt-12">
+          <div className="text-center mt-10">
             <button
+              type="button"
               onClick={handleSavePreferences}
-              className="py-4 px-12 font-bold rounded-xl transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105"
+              className="py-3 px-7 rounded-xl font-semibold border"
               style={{
-                background: `linear-gradient(to right, var(--color-primary), var(--color-secondary))`,
-                color: 'var(--button-text)'
+                borderColor: "var(--color-primary)",
+                backgroundColor: "var(--color-primary)",
+                color: "var(--button-text)",
               }}
             >
-              שמור העדפות 💾
+              {t("public.cookies.saveButton")}
             </button>
           </div>
         </div>
       </section>
 
-      {/* How to Manage */}
-      <section 
-        className="py-20"
-        style={{
-          background: `linear-gradient(135deg, var(--color-secondary), var(--color-accent))`
-        }}
-      >
+      <section className="pb-16 md:pb-20 pt-14">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-6 text-white">
-            איך לנהל עוגיות בדפדפן?
-          </h2>
-          <p className="text-lg text-white mb-8" style={{ opacity: 0.9 }}>
-            רוב הדפדפנים מאפשרים לך לשלוט בעוגיות דרך ההגדרות. ניתן לחסום,
-            למחוק או לקבל התראות לפני שמירת עוגיות חדשות.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            {['Chrome', 'Firefox', 'Safari', 'Edge'].map((browser) => (
-              <div
-                key={browser}
-                className="px-6 py-3 rounded-xl font-semibold"
-                style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                  color: 'white'
-                }}
-              >
-                {browser}
-              </div>
-            ))}
+          <div
+            className="rounded-2xl border p-8 md:p-10"
+            style={{
+              borderColor: "var(--border-color)",
+              backgroundColor: "var(--bg-color)",
+            }}
+          >
+            <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: "var(--text-color)" }}>
+              {t("public.cookies.manageTitle")}
+            </h2>
+            <p className="mb-7" style={{ color: "var(--color-secondary)" }}>
+              {t("public.cookies.manageSubtitle")}
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {(t("public.cookies.browsers", { returnObjects: true }) || []).map((browser) => (
+                <span
+                  key={browser}
+                  className="px-4 py-2 rounded-full border text-sm"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  {browser}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </section>
-    </div>
+    </PublicPageLayout>
   );
 };
 

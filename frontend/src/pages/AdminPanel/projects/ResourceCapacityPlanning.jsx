@@ -14,7 +14,8 @@ import {
 } from "lucide-react";
 
 const ResourceCapacityPlanning = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = ["he", "ar"].includes(i18n.language);
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data, isLoading, error } = useQuery({
@@ -27,15 +28,15 @@ const ResourceCapacityPlanning = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <div className="flex items-center justify-center h-screen" style={{ backgroundColor: 'var(--bg-color)' }}>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: 'var(--color-primary)' }}></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 text-red-600">
+      <div className="min-h-screen p-4" style={{ backgroundColor: 'var(--bg-color)', color: '#ef4444' }}>
         {t("projects.error_loading") || "Error loading resource capacity"}
       </div>
     );
@@ -50,14 +51,14 @@ const ResourceCapacityPlanning = () => {
   });
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-6" style={{ backgroundColor: 'var(--bg-color)' }}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-left" style={{ color: 'var(--text-color)' }}>
             {t("projects.resource_capacity")}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="mt-1 text-left" style={{ color: 'var(--color-secondary)' }}>
             {t("projects.resource_capacity_description")}
           </p>
         </div>
@@ -68,18 +69,19 @@ const ResourceCapacityPlanning = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow p-6"
+          className="rounded-lg shadow p-6 border"
+          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
                 {t("projects.total_employees")}
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+              <p className="text-2xl font-bold mt-1" style={{ color: 'var(--text-color)' }}>
                 {statistics.totalEmployees || 0}
               </p>
             </div>
-            <Users className="w-8 h-8 text-blue-500" />
+            <Users className="w-8 h-8" style={{ color: 'var(--color-primary)' }} />
           </div>
         </motion.div>
 
@@ -87,18 +89,19 @@ const ResourceCapacityPlanning = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow p-6"
+          className="rounded-lg shadow p-6 border"
+          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
                 {t("projects.overloaded_employees")}
               </p>
-              <p className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
+              <p className="text-2xl font-bold mt-1" style={{ color: '#ef4444' }}>
                 {statistics.overloadedEmployees || 0}
               </p>
             </div>
-            <AlertTriangle className="w-8 h-8 text-red-500" />
+            <AlertTriangle className="w-8 h-8" style={{ color: '#ef4444' }} />
           </div>
         </motion.div>
 
@@ -106,125 +109,133 @@ const ResourceCapacityPlanning = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow p-6"
+          className="rounded-lg shadow p-6 border"
+          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
                 {t("projects.average_utilization")}
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+              <p className="text-2xl font-bold mt-1" style={{ color: 'var(--text-color)' }}>
                 {statistics.averageUtilization || 0}%
               </p>
             </div>
-            <TrendingUp className="w-8 h-8 text-green-500" />
+            <TrendingUp className="w-8 h-8" style={{ color: 'var(--color-accent)' }} />
           </div>
         </motion.div>
       </div>
 
       {/* Search */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+      <div className="rounded-lg shadow p-4 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Search className={`absolute top-1/2 transform -translate-y-1/2 w-5 h-5 ${isRTL ? 'right-3' : 'left-3'}`} style={{ color: 'var(--color-secondary)' }} />
           <input
             type="text"
             placeholder={t("projects.search_employees")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            className={`w-full py-2 border rounded-lg focus:ring-2 ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'}`}
+            style={{ 
+              borderColor: 'var(--border-color)', 
+              backgroundColor: 'var(--bg-color)', 
+              color: 'var(--text-color)',
+              '--tw-ring-color': 'var(--color-primary)'
+            }}
           />
         </div>
       </div>
 
       {/* Employee Capacity Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <div className="rounded-lg shadow overflow-hidden border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-700">
+          <table className="w-full" dir={isRTL ? "rtl" : "ltr"}>
+            <thead style={{ backgroundColor: 'var(--footer-bg)' }}>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                <th className={`px-6 py-3 text-xs font-medium uppercase ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                   {t("projects.employee")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                <th className={`px-6 py-3 text-xs font-medium uppercase ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                   {t("projects.department")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                <th className={`px-6 py-3 text-xs font-medium uppercase ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                   {t("projects.weekly_capacity")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                <th className={`px-6 py-3 text-xs font-medium uppercase ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                   {t("projects.allocated_hours")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                <th className={`px-6 py-3 text-xs font-medium uppercase ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                   {t("projects.utilization")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                <th className={`px-6 py-3 text-xs font-medium uppercase ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                   {t("projects.tasks")}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                <th className={`px-6 py-3 text-xs font-medium uppercase ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                   {t("projects.projects")}
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="divide-y" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
               {filteredEmployees.map((emp) => (
                 <tr
                   key={emp.employee._id}
-                  className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${
-                    emp.isOverloaded ? "bg-red-50 dark:bg-red-900/20" : ""
-                  }`}
+                  className="hover:opacity-80"
+                  style={emp.isOverloaded ? { backgroundColor: 'rgba(239, 68, 68, 0.1)' } : {}}
                 >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
+                  <td className={`px-6 py-4 whitespace-nowrap ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <div className={`flex items-center ${isRTL ? 'flex-row-reverse ml-auto' : ''}`} style={{ width: isRTL ? 'fit-content' : 'auto', marginLeft: isRTL ? 'auto' : '0' }}>
                       {emp.isOverloaded ? (
-                        <AlertTriangle className="w-5 h-5 text-red-500 mr-2" />
+                        <AlertTriangle className={`w-5 h-5 ${isRTL ? 'ml-2' : 'mr-2'}`} style={{ color: '#ef4444' }} />
                       ) : (
-                        <UserCheck className="w-5 h-5 text-green-500 mr-2" />
+                        <UserCheck className={`w-5 h-5 ${isRTL ? 'ml-2' : 'mr-2'}`} style={{ color: 'var(--color-accent)' }} />
                       )}
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      <div className="text-sm font-medium" dir="ltr" style={{ color: 'var(--text-color)', textAlign: 'left' }}>
                         {emp.employee.name} {emp.employee.lastName}
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                     {emp.employee.department || "-"}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                     {emp.weeklyCapacity}h
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                     {emp.allocatedHours}h
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mr-2">
+                    <div className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                      <div className={`w-full rounded-full h-2 ${isRTL ? 'ml-2' : 'mr-2'}`} style={{ backgroundColor: 'var(--border-color)' }}>
                         <div
-                          className={`h-2 rounded-full ${
-                            emp.utilization > 100
-                              ? "bg-red-600"
+                          className="h-2 rounded-full"
+                          style={{ 
+                            width: `${Math.min(emp.utilization, 100)}%`,
+                            backgroundColor: emp.utilization > 100
+                              ? "#ef4444"
                               : emp.utilization > 80
-                              ? "bg-yellow-600"
-                              : "bg-green-600"
-                          }`}
-                          style={{ width: `${Math.min(emp.utilization, 100)}%` }}
+                              ? "#f59e0b"
+                              : "var(--color-accent)"
+                          }}
                         ></div>
                       </div>
                       <span
-                        className={`text-sm font-semibold ${
-                          emp.utilization > 100
-                            ? "text-red-600"
+                        className="text-sm font-semibold"
+                        style={{
+                          color: emp.utilization > 100
+                            ? "#ef4444"
                             : emp.utilization > 80
-                            ? "text-yellow-600"
-                            : "text-green-600"
-                        }`}
+                            ? "#f59e0b"
+                            : "var(--color-accent)"
+                        }}
                       >
                         {emp.utilization}%
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                     {emp.tasksCount}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                     {emp.projectsCount}
                   </td>
                 </tr>

@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
+import { motion } from "framer-motion";
 import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
-import { Save, X, Plus, Trash2 } from "lucide-react";
+import { Save, X, Plus, Trash2, ArrowLeft } from "lucide-react";
 
 const AddSalesOpportunity = () => {
   const { t } = useTranslation();
@@ -159,257 +160,472 @@ const AddSalesOpportunity = () => {
 
   return (
     <div className="p-6" style={{ backgroundColor: "var(--bg-color)", minHeight: "100vh" }}>
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6" style={{ color: "var(--text-color)" }}>
-          {isEdit
-            ? t("sales.edit_opportunity") || "Edit Sales Opportunity"
-            : t("sales.add_opportunity") || "Add Sales Opportunity"}
-        </h1>
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <motion.div
+          className="mb-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <button
+            onClick={() => navigate("/dashboard/sales/opportunities")}
+            className="flex items-center gap-2 mb-4 text-sm hover:underline"
+            style={{ color: "var(--color-secondary)" }}
+          >
+            <ArrowLeft size={18} />
+            {t("common.back") || "Back"}
+          </button>
+          <h1
+            className="text-3xl font-bold mb-2"
+            style={{
+              background: "linear-gradient(135deg, var(--color-primary), var(--color-secondary))",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            {isEdit
+              ? t("sales.edit_opportunity") || "Edit Sales Opportunity"
+              : t("sales.add_opportunity") || "Add Sales Opportunity"}
+          </h1>
+          <p className="text-sm" style={{ color: "var(--color-secondary)" }}>
+            {isEdit
+              ? t("sales.update_opportunity_desc") || "Update opportunity details"
+              : t("sales.create_opportunity_desc") || "Create a new sales opportunity"}
+          </p>
+        </motion.div>
 
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div className="md:col-span-2">
-              <label className="block mb-2">{t("sales.opportunity_name") || "Opportunity Name"} *</label>
-              <input
-                type="text"
-                required
-                value={formData.opportunityName}
-                onChange={(e) => setFormData({ ...formData, opportunityName: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block mb-2">{t("sales.lead") || "Lead"}</label>
-              <select
-                value={formData.leadId}
-                onChange={(e) => setFormData({ ...formData, leadId: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg"
-              >
-                <option value="">None</option>
-                {leads.map((lead) => (
-                  <option key={lead._id} value={lead._id}>
-                    {lead.name} - {lead.email}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block mb-2">{t("sales.customer") || "Customer"}</label>
-              <select
-                value={formData.customerId}
-                onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg"
-              >
-                <option value="">None</option>
-                {customers.map((customer) => (
-                  <option key={customer._id} value={customer._id}>
-                    {customer.name} - {customer.email}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block mb-2">{t("sales.stage") || "Stage"} *</label>
-              <select
-                required
-                value={formData.stage}
-                onChange={(e) => setFormData({ ...formData, stage: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg"
-              >
-                <option value="Prospecting">Prospecting</option>
-                <option value="Qualification">Qualification</option>
-                <option value="Needs Analysis">Needs Analysis</option>
-                <option value="Proposal">Proposal</option>
-                <option value="Negotiation">Negotiation</option>
-                <option value="Closed Won">Closed Won</option>
-                <option value="Closed Lost">Closed Lost</option>
-              </select>
-            </div>
-            <div>
-              <label className="block mb-2">{t("sales.assigned_to") || "Assigned To"} *</label>
-              <select
-                required
-                value={formData.assignedTo}
-                onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg"
-              >
-                <option value="">Select Employee</option>
-                {employees.map((emp) => (
-                  <option key={emp._id} value={emp._id}>
-                    {emp.name} {emp.lastName}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block mb-2">{t("sales.amount") || "Amount"}</label>
-              <input
-                type="number"
-                step="0.01"
-                value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block mb-2">{t("sales.currency") || "Currency"}</label>
-              <select
-                value={formData.currency}
-                onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg"
-              >
-                <option value="ILS">ILS</option>
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-              </select>
-            </div>
-            <div>
-              <label className="block mb-2">{t("sales.probability") || "Probability (%)"}</label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={formData.probability}
-                onChange={(e) => setFormData({ ...formData, probability: parseInt(e.target.value) || 0 })}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block mb-2">{t("sales.expected_close_date") || "Expected Close Date"}</label>
-              <input
-                type="date"
-                value={formData.expectedCloseDate}
-                onChange={(e) => setFormData({ ...formData, expectedCloseDate: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block mb-2">{t("sales.source") || "Source"}</label>
-              <select
-                value={formData.source}
-                onChange={(e) => setFormData({ ...formData, source: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg"
-              >
-                <option value="Website">Website</option>
-                <option value="Referral">Referral</option>
-                <option value="Social Media">Social Media</option>
-                <option value="Email Campaign">Email Campaign</option>
-                <option value="Trade Show">Trade Show</option>
-                <option value="Cold Call">Cold Call</option>
-                <option value="Partner">Partner</option>
-                <option value="Existing Customer">Existing Customer</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-            <div>
-              <label className="block mb-2">{t("sales.type") || "Type"}</label>
-              <select
-                value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg"
-              >
-                <option value="New Business">New Business</option>
-                <option value="Existing Business">Existing Business</option>
-                <option value="Renewal">Renewal</option>
-                <option value="Upsell">Upsell</option>
-                <option value="Cross-sell">Cross-sell</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <div className="flex justify-between items-center mb-2">
-              <label className="block">{t("sales.products") || "Products"}</label>
-              <button
-                type="button"
-                onClick={addProduct}
-                className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white rounded text-sm"
-              >
-                <Plus size={16} />
-                {t("sales.add_product") || "Add Product"}
-              </button>
-            </div>
-            {formData.products.map((product, index) => (
-              <div key={index} className="grid grid-cols-5 gap-2 mb-2 items-end">
+        {/* Form Card */}
+        <motion.form
+          onSubmit={handleSubmit}
+          className="rounded-2xl shadow-lg border p-6 md:p-8"
+          style={{
+            backgroundColor: "var(--bg-color)",
+            borderColor: "var(--border-color)",
+          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          {/* Basic Information */}
+          <div className="mb-8">
+            <h2 className="text-xl font-bold mb-4 pb-2 border-b" style={{ color: "var(--text-color)", borderColor: "var(--border-color)" }}>
+              {t("sales.basic_information") || "Basic Information"}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("sales.opportunity_name") || "Opportunity Name"} *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.opportunityName}
+                  onChange={(e) => setFormData({ ...formData, opportunityName: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                  placeholder={t("sales.enter_opportunity_name") || "Enter opportunity name"}
+                />
+              </div>
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("sales.lead") || "Lead"}
+                </label>
                 <select
-                  value={product.productId}
-                  onChange={(e) => updateProduct(index, "productId", e.target.value)}
-                  className="px-3 py-2 border rounded-lg"
+                  value={formData.leadId}
+                  onChange={(e) => setFormData({ ...formData, leadId: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
                 >
-                  <option value="">Select Product</option>
-                  {products.map((p) => (
-                    <option key={p._id} value={p._id}>
-                      {p.productName}
+                  <option value="">{t("sales.none") || "None"}</option>
+                  {leads.map((lead) => (
+                    <option key={lead._id} value={lead._id}>
+                      {lead.name} - {lead.email}
                     </option>
                   ))}
                 </select>
-                <input
-                  type="number"
-                  placeholder="Quantity"
-                  value={product.quantity}
-                  onChange={(e) => updateProduct(index, "quantity", parseFloat(e.target.value) || 0)}
-                  className="px-3 py-2 border rounded-lg"
-                />
-                <input
-                  type="number"
-                  step="0.01"
-                  placeholder="Unit Price"
-                  value={product.unitPrice}
-                  onChange={(e) => updateProduct(index, "unitPrice", parseFloat(e.target.value) || 0)}
-                  className="px-3 py-2 border rounded-lg"
-                />
-                <input
-                  type="number"
-                  step="0.01"
-                  placeholder="Total"
-                  value={product.totalPrice}
-                  readOnly
-                  className="px-3 py-2 border rounded-lg bg-gray-100"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeProduct(index)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded"
-                >
-                  <Trash2 size={18} />
-                </button>
               </div>
-            ))}
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("sales.customer") || "Customer"}
+                </label>
+                <select
+                  value={formData.customerId}
+                  onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  <option value="">{t("sales.none") || "None"}</option>
+                  {customers.map((customer) => (
+                    <option key={customer._id} value={customer._id}>
+                      {customer.name} - {customer.email}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("sales.stage") || "Stage"} *
+                </label>
+                <select
+                  required
+                  value={formData.stage}
+                  onChange={(e) => setFormData({ ...formData, stage: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  <option value="Prospecting">{t("sales.prospecting") || "Prospecting"}</option>
+                  <option value="Qualification">{t("sales.qualification") || "Qualification"}</option>
+                  <option value="Needs Analysis">{t("sales.needs_analysis") || "Needs Analysis"}</option>
+                  <option value="Proposal">{t("sales.proposal") || "Proposal"}</option>
+                  <option value="Negotiation">{t("sales.negotiation") || "Negotiation"}</option>
+                  <option value="Closed Won">{t("sales.closed_won") || "Closed Won"}</option>
+                  <option value="Closed Lost">{t("sales.closed_lost") || "Closed Lost"}</option>
+                </select>
+              </div>
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("sales.assigned_to") || "Assigned To"} *
+                </label>
+                <select
+                  required
+                  value={formData.assignedTo}
+                  onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  <option value="">{t("sales.select_employee") || "Select Employee"}</option>
+                  {employees.map((emp) => (
+                    <option key={emp._id} value={emp._id}>
+                      {emp.name} {emp.lastName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
 
-          <div className="mb-4">
-            <label className="block mb-2">{t("sales.notes") || "Notes"}</label>
+          {/* Financial Information */}
+          <div className="mb-8">
+            <h2 className="text-xl font-bold mb-4 pb-2 border-b" style={{ color: "var(--text-color)", borderColor: "var(--border-color)" }}>
+              {t("sales.financial_information") || "Financial Information"}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("sales.amount") || "Amount"}
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={formData.amount}
+                  onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("sales.currency") || "Currency"}
+                </label>
+                <select
+                  value={formData.currency}
+                  onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  <option value="ILS">ILS</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                </select>
+              </div>
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("sales.probability") || "Probability (%)"}
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={formData.probability}
+                  onChange={(e) => setFormData({ ...formData, probability: parseInt(e.target.value) || 0 })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                />
+                <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div
+                    className="h-2 rounded-full transition-all"
+                    style={{
+                      width: `${formData.probability}%`,
+                      backgroundColor: "var(--color-primary)",
+                    }}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("sales.expected_close_date") || "Expected Close Date"}
+                </label>
+                <input
+                  type="date"
+                  value={formData.expectedCloseDate}
+                  onChange={(e) => setFormData({ ...formData, expectedCloseDate: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                />
+              </div>
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("sales.source") || "Source"}
+                </label>
+                <select
+                  value={formData.source}
+                  onChange={(e) => setFormData({ ...formData, source: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  <option value="Website">Website</option>
+                  <option value="Referral">Referral</option>
+                  <option value="Social Media">Social Media</option>
+                  <option value="Email Campaign">Email Campaign</option>
+                  <option value="Trade Show">Trade Show</option>
+                  <option value="Cold Call">Cold Call</option>
+                  <option value="Partner">Partner</option>
+                  <option value="Existing Customer">Existing Customer</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+                  {t("sales.type") || "Type"}
+                </label>
+                <select
+                  value={formData.type}
+                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  <option value="New Business">New Business</option>
+                  <option value="Existing Business">Existing Business</option>
+                  <option value="Renewal">Renewal</option>
+                  <option value="Upsell">Upsell</option>
+                  <option value="Cross-sell">Cross-sell</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Products */}
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-4 pb-2 border-b" style={{ borderColor: "var(--border-color)" }}>
+              <h2 className="text-xl font-bold" style={{ color: "var(--text-color)" }}>
+                {t("sales.products") || "Products"}
+              </h2>
+              <motion.button
+                type="button"
+                onClick={addProduct}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl shadow-md hover:shadow-lg transition-all"
+                style={{
+                  backgroundColor: "var(--button-bg)",
+                  color: "var(--button-text)",
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Plus size={18} />
+                {t("sales.add_product") || "Add Product"}
+              </motion.button>
+            </div>
+            <div className="space-y-3">
+              {formData.products.map((product, index) => (
+                <motion.div
+                  key={index}
+                  className="grid grid-cols-1 md:grid-cols-5 gap-3 p-4 rounded-xl border"
+                  style={{
+                    backgroundColor: "var(--bg-color)",
+                    borderColor: "var(--border-color)",
+                  }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <select
+                    value={product.productId}
+                    onChange={(e) => updateProduct(index, "productId", e.target.value)}
+                    className="px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 transition-all md:col-span-2"
+                    style={{
+                      borderColor: "var(--border-color)",
+                      backgroundColor: "var(--bg-color)",
+                      color: "var(--text-color)",
+                    }}
+                  >
+                    <option value="">{t("sales.select_product") || "Select Product"}</option>
+                    {products.map((p) => (
+                      <option key={p._id} value={p._id}>
+                        {p.productName}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="number"
+                    placeholder={t("sales.quantity") || "Quantity"}
+                    value={product.quantity}
+                    onChange={(e) => updateProduct(index, "quantity", parseFloat(e.target.value) || 0)}
+                    className="px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 transition-all"
+                    style={{
+                      borderColor: "var(--border-color)",
+                      backgroundColor: "var(--bg-color)",
+                      color: "var(--text-color)",
+                    }}
+                  />
+                  <input
+                    type="number"
+                    step="0.01"
+                    placeholder={t("sales.unit_price") || "Unit Price"}
+                    value={product.unitPrice}
+                    onChange={(e) => updateProduct(index, "unitPrice", parseFloat(e.target.value) || 0)}
+                    className="px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 transition-all"
+                    style={{
+                      borderColor: "var(--border-color)",
+                      backgroundColor: "var(--bg-color)",
+                      color: "var(--text-color)",
+                    }}
+                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder={t("sales.total") || "Total"}
+                      value={product.totalPrice}
+                      readOnly
+                      className="flex-1 px-3 py-2 rounded-lg border"
+                      style={{
+                        borderColor: "var(--border-color)",
+                        backgroundColor: "var(--footer-bg)",
+                        color: "var(--text-color)",
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeProduct(index)}
+                      className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                      style={{ color: "#ef4444" }}
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+              {formData.products.length === 0 && (
+                <p className="text-center py-8 text-sm" style={{ color: "var(--color-secondary)" }}>
+                  {t("sales.no_products_added") || "No products added yet. Click 'Add Product' to get started."}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Notes */}
+          <div className="mb-8">
+            <label className="block mb-2 font-medium" style={{ color: "var(--text-color)" }}>
+              {t("sales.notes") || "Notes"}
+            </label>
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg"
-              rows={3}
+              className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+              style={{
+                borderColor: "var(--border-color)",
+                backgroundColor: "var(--bg-color)",
+                color: "var(--text-color)",
+              }}
+              rows={4}
+              placeholder={t("sales.enter_notes") || "Enter any additional notes..."}
             />
           </div>
 
-          <div className="flex gap-4">
-            <button
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t" style={{ borderColor: "var(--border-color)" }}>
+            <motion.button
               type="submit"
               disabled={mutation.isLoading}
-              className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                backgroundColor: "var(--button-bg)",
+                color: "var(--button-text)",
+              }}
+              whileHover={{ scale: mutation.isLoading ? 1 : 1.02 }}
+              whileTap={{ scale: mutation.isLoading ? 1 : 0.98 }}
             >
               <Save size={20} />
-              {mutation.isLoading ? "Saving..." : t("sales.save") || "Save"}
-            </button>
-            <button
+              {mutation.isLoading
+                ? t("common.saving") || "Saving..."
+                : t("sales.save") || "Save"}
+            </motion.button>
+            <motion.button
               type="button"
               onClick={() => navigate("/dashboard/sales/opportunities")}
-              className="flex items-center gap-2 px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+              className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl border shadow-md hover:shadow-lg transition-all"
+              style={{
+                borderColor: "var(--border-color)",
+                backgroundColor: "var(--bg-color)",
+                color: "var(--text-color)",
+              }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <X size={20} />
               {t("sales.cancel") || "Cancel"}
-            </button>
+            </motion.button>
           </div>
-        </form>
+        </motion.form>
       </div>
     </div>
   );
 };
 
 export default AddSalesOpportunity;
-

@@ -12,9 +12,9 @@ import Lead from "../models/Lead.model.js";
 import Department from "../models/department.model.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import puppeteer from "puppeteer";
+import { launchBrowser } from "../config/lib/browser.js";
 import { transporter } from "../config/lib/nodemailer.js";
-import { createOrderSummaryEmail } from "../emails/emailHandlers.js";
+import { createOrderSummaryEmail, createPaymentInvoiceEmail } from "../emails/emailHandlers.js";
 import { uploadToCloudinaryFile } from "../config/lib/cloudinary.js";
 import {
   linkOrderToLead,
@@ -183,10 +183,7 @@ const sendInvoiceEmailFromOrder = async (invoice) => {
       // Import generateInvoiceHTML from invoice controller (we'll create it inline here)
       const html = await generateInvoiceHTMLForPDF(invoice);
       
-      const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
+      const browser = await launchBrowser();
       
       const page = await browser.newPage();
       await page.setContent(html, { waitUntil: 'networkidle0' });
@@ -650,10 +647,7 @@ const sendOrderSummaryEmail = async (order, financialRecord) => {
     try {
       const html = await generateOrderHTMLForPDF(order);
       
-      const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
+      const browser = await launchBrowser();
       
       const page = await browser.newPage();
       await page.setContent(html, { waitUntil: 'networkidle0' });

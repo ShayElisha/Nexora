@@ -1,0 +1,542 @@
+{
+  "ru": {
+    "translation": {
+      "landing": {
+        "nav": {
+          "products": "Продукты",
+          "solutions": "Решения",
+          "enterprise": "Enterprise",
+          "pricing": "Цены",
+          "resources": "Ресурсы",
+          "sign_in": "Войти",
+          "request_demo": "Запросить демо",
+          "erp_core": "ERP Core",
+          "crm_suite": "CRM Suite",
+          "hr_payroll": "HR и зарплата",
+          "inventory": "Управление складом"
+        },
+        "hero": {
+          "badge": "Платформа Nexora ERP",
+          "title": "Операционная система для современного бизнеса",
+          "subtitle": "Унифицируйте процессы, автоматизируйте финансовый комплаенс и масштабируйте операции с интеллектуальным движком ERP Nexora.",
+          "cta_trial": "Бесплатная пробная версия",
+          "cta_expert": "Связаться с экспертом"
+        },
+        "values": {
+          "title": "Создано для максимальной эффективности",
+          "support_title": "Поддержка 24/7",
+          "support_desc": "Команда enterprise-специалистов доступна круглосуточно.",
+          "analytics_title": "Предиктивная аналитика",
+          "analytics_desc": "Прогнозирование рисков и возможностей в реальном времени.",
+          "security_title": "Банковский уровень безопасности",
+          "security_desc": "Шифрование, ежедневные резервные копии и контроль доступа.",
+          "deploy_title": "Быстрый запуск",
+          "deploy_desc": "Внедрение за дни, а не месяцы, с готовыми модулями."
+        },
+        "modules": {
+          "title": "Корпоративные модули",
+          "subtitle": "Специализированные системы для вашей операционной инфраструктуры.",
+          "crm_title": "Продвинутый CRM",
+          "crm_desc": "Единая база клиентов, автоматизация воронки и совместная работа.",
+          "hr_title": "Интеллектуальный HR",
+          "hr_desc": "Аналитика персонала, зарплата и комплаенс в одном центре.",
+          "inventory_title": "Управление запасами",
+          "inventory_desc": "Видимость склада в реальном времени и умные заказы."
+        },
+        "testimonials": {
+          "title": "Нам доверяют лидеры отрасли",
+          "quote1": "Nexora сократила финансовый закрытие с двух недель до двух дней.",
+          "quote2": "Мы объединили шесть legacy-систем. Точность склада выросла до 99,4%.",
+          "quote3": "Модульность впечатляет — три кастомных workflow без кода."
+        },
+        "theme_section": {
+          "title": "Рабочее пространство под вас",
+          "subtitle": "Выберите цветовую схему — изменения применяются ко всему сайту.",
+          "panel_label": "Цветовая схема",
+          "preview_hint": "Живой предпросмотр панели управления"
+        },
+        "integrations": {
+          "title": "Интеграция с вашими инструментами",
+          "subtitle": "Умные интеграции с ключевыми системами"
+        },
+        "cta": {
+          "title": "Готовы модернизировать бизнес?",
+          "subtitle": "Присоединяйтесь к компаниям, повышающим прибыльность с Nexora.",
+          "try": "Попробовать",
+          "login": "Войти"
+        },
+        "stats": {
+          "efficiency": "85%",
+          "efficiency_label": "Рост эффективности",
+          "clients": "1,200+",
+          "clients_label": "Корпоративных клиентов",
+          "support": "24/7",
+          "support_label": "Экспертная поддержка",
+          "uptime": "99.9%",
+          "uptime_label": "Доступность платформы"
+        },
+        "trust": {
+          "badge": "Enterprise-класс",
+          "title": "Нам доверяют ведущие организации",
+          "client1": "Vertex Dynamics",
+          "client2": "Apex Manufacturing",
+          "client3": "NovaScale",
+          "client4": "GlobalFin",
+          "client5": "TechBridge",
+          "soc2_title": "SOC 2 Type II",
+          "soc2_desc": "Аудированные контроли безопасности",
+          "iso_title": "ISO 27001",
+          "iso_desc": "Сертификация ИБ",
+          "gdpr_title": "GDPR Ready",
+          "gdpr_desc": "Privacy by design",
+          "uptime_title": "SLA 99.9%",
+          "uptime_desc": "Гарантированная доступность"
+        },
+        "process": {
+          "title": "От внедрения до ROI за недели",
+          "subtitle": "Проверенная методология enterprise-развёртывания.",
+          "step1_title": "Анализ",
+          "step1_desc": "Картирование процессов и требований интеграции.",
+          "step2_title": "Настройка",
+          "step2_desc": "Развёртывание модулей и безопасная миграция данных.",
+          "step3_title": "Обучение",
+          "step3_desc": "Практическое обучение администраторов и пользователей.",
+          "step4_title": "Запуск",
+          "step4_desc": "Go-live с выделенной поддержкой hypercare."
+        }
+      }
+    }
+  },
+  "ar": {
+    "translation": {
+      "landing": {
+        "nav": {
+          "products": "المنتجات",
+          "solutions": "الحلول",
+          "enterprise": "المؤسسات",
+          "pricing": "الأسعار",
+          "resources": "الموارد",
+          "sign_in": "تسجيل الدخول",
+          "request_demo": "طلب عرض",
+          "erp_core": "نواة ERP",
+          "crm_suite": "حزمة CRM",
+          "hr_payroll": "الموارد البشرية والرواتب",
+          "inventory": "إدارة المخزون"
+        },
+        "hero": {
+          "badge": "منصة Nexora ERP",
+          "title": "نظام التشغيل للمؤسسة الحديثة",
+          "subtitle": "وحّد سير العمل، أتمت الامتثال المالي، ووسّع العمليات بمحرك ERP التنبؤي من Nexora.",
+          "cta_trial": "ابدأ تجربة مجانية",
+          "cta_expert": "تحدث مع خبير"
+        },
+        "values": {
+          "title": "مصمم للكفاءة المطلقة",
+          "support_title": "دعم 24/7",
+          "support_desc": "متخصصون مؤسسيون متاحون على مدار الساعة.",
+          "analytics_title": "تحليلات تنبؤية",
+          "analytics_desc": "رؤى فورية قبل تأثيرها على الربحية.",
+          "security_title": "أمان بمستوى عسكري",
+          "security_desc": "تشفير ونسخ احتياطي يومي وتحكم بالوصول.",
+          "deploy_title": "نشر فوري",
+          "deploy_desc": "انطلاق خلال أيام مع وحدات جاهزة."
+        },
+        "modules": {
+          "title": "وحدات مؤسسية",
+          "subtitle": "أنظمة متكاملة لعملياتك الأساسية.",
+          "crm_title": "CRM متقدم",
+          "crm_desc": "ذكاء عملاء موحد وأتمتة خط المبيعات.",
+          "hr_title": "موارد بشرية ذكية",
+          "hr_desc": "تحليلات القوى العاملة والرواتب والامتثال.",
+          "inventory_title": "تحكم بالمخزون",
+          "inventory_desc": "رؤية فورية للمخزون وطلبات ذكية."
+        },
+        "testimonials": {
+          "title": "موثوق من قادة الصناعة",
+          "quote1": "حوّلت Nexora الإقفال المالي من أسبوعين إلى يومين.",
+          "quote2": "دمجنا ستة أنظمة قديمة. دقة المخزون وصلت 99.4%.",
+          "quote3": "مرونة استثنائية — ثلاثة سير عمل مخصصة بدون كود."
+        },
+        "theme_section": {
+          "title": "مساحة عمل تناسبك",
+          "subtitle": "اختر نظام ألوان — يُطبق على الموقع بالكامل.",
+          "panel_label": "نظام الألوان",
+          "preview_hint": "معاينة حية للوحة التحكم"
+        },
+        "integrations": {
+          "title": "يتكامل مع أدواتك الحالية",
+          "subtitle": "تكاملات ذكية مع أنظمتك الأساسية"
+        },
+        "cta": {
+          "title": "مستعد لترقية عملك؟",
+          "subtitle": "انضم للشركات التي تزيد الربحية والسيطرة مع Nexora.",
+          "try": "جرّب الآن",
+          "login": "دخول"
+        },
+        "stats": {
+          "efficiency": "85%",
+          "efficiency_label": "تحسين الكفاءة",
+          "clients": "+1,200",
+          "clients_label": "عملاء مؤسسيون",
+          "support": "24/7",
+          "support_label": "دعم خبراء",
+          "uptime": "99.9%",
+          "uptime_label": "توفر المنصة"
+        },
+        "trust": {
+          "badge": "مستوى مؤسسي",
+          "title": "موثوق من مؤسسات رائدة",
+          "client1": "Vertex Dynamics",
+          "client2": "Apex Manufacturing",
+          "client3": "NovaScale",
+          "client4": "GlobalFin",
+          "client5": "TechBridge",
+          "soc2_title": "SOC 2 Type II",
+          "soc2_desc": "ضوابط أمان مدققة",
+          "iso_title": "ISO 27001",
+          "iso_desc": "معتمد أمن المعلومات",
+          "gdpr_title": "جاهز لـ GDPR",
+          "gdpr_desc": "خصوصية بالتصميم",
+          "uptime_title": "SLA 99.9%",
+          "uptime_desc": "توفر مضمون"
+        },
+        "process": {
+          "title": "من التهيئة إلى العائد خلال أسابيع",
+          "subtitle": "منهجية نشر مؤسسية مثبتة.",
+          "step1_title": "اكتشاف",
+          "step1_desc": "رسم العمليات ومتطلبات التكامل.",
+          "step2_title": "إعداد",
+          "step2_desc": "نشر الوحدات وترحيل البيانات بأمان.",
+          "step3_title": "تدريب",
+          "step3_desc": "تمكين عملي للمسؤولين والمستخدمين.",
+          "step4_title": "إطلاق",
+          "step4_desc": "انطلاق مع دعم hypercare مخصص."
+        }
+      }
+    }
+  },
+  "fr": {
+    "translation": {
+      "landing": {
+        "nav": {
+          "products": "Produits",
+          "solutions": "Solutions",
+          "enterprise": "Entreprise",
+          "pricing": "Tarifs",
+          "resources": "Ressources",
+          "sign_in": "Connexion",
+          "request_demo": "Demander une démo",
+          "erp_core": "ERP Core",
+          "crm_suite": "Suite CRM",
+          "hr_payroll": "RH & Paie",
+          "inventory": "Gestion des stocks"
+        },
+        "hero": {
+          "badge": "Plateforme Nexora ERP",
+          "title": "Le système d'exploitation de l'entreprise moderne",
+          "subtitle": "Unifiez les flux de travail, automatisez la conformité financière et scalez avec le moteur ERP prédictif de Nexora.",
+          "cta_trial": "Essai gratuit",
+          "cta_expert": "Parler à un expert"
+        },
+        "values": {
+          "title": "Conçu pour une efficacité absolue",
+          "support_title": "Support 24/7",
+          "support_desc": "Spécialistes enterprise disponibles en permanence.",
+          "analytics_title": "Analytique prédictive",
+          "analytics_desc": "Anticipez risques et opportunités en temps réel.",
+          "security_title": "Sécurité de niveau bancaire",
+          "security_desc": "Chiffrement, sauvegardes quotidiennes et contrôle d'accès.",
+          "deploy_title": "Déploiement rapide",
+          "deploy_desc": "Mise en production en jours avec modules prêts à l'emploi."
+        },
+        "modules": {
+          "title": "Modules enterprise",
+          "subtitle": "Systèmes intégrés à votre infrastructure opérationnelle.",
+          "crm_title": "CRM avancé",
+          "crm_desc": "Intelligence client unifiée et automatisation du pipeline.",
+          "hr_title": "RH intelligent",
+          "hr_desc": "Analytics RH, paie et conformité en un seul centre.",
+          "inventory_title": "Contrôle des stocks",
+          "inventory_desc": "Visibilité temps réel et réapprovisionnement intelligent."
+        },
+        "testimonials": {
+          "title": "Approuvé par les leaders du secteur",
+          "quote1": "Nexora a réduit notre clôture financière de deux semaines à deux jours.",
+          "quote2": "Six systèmes legacy consolidés. Précision stock à 99,4%.",
+          "quote3": "Modularité remarquable — trois workflows sans code backend."
+        },
+        "theme_section": {
+          "title": "Un espace de travail adapté à vous",
+          "subtitle": "Choisissez un thème — appliqué sur tout le site.",
+          "panel_label": "Schéma de couleurs",
+          "preview_hint": "Aperçu en direct du tableau de bord"
+        },
+        "integrations": {
+          "title": "S'intègre à vos outils existants",
+          "subtitle": "Intégrations intelligentes avec vos systèmes clés"
+        },
+        "cta": {
+          "title": "Prêt à faire évoluer votre entreprise ?",
+          "subtitle": "Rejoignez les entreprises qui augmentent rentabilité et contrôle.",
+          "try": "Essayer",
+          "login": "Connexion"
+        },
+        "stats": {
+          "efficiency": "85%",
+          "efficiency_label": "Gain d'efficacité",
+          "clients": "1 200+",
+          "clients_label": "Clients enterprise",
+          "support": "24/7",
+          "support_label": "Support expert",
+          "uptime": "99,9%",
+          "uptime_label": "Disponibilité plateforme"
+        },
+        "trust": {
+          "badge": "Niveau enterprise",
+          "title": "La confiance des organisations leaders",
+          "client1": "Vertex Dynamics",
+          "client2": "Apex Manufacturing",
+          "client3": "NovaScale",
+          "client4": "GlobalFin",
+          "client5": "TechBridge",
+          "soc2_title": "SOC 2 Type II",
+          "soc2_desc": "Contrôles de sécurité audités",
+          "iso_title": "ISO 27001",
+          "iso_desc": "Sécurité de l'information certifiée",
+          "gdpr_title": "Conforme RGPD",
+          "gdpr_desc": "Privacy by design",
+          "uptime_title": "SLA 99,9%",
+          "uptime_desc": "Disponibilité garantie"
+        },
+        "process": {
+          "title": "De l'onboarding au ROI en semaines",
+          "subtitle": "Méthodologie de déploiement enterprise éprouvée.",
+          "step1_title": "Découverte",
+          "step1_desc": "Cartographie des processus et besoins d'intégration.",
+          "step2_title": "Configuration",
+          "step2_desc": "Déploiement des modules et migration sécurisée.",
+          "step3_title": "Formation",
+          "step3_desc": "Activation pratique des admins et utilisateurs.",
+          "step4_title": "Mise en production",
+          "step4_desc": "Go-live avec support hypercare dédié."
+        }
+      }
+    }
+  },
+  "es": {
+    "translation": {
+      "landing": {
+        "nav": {
+          "products": "Productos",
+          "solutions": "Soluciones",
+          "enterprise": "Empresa",
+          "pricing": "Precios",
+          "resources": "Recursos",
+          "sign_in": "Iniciar sesión",
+          "request_demo": "Solicitar demo",
+          "erp_core": "ERP Core",
+          "crm_suite": "Suite CRM",
+          "hr_payroll": "RRHH y nómina",
+          "inventory": "Control de inventario"
+        },
+        "hero": {
+          "badge": "Plataforma Nexora ERP",
+          "title": "El sistema operativo para la empresa moderna",
+          "subtitle": "Unifica flujos de trabajo, automatiza el cumplimiento financiero y escala con el motor ERP predictivo de Nexora.",
+          "cta_trial": "Prueba gratuita",
+          "cta_expert": "Hablar con un experto"
+        },
+        "values": {
+          "title": "Diseñado para máxima eficiencia",
+          "support_title": "Soporte 24/7",
+          "support_desc": "Especialistas enterprise disponibles siempre.",
+          "analytics_title": "Analítica predictiva",
+          "analytics_desc": "Anticipa riesgos y oportunidades en tiempo real.",
+          "security_title": "Seguridad de nivel bancario",
+          "security_desc": "Cifrado, copias diarias y control de acceso.",
+          "deploy_title": "Despliegue rápido",
+          "deploy_desc": "En marcha en días con módulos preconstruidos."
+        },
+        "modules": {
+          "title": "Módulos enterprise",
+          "subtitle": "Sistemas integrados en tu operación.",
+          "crm_title": "CRM avanzado",
+          "crm_desc": "Inteligencia de clientes y automatización del pipeline.",
+          "hr_title": "RRHH inteligente",
+          "hr_desc": "Analytics, nómina y cumplimiento en un centro.",
+          "inventory_title": "Control de inventario",
+          "inventory_desc": "Visibilidad en tiempo real y reorden inteligente."
+        },
+        "testimonials": {
+          "title": "Confianza de líderes del sector",
+          "quote1": "Nexora redujo el cierre financiero de dos semanas a dos días.",
+          "quote2": "Consolidamos seis sistemas legacy. Precisión de stock al 99,4%.",
+          "quote3": "Modularidad extraordinaria — tres flujos sin código backend."
+        },
+        "theme_section": {
+          "title": "Un espacio de trabajo a tu medida",
+          "subtitle": "Elige un tema — se aplica en todo el sitio.",
+          "panel_label": "Esquema de color",
+          "preview_hint": "Vista previa en vivo del panel"
+        },
+        "integrations": {
+          "title": "Se integra con tus herramientas",
+          "subtitle": "Integraciones inteligentes con sistemas clave"
+        },
+        "cta": {
+          "title": "¿Listo para impulsar tu negocio?",
+          "subtitle": "Únete a empresas que aumentan rentabilidad y control.",
+          "try": "Probar ahora",
+          "login": "Iniciar sesión"
+        },
+        "stats": {
+          "efficiency": "85%",
+          "efficiency_label": "Mejora de eficiencia",
+          "clients": "1,200+",
+          "clients_label": "Clientes enterprise",
+          "support": "24/7",
+          "support_label": "Soporte experto",
+          "uptime": "99.9%",
+          "uptime_label": "Disponibilidad"
+        },
+        "trust": {
+          "badge": "Nivel enterprise",
+          "title": "Organizaciones líderes confían en nosotros",
+          "client1": "Vertex Dynamics",
+          "client2": "Apex Manufacturing",
+          "client3": "NovaScale",
+          "client4": "GlobalFin",
+          "client5": "TechBridge",
+          "soc2_title": "SOC 2 Type II",
+          "soc2_desc": "Controles de seguridad auditados",
+          "iso_title": "ISO 27001",
+          "iso_desc": "Seguridad de la información",
+          "gdpr_title": "Listo para GDPR",
+          "gdpr_desc": "Privacidad por diseño",
+          "uptime_title": "SLA 99.9%",
+          "uptime_desc": "Disponibilidad garantizada"
+        },
+        "process": {
+          "title": "Del onboarding al ROI en semanas",
+          "subtitle": "Metodología enterprise probada.",
+          "step1_title": "Descubrimiento",
+          "step1_desc": "Mapeo de procesos y requisitos de integración.",
+          "step2_title": "Configuración",
+          "step2_desc": "Despliegue de módulos y migración segura.",
+          "step3_title": "Formación",
+          "step3_desc": "Capacitación práctica para admins y usuarios.",
+          "step4_title": "Go-live",
+          "step4_desc": "Lanzamiento con soporte hypercare dedicado."
+        }
+      }
+    }
+  },
+  "ja": {
+    "translation": {
+      "landing": {
+        "nav": {
+          "products": "製品",
+          "solutions": "ソリューション",
+          "enterprise": "エンタープライズ",
+          "pricing": "料金",
+          "resources": "リソース",
+          "sign_in": "ログイン",
+          "request_demo": "デモを依頼",
+          "erp_core": "ERPコア",
+          "crm_suite": "CRMスイート",
+          "hr_payroll": "人事・給与",
+          "inventory": "在庫管理"
+        },
+        "hero": {
+          "badge": "Nexora ERPプラットフォーム",
+          "title": "現代企業のためのオペレーティングシステム",
+          "subtitle": "ワークフローを統合し、財務コンプライアンスを自動化。Nexoraの予測ERPエンジンでスケール。",
+          "cta_trial": "無料トライアル",
+          "cta_expert": "専門家に相談"
+        },
+        "values": {
+          "title": "究極の効率性のために設計",
+          "support_title": "24/7サポート",
+          "support_desc": "エンタープライズ専門家が常時対応。",
+          "analytics_title": "予測分析",
+          "analytics_desc": "リスクと機会をリアルタイムで把握。",
+          "security_title": "銀行級セキュリティ",
+          "security_desc": "暗号化、日次バックアップ、アクセス制御。",
+          "deploy_title": "即時導入",
+          "deploy_desc": "事前構築モジュールで数日で本番稼働。"
+        },
+        "modules": {
+          "title": "エンタープライズモジュール",
+          "subtitle": "業務基盤にシームレスに統合。",
+          "crm_title": "高度なCRM",
+          "crm_desc": "統合顧客インテリジェンスとパイプライン自動化。",
+          "hr_title": "インテリジェントHR",
+          "hr_desc": "人材分析、給与、コンプライアンスを一元管理。",
+          "inventory_title": "在庫コントロール",
+          "inventory_desc": "リアルタイム在庫可視化とスマート発注。"
+        },
+        "testimonials": {
+          "title": "業界リーダーに信頼されています",
+          "quote1": "Nexoraは財務締めを2週間から2日に短縮しました。",
+          "quote2": "6つのレガシーシステムを統合。在庫精度99.4%。",
+          "quote3": "モジュール性が卓越 — バックエンドコードなしで3ワークフロー。"
+        },
+        "theme_section": {
+          "title": "あなたに合わせたワークスペース",
+          "subtitle": "カラースキームを選択 — サイト全体に適用。",
+          "panel_label": "カラースキーム",
+          "preview_hint": "ダッシュボードのライブプレビュー"
+        },
+        "integrations": {
+          "title": "既存ツールと統合",
+          "subtitle": "コアシステムとのスマート統合"
+        },
+        "cta": {
+          "title": "ビジネスをアップグレードする準備は？",
+          "subtitle": "Nexoraで収益性と統制を高める企業に参加。",
+          "try": "今すぐ試す",
+          "login": "ログイン"
+        },
+        "stats": {
+          "efficiency": "85%",
+          "efficiency_label": "効率改善",
+          "clients": "1,200+",
+          "clients_label": "エンタープライズ顧客",
+          "support": "24/7",
+          "support_label": "専門サポート",
+          "uptime": "99.9%",
+          "uptime_label": "プラットフォーム稼働率"
+        },
+        "trust": {
+          "badge": "エンタープライズグレード",
+          "title": "世界の主要組織に信頼されています",
+          "client1": "Vertex Dynamics",
+          "client2": "Apex Manufacturing",
+          "client3": "NovaScale",
+          "client4": "GlobalFin",
+          "client5": "TechBridge",
+          "soc2_title": "SOC 2 Type II",
+          "soc2_desc": "監査済みセキュリティ管理",
+          "iso_title": "ISO 27001",
+          "iso_desc": "情報セキュリティ認証",
+          "gdpr_title": "GDPR対応",
+          "gdpr_desc": "プライバシー・バイ・デザイン",
+          "uptime_title": "SLA 99.9%",
+          "uptime_desc": "可用性保証"
+        },
+        "process": {
+          "title": "導入からROIまで数週間",
+          "subtitle": "実績あるエンタープライズ導入手法。",
+          "step1_title": "ディスカバリー",
+          "step1_desc": "プロセスと統合要件のマッピング。",
+          "step2_title": "設定",
+          "step2_desc": "モジュール展開と安全なデータ移行。",
+          "step3_title": "トレーニング",
+          "step3_desc": "管理者・ユーザー向け実践トレーニング。",
+          "step4_title": "本番稼働",
+          "step4_desc": "専任hypercareサポートでローンチ。"
+        }
+      }
+    }
+  }
+}

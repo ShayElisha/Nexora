@@ -63,16 +63,19 @@
 ### Frontend
 
 - **Framework**: React 18.3
-- **Build Tool**: Vite
-- **State Management**: Zustand, TanStack Query
+- **Build Tool**: Vite 5
+- **State Management**: Zustand, TanStack Query (React Query)
 - **Routing**: React Router DOM v6
 - **Styling**: Tailwind CSS, DaisyUI
-- **Animations**: Framer Motion
+- **Animations**: Framer Motion, canvas-confetti
 - **Forms**: Formik, React Hook Form, Yup
 - **Charts**: Chart.js, react-chartjs-2
-- **PDF**: html2pdf.js, jsPDF, html2canvas
-- **i18n**: react-i18next (7 שפות)
+- **PDF**: html2pdf.js, jsPDF, jspdf-autotable, pdfmake
+- **Excel**: xlsx (SheetJS) לייצוא נתונים
+- **Payments (Client)**: Stripe.js, PayPal React SDK
+- **i18n**: react-i18next עם i18next (7 שפות, 32 namespaces)
 - **Icons**: Lucide React, Heroicons, React Icons
+- **Desktop (Optional)**: Electron packaging
 
 ---
 
@@ -89,8 +92,8 @@
 
 1. **שכפול הפרויקט**
 ```bash
-git clone https://github.com/yourusername/nexora-erp.git
-cd nexora-erp
+git clone https://github.com/ShayElisha/Nexora.git
+cd Nexora
 ```
 
 2. **התקנת תלויות Backend**
@@ -170,7 +173,7 @@ nexora-erp/
 │   │   ├── redis.js         # Redis configuration
 │   │   ├── addIndexes.js    # Performance indexes
 │   │   └── lib/             # Libraries (Cloudinary, Nodemailer, Payment)
-│   ├── controllers/         # 73 controller files
+│   ├── controllers/         # 60 controller files
 │   ├── models/              # 73 model files
 │   ├── routes/              # 56 route files
 │   ├── middleware/          # Custom middleware
@@ -182,15 +185,23 @@ nexora-erp/
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── pages/           # 179 page files
-│   │   │   ├── AdminPanel/ # Admin pages
+│   │   ├── pages/           # 176 page files
+│   │   │   ├── AdminPanel/ # Admin pages (all business modules)
 │   │   │   ├── auth/        # Authentication pages
-│   │   │   └── employeePages/ # Employee pages
-│   │   ├── components/      # Reusable components
+│   │   │   ├── payment/     # Pricing & payment pages
+│   │   │   └── employeePages/ # Employee self-service pages
+│   │   ├── components/
+│   │   │   ├── auth/        # Auth UI shell (Canvas, Card, Surface)
+│   │   │   ├── home/        # Landing hero, stats, modules, testimonials
+│   │   │   ├── landing/     # Marketing page shells & sections
+│   │   │   ├── public/      # Public (legal / card-grid) building blocks
+│   │   │   ├── company/     # Company onboarding
+│   │   │   └── layout/      # Navbar, Layout, i18n + translations/
+│   │   │       └── translations/modules/  # 32 namespace JSON files
 │   │   ├── stores/          # Zustand stores
-│   │   ├── hooks/           # Custom hooks
-│   │   ├── api/             # API configuration
-│   │   └── lib/             # Libraries
+│   │   ├── hooks/           # Custom hooks (usePageLocale, ...)
+│   │   ├── api/             # Axios API configuration
+│   │   └── lib/             # designThemes, publicRoutes, helpers
 │   ├── public/              # Static assets
 │   └── package.json
 │
@@ -357,6 +368,22 @@ nexora-erp/
 - **מגמות מכירות**: זיהוי מגמות מכירות
 - **תובנות אוטומטיות**: תובנות AI אוטומטיות
 
+### 21. אתר שיווקי ציבורי (Marketing Website) 🌐
+
+- **דף בית (Landing)**: Hero, Value Pillars, Product Modules, How It Works, Stats, Testimonials, Trust & CTA
+- **עמודי שיווק**: Features, Integrations, About, Careers, Blog, Customers, Partners, Contact
+- **עמודי מוצר/מסמכים**: API, Docs, Help, Status, Security, Report
+- **עמודים משפטיים**: Privacy, Terms, Cookies
+- **מבנה מודולרי**: `MarketingPageShell`, `LandingSection`, ו-blocks לשימוש חוזר
+- **רב-לשוני**: כל עמודי השיווק נתמכים ב-`usePageLocale` ו-namespaces ייעודיים
+
+### 22. מערכת עיצוב וערכות נושא (Design System) 🎨
+
+- **Theme Playground**: החלפת ערכות עיצוב בזמן אמת
+- **Design Themes**: הגדרות עיצוב מרוכזות ב-`lib/designThemes.js`
+- **Auth UI Shell**: `AuthCanvas`, `AuthCard`, `AuthSurface` לחוויית התחברות אחידה
+- **Responsive & RTL**: תמיכה מלאה בכל רוחבי המסך ובכיווניות
+
 ---
 
 ## 🔐 אבטחה
@@ -389,6 +416,8 @@ nexora-erp/
 - תאריכים וזמנים מותאמים לשפה
 - PDF עם תמיכה בשפות
 - ממשק משתמש מתורגם מלא
+- **ארכיטקטורת תרגום מודולרית**: 32 קבצי namespace נפרדים (`hr`, `procurement`, `crm`, `finance`, `landing` ועוד) לטעינה ותחזוקה יעילות
+- **זיהוי שפה אוטומטי**: `i18next-browser-languagedetector`
 
 ---
 
@@ -417,12 +446,15 @@ nexora-erp/
 ## 📊 סטטיסטיקות
 
 - **Models**: 73 מודלים
-- **Controllers**: 73 controllers
+- **Controllers**: 60 controllers
 - **Routes**: 56 routes
-- **Pages**: 179 דפים
-- **Components**: 44 components
+- **Pages**: 176 דפים
+- **Components**: 54+ components
+- **Translation Modules**: 32 מודולי תרגום (namespace-based)
 - **Languages**: 7 שפות
 - **API Endpoints**: 200+ endpoints
+- **Marketing / Landing Pages**: 30+ עמודי שיווק ציבוריים
+- **Design Themes**: מספר ערכות עיצוב מתחלפות (Theme Playground)
 
 ---
 
@@ -552,7 +584,15 @@ npm test
 
 ## 🔄 עדכונים אחרונים
 
-### v1.0.0 (2025-01-XX)
+### v1.1.0 (2026)
+- ✨ אתר שיווקי ציבורי חדש (Landing + 30+ עמודי Marketing)
+- ✨ מערכת עיצוב וערכות נושא מתחלפות (Theme Playground + `designThemes`)
+- ✨ Auth UI Shell חדש (Canvas / Card / Surface) לחוויית התחברות אחידה
+- ✨ ארכיטקטורת תרגום מודולרית — 32 namespaces נפרדים
+- ✨ ניהול רכיבים חסרים בייצור (Missing Components Management)
+- ⚡ שיפורי ביצועים ותחזוקתיות
+
+### v1.0.0
 - ✨ הוספת תמיכה ב-7 שפות
 - ✨ שיפור מערכת רשימות מחירים
 - ✨ הוספת הנחות לפי כמות

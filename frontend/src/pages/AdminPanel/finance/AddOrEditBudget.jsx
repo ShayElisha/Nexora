@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import SignaturesModal from "../Procurement/components/SignaturesModal";
+import SignaturesModal from "../procurement/components/SignaturesModal";
 import currency from "./currency.json";
 import {
   Plus,

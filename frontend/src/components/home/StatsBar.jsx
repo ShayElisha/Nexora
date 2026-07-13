@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import LandingSection from "./LandingSection";
+import LandingSection from "../landing/LandingSection";
 
 const StatsBar = () => {
   const { t } = useTranslation();

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
-import { plans } from "../../../../backend/config/lib/payment.js";
+import { plans } from "../../lib/plans.js";
 import { Check, Loader2, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
 import PublicPageHero from "../../components/home/PublicPageHero";

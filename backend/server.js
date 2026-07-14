@@ -90,13 +90,31 @@ app.use(express.json({ limit: "50mb" })); // הגדל את הגבול לפי ה�
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
 
-// Liveness check — must work even if MongoDB is not configured yet.
-app.get("/api/health", (_req, res) => {
-  res.status(200).json({
-    ok: true,
+// Liveness + DB diagnostic — must work even if MongoDB is not configured yet.
+app.get("/api/health", async (_req, res) => {
+  const hasMongoUri = Boolean(process.env.MONGO_URI || process.env.MONGODB_URI);
+  let db = { ok: false, error: null };
+  if (hasMongoUri) {
+    try {
+      await connectDB();
+      db = { ok: true, error: null };
+    } catch (error) {
+      db = { ok: false, error: error.message };
+    }
+  } else {
+    db = {
+      ok: false,
+      error:
+        "MONGO_URI is not set in Vercel Environment Variables (Project Settings → Environment Variables).",
+    };
+  }
+  res.status(db.ok ? 200 : 503).json({
+    ok: db.ok,
     service: "nexora-backend",
     vercel: Boolean(process.env.VERCEL),
-    hasMongoUri: Boolean(process.env.MONGO_URI || process.env.MONGODB_URI),
+    hasMongoUri,
+    hasJwtSecret: Boolean(process.env.JWT_SECRET),
+    db,
   });
 });
 
@@ -111,6 +129,8 @@ app.use("/api", async (req, res, next) => {
       success: false,
       message: "Database unavailable",
       error: error.message,
+      hint:
+        "Set MONGO_URI in Vercel → Settings → Environment Variables, then Redeploy. In MongoDB Atlas → Network Access, allow 0.0.0.0/0 (or Vercel IPs).",
     });
   }
 });

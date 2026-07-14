@@ -3,7 +3,7 @@ import Finance from "../models/finance.model.js";
 import Procurement from "../models/procurement.model.js";
 import Suppliers from "../models/suppliers.model.js";
 import Budget from "../models/Budget.model.js";
-import Salary from "../models/Salary.model.js";
+import Salary from "../models/salary.model.js";
 import Shifts from "../models/Shifts.model.js";
 import Projects from "../models/project.model.js";
 import Tasks from "../models/tasks.model.js";

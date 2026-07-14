@@ -2,7 +2,7 @@ import Employee from "../models/employees.model.js";
 import SickDays from "../models/SickDays.models.js";
 import Shift from "../models/Shifts.model.js";
 import PayRate from "../models/PayRates.model.js";
-import Salary from "../models/Salary.model.js";
+import Salary from "../models/salary.model.js";
 import Notification from "../models/notification.model.js";
 
 

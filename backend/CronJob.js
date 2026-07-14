@@ -82,7 +82,7 @@ import { addMonthlyVacationDays } from "./controllers/employees.controller.js";
 import { sendInvoiceReminders } from "./controllers/invoiceReminder.controller.js";
 import { checkAndCreateProjectRisks } from "./controllers/advancedProject.controller.js";
 import Company from "./models/companies.model.js";
-import Salary from "./models/Salary.model.js";
+import Salary from "./models/salary.model.js";
 import Employee from "./models/employees.model.js";
 import Shift from "./models/Shifts.model.js";
 import TaxConfig from "./models/TaxConfig.model.js";

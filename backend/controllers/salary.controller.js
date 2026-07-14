@@ -1,4 +1,4 @@
-import Salary from "../models/Salary.model.js";
+import Salary from "../models/salary.model.js";
 import TaxConfig from "../models/TaxConfig.model.js";
 import Employee from "../models/employees.model.js";
 import Company from "../models/companies.model.js";

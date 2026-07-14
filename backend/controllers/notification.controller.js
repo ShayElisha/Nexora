@@ -20,7 +20,7 @@ import productTree from "../models/productTree.model.js";
 import Product from "../models/product.model.js";
 import { checkComponentAvailability } from "./ProductionOrder.controller.js";
 import Shift from "../models/Shifts.model.js";
-import Salary from "../models/Salary.model.js";
+import Salary from "../models/salary.model.js";
 import Invoice from "../models/invoice.model.js";
 import Suppliers from "../models/suppliers.model.js";
 import Customer from "../models/customers.model.js";

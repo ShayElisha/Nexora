@@ -1,4 +1,4 @@
-import Budget from "./budget.model.js";
+import Budget from "./Budget.model.js";
 import Company from "./companies.model.js";
 import CustomerOrder from "./CustomerOrder.model.js";
 import Customer from "./customers.model.js";

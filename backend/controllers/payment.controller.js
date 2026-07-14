@@ -1507,7 +1507,7 @@ export const updateCompanyPlanFromAdmin = async (req, res) => {
  */
 export const retryPayment = async (req, res) => {
   try {
-    const companyId = req.user?.companyId;
+    let companyId = req.user?.companyId;
     
     // Try to get companyId from cookies if not in user
     if (!companyId) {

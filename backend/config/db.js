@@ -3,26 +3,22 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// Cache the connection across serverless invocations (Vercel reuses the
-// module scope between warm invocations, so we avoid opening a new
-// connection on every request).
+// Cache the connection across serverless / Fluid invocations.
 let cached = global._mongooseCache;
 if (!cached) {
   cached = global._mongooseCache = { conn: null, promise: null };
 }
 
 export const connectDB = async () => {
-  // Try MONGO_URI first, fallback to MONGODB_URI
   const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
 
   if (!mongoUri) {
-    console.error("❌ MongoDB URI not found in environment variables");
-    console.error("Please set MONGO_URI or MONGODB_URI in .env file");
-    // In serverless we must not kill the process; surface the error instead.
-    if (process.env.VERCEL) {
-      throw new Error("MongoDB URI not found in environment variables");
-    }
-    process.exit(1);
+    const message =
+      "MongoDB URI not found. Set MONGO_URI (or MONGODB_URI) in environment variables.";
+    console.error(`❌ ${message}`);
+    // Never process.exit on Vercel / production — that kills the whole service
+    // and surfaces as FUNCTION_INVOCATION_FAILED / opaque 404s to the client.
+    throw new Error(message);
   }
 
   if (cached.conn) {
@@ -47,11 +43,11 @@ export const connectDB = async () => {
   } catch (error) {
     cached.promise = null;
     console.log(`❌ Error connecting to MongoDb: ${error.message}`);
-    if (process.env.VERCEL) {
-      throw error;
-    }
-    process.exit(1);
+    throw error;
   }
 
   return cached.conn;
 };
+
+export const isDbConnected = () =>
+  mongoose.connection.readyState === 1 || Boolean(cached.conn);

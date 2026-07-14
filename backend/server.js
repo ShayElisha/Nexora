@@ -89,6 +89,32 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "50mb" })); // הגדל את הגבול לפי הצורך
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
+
+// Liveness check — must work even if MongoDB is not configured yet.
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({
+    ok: true,
+    service: "nexora-backend",
+    vercel: Boolean(process.env.VERCEL),
+    hasMongoUri: Boolean(process.env.MONGO_URI || process.env.MONGODB_URI),
+  });
+});
+
+// Ensure DB is connected for API traffic (cached; first request may await).
+app.use("/api", async (req, res, next) => {
+  if (req.path === "/health") return next();
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    res.status(503).json({
+      success: false,
+      message: "Database unavailable",
+      error: error.message,
+    });
+  }
+});
+
 // API routes
 app.use("/api/auth", authRoutes);
 app.use("/api/superAdmin", superAdminRoutes);
@@ -176,9 +202,10 @@ app.post("/save-pdf", (req, res) => {
 import { errorHandler } from "./middleware/errorHandler.js";
 app.use(errorHandler);
 
-// Connect to the database (connection is cached across invocations). Mongoose
-// buffers queries until the connection is ready.
-connectDB();
+// Connect to the database in the background (connection is cached).
+connectDB().catch((error) =>
+  console.error("Initial DB connect failed (will retry on request):", error.message)
+);
 
 // Performance indexes run in the background and are non-critical.
 import("./config/addIndexes.js")
@@ -187,9 +214,8 @@ import("./config/addIndexes.js")
     console.error("Error adding indexes (non-critical):", error.message)
   );
 
-// In-process cron jobs require a persistent process. They run locally by
-// default, and on Vercel only when ENABLE_CRON=true (otherwise use Vercel Cron,
-// since Fluid compute can scale to zero).
+// In-process cron jobs require a persistent process. Skip on Vercel unless
+// ENABLE_CRON=true (Fluid compute can scale to zero).
 if (!isServerless || process.env.ENABLE_CRON === "true") {
   await import("./CronJob.js");
 }

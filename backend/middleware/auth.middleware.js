@@ -145,67 +145,82 @@ const handleRefreshToken = async (req, res, next) => {
  */
 export const protectCompanyOrUserRoute = async (req, res, next) => {
   try {
-    const token = extractToken(req);
+    const authToken = req.cookies["auth_token"];
+    const companyToken = req.cookies["company_jwt"];
+    const authHeader = req.headers.authorization;
+    const bearerToken =
+      authHeader && authHeader.startsWith("Bearer ")
+        ? authHeader.substring(7)
+        : null;
 
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: ERROR_MESSAGES.NO_TOKEN_PROVIDED,
-        error: getErrorMessage("NO_TOKEN_PROVIDED"),
-      });
+    // Prefer a valid employee session
+    const userToken = authToken || bearerToken;
+    if (userToken) {
+      try {
+        const decoded = AuthService.verifyAccessToken(userToken);
+
+        if (decoded.userId) {
+          const user = await Employee.findById(decoded.userId).select(
+            "-password"
+          );
+          if (user) {
+            req.user = user;
+            req.decoded = decoded;
+            return next();
+          }
+          // Stale employee cookie — clear user cookies only, keep company_jwt
+          AuthService.clearAuthCookies(res);
+        } else if (decoded.companyId) {
+          const company = await Company.findById(decoded.companyId);
+          if (company) {
+            req.user = { companyId: decoded.companyId };
+            req.company = company;
+            req.decoded = decoded;
+            return next();
+          }
+        }
+      } catch (error) {
+        if (
+          !(
+            error.message?.includes("expired") ||
+            error.name === "TokenExpiredError"
+          )
+        ) {
+          AuthService.clearAuthCookies(res);
+        } else {
+          // Try refresh for employee sessions only
+          const refreshToken = req.cookies["auth_refresh_token"];
+          if (refreshToken) {
+            return handleRefreshToken(req, res, next);
+          }
+          AuthService.clearAuthCookies(res);
+        }
+      }
     }
 
-    try {
-      const decoded = AuthService.verifyAccessToken(token);
-
-      // Check if it's a user token or company token
-      if (decoded.userId) {
-        // User token - find the user
-        const user = await Employee.findById(decoded.userId).select("-password");
-        if (!user) {
-          AuthService.clearAuthCookies(res);
-          return res.status(401).json({
-            success: false,
-            message: ERROR_MESSAGES.USER_NOT_FOUND,
-            error: getErrorMessage("USER_NOT_FOUND"),
-          });
+    // Fall back to company registration cookie (pre–first-admin payment flow)
+    if (companyToken) {
+      try {
+        const decoded = AuthService.verifyAccessToken(companyToken);
+        if (decoded.companyId) {
+          const company = await Company.findById(decoded.companyId);
+          if (company) {
+            req.user = { companyId: decoded.companyId };
+            req.company = company;
+            req.decoded = decoded;
+            return next();
+          }
         }
-        req.user = user;
-        req.decoded = decoded;
-      } else if (decoded.companyId) {
-        // Company token - find the company
-        const company = await Company.findById(decoded.companyId);
-        if (!company) {
-          AuthService.clearAuthCookies(res);
-          return res.status(401).json({
-            success: false,
-            message: "Company not found",
-            error: getErrorMessage("NOT_FOUND"),
-          });
-        }
-        req.user = { companyId: decoded.companyId };
-        req.company = company;
-        req.decoded = decoded;
-      } else {
-        return res.status(401).json({
-          success: false,
-          message: ERROR_MESSAGES.INVALID_TOKEN,
-          error: "Token does not contain userId or companyId",
-        });
+      } catch (error) {
+        console.error("Invalid company_jwt:", error.message);
       }
-
-      next();
-    } catch (error) {
-      if (error.message.includes("expired") || error.name === "TokenExpiredError") {
-        return handleRefreshToken(req, res, next);
-      }
-      
-      return res.status(401).json({
-        success: false,
-        message: ERROR_MESSAGES.INVALID_TOKEN,
-        error: getErrorMessage("TOKEN_VERIFICATION_FAILED"),
-      });
     }
+
+    return res.status(401).json({
+      success: false,
+      message: ERROR_MESSAGES.NO_TOKEN_PROVIDED,
+      error: getErrorMessage("NO_TOKEN_PROVIDED"),
+    });
   } catch (error) {
     console.error("Error in protectCompanyOrUserRoute middleware:", error.message);
     return res.status(500).json({

@@ -3,11 +3,22 @@ import { Bar, Doughnut } from "react-chartjs-2";
 import { axiosInstance } from "../../../lib/axios";
 import { motion } from "framer-motion";
 import { FaChartBar } from "react-icons/fa";
+import {
+  getThemeColors,
+  hexToRgba,
+} from "../../../lib/designThemes";
 
 const ProfitabilityAnalysis = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState("product"); // 'product', 'customer', 'both'
+  const theme = getThemeColors();
+  const [, setThemeTick] = useState(0);
+  useEffect(() => {
+    const onTheme = () => setThemeTick((n) => n + 1);
+    window.addEventListener("nexora-theme-change", onTheme);
+    return () => window.removeEventListener("nexora-theme-change", onTheme);
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -36,7 +47,7 @@ const ProfitabilityAnalysis = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -51,7 +62,7 @@ const ProfitabilityAnalysis = () => {
           {
             label: "הכנסות (₪)",
             data: data.byProduct.slice(0, 10).map((p) => p.revenue),
-            backgroundColor: "rgba(75, 192, 192, 0.8)",
+            backgroundColor: hexToRgba(theme.accent, 0.8),
             borderWidth: 2,
           },
         ],
@@ -66,7 +77,7 @@ const ProfitabilityAnalysis = () => {
           {
             label: "הכנסות (₪)",
             data: data.byCustomer.slice(0, 10).map((c) => c.revenue),
-            backgroundColor: "rgba(54, 162, 235, 0.8)",
+            backgroundColor: hexToRgba(theme.secondary, 0.8),
             borderWidth: 2,
           },
         ],
@@ -116,19 +127,19 @@ const ProfitabilityAnalysis = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200"
+      className="bg-[var(--bg-color)] rounded-2xl shadow-lg p-6 border border-[var(--border-color)]"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
-            <FaChartBar className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center">
+            <FaChartBar className="w-5 h-5 text-button-text" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-900">
+            <h3 className="text-xl font-bold">
               ניתוח רווחיות
             </h3>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-secondary mt-0.5">
               המוצרים והלקוחות המובילים
             </p>
           </div>
@@ -140,8 +151,8 @@ const ProfitabilityAnalysis = () => {
             onClick={() => setViewMode("product")}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               viewMode === "product"
-                ? "bg-teal-500 text-white shadow-md"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? "bg-accent text-button-text shadow-md"
+                : "bg-gray-100 text-secondary hover:bg-gray-200"
             }`}
           >
             לפי מוצר
@@ -150,8 +161,8 @@ const ProfitabilityAnalysis = () => {
             onClick={() => setViewMode("customer")}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               viewMode === "customer"
-                ? "bg-blue-500 text-white shadow-md"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? "bg-primary text-button-text shadow-md"
+                : "bg-gray-100 text-secondary hover:bg-gray-200"
             }`}
           >
             לפי לקוח
@@ -167,14 +178,14 @@ const ProfitabilityAnalysis = () => {
           </div>
 
           {/* Top Products Table */}
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-            <h4 className="text-base font-semibold text-gray-900 mb-4">
+          <div className="bg-gray-50 rounded-xl p-4 border border-[var(--border-color)]">
+            <h4 className="text-base font-semibold mb-4">
               TOP 10 מוצרים מרווחיים
             </h4>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-gray-200 text-gray-700">
+                  <tr className="bg-gray-200 text-secondary">
                     <th className="px-4 py-2 text-right">#</th>
                     <th className="px-4 py-2 text-right">מוצר</th>
                     <th className="px-4 py-2 text-right">הכנסות</th>
@@ -187,30 +198,30 @@ const ProfitabilityAnalysis = () => {
                   {data.byProduct.slice(0, 10).map((product, index) => (
                     <tr
                       key={index}
-                      className="border-b border-gray-200 hover:bg-gray-100"
+                      className="border-b border-[var(--border-color)] hover:bg-gray-100"
                     >
                       <td className="px-4 py-3 font-semibold text-gray-600">
                         {index + 1}
                       </td>
-                      <td className="px-4 py-3 font-medium text-gray-900">
+                      <td className="px-4 py-3 font-medium">
                         {product.productName}
                       </td>
-                      <td className="px-4 py-3 font-semibold text-green-600">
+                      <td className="px-4 py-3 font-semibold text-accent">
                         {new Intl.NumberFormat("he-IL", {
                           style: "currency",
                           currency: "ILS",
                         }).format(product.revenue)}
                       </td>
-                      <td className="px-4 py-3 text-gray-700">
+                      <td className="px-4 py-3 text-secondary">
                         {product.quantity}
                       </td>
-                      <td className="px-4 py-3 text-gray-700">
+                      <td className="px-4 py-3 text-secondary">
                         {new Intl.NumberFormat("he-IL", {
                           style: "currency",
                           currency: "ILS",
                         }).format(product.avgPrice)}
                       </td>
-                      <td className="px-4 py-3 text-gray-700">
+                      <td className="px-4 py-3 text-secondary">
                         {product.orderCount}
                       </td>
                     </tr>
@@ -230,14 +241,14 @@ const ProfitabilityAnalysis = () => {
           </div>
 
           {/* Top Customers Table */}
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-            <h4 className="text-base font-semibold text-gray-900 mb-4">
+          <div className="bg-gray-50 rounded-xl p-4 border border-[var(--border-color)]">
+            <h4 className="text-base font-semibold mb-4">
               TOP 10 לקוחות מרווחיים
             </h4>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-gray-200 text-gray-700">
+                  <tr className="bg-gray-200 text-secondary">
                     <th className="px-4 py-2 text-right">#</th>
                     <th className="px-4 py-2 text-right">לקוח</th>
                     <th className="px-4 py-2 text-right">הכנסות כוללות</th>
@@ -250,24 +261,24 @@ const ProfitabilityAnalysis = () => {
                   {data.byCustomer.slice(0, 10).map((customer, index) => (
                     <tr
                       key={index}
-                      className="border-b border-gray-200 hover:bg-gray-100"
+                      className="border-b border-[var(--border-color)] hover:bg-gray-100"
                     >
                       <td className="px-4 py-3 font-semibold text-gray-600">
                         {index + 1}
                       </td>
-                      <td className="px-4 py-3 font-medium text-gray-900">
+                      <td className="px-4 py-3 font-medium">
                         {customer.customerName}
                       </td>
-                      <td className="px-4 py-3 font-semibold text-blue-600">
+                      <td className="px-4 py-3 font-semibold text-secondary">
                         {new Intl.NumberFormat("he-IL", {
                           style: "currency",
                           currency: "ILS",
                         }).format(customer.revenue)}
                       </td>
-                      <td className="px-4 py-3 text-gray-700">
+                      <td className="px-4 py-3 text-secondary">
                         {customer.orders}
                       </td>
-                      <td className="px-4 py-3 text-gray-700">
+                      <td className="px-4 py-3 text-secondary">
                         {new Intl.NumberFormat("he-IL", {
                           style: "currency",
                           currency: "ILS",

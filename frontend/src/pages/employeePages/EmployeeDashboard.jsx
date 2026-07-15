@@ -12,6 +12,7 @@ import {
   BarElement,
 } from "chart.js";
 import { useTranslation } from "react-i18next";
+import { themeSoftStyle, themeIconBg } from "../../lib/designThemes";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import {
@@ -346,53 +347,70 @@ const EmployeeDashboard = () => {
       title: t("employeeDashboard.myTasks"),
       value: myTasks.length,
       icon: Target,
-      gradient: "from-blue-500 to-cyan-500",
-      lightBg: "from-blue-50 to-cyan-50",
+      tone: "primary",
     },
     {
       title: t("employeeDashboard.activeTasks"),
       value: activeTasks.length,
       icon: Clock,
-      gradient: "from-orange-500 to-amber-500",
-      lightBg: "from-orange-50 to-amber-50",
+      tone: "secondary",
     },
     {
       title: t("employeeDashboard.completedTasks"),
       value: myTasks.filter((t) => t.status === "completed").length,
       icon: CheckCircle2,
-      gradient: "from-emerald-500 to-teal-500",
-      lightBg: "from-emerald-50 to-teal-50",
+      tone: "accent",
     },
     {
       title: t("employeeDashboard.projects"),
       value: employee?.projects?.length || 0,
       icon: Award,
-      gradient: "from-violet-500 to-purple-500",
-      lightBg: "from-violet-50 to-purple-50",
+      tone: "primary",
     },
   ];
 
   const getStatusColor = (status) => {
     const colors = {
-      pending: "bg-blue-50 text-blue-700 border-blue-200",
-      "in progress": "bg-orange-50 text-orange-700 border-orange-200",
-      completed: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      cancelled: "bg-rose-50 text-rose-700 border-rose-200",
+      pending: "theme-emp-badge theme-emp-badge--secondary",
+      "in progress": "theme-emp-badge theme-emp-badge--primary",
+      completed: "theme-emp-badge theme-emp-badge--accent",
+      cancelled: "theme-emp-badge theme-emp-badge--muted",
     };
-    return colors[status] || "bg-gray-50 text-gray-700 border-gray-200";
+    return colors[status] || "theme-emp-badge theme-emp-badge--muted";
   };
 
   const getPriorityColor = (priority) => {
     const colors = {
-      low: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      medium: "bg-amber-50 text-amber-700 border-amber-200",
-      high: "bg-rose-50 text-rose-700 border-rose-200",
+      low: "theme-emp-badge theme-emp-badge--accent",
+      medium: "theme-emp-badge theme-emp-badge--secondary",
+      high: "theme-emp-badge theme-emp-badge--primary",
     };
-    return colors[priority] || "bg-gray-50 text-gray-700 border-gray-200";
+    return colors[priority] || "theme-emp-badge theme-emp-badge--muted";
   };
 
   return (
     <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
+      <style>{`
+        .theme-emp-badge {
+          border: 1px solid var(--border-color);
+        }
+        .theme-emp-badge--primary {
+          background: color-mix(in srgb, var(--color-primary) 14%, var(--bg-color));
+          color: var(--color-primary);
+        }
+        .theme-emp-badge--secondary {
+          background: color-mix(in srgb, var(--color-secondary) 14%, var(--bg-color));
+          color: var(--color-secondary);
+        }
+        .theme-emp-badge--accent {
+          background: color-mix(in srgb, var(--color-accent) 14%, var(--bg-color));
+          color: var(--color-accent);
+        }
+        .theme-emp-badge--muted {
+          background: var(--footer-bg);
+          color: var(--color-secondary);
+        }
+      `}</style>
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header - Refined */}
         <div className="mb-6">
@@ -411,7 +429,8 @@ const EmployeeDashboard = () => {
           {statsCards.map((card, index) => (
             <div
               key={index}
-              className={`rounded-xl shadow-sm p-5 bg-gradient-to-br ${card.lightBg} border border-gray-200/50 hover:shadow-md transition-all duration-200`}
+              className="rounded-xl shadow-sm p-5 border hover:shadow-md transition-all duration-200"
+              style={themeSoftStyle(card.tone)}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -422,8 +441,11 @@ const EmployeeDashboard = () => {
                     {card.value}
                   </p>
                 </div>
-                <div className={`p-3 rounded-lg bg-gradient-to-br ${card.gradient} shadow-sm`}>
-                  <card.icon className="w-5 h-5 text-white" strokeWidth={2} />
+                <div
+                  className="p-3 rounded-lg shadow-sm"
+                  style={themeIconBg(card.tone)}
+                >
+                  <card.icon className="w-5 h-5" strokeWidth={2} />
                 </div>
               </div>
             </div>
@@ -520,15 +542,15 @@ const EmployeeDashboard = () => {
 
                       {/* Projects */}
                       {employee.projects && employee.projects.length > 0 && (
-                        <div className="p-3 rounded-lg bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-200">
-                          <p className="text-xs font-medium mb-2 text-violet-700">
+                        <div className="p-3 rounded-lg bg-gradient-to-br border border-[var(--border-color)] bg-[color-mix(in_srgb,var(--color-primary)_10%,var(--bg-color))]">
+                          <p className="text-xs font-medium mb-2 text-primary">
                             {t("employeeDashboard.myProjects")}
                           </p>
                           <div className="flex flex-wrap gap-2">
                             {employee.projects.map((proj, index) => (
                               <span
                                 key={index}
-                                className="px-3 py-1 rounded-full text-xs font-semibold bg-violet-600 text-white"
+                                className="px-3 py-1 rounded-full text-xs font-semibold bg-primary text-white"
                               >
                                 {proj.projectId?.name || t("employeeDashboard.unknownProject")}
                               </span>
@@ -597,7 +619,7 @@ const EmployeeDashboard = () => {
                             name={field.name}
                             value={field.value || ""}
                             onChange={handleProfileChange}
-                            className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm transition-all duration-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                            className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm transition-all duration-200 focus:border-[var(--border-color)] focus:ring-2 focus:ring-blue-100"
                             style={{
                               backgroundColor: 'var(--bg-color)',
                               color: 'var(--text-color)',
@@ -608,8 +630,8 @@ const EmployeeDashboard = () => {
                     </div>
 
                     {/* Password Section - Compact */}
-                    <div className="bg-gradient-to-br from-violet-50 to-purple-50 p-4 rounded-lg border border-violet-200">
-                      <p className="text-xs font-semibold mb-3 text-violet-700 flex items-center gap-2">
+                    <div className="bg-gradient-to-br p-4 rounded-lg border border-[var(--border-color)] bg-[color-mix(in_srgb,var(--color-primary)_10%,var(--bg-color))]">
+                      <p className="text-xs font-semibold mb-3 text-primary flex items-center gap-2">
                         <Edit className="w-3.5 h-3.5" />
                         {t("employeeDashboard.changePassword")}
                       </p>
@@ -626,7 +648,7 @@ const EmployeeDashboard = () => {
                               value={editedEmployee[field.name] || ""}
                               onChange={handleProfileChange}
                               placeholder={field.label}
-                              className="w-full px-3 py-2 pr-10 rounded-lg border border-violet-200 text-sm focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all"
+                              className="w-full px-3 py-2 pr-10 rounded-lg border border-[var(--border-color)] text-sm focus:border-[var(--border-color)] focus:ring-2 focus:ring-primary transition-all"
                             />
                             <button
                               type="button"
@@ -636,7 +658,7 @@ const EmployeeDashboard = () => {
                                   [field.key]: !prev[field.key],
                                 }))
                               }
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-violet-600"
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary"
                             >
                               {showPasswords[field.key] ? (
                                 <EyeOff className="w-4 h-4" />
@@ -660,7 +682,7 @@ const EmployeeDashboard = () => {
                       </button>
                       <button
                         onClick={handleSaveProfile}
-                        className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-sm font-semibold hover:shadow-md transition-all flex items-center justify-center gap-2"
+                        className="flex-1 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-button-text rounded-lg text-sm font-semibold hover:shadow-md transition-all flex items-center justify-center gap-2"
                       >
                         <Save className="w-4 h-4" />
                         {t("employeeDashboard.save")}
@@ -852,7 +874,7 @@ const EmployeeDashboard = () => {
                         {task.priority}
                       </span>
                       {task.projectId && (
-                        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-violet-600 text-white">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-primary text-white">
                           {task.projectId.name || t("employeeDashboard.unknownProject")}
                         </span>
                       )}

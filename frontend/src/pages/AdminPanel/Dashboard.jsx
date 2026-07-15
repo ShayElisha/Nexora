@@ -21,6 +21,10 @@ import RevenueVsExpenses from "./components/RevenueVsExpenses";
 import SalesTrends from "./components/SalesTrends";
 import ProfitabilityAnalysis from "./components/ProfitabilityAnalysis";
 import AIPredictions from "./components/AIPredictions";
+import {
+  getThemeChartColors,
+  getThemeColors,
+} from "../../lib/designThemes";
 
 ChartJS.register(
   CategoryScale,
@@ -55,6 +59,31 @@ const Dashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState({});
   const [showAdvancedAnalytics, setShowAdvancedAnalytics] = useState(true);
+  const [themeTick, setThemeTick] = useState(0);
+
+  useEffect(() => {
+    const onTheme = () => setThemeTick((n) => n + 1);
+    window.addEventListener("nexora-theme-change", onTheme);
+    return () => window.removeEventListener("nexora-theme-change", onTheme);
+  }, []);
+
+  void themeTick; // re-render charts when Design Box theme changes
+  const chartColors = getThemeChartColors(8);
+  const theme = getThemeColors();
+  const themeBadgeStyles = `
+    .theme-badge-positive {
+      background: color-mix(in srgb, var(--color-accent) 18%, var(--bg-color));
+      color: var(--color-accent);
+    }
+    .theme-badge-negative {
+      background: color-mix(in srgb, var(--color-primary) 18%, var(--bg-color));
+      color: var(--color-primary);
+    }
+    .theme-badge-warn {
+      background: color-mix(in srgb, var(--color-secondary) 18%, var(--bg-color));
+      color: var(--color-secondary);
+    }
+  `;
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -145,8 +174,8 @@ const Dashboard = () => {
     datasets: [
       {
         data: [1],
-        backgroundColor: ["#E0E0E0"],
-        borderColor: ["#B0B0B0"],
+        backgroundColor: [theme.border],
+        borderColor: [theme.secondary],
         borderWidth: 1,
       },
     ],
@@ -314,9 +343,7 @@ const Dashboard = () => {
           datasets: [
             {
               data: dashboardData.budgetSummary?.map((item) => item.totalBudget || 0) || [],
-              backgroundColor: [
-                "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"
-              ],
+              backgroundColor: chartColors.slice(0, 6),
             },
           ],
         },
@@ -671,7 +698,7 @@ const Dashboard = () => {
                 }
                 return acc;
               }, []).map(item => item.count) || [],
-              backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"],
+              backgroundColor: chartColors.slice(0, 5),
               borderWidth: 2,
             },
           ],
@@ -967,9 +994,7 @@ const Dashboard = () => {
           datasets: [
             {
               data: dashboardData.customerOrderSummary?.map((item) => item.totalOrders || 0) || [],
-              backgroundColor: [
-                "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"
-              ],
+              backgroundColor: chartColors.slice(0, 5),
               borderWidth: 2,
             },
           ],
@@ -1065,9 +1090,7 @@ const Dashboard = () => {
                 });
                 return Object.values(deptCounts);
               })(),
-              backgroundColor: [
-                "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"
-              ],
+              backgroundColor: chartColors.slice(0, 6),
               borderWidth: 2,
             },
           ],
@@ -1204,9 +1227,7 @@ const Dashboard = () => {
                 });
                 return Object.values(categoryCounts);
               })(),
-              backgroundColor: [
-                "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"
-              ],
+              backgroundColor: chartColors.slice(0, 6),
               borderWidth: 2,
             },
           ],
@@ -1384,9 +1405,7 @@ const Dashboard = () => {
                 ?.sort((a, b) => (b.teamMembers?.length || 0) - (a.teamMembers?.length || 0))
                 .slice(0, 8)
                 .map((item) => item.teamMembers?.length || 0) || [],
-              backgroundColor: [
-                "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", "#8A2BE2", "#00CED1"
-              ],
+              backgroundColor: chartColors,
               borderWidth: 2,
             },
           ],
@@ -1599,7 +1618,7 @@ const Dashboard = () => {
     );
   }
 
-  if (error) return <div className="p-4 text-red-600">{error}</div>;
+  if (error) return <div className="p-4" style={{ color: "var(--color-primary)" }}>{error}</div>;
 
   const renderChart = (chart) => {
     const data = chart.data.labels.length > 0 ? chart.data : emptyChartData;
@@ -1708,8 +1727,8 @@ const Dashboard = () => {
               animate={{ opacity: 1, y: 0 }}
             >
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <div className="w-1 h-8 bg-gradient-to-b from-primary to-secondary rounded-full"></div>
+                <h2 className="text-2xl font-bold">
                   📊 Analytics מתקדם
                 </h2>
               </div>
@@ -1757,14 +1776,14 @@ const Dashboard = () => {
               overdueTasksCount: "🔴"
             };
             const colors = {
-              totalRevenue: "#10b981", // Green
-              cashFlow: "#3b82f6", // Blue
-              activeEmployees: "#8b5cf6", // Purple
-              taskCompletionRate: "#06b6d4", // Cyan
-              totalOrders: "#f59e0b", // Amber
-              inventoryValue: "#ec4899", // Pink
-              lowStockItems: "#ef4444", // Red
-              overdueTasksCount: "#dc2626" // Dark Red
+              totalRevenue: theme.accent,
+              cashFlow: theme.primary,
+              activeEmployees: theme.secondary,
+              taskCompletionRate: theme.accent,
+              totalOrders: theme.primary,
+              inventoryValue: theme.secondary,
+              lowStockItems: theme.primary,
+              overdueTasksCount: theme.secondary,
             };
             
             return (
@@ -1854,12 +1873,13 @@ const Dashboard = () => {
                     💰 {t("dashboard.financial_health")}
                   </h3>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    (kpis.cashFlow || 0) > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    (kpis.cashFlow || 0) > 0 ? 'theme-badge-positive' : 'theme-badge-negative'
                   }`}>
                     {(kpis.cashFlow || 0) > 0 ? '✅ ' + t("dashboard.positive") : '⚠️ ' + t("dashboard.negative")}
                   </span>
                 </div>
-                <div className="space-y-2">
+                <style>{themeBadgeStyles}</style>
+    <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span style={{ color: 'var(--color-secondary)' }}>{t("dashboard.revenue")}:</span>
                     <span className="font-semibold" style={{ color: 'var(--text-color)' }}>
@@ -1868,7 +1888,7 @@ const Dashboard = () => {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span style={{ color: 'var(--color-secondary)' }}>{t("dashboard.cash_flow")}:</span>
-                    <span className={`font-semibold ${(kpis.cashFlow || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    <span className={`font-semibold ${(kpis.cashFlow || 0) >= 0 ? 'text-accent' : 'text-primary'}`}>
                       ${(kpis.cashFlow || 0).toLocaleString()}
                     </span>
                   </div>
@@ -1888,7 +1908,7 @@ const Dashboard = () => {
                     ⚙️ {t("dashboard.operations")}
                   </h3>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    (kpis.taskCompletionRate || 0) > 70 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                    (kpis.taskCompletionRate || 0) > 70 ? 'theme-badge-positive' : 'theme-badge-warn'
                   }`}>
                     {(kpis.taskCompletionRate || 0) > 70 ? '✅ ' + t("dashboard.good") : '⚠️ ' + t("dashboard.needs_attention")}
                   </span>
@@ -1922,7 +1942,7 @@ const Dashboard = () => {
                     🚨 {t("dashboard.alerts")}
                   </h3>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    ((kpis.lowStockItems || 0) + (kpis.overdueTasksCount || 0)) > 5 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                    ((kpis.lowStockItems || 0) + (kpis.overdueTasksCount || 0)) > 5 ? 'theme-badge-negative' : 'theme-badge-positive'
                   }`}>
                     {((kpis.lowStockItems || 0) + (kpis.overdueTasksCount || 0)) > 5 ? '⚠️ ' + t("dashboard.action_required") : '✅ ' + t("dashboard.all_good")}
                   </span>
@@ -1930,13 +1950,13 @@ const Dashboard = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span style={{ color: 'var(--color-secondary)' }}>{t("dashboard.low_stock")}:</span>
-                    <span className={`font-semibold ${(kpis.lowStockItems || 0) > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                    <span className={`font-semibold ${(kpis.lowStockItems || 0) > 0 ? 'text-primary' : 'text-accent'}`}>
                       {kpis.lowStockItems || 0} {t("dashboard.items")}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span style={{ color: 'var(--color-secondary)' }}>{t("dashboard.overdue_tasks")}:</span>
-                    <span className={`font-semibold ${(kpis.overdueTasksCount || 0) > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                    <span className={`font-semibold ${(kpis.overdueTasksCount || 0) > 0 ? 'text-primary' : 'text-accent'}`}>
                       {kpis.overdueTasksCount || 0} {t("dashboard.tasks")}
                     </span>
                   </div>
@@ -2240,8 +2260,8 @@ const Dashboard = () => {
                         onClick={() => handlePageChange(category, page)}
                         className={`px-4 py-2 rounded-lg transition-all duration-200 ${
                           currentPage[category] === page
-                            ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg"
-                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                            ? "bg-gradient-to-r from-primary to-secondary text-button-text shadow-lg"
+                            : "bg-gray-100 text-secondary hover:bg-gray-200"
                         }`}
                       >
                         {page}
@@ -2261,8 +2281,8 @@ const Dashboard = () => {
                           className={`px-4 py-2 rounded-lg transition-all duration-200 ${
                             currentPage[category] ===
                             getPaginationRange(category).totalPages
-                              ? "bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg"
-                              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                              ? "bg-gradient-to-r from-primary to-secondary text-button-text shadow-lg"
+                              : "bg-gray-100 text-secondary hover:bg-gray-200"
                           }`}
                         >
                           {getPaginationRange(category).totalPages}
@@ -2275,7 +2295,7 @@ const Dashboard = () => {
                       disabled={
                         (currentPage[category] || 1) === getTotalPages(category)
                       }
-                      className="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-1"
+                      className="px-4 py-2 rounded-lg bg-gray-100 text-secondary hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-1"
                     >
                       <span>{t("dashboard.next")}</span>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2293,7 +2313,7 @@ const Dashboard = () => {
                         `${category}_Summary`
                       )
                     }
-                    className="px-6 py-3 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-xl hover:from-green-600 hover:to-blue-600 transition-all duration-200 font-medium shadow-lg hover:shadow-xl flex items-center space-x-2"
+                    className="px-6 py-3 bg-gradient-to-r from-primary to-accent text-button-text rounded-xl hover:opacity-90 transition-all duration-200 font-medium shadow-lg hover:shadow-xl flex items-center space-x-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -2308,7 +2328,7 @@ const Dashboard = () => {
 
         {/* Professional Footer */}
         <motion.footer 
-          className="mt-16 pt-8 border-t border-gray-200"
+          className="mt-16 pt-8 border-t"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
@@ -2316,46 +2336,46 @@ const Dashboard = () => {
           <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("dashboard.dashboard_overview")}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
+                <h3 className="text-lg font-semibold mb-4">{t("dashboard.dashboard_overview")}</h3>
+                <p className="text-secondary text-sm leading-relaxed">
                   {t("dashboard.monitor_metrics")}
                 </p>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("dashboard.quick_stats")}</h3>
+                <h3 className="text-lg font-semibold mb-4">{t("dashboard.quick_stats")}</h3>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">{t("dashboard.total_categories")}</span>
-                    <span className="font-medium text-gray-900">{categories.length}</span>
+                    <span className="text-secondary">{t("dashboard.total_categories")}</span>
+                    <span className="font-medium">{categories.length}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">{t("dashboard.last_updated")}</span>
-                    <span className="font-medium text-gray-900">{new Date().toLocaleDateString()}</span>
+                    <span className="text-secondary">{t("dashboard.last_updated")}</span>
+                    <span className="font-medium">{new Date().toLocaleDateString()}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">{t("dashboard.data_points")}</span>
-                    <span className="font-medium text-gray-900">
+                    <span className="text-secondary">{t("dashboard.data_points")}</span>
+                    <span className="font-medium">
                       {Object.values(topMetrics).reduce((acc, val) => acc + (parseInt(val) || 0), 0)}
                     </span>
                   </div>
                 </div>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("dashboard.actions")}</h3>
+                <h3 className="text-lg font-semibold mb-4">{t("dashboard.actions")}</h3>
                 <div className="space-y-3">
-                  <button className="w-full px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 text-sm font-medium">
+                  <button className="w-full px-4 py-2 bg-gradient-to-r from-primary to-secondary text-button-text rounded-lg hover:opacity-90 transition-all duration-200 text-sm font-medium">
                     📊 {t("dashboard.export_all_data")}
                   </button>
-                  <button className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 text-sm font-medium">
+                  <button className="w-full px-4 py-2 rounded-lg hover:opacity-80 transition-colors duration-200 text-sm font-medium">
                     🔄 {t("dashboard.refresh_dashboard")}
                   </button>
                 </div>
               </div>
             </div>
-            <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-              <p className="text-sm text-gray-500">
+            <div className="mt-8 pt-6 border-t text-center">
+              <p className="text-sm text-secondary">
                 {t("dashboard.footer")} | 
-                <span className="ml-2 text-blue-600">{t("dashboard.powered_by")}</span>
+                <span className="ml-2 text-primary">{t("dashboard.powered_by")}</span>
               </p>
             </div>
           </div>

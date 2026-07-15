@@ -41,13 +41,30 @@ export const signUp = async (req, res) => {
       phone,
       department,
       dateOfBirth,
-      address,
       role,
       paymentType,
       hourlySalary,
       globalSalary,
       expectedHours,
     } = req.body;
+
+    // Multipart forms often send nested fields as address[street] or JSON strings
+    let address = req.body.address;
+    if (typeof address === "string") {
+      try {
+        address = JSON.parse(address);
+      } catch {
+        address = null;
+      }
+    }
+    if (!address || typeof address !== "object") {
+      address = {
+        street: req.body["address[street]"],
+        city: req.body["address[city]"],
+        country: req.body["address[country]"],
+        postalCode: req.body["address[postalCode]"],
+      };
+    }
 
     const profileImageFile = req.file;
     const profileImageUrl = req.body.profileImageUrl || "";
@@ -92,7 +109,7 @@ export const signUp = async (req, res) => {
     }
 
     if (paymentType === "Hourly") {
-      if (hourlySalary == null || hourlySalary < 0) {
+      if (hourlySalary == null || hourlySalary === "" || hourlySalary < 0) {
         return res.status(400).json({
           success: false,
           message:
@@ -100,14 +117,14 @@ export const signUp = async (req, res) => {
         });
       }
     } else if (paymentType === "Global") {
-      if (globalSalary == null || globalSalary < 0) {
+      if (globalSalary == null || globalSalary === "" || globalSalary < 0) {
         return res.status(400).json({
           success: false,
           message:
             "globalSalary is required and must be non-negative for Global payment type",
         });
       }
-      if (expectedHours == null || expectedHours < 0) {
+      if (expectedHours == null || expectedHours === "" || expectedHours < 0) {
         return res.status(400).json({
           success: false,
           message:
@@ -131,35 +148,36 @@ export const signUp = async (req, res) => {
       }
     }
 
-    // Resolve companyId
+    // Resolve companyId from body/query, invite token, or cookies set during company creation
     let companyId =
       req.params.companyId || req.query.companyId || req.body.companyId;
 
-    if (!companyId) {
-      const token =
-        req.cookies["email_approved_jwt"] || req.cookies["auth_token"];
-      if (!token) {
-        return res.status(401).json({
-          success: false,
-          message: "Unauthorized - No token or companyId provided",
-        });
-      }
-
+    const resolveCompanyIdFromToken = (token) => {
+      if (!token) return null;
       try {
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-        companyId = decodedToken.companyId;
-      } catch (error) {
-        return res.status(401).json({
-          success: false,
-          message: "Invalid token",
-        });
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        return decoded.companyId || null;
+      } catch {
+        return null;
       }
+    };
+
+    if (!companyId && req.body.signupToken) {
+      companyId = resolveCompanyIdFromToken(req.body.signupToken);
+    }
+
+    if (!companyId) {
+      companyId =
+        resolveCompanyIdFromToken(req.cookies["email_approved_jwt"]) ||
+        resolveCompanyIdFromToken(req.cookies["company_jwt"]) ||
+        resolveCompanyIdFromToken(req.cookies["auth_token"]);
     }
 
     if (!companyId) {
       return res.status(400).json({
         success: false,
-        message: "No company ID provided",
+        message:
+          "Company ID is required. Open the invite/approval link from your email, or complete company registration first.",
       });
     }
 
@@ -197,7 +215,6 @@ export const signUp = async (req, res) => {
         message: "Email or identity already exists under this company",
       });
     }
-
     // Set role to Admin for the first employee
     let finalRole = role || "";
     const firstEmp = await Employee.find({ companyId });

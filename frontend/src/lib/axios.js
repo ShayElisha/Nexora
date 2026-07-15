@@ -22,8 +22,15 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-const isAuthProbe = (url = "") =>
-  url.includes("/auth/me") || url.includes("/auth/refresh");
+const shouldSkipTokenRefresh = (url = "") =>
+  [
+    "/auth/me",
+    "/auth/refresh",
+    "/auth/signup",
+    "/auth/login",
+    "/auth/forgot-password",
+    "/auth/reset-password",
+  ].some((path) => url.includes(path));
 
 const isProtectedPath = (pathname = "") =>
   pathname.startsWith("/dashboard") || pathname.startsWith("/employee");
@@ -36,10 +43,17 @@ axiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config || {};
 
+    // Guests and public auth calls routinely get 401 — do not attempt refresh
+    if (
+      error.response?.status === 401 &&
+      shouldSkipTokenRefresh(originalRequest.url || "")
+    ) {
+      return Promise.reject(error);
+    }
+
     // If we get a 401 and haven't already retried
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      const authProbe = isAuthProbe(originalRequest.url || "");
 
       try {
         // Try to refresh the token using axios directly to avoid interceptor loop
@@ -59,9 +73,7 @@ axiosInstance.interceptors.response.use(
           return axiosInstance(originalRequest);
         }
       } catch (refreshError) {
-        // Guests hit /auth/me with no cookies — that is normal, not a logout.
-        // Never hard-redirect from public/marketing pages; only from app areas.
-        if (!authProbe && isProtectedPath(window.location.pathname)) {
+        if (isProtectedPath(window.location.pathname)) {
           console.error("Token refresh failed, redirecting to login");
           window.location.href = "/login";
         }

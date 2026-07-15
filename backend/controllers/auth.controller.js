@@ -6,8 +6,7 @@ import { AuthService } from "../services/auth.service.js";
 import { transporter } from "../config/lib/nodemailer.js";
 import cloudinary, { uploadToCloudinary } from "../config/lib/cloudinary.js";
 import Payment from "../models/payment.model.js";
-
-const CLIENT_URL = process.env.FRONTEND_URL || process.env.FRONTEND_BASE_URL || "http://localhost:5173";
+import { getFrontendUrl } from "../utils/appUrls.js";
 
 const buildResetPasswordEmail = (name = "there", resetURL) => `
   <div style="font-family: 'Segoe UI', Arial, sans-serif; padding: 24px; background-color: #f4f6fb;">
@@ -491,7 +490,7 @@ export const requestPasswordReset = async (req, res) => {
     user.passwordResetExpires = Date.now() + 30 * 60 * 1000; // 30 minutes
     await user.save();
 
-    const resetURL = `${CLIENT_URL}/reset-password?token=${resetToken}&email=${encodeURIComponent(
+    const resetURL = `${getFrontendUrl()}/reset-password?token=${resetToken}&email=${encodeURIComponent(
       normalizedEmail
     )}`;
 

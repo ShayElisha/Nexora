@@ -18,6 +18,7 @@ import {
 import { transporter } from "../config/lib/nodemailer.js";
 import { createPaymentInvoiceEmail } from "../emails/emailHandlers.js";
 import { launchBrowser } from "../config/lib/browser.js";
+import { getFrontendUrl, getApiUrl } from "../utils/appUrls.js";
 import cron from "node-cron";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -263,13 +264,13 @@ const sendPaymentInvoiceEmail = async (company, invoice) => {
     }
     
     // Generate PDF URL (still include in email as backup)
-    const baseUrl = process.env.NEXORA_API_URL || process.env.API_URL || "http://localhost:5000";
+    const baseUrl = getApiUrl();
     const pdfUrl = `${baseUrl}/api/invoices/${invoice._id}/pdf`;
     
     // Get logo URL from company or use default
     const logoUrl = company.logo 
-      ? (company.logo.startsWith('http') ? company.logo : `${process.env.FRONTEND_URL || "http://localhost:5173"}${company.logo}`)
-      : `${process.env.FRONTEND_URL || "http://localhost:5173"}/assets/logo.png`;
+      ? (company.logo.startsWith('http') ? company.logo : `${getFrontendUrl()}${company.logo}`)
+      : `${getFrontendUrl()}/assets/logo.png`;
     
     // Create email HTML
     const emailHTML = createPaymentInvoiceEmail(company.name, invoice, pdfUrl, logoUrl);
@@ -390,8 +391,8 @@ export const createPaymentSession = async (req, res) => {
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: plan.plan_id, quantity: 1 }],
-      success_url: `${process.env.CLIENT_URL}/payment/completed?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.CLIENT_URL}/pricing-plans`,
+      success_url: `${getFrontendUrl()}/payment/completed?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${getFrontendUrl()}/pricing-plans`,
       metadata: {
         companyId: companyId.toString(),
         companyName: company.name,
@@ -1581,8 +1582,8 @@ export const retryPayment = async (req, res) => {
               mode: "subscription",
               payment_method_types: ["card"],
               line_items: [{ price: plan.plan_id, quantity: 1 }],
-              success_url: `${process.env.CLIENT_URL}/payment/completed?session_id={CHECKOUT_SESSION_ID}`,
-              cancel_url: `${process.env.CLIENT_URL}/pricing-plans?retry=true`,
+              success_url: `${getFrontendUrl()}/payment/completed?session_id={CHECKOUT_SESSION_ID}`,
+              cancel_url: `${getFrontendUrl()}/pricing-plans?retry=true`,
               customer: subscription.customer,
               subscription_data: {
                 metadata: {
@@ -1631,8 +1632,8 @@ export const retryPayment = async (req, res) => {
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: plan.plan_id, quantity: 1 }],
-      success_url: `${process.env.CLIENT_URL}/payment/completed?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.CLIENT_URL}/pricing-plans?retry=true`,
+      success_url: `${getFrontendUrl()}/payment/completed?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${getFrontendUrl()}/pricing-plans?retry=true`,
       metadata: {
         companyId: companyId.toString(),
         companyName: company.name,

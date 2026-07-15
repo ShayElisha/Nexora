@@ -45,7 +45,7 @@ const SignupEmployee = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const registrationUrl = `http://localhost:5173/signup`;
+  const registrationUrl = `${window.location.origin}/signup`;
 
   const handleCopyLink = async () => {
     try {

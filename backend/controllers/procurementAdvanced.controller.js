@@ -8,6 +8,7 @@ import Supplier from "../models/suppliers.model.js";
 import Company from "../models/companies.model.js";
 import Product from "../models/product.model.js";
 import { sendSupplierInvoiceEmail as sendEmail } from "../emails/emailService.js";
+import { getFrontendUrl } from "../utils/appUrls.js";
 import jwt from "jsonwebtoken";
 
 const verifyToken = (req) => {
@@ -916,7 +917,7 @@ export const sendSupplierInvoiceEmail = async (req, res) => {
     }
 
     const company = await Company.findById(decoded.companyId);
-    const invoiceUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/dashboard/procurement/supplier-invoices/${invoice._id}`;
+    const invoiceUrl = `${getFrontendUrl()}/dashboard/procurement/supplier-invoices/${invoice._id}`;
 
     await sendEmail(
       invoice.supplierId.Email,

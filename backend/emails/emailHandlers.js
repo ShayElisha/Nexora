@@ -1,3 +1,5 @@
+import { getFrontendUrl } from "../utils/appUrls.js";
+
 /**
  * תבנית בסיסית אחידה לכל המיילים
  */
@@ -263,7 +265,7 @@ export function createProcurementUpdateEmail(
   companyName,
   procurementOrderId
 ) {
-  const updateUrl = `http://localhost:5173/supplier/updateProcurement/${procurementOrderId}`;
+  const updateUrl = `${getFrontendUrl()}/supplier/updateProcurement/${procurementOrderId}`;
 
   const content = `
     <p style="font-size: 18px; color: #333;"><strong>שלום ${supplierName},</strong></p>

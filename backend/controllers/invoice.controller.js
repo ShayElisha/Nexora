@@ -12,6 +12,7 @@ import { transporter } from "../config/lib/nodemailer.js";
 import { createPaymentInvoiceEmail } from "../emails/emailHandlers.js";
 import { launchBrowser } from "../config/lib/browser.js";
 import { uploadToCloudinary } from "../config/lib/cloudinary.js";
+import { getFrontendUrl, getApiUrl } from "../utils/appUrls.js";
 
 /**
  * Generate unique invoice number based on company settings
@@ -1892,14 +1893,14 @@ const sendInvoiceEmail = async (invoice, sendToCompany = false) => {
     }
 
     // Generate PDF URL (still include in email as backup - use Cloudinary URL if available)
-    const baseUrl = process.env.NEXORA_API_URL || process.env.API_URL || "http://localhost:5000";
+    const baseUrl = getApiUrl();
     const fallbackPdfUrl = `${baseUrl}/api/invoices/${invoice._id}/pdf`;
     const emailPdfUrl = pdfUrl || populatedInvoice.pdfUrl || fallbackPdfUrl;
 
     // Get logo URL
     const logoUrl = company?.logo 
-      ? (company.logo.startsWith('http') ? company.logo : `${process.env.FRONTEND_URL || "http://localhost:5173"}${company.logo}`)
-      : `${process.env.FRONTEND_URL || "http://localhost:5173"}/assets/logo.png`;
+      ? (company.logo.startsWith('http') ? company.logo : `${getFrontendUrl()}${company.logo}`)
+      : `${getFrontendUrl()}/assets/logo.png`;
 
     // Create email HTML
     const emailHTML = createPaymentInvoiceEmail(recipientName || company?.name || "Customer", invoice, emailPdfUrl, logoUrl);

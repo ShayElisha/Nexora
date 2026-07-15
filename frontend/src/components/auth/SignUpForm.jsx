@@ -57,6 +57,8 @@ const SignUpForm = () => {
       const res = await axiosInstance.get("/departments");
       return res.data?.data || [];
     },
+    enabled: Boolean(authUser),
+    retry: false,
   });
 
   const validationSchema = Yup.object({

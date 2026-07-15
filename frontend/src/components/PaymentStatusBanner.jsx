@@ -6,6 +6,8 @@ import toast from "react-hot-toast";
 
 const PaymentStatusBanner = () => {
   const navigate = useNavigate();
+  const { data: authData } = useQuery({ queryKey: ["authUser"] });
+  const isAuthenticated = Boolean(authData?.user);
   
   const { data: company, isLoading } = useQuery({
     queryKey: ['company', 'current'],
@@ -23,6 +25,7 @@ const PaymentStatusBanner = () => {
         throw error;
       }
     },
+    enabled: isAuthenticated,
     retry: false,
     refetchOnWindowFocus: false,
   });

@@ -47,7 +47,9 @@ export const protectRoute = async (req, res, next) => {
       // Find the user
       const user = await Employee.findById(decoded.userId).select("-password");
       if (!user) {
-        return res.status(404).json({
+        // Stale cookie after DB reset / migration — treat as logged out
+        AuthService.clearAuthCookies(res);
+        return res.status(401).json({
           success: false,
           message: ERROR_MESSAGES.USER_NOT_FOUND,
           error: getErrorMessage("USER_NOT_FOUND"),
@@ -101,7 +103,8 @@ const handleRefreshToken = async (req, res, next) => {
     // Find the user
     const user = await Employee.findById(decoded.userId).select("-password");
     if (!user) {
-      return res.status(404).json({
+      AuthService.clearAuthCookies(res);
+      return res.status(401).json({
         success: false,
         message: ERROR_MESSAGES.USER_NOT_FOUND,
         error: getErrorMessage("USER_NOT_FOUND"),
@@ -160,7 +163,8 @@ export const protectCompanyOrUserRoute = async (req, res, next) => {
         // User token - find the user
         const user = await Employee.findById(decoded.userId).select("-password");
         if (!user) {
-          return res.status(404).json({
+          AuthService.clearAuthCookies(res);
+          return res.status(401).json({
             success: false,
             message: ERROR_MESSAGES.USER_NOT_FOUND,
             error: getErrorMessage("USER_NOT_FOUND"),
@@ -172,7 +176,8 @@ export const protectCompanyOrUserRoute = async (req, res, next) => {
         // Company token - find the company
         const company = await Company.findById(decoded.companyId);
         if (!company) {
-          return res.status(404).json({
+          AuthService.clearAuthCookies(res);
+          return res.status(401).json({
             success: false,
             message: "Company not found",
             error: getErrorMessage("NOT_FOUND"),

@@ -336,7 +336,8 @@ export const refreshToken = async (req, res) => {
     // Find the user
     const user = await Employee.findById(decoded.userId).select("-password");
     if (!user) {
-      return res.status(404).json({
+      AuthService.clearAuthCookies(res);
+      return res.status(401).json({
         success: false,
         message: "User not found",
       });

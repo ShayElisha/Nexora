@@ -3,6 +3,7 @@ import Employee from "../models/employees.model.js";
 import { generateCompanyToken } from "../config/utils/generateToken.js";
 import { SendRegistrationEmployee } from "../emails/emailService.js";
 import { getFrontendUrl } from "../utils/appUrls.js";
+import { AuthService } from "../services/auth.service.js";
 import jwt from "jsonwebtoken";
 
 // Create a new company
@@ -89,7 +90,18 @@ export const getCurrentCompany = async (req, res) => {
       });
     }
     
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    let decodedToken;
+    try {
+      decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    } catch {
+      AuthService.clearAuthCookies(res);
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+        error: "Invalid or expired token",
+      });
+    }
+
     let companyId = decodedToken.companyId;
     
     // If it's a user token (userId), we need to fetch the user's company
@@ -98,13 +110,21 @@ export const getCurrentCompany = async (req, res) => {
       if (user) {
         companyId = user.companyId || user.company;
         console.log("Company ID from user:", companyId);
+      } else {
+        AuthService.clearAuthCookies(res);
+        return res.status(401).json({
+          success: false,
+          message: "Unauthorized",
+          error: "User not found",
+        });
       }
     }
 
     if (!companyId) {
-      return res.status(404).json({
+      return res.status(401).json({
         success: false,
-        message: "Company not found",
+        message: "Unauthorized",
+        error: "No company associated with this session",
       });
     }
 

@@ -50,8 +50,9 @@ export const approveCompany = async (req, res) => {
     company.status = "Active";
     await company.save();
 
-    // Generate a token and send the approval email
-    const signUpUrl = `${getFrontendUrl()}/signup`;
+    // Approval signup link must include companyId — cookie is set on the
+    // approving admin's browser, not the company owner's.
+    const signUpUrl = `${getFrontendUrl()}/signup?companyId=${company._id}`;
     await generateTokenAndSendEmail(res, company._id);
     await sendCompanyApprovalEmail(
       company.email,

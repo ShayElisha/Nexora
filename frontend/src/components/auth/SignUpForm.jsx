@@ -197,12 +197,16 @@ const SignUpForm = () => {
       formData.append("gender", values.gender);
       formData.append("identity", values.identity);
       formData.append("dateOfBirth", values.dateOfBirth);
-      if (!authUser && companyIdFromQuery)
-        formData.append("companyId", companyIdFromQuery);
+      const resolvedCompanyId =
+        companyIdFromQuery || authUser?.company || authUser?.companyId || "";
+      if (resolvedCompanyId) {
+        formData.append("companyId", resolvedCompanyId);
+      }
       if (authUser) {
         formData.append("department", values.department || "");
         formData.append("role", values.role || "");
       }
+      formData.append("address", JSON.stringify(values.address));
       formData.append("address[street]", values.address.street);
       formData.append("address[city]", values.address.city);
       formData.append("address[country]", values.address.country);

@@ -1,5 +1,4 @@
 import axios from "axios";
-import { isPublicMarketingRoute } from "./publicRoutes";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
@@ -23,28 +22,35 @@ axiosInstance.interceptors.request.use(
   }
 );
 
+const isAuthProbe = (url = "") =>
+  url.includes("/auth/me") || url.includes("/auth/refresh");
+
+const isProtectedPath = (pathname = "") =>
+  pathname.startsWith("/dashboard") || pathname.startsWith("/employee");
+
 // Add response interceptor to handle 401 errors
 axiosInstance.interceptors.response.use(
   (response) => {
     return response;
   },
   async (error) => {
-    const originalRequest = error.config;
+    const originalRequest = error.config || {};
 
     // If we get a 401 and haven't already retried
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
+      const authProbe = isAuthProbe(originalRequest.url || "");
 
       try {
         // Try to refresh the token using axios directly to avoid interceptor loop
         const refreshResponse = await axios.post(
           `${API_BASE_URL}/auth/refresh`,
           {},
-          { 
+          {
             withCredentials: true,
             headers: {
               "Content-Type": "application/json",
-            }
+            },
           }
         );
 
@@ -53,10 +59,9 @@ axiosInstance.interceptors.response.use(
           return axiosInstance(originalRequest);
         }
       } catch (refreshError) {
-        // Session expired / missing — send to login only on protected pages.
-        // Public routes (home, pricing, etc.) must stay reachable for guests.
-        const pathname = window.location.pathname;
-        if (!isPublicMarketingRoute(pathname)) {
+        // Guests hit /auth/me with no cookies — that is normal, not a logout.
+        // Never hard-redirect from public/marketing pages; only from app areas.
+        if (!authProbe && isProtectedPath(window.location.pathname)) {
           console.error("Token refresh failed, redirecting to login");
           window.location.href = "/login";
         }

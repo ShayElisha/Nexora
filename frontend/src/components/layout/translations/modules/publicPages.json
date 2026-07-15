@@ -511,7 +511,7 @@
           "toasts": {
             "redirecting": "Redirecting to secure checkout...",
             "updated": "Plan updated successfully.",
-            "loginRequired": "Please sign in to update your subscription.",
+            "loginRequired": "No active company session. Create a company again, then choose a plan.",
             "genericError": "Unable to process your request right now."
           }
         }
@@ -982,7 +982,7 @@
           "toasts": {
             "redirecting": "מעבירים לעמוד תשלום מאובטח...",
             "updated": "החבילה עודכנה בהצלחה.",
-            "loginRequired": "יש להתחבר כדי לעדכן את המנוי.",
+            "loginRequired": "אין הרשאת חברה פעילה. צרו חברה מחדש ואז בחרו מסלול.",
             "genericError": "לא ניתן לעבד את הבקשה כרגע."
           }
         }

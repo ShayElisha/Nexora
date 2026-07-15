@@ -164,9 +164,12 @@ const PricingPlans = ({ currentPlan: propCurrentPlan, onPlanUpdate }) => {
         t("public.pricing.toasts.genericError");
       
       if (error.response?.status === 401) {
-        toast.error(t("public.pricing.toasts.loginRequired"));
+        toast.error(
+          t("public.pricing.toasts.loginRequired") ||
+            "אין הרשאת חברה פעילה. צרו חברה מחדש או השתמשו בקישור מהמייל."
+        );
         setTimeout(() => {
-          window.location.href = "/login";
+          window.location.href = "/create-company";
         }, 2000);
       } else {
         toast.error(errorMessage);

@@ -110,7 +110,9 @@ export class AuthService {
   }
 
   /**
-   * Clear authentication cookies
+   * Clear user authentication cookies.
+   * Does NOT clear company_jwt — that cookie is used during company
+   * registration / first payment before an employee account exists.
    */
   static clearAuthCookies(res, accessTokenName = "auth_token", refreshTokenName = "auth_refresh_token") {
     const cookieOptions = {
@@ -121,7 +123,18 @@ export class AuthService {
     };
     res.clearCookie(accessTokenName, cookieOptions);
     res.clearCookie(refreshTokenName, cookieOptions);
-    res.clearCookie("company_jwt", { ...cookieOptions, sameSite: "strict" });
+  }
+
+  /**
+   * Clear the temporary company registration cookie
+   */
+  static clearCompanyCookie(res) {
+    res.clearCookie("company_jwt", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    });
   }
 
   /**
@@ -150,7 +163,7 @@ export class AuthService {
     res.cookie("company_jwt", token, {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
     });
 

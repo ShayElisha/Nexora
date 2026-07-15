@@ -113,8 +113,15 @@ export class AuthService {
    * Clear authentication cookies
    */
   static clearAuthCookies(res, accessTokenName = "auth_token", refreshTokenName = "auth_refresh_token") {
-    res.clearCookie(accessTokenName);
-    res.clearCookie(refreshTokenName);
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    };
+    res.clearCookie(accessTokenName, cookieOptions);
+    res.clearCookie(refreshTokenName, cookieOptions);
+    res.clearCookie("company_jwt", { ...cookieOptions, sameSite: "strict" });
   }
 
   /**

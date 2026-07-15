@@ -1,6 +1,7 @@
 import Companies from "../models/companies.model.js";
 import { sendCompanyApprovalEmail } from "../emails/emailService.js";
 import { generateTokenAndSendEmail } from "../config/utils/generateToken.js";
+import { getFrontendUrl } from "../utils/appUrls.js";
 
 /**
  * Fetch all companies with status "Pending".
@@ -50,7 +51,7 @@ export const approveCompany = async (req, res) => {
     await company.save();
 
     // Generate a token and send the approval email
-    const signUpUrl = `${process.env.CLIENT_URL}/signup`;
+    const signUpUrl = `${getFrontendUrl()}/signup`;
     await generateTokenAndSendEmail(res, company._id);
     await sendCompanyApprovalEmail(
       company.email,

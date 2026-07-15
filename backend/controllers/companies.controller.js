@@ -2,6 +2,7 @@ import Companies from "../models/companies.model.js";
 import Employee from "../models/employees.model.js";
 import { generateCompanyToken } from "../config/utils/generateToken.js";
 import { SendRegistrationEmployee } from "../emails/emailService.js";
+import { getFrontendUrl } from "../utils/appUrls.js";
 import jwt from "jsonwebtoken";
 
 // Create a new company
@@ -280,7 +281,7 @@ export const sendSignUpLink = async (req, res) => {
     }
 
     const companyName = company.name;
-    const signUpUrl = `http://localhost:5173/signup?companyId=${companyId}`;
+    const signUpUrl = `${getFrontendUrl()}/signup?companyId=${companyId}`;
     await SendRegistrationEmployee(email, companyName, signUpUrl);
 
     return res

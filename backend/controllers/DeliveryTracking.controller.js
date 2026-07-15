@@ -3,6 +3,7 @@ import Procurement from "../models/procurement.model.js";
 import CustomerOrder from "../models/CustomerOrder.model.js";
 import jwt from "jsonwebtoken";
 import { uploadToCloudinaryFile } from "../config/lib/cloudinary.js";
+import { getFrontendUrl } from "../utils/appUrls.js";
 
 /**
  * Generate unique tracking number
@@ -108,7 +109,7 @@ export const createTracking = async (req, res) => {
 
     // Generate QR code (optional - if qrcode package is installed)
     try {
-      const trackingUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/track/${trackingNumber}`;
+      const trackingUrl = `${getFrontendUrl()}/track/${trackingNumber}`;
       const QRCode = (await import("qrcode")).default;
       const qrCodeDataUrl = await QRCode.toDataURL(trackingUrl);
       const qrCodeUpload = await uploadToCloudinaryFile(qrCodeDataUrl);

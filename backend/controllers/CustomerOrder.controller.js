@@ -21,6 +21,7 @@ import {
   linkOrderToProject,
 } from "../services/RelationshipService.js";
 import { createProductionOrderFromCustomerOrder } from "./ProductionOrder.controller.js";
+import { getFrontendUrl, getApiUrl } from "../utils/appUrls.js";
 
 const normalizeOrderShippingAddress = (address = {}) => {
   if (!address || typeof address !== "object") {
@@ -201,13 +202,13 @@ const sendInvoiceEmailFromOrder = async (invoice) => {
     }
 
     // Generate PDF URL (still include in email as backup)
-    const baseUrl = process.env.NEXORA_API_URL || process.env.API_URL || "http://localhost:5000";
+    const baseUrl = getApiUrl();
     const pdfUrl = `${baseUrl}/api/invoices/${invoice._id}/pdf`;
 
     // Get logo URL
     const logoUrl = company?.logo 
-      ? (company.logo.startsWith('http') ? company.logo : `${process.env.FRONTEND_URL || "http://localhost:5173"}${company.logo}`)
-      : `${process.env.FRONTEND_URL || "http://localhost:5173"}/assets/logo.png`;
+      ? (company.logo.startsWith('http') ? company.logo : `${getFrontendUrl()}${company.logo}`)
+      : `${getFrontendUrl()}/assets/logo.png`;
 
     // Create email HTML
     const emailHTML = createPaymentInvoiceEmail(recipientName || company?.name || "Customer", invoice, pdfUrl, logoUrl);
@@ -670,7 +671,7 @@ const sendOrderSummaryEmail = async (order, financialRecord) => {
       } catch (uploadError) {
         console.error("❌ Error uploading PDF to Cloudinary:", uploadError.message);
         // Fallback to API URL if upload fails
-        const baseUrl = process.env.NEXORA_API_URL || process.env.API_URL || "http://localhost:5000";
+        const baseUrl = getApiUrl();
         pdfUrl = `${baseUrl}/api/orders/${order._id}/pdf`;
       }
     } catch (pdfError) {
@@ -679,8 +680,8 @@ const sendOrderSummaryEmail = async (order, financialRecord) => {
 
     // Get logo URL
     const logoUrl = company?.logo 
-      ? (company.logo.startsWith('http') ? company.logo : `${process.env.FRONTEND_URL || "http://localhost:5173"}${company.logo}`)
-      : `${process.env.FRONTEND_URL || "http://localhost:5173"}/assets/logo.png`;
+      ? (company.logo.startsWith('http') ? company.logo : `${getFrontendUrl()}${company.logo}`)
+      : `${getFrontendUrl()}/assets/logo.png`;
 
     // Create email HTML
     const emailHTML = createOrderSummaryEmail(recipientName || company?.name || "Customer", order, pdfUrl || "#", logoUrl);

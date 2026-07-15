@@ -3,6 +3,7 @@ import Company from "../models/companies.model.js";
 import Customer from "../models/customers.model.js";
 import { transporter } from "../config/lib/nodemailer.js";
 import { createPaymentInvoiceEmail } from "../emails/emailHandlers.js";
+import { getFrontendUrl, getApiUrl } from "../utils/appUrls.js";
 
 /**
  * Send reminder email for unpaid invoice
@@ -46,13 +47,13 @@ const sendInvoiceReminderEmail = async (invoice, reminderType = "reminder") => {
     console.log(`📧 Sending ${reminderType} email to ${recipientEmail} for invoice ${invoice.invoiceNumber} (${daysOverdue} days overdue)`);
 
     // Generate PDF URL
-    const baseUrl = process.env.NEXORA_API_URL || process.env.API_URL || "http://localhost:5000";
+    const baseUrl = getApiUrl();
     const pdfUrl = invoice.pdfUrl || `${baseUrl}/api/invoices/${invoice._id}/pdf`;
 
     // Get logo URL
     const logoUrl = company?.logo 
-      ? (company.logo.startsWith('http') ? company.logo : `${process.env.FRONTEND_URL || "http://localhost:5173"}${company.logo}`)
-      : `${process.env.FRONTEND_URL || "http://localhost:5173"}/assets/logo.png`;
+      ? (company.logo.startsWith('http') ? company.logo : `${getFrontendUrl()}${company.logo}`)
+      : `${getFrontendUrl()}/assets/logo.png`;
 
     // Create email HTML (reuse payment invoice template)
     const emailHTML = createPaymentInvoiceEmail(recipientName || company?.name || "Customer", invoice, pdfUrl, logoUrl);

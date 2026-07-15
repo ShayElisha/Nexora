@@ -33,6 +33,7 @@ import salesTranslations from "./translations/modules/sales.json";
 import customerServiceTranslations from "./translations/modules/customerService.json";
 import contractsTranslations from "./translations/modules/contracts.json";
 import jobPercentagesTranslations from "./translations/modules/jobPercentages.json";
+import shiftsTranslations from "./translations/modules/shifts.json";
 import landingTranslations from "./translations/modules/landing.json";
 import landingLocalesTranslations from "./translations/modules/landing-locales.json";
 import publicPagesTranslations from "./translations/modules/publicPages.json";
@@ -70,6 +71,7 @@ const translationModules = [
   customerServiceTranslations,
   contractsTranslations,
   jobPercentagesTranslations,
+  shiftsTranslations,
   landingTranslations,
   landingLocalesTranslations,
   publicPagesTranslations,

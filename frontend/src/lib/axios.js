@@ -1,4 +1,5 @@
 import axios from "axios";
+import { isPublicMarketingRoute } from "./publicRoutes";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
@@ -52,9 +53,11 @@ axiosInstance.interceptors.response.use(
           return axiosInstance(originalRequest);
         }
       } catch (refreshError) {
-        // If refresh fails, redirect to login
-        console.error("Token refresh failed, redirecting to login");
-        if (window.location.pathname !== "/login" && window.location.pathname !== "/signup") {
+        // Session expired / missing — send to login only on protected pages.
+        // Public routes (home, pricing, etc.) must stay reachable for guests.
+        const pathname = window.location.pathname;
+        if (!isPublicMarketingRoute(pathname)) {
+          console.error("Token refresh failed, redirecting to login");
           window.location.href = "/login";
         }
         return Promise.reject(refreshError);

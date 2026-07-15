@@ -3,11 +3,22 @@ import { Line, Bar } from "react-chartjs-2";
 import { axiosInstance } from "../../../lib/axios";
 import { motion } from "framer-motion";
 import { FaChartLine } from "react-icons/fa";
+import {
+  getThemeColors,
+  hexToRgba,
+} from "../../../lib/designThemes";
 
 const SalesTrends = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [viewType, setViewType] = useState("line"); // 'line' or 'bar'
+  const theme = getThemeColors();
+  const [, setThemeTick] = useState(0);
+  useEffect(() => {
+    const onTheme = () => setThemeTick((n) => n + 1);
+    window.addEventListener("nexora-theme-change", onTheme);
+    return () => window.removeEventListener("nexora-theme-change", onTheme);
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -36,7 +47,7 @@ const SalesTrends = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -49,8 +60,8 @@ const SalesTrends = () => {
       {
         label: "💰 מכירות (₪)",
         data: data.timeline.sales,
-        borderColor: "rgb(75, 192, 192)",
-        backgroundColor: "rgba(75, 192, 192, 0.1)",
+        borderColor: theme.accent,
+        backgroundColor: hexToRgba(theme.accent, 0.12),
         yAxisID: "y",
         fill: true,
         tension: 0.4,
@@ -59,8 +70,8 @@ const SalesTrends = () => {
       {
         label: "📦 מספר הזמנות",
         data: data.timeline.orders,
-        borderColor: "rgb(255, 159, 64)",
-        backgroundColor: "rgba(255, 159, 64, 0.1)",
+        borderColor: theme.secondary,
+        backgroundColor: hexToRgba(theme.secondary, 0.12),
         yAxisID: "y1",
         fill: true,
         tension: 0.4,
@@ -136,19 +147,19 @@ const SalesTrends = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200"
+      className="bg-[var(--bg-color)] rounded-2xl shadow-lg p-6 border border-[var(--border-color)]"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
-            <FaChartLine className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center">
+            <FaChartLine className="w-5 h-5 text-button-text" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-900">
+            <h3 className="text-xl font-bold">
               מגמות מכירות
             </h3>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-secondary mt-0.5">
               ניתוח מכירות לאורך זמן
             </p>
           </div>
@@ -160,8 +171,8 @@ const SalesTrends = () => {
             onClick={() => setViewType("line")}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               viewType === "line"
-                ? "bg-blue-500 text-white shadow-md"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? "bg-primary text-button-text shadow-md"
+                : "bg-gray-100 text-secondary hover:bg-gray-200"
             }`}
           >
             גרף קו
@@ -170,8 +181,8 @@ const SalesTrends = () => {
             onClick={() => setViewType("bar")}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               viewType === "bar"
-                ? "bg-blue-500 text-white shadow-md"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                ? "bg-primary text-button-text shadow-md"
+                : "bg-gray-100 text-secondary hover:bg-gray-200"
             }`}
           >
             עמודות
@@ -181,11 +192,11 @@ const SalesTrends = () => {
 
       {/* KPIs Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
-          <div className="text-xs text-green-600 font-medium uppercase">
+        <div className="rounded-xl p-4 border border-[var(--border-color)] bg-[color-mix(in_srgb,var(--color-primary)_12%,var(--bg-color))] bg-[color-mix(in_srgb,var(--color-accent)_12%,var(--bg-color))]">
+          <div className="text-xs text-accent font-medium uppercase">
             סה״כ מכירות
           </div>
-          <div className="text-xl font-bold text-green-700 mt-1">
+          <div className="text-xl font-bold text-accent mt-1">
             {new Intl.NumberFormat("he-IL", {
               style: "currency",
               currency: "ILS",
@@ -194,20 +205,20 @@ const SalesTrends = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
-          <div className="text-xs text-blue-600 font-medium uppercase">
+        <div className="rounded-xl p-4 border border-[var(--border-color)] bg-[color-mix(in_srgb,var(--color-primary)_12%,var(--bg-color))] bg-[color-mix(in_srgb,var(--color-secondary)_12%,var(--bg-color))]">
+          <div className="text-xs text-secondary font-medium uppercase">
             סה״כ הזמנות
           </div>
-          <div className="text-xl font-bold text-blue-700 mt-1">
+          <div className="text-xl font-bold text-secondary mt-1">
             {data.kpis.totalOrders}
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
-          <div className="text-xs text-purple-600 font-medium uppercase">
+        <div className="rounded-xl p-4 border border-[var(--border-color)] bg-[color-mix(in_srgb,var(--color-primary)_12%,var(--bg-color))]">
+          <div className="text-xs text-primary font-medium uppercase">
             ממוצע הזמנה
           </div>
-          <div className="text-xl font-bold text-purple-700 mt-1">
+          <div className="text-xl font-bold text-primary mt-1">
             {new Intl.NumberFormat("he-IL", {
               style: "currency",
               currency: "ILS",
@@ -215,11 +226,11 @@ const SalesTrends = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl p-4 border border-orange-200">
-          <div className="text-xs text-orange-600 font-medium uppercase">
+        <div className="rounded-xl p-4 border border-[var(--border-color)] bg-[color-mix(in_srgb,var(--color-primary)_12%,var(--bg-color))] bg-[color-mix(in_srgb,var(--color-secondary)_12%,var(--bg-color))]">
+          <div className="text-xs text-secondary font-medium uppercase">
             שיעור צמיחה
           </div>
-          <div className="text-xl font-bold text-orange-700 mt-1">
+          <div className="text-xl font-bold text-secondary mt-1">
             {data.kpis.avgGrowthRate.toFixed(1)}%
           </div>
         </div>
@@ -236,25 +247,25 @@ const SalesTrends = () => {
 
       {/* Status Breakdown */}
       {data.byStatus && data.byStatus.length > 0 && (
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <h4 className="text-sm font-semibold text-gray-700 mb-3">
+        <div className="mt-6 pt-6 border-t border-[var(--border-color)]">
+          <h4 className="text-sm font-semibold text-secondary mb-3">
             פילוח לפי סטטוס הזמנה
           </h4>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {data.byStatus.map((status, index) => (
               <div
                 key={index}
-                className="bg-gray-50 rounded-lg p-3 border border-gray-200"
+                className="bg-gray-50 rounded-lg p-3 border border-[var(--border-color)]"
               >
-                <div className="text-xs text-gray-500">{status._id}</div>
-                <div className="text-lg font-bold text-gray-900">
+                <div className="text-xs text-secondary">{status._id}</div>
+                <div className="text-lg font-bold">
                   {new Intl.NumberFormat("he-IL", {
                     style: "currency",
                     currency: "ILS",
                     notation: "compact",
                   }).format(status.total)}
                 </div>
-                <div className="text-xs text-gray-500 mt-1">
+                <div className="text-xs text-secondary mt-1">
                   {status.count} הזמנות
                 </div>
               </div>

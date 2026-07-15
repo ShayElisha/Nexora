@@ -3,11 +3,22 @@ import { Line } from "react-chartjs-2";
 import { axiosInstance } from "../../../lib/axios";
 import { motion } from "framer-motion";
 import { FaBrain, FaArrowUp, FaArrowDown, FaChartLine } from "react-icons/fa";
+import {
+  getThemeColors,
+  hexToRgba,
+} from "../../../lib/designThemes";
 
 const AIPredictions = () => {
   const [predictions, setPredictions] = useState(null);
   const [kpis, setKpis] = useState(null);
   const [loading, setLoading] = useState(true);
+  const theme = getThemeColors();
+  const [, setThemeTick] = useState(0);
+  useEffect(() => {
+    const onTheme = () => setThemeTick((n) => n + 1);
+    window.addEventListener("nexora-theme-change", onTheme);
+    return () => window.removeEventListener("nexora-theme-change", onTheme);
+  }, []);
 
   useEffect(() => {
     fetchPredictions();
@@ -45,7 +56,7 @@ const AIPredictions = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--border-color)]"></div>
       </div>
     );
   }
@@ -58,16 +69,16 @@ const AIPredictions = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl shadow-lg p-6 border-2 border-purple-200"
+      className="bg-[color-mix(in_srgb,var(--color-primary)_10%,var(--bg-color))] rounded-2xl shadow-lg p-6 border-2 border-[var(--border-color)]"
     >
       {/* Header with AI Badge */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
-            <FaBrain className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+            <FaBrain className="w-5 h-5 text-button-text" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-900">
+            <h3 className="text-xl font-bold">
               תחזיות AI
             </h3>
             <p className="text-xs text-gray-600 mt-0.5">
@@ -77,9 +88,9 @@ const AIPredictions = () => {
         </div>
 
         {/* Confidence Badge */}
-        <div className="bg-white rounded-lg px-3 py-2 border border-gray-200 shadow-sm">
-          <div className="text-xs text-gray-500 uppercase">ודאות</div>
-          <div className="text-sm font-bold text-purple-600">
+        <div className="bg-[var(--bg-color)] rounded-lg px-3 py-2 border border-[var(--border-color)] shadow-sm">
+          <div className="text-xs text-secondary uppercase">ודאות</div>
+          <div className="text-sm font-bold text-primary">
             {predictions.confidence === "high"
               ? "גבוהה"
               : predictions.confidence === "medium"
@@ -93,37 +104,37 @@ const AIPredictions = () => {
       <div
         className={`mb-6 p-4 rounded-xl border ${
           trend.direction === "growing"
-            ? "bg-green-50 border-green-200"
+            ? "border-[var(--border-color)]"
             : trend.direction === "declining"
-            ? "bg-red-50 border-red-200"
-            : "bg-gray-50 border-gray-200"
+            ? "border-[var(--border-color)]"
+            : "bg-gray-50 border-[var(--border-color)]"
         }`}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
               trend.direction === "growing"
-                ? "bg-green-500"
+                ? "bg-accent"
                 : trend.direction === "declining"
-                ? "bg-red-500"
+                ? "bg-primary"
                 : "bg-gray-500"
             }`}>
               {trend.direction === "growing" ? (
-                <FaArrowUp className="w-5 h-5 text-white" />
+                <FaArrowUp className="w-5 h-5 text-button-text" />
               ) : trend.direction === "declining" ? (
-                <FaArrowDown className="w-5 h-5 text-white" />
+                <FaArrowDown className="w-5 h-5 text-button-text" />
               ) : (
-                <FaChartLine className="w-5 h-5 text-white" />
+                <FaChartLine className="w-5 h-5 text-button-text" />
               )}
             </div>
             <div>
               <h4
                 className={`text-lg font-bold ${
                   trend.direction === "growing"
-                    ? "text-green-700"
+                    ? "text-accent"
                     : trend.direction === "declining"
-                    ? "text-red-700"
-                    : "text-gray-700"
+                    ? "text-primary"
+                    : "text-secondary"
                 }`}
               >
                 {trend.direction === "growing"
@@ -138,9 +149,9 @@ const AIPredictions = () => {
           <div
             className={`text-3xl font-bold ${
               trend.direction === "growing"
-                ? "text-green-600"
+                ? "text-accent"
                 : trend.direction === "declining"
-                ? "text-red-600"
+                ? "text-primary"
                 : "text-gray-600"
             }`}
           >
@@ -152,14 +163,14 @@ const AIPredictions = () => {
 
       {/* Predictions Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-purple-200">
+        <div className="bg-[var(--bg-color)] rounded-lg p-4 shadow-sm border border-[var(--border-color)]">
           <div className="flex items-center justify-between mb-2">
-            <div className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded font-semibold">
+            <div className="text-xs bg-[color-mix(in_srgb,var(--color-primary)_14%,var(--bg-color))] text-primary px-2 py-1 rounded font-semibold">
               תחזית
             </div>
           </div>
-          <div className="text-xs text-gray-500 uppercase">הכנסות</div>
-          <div className="text-xl font-bold text-purple-600 mt-1">
+          <div className="text-xs text-secondary uppercase">הכנסות</div>
+          <div className="text-xl font-bold text-primary mt-1">
             {new Intl.NumberFormat("he-IL", {
               style: "currency",
               currency: "ILS",
@@ -168,26 +179,26 @@ const AIPredictions = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-blue-200">
+        <div className="bg-[var(--bg-color)] rounded-lg p-4 shadow-sm border border-[var(--border-color)]">
           <div className="flex items-center justify-between mb-2">
-            <div className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded font-semibold">
+            <div className="text-xs bg-[color-mix(in_srgb,var(--color-secondary)_14%,var(--bg-color))] text-secondary px-2 py-1 rounded font-semibold">
               תחזית
             </div>
           </div>
-          <div className="text-xs text-gray-500 uppercase">הזמנות</div>
-          <div className="text-xl font-bold text-blue-600 mt-1">
+          <div className="text-xs text-secondary uppercase">הזמנות</div>
+          <div className="text-xl font-bold text-secondary mt-1">
             {pred.nextMonthOrders}
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-red-200">
+        <div className="bg-[var(--bg-color)] rounded-lg p-4 shadow-sm border border-[var(--border-color)]">
           <div className="flex items-center justify-between mb-2">
-            <div className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded font-semibold">
+            <div className="text-xs bg-[color-mix(in_srgb,var(--color-primary)_14%,var(--bg-color))] text-primary px-2 py-1 rounded font-semibold">
               תחזית
             </div>
           </div>
-          <div className="text-xs text-gray-500 uppercase">הוצאות</div>
-          <div className="text-xl font-bold text-red-600 mt-1">
+          <div className="text-xs text-secondary uppercase">הוצאות</div>
+          <div className="text-xl font-bold text-primary mt-1">
             {new Intl.NumberFormat("he-IL", {
               style: "currency",
               currency: "ILS",
@@ -197,27 +208,27 @@ const AIPredictions = () => {
         </div>
 
         <div
-          className={`bg-white rounded-lg p-4 shadow-sm border ${
+          className={`bg-[var(--bg-color)] rounded-lg p-4 shadow-sm border ${
             pred.nextMonthProfit >= 0
-              ? "border-green-200"
-              : "border-orange-200"
+              ? "border-[var(--border-color)]"
+              : "border-[var(--border-color)]"
           }`}
         >
           <div className="flex items-center justify-between mb-2">
             <div
               className={`text-xs px-2 py-1 rounded font-semibold ${
                 pred.nextMonthProfit >= 0
-                  ? "bg-green-100 text-green-600"
-                  : "bg-orange-100 text-orange-600"
+                  ? "bg-[color-mix(in_srgb,var(--color-accent)_14%,var(--bg-color))] text-accent"
+                  : "bg-[color-mix(in_srgb,var(--color-secondary)_14%,var(--bg-color))] text-secondary"
               }`}
             >
               תחזית
             </div>
           </div>
-          <div className="text-xs text-gray-500 uppercase">רווח צפוי</div>
+          <div className="text-xs text-secondary uppercase">רווח צפוי</div>
           <div
             className={`text-xl font-bold mt-1 ${
-              pred.nextMonthProfit >= 0 ? "text-green-600" : "text-orange-600"
+              pred.nextMonthProfit >= 0 ? "text-accent" : "text-secondary"
             }`}
           >
             {new Intl.NumberFormat("he-IL", {
@@ -230,16 +241,16 @@ const AIPredictions = () => {
       </div>
 
       {/* Current vs Predicted */}
-      <div className="bg-white rounded-xl p-5 border border-gray-200">
-        <h4 className="text-base font-semibold text-gray-900 mb-4 uppercase tracking-wide">
+      <div className="bg-[var(--bg-color)] rounded-xl p-5 border border-[var(--border-color)]">
+        <h4 className="text-base font-semibold mb-4 uppercase tracking-wide">
           השוואה: נוכחי vs חזוי
         </h4>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <div className="text-xs text-gray-500 uppercase">
+            <div className="text-xs text-secondary uppercase">
               הכנסות נוכחיות
             </div>
-            <div className="text-lg font-bold text-gray-900">
+            <div className="text-lg font-bold">
               {new Intl.NumberFormat("he-IL", {
                 style: "currency",
                 currency: "ILS",
@@ -248,26 +259,26 @@ const AIPredictions = () => {
             </div>
           </div>
           <div>
-            <div className="text-xs text-gray-500 uppercase">מרווח רווח</div>
+            <div className="text-xs text-secondary uppercase">מרווח רווח</div>
             <div
               className={`text-lg font-bold ${
                 kpis.financial.profitMargin > 0
-                  ? "text-green-600"
-                  : "text-red-600"
+                  ? "text-accent"
+                  : "text-primary"
               }`}
             >
               {kpis.financial.profitMargin}%
             </div>
           </div>
           <div>
-            <div className="text-xs text-gray-500 uppercase">שימור לקוחות</div>
-            <div className="text-lg font-bold text-blue-600">
+            <div className="text-xs text-secondary uppercase">שימור לקוחות</div>
+            <div className="text-lg font-bold text-secondary">
               {kpis.customers.retentionRate}%
             </div>
           </div>
           <div>
-            <div className="text-xs text-gray-500 uppercase">ערך מלאי</div>
-            <div className="text-lg font-bold text-purple-600">
+            <div className="text-xs text-secondary uppercase">ערך מלאי</div>
+            <div className="text-lg font-bold text-primary">
               {new Intl.NumberFormat("he-IL", {
                 style: "currency",
                 currency: "ILS",
@@ -279,13 +290,13 @@ const AIPredictions = () => {
       </div>
 
       {/* AI Insights */}
-      <div className="mt-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-4 border border-purple-200">
-        <h4 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">
+      <div className="mt-6 rounded-lg p-4 border border-[var(--border-color)] bg-[color-mix(in_srgb,var(--color-primary)_10%,var(--bg-color))]">
+        <h4 className="text-sm font-bold mb-3 uppercase tracking-wide">
           תובנות
         </h4>
-        <ul className="space-y-2 text-sm text-gray-700">
+        <ul className="space-y-2 text-sm text-secondary">
           <li className="flex items-start gap-2">
-            <span className="text-green-500 mt-0.5 text-xs">•</span>
+            <span className="text-accent mt-0.5 text-xs">•</span>
                 <span>
                   בהתבסס על הנתונים, הכנסותיך צפויות{" "}
                   {trend.direction === "growing" ? "לעלות" : "לרדת"} ב-
@@ -293,7 +304,7 @@ const AIPredictions = () => {
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-green-500 mt-0.5 text-xs">•</span>
+                <span className="text-accent mt-0.5 text-xs">•</span>
                 <span>
                   מרווח הרווח הנוכחי שלך הוא {kpis.financial.profitMargin}%
                   {kpis.financial.profitMargin > 20
@@ -304,7 +315,7 @@ const AIPredictions = () => {
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-green-500 mt-0.5 text-xs">•</span>
+                <span className="text-accent mt-0.5 text-xs">•</span>
                 <span>
                   ערך ההזמנה הממוצע שלך:{" "}
                   {new Intl.NumberFormat("he-IL", {
@@ -315,8 +326,8 @@ const AIPredictions = () => {
             </li>
             {kpis.inventory.lowStockItems > 0 && (
               <li className="flex items-start gap-2">
-                <span className="text-orange-500 mt-0.5 text-xs">•</span>
-                <span className="text-orange-700 font-medium">
+                <span className="text-secondary mt-0.5 text-xs">•</span>
+                <span className="text-secondary font-medium">
                   יש {kpis.inventory.lowStockItems} מוצרים במלאי נמוך -
                   מומלץ לרכוש בקרוב
                 </span>

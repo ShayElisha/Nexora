@@ -1,21 +1,31 @@
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../../lib/axios";
 import { motion } from "framer-motion";
-import { 
-  FaMoneyBillWave, 
-  FaChartLine, 
-  FaShoppingCart, 
-  FaBox, 
-  FaGem, 
-  FaUsers 
+import {
+  FaMoneyBillWave,
+  FaChartLine,
+  FaShoppingCart,
+  FaBox,
+  FaGem,
+  FaUsers,
 } from "react-icons/fa";
+import { themeIconBg, themeSoftStyle } from "../../../lib/designThemes";
+
+const TONES = ["primary", "secondary", "accent"];
 
 const AdvancedKPICards = () => {
   const [kpis, setKpis] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [, setThemeTick] = useState(0);
 
   useEffect(() => {
     fetchKPIs();
+  }, []);
+
+  useEffect(() => {
+    const onTheme = () => setThemeTick((n) => n + 1);
+    window.addEventListener("nexora-theme-change", onTheme);
+    return () => window.removeEventListener("nexora-theme-change", onTheme);
   }, []);
 
   const fetchKPIs = async () => {
@@ -26,9 +36,14 @@ const AdvancedKPICards = () => {
       setKpis(response.data.data);
     } catch (error) {
       console.error("Error fetching KPIs:", error);
-      // אם יש שגיאה, נשתמש בנתונים ריקים
       setKpis({
-        financial: { revenue: 0, expenses: 0, netProfit: 0, profitMargin: 0, cashFlow: 0 },
+        financial: {
+          revenue: 0,
+          expenses: 0,
+          netProfit: 0,
+          profitMargin: 0,
+          cashFlow: 0,
+        },
         sales: { totalRevenue: 0, totalOrders: 0, avgOrderValue: 0 },
         inventory: { totalValue: 0, lowStockItems: 0 },
         customers: { active: 0, total: 0, retentionRate: 0 },
@@ -44,8 +59,9 @@ const AdvancedKPICards = () => {
         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
           <div
             key={i}
-            className="h-40 bg-gray-100 rounded-2xl animate-pulse"
-          ></div>
+            className="h-40 rounded-2xl animate-pulse"
+            style={{ backgroundColor: "var(--footer-bg)" }}
+          />
         ))}
       </div>
     );
@@ -59,21 +75,18 @@ const AdvancedKPICards = () => {
       title: "סה״כ הכנסות",
       value: kpis.financial.revenue,
       format: "currency",
-      color: "green",
     },
     {
       icon: FaMoneyBillWave,
       title: "סה״כ הוצאות",
       value: kpis.financial.expenses,
       format: "currency",
-      color: "red",
     },
     {
       icon: FaChartLine,
       title: "רווח נקי",
       value: kpis.financial.netProfit,
       format: "currency",
-      color: kpis.financial.netProfit >= 0 ? "blue" : "orange",
       badge: kpis.financial.netProfit >= 0 ? "רווחי" : "הפסד",
     },
     {
@@ -81,101 +94,39 @@ const AdvancedKPICards = () => {
       title: "מרווח רווח",
       value: kpis.financial.profitMargin,
       format: "percent",
-      color: "purple",
       badge:
         kpis.financial.profitMargin > 20
           ? "מצוין"
           : kpis.financial.profitMargin > 10
-          ? "טוב"
-          : "בינוני",
+            ? "טוב"
+            : "בינוני",
     },
     {
       icon: FaShoppingCart,
       title: "סה״כ מכירות",
       value: kpis.sales.totalRevenue,
       format: "currency",
-      color: "teal",
     },
     {
       icon: FaBox,
       title: "מספר הזמנות",
       value: kpis.sales.totalOrders,
       format: "number",
-      color: "indigo",
     },
     {
       icon: FaGem,
       title: "ערך הזמנה ממוצע",
       value: kpis.sales.avgOrderValue,
       format: "currency",
-      color: "pink",
     },
     {
       icon: FaUsers,
       title: "לקוחות פעילים",
       value: kpis.customers.active,
       format: "number",
-      color: "cyan",
       subtitle: `${kpis.customers.retentionRate}% שימור`,
     },
   ];
-
-  const colorClasses = {
-    green: {
-      bg: "from-green-50 to-green-100",
-      border: "border-green-200",
-      icon: "bg-green-500",
-      text: "text-green-700",
-    },
-    red: {
-      bg: "from-red-50 to-red-100",
-      border: "border-red-200",
-      icon: "bg-red-500",
-      text: "text-red-700",
-    },
-    blue: {
-      bg: "from-blue-50 to-blue-100",
-      border: "border-blue-200",
-      icon: "bg-blue-500",
-      text: "text-blue-700",
-    },
-    purple: {
-      bg: "from-purple-50 to-purple-100",
-      border: "border-purple-200",
-      icon: "bg-purple-500",
-      text: "text-purple-700",
-    },
-    orange: {
-      bg: "from-orange-50 to-orange-100",
-      border: "border-orange-200",
-      icon: "bg-orange-500",
-      text: "text-orange-700",
-    },
-    teal: {
-      bg: "from-teal-50 to-teal-100",
-      border: "border-teal-200",
-      icon: "bg-teal-500",
-      text: "text-teal-700",
-    },
-    indigo: {
-      bg: "from-indigo-50 to-indigo-100",
-      border: "border-indigo-200",
-      icon: "bg-indigo-500",
-      text: "text-indigo-700",
-    },
-    pink: {
-      bg: "from-pink-50 to-pink-100",
-      border: "border-pink-200",
-      icon: "bg-pink-500",
-      text: "text-pink-700",
-    },
-    cyan: {
-      bg: "from-cyan-50 to-cyan-100",
-      border: "border-cyan-200",
-      icon: "bg-cyan-500",
-      text: "text-cyan-700",
-    },
-  };
 
   const formatValue = (value, format) => {
     if (format === "currency") {
@@ -185,17 +136,19 @@ const AdvancedKPICards = () => {
         notation: "compact",
         maximumFractionDigits: 1,
       }).format(value);
-    } else if (format === "percent") {
-      return `${value}%`;
-    } else {
-      return value.toLocaleString("he-IL");
     }
+    if (format === "percent") {
+      return `${value}%`;
+    }
+    return value.toLocaleString("he-IL");
   };
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       {cards.map((card, index) => {
-        const colors = colorClasses[card.color];
+        const tone = TONES[index % TONES.length];
+        const soft = themeSoftStyle(tone);
+        const iconBg = themeIconBg(tone);
         return (
           <motion.div
             key={index}
@@ -203,38 +156,55 @@ const AdvancedKPICards = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
             whileHover={{ y: -5, scale: 1.02 }}
-            className={`bg-gradient-to-br ${colors.bg} rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border-2 ${colors.border}`}
+            className="rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border-2"
+            style={soft}
           >
-            {/* Badge (if exists) */}
             {card.badge && (
               <div className="mb-3">
-                <span className="text-xs bg-white px-3 py-1 rounded-full font-semibold text-gray-700 shadow-sm">
+                <span
+                  className="text-xs px-3 py-1 rounded-full font-semibold shadow-sm"
+                  style={{
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                    border: "1px solid var(--border-color)",
+                  }}
+                >
                   {card.badge}
                 </span>
               </div>
             )}
 
-            {/* Icon and Value */}
             <div className="flex items-start justify-between mb-4">
               <div
-                className={`w-12 h-12 ${colors.icon} rounded-lg flex items-center justify-center shadow-sm`}
+                className="w-12 h-12 rounded-lg flex items-center justify-center shadow-sm"
+                style={iconBg}
               >
-                <card.icon className="w-6 h-6 text-white" />
+                <card.icon className="w-6 h-6" />
               </div>
               <div className="text-right">
-                <div className={`text-3xl font-bold ${colors.text}`}>
+                <div
+                  className="text-3xl font-bold"
+                  style={{ color: "var(--text-color)" }}
+                >
                   {formatValue(card.value, card.format)}
                 </div>
               </div>
             </div>
 
-            {/* Title and Subtitle */}
             <div>
-              <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-1">
+              <h3
+                className="text-sm font-semibold uppercase tracking-wide mb-1"
+                style={{ color: "var(--color-secondary)" }}
+              >
                 {card.title}
               </h3>
               {card.subtitle && (
-                <p className="text-xs text-gray-500">{card.subtitle}</p>
+                <p
+                  className="text-xs"
+                  style={{ color: "var(--color-secondary)" }}
+                >
+                  {card.subtitle}
+                </p>
               )}
             </div>
           </motion.div>
@@ -245,4 +215,3 @@ const AdvancedKPICards = () => {
 };
 
 export default AdvancedKPICards;
-

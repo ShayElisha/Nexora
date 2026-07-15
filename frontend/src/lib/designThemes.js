@@ -222,3 +222,80 @@ export const cssVarsToPreview = (vars) => ({
   sidebar: vars["--footer-bg"],
   chart: [vars["--color-primary"], vars["--color-secondary"], vars["--color-accent"]],
 });
+
+/** Read a live CSS variable from :root (Design Box themes). */
+export const getCssVar = (name, fallback = "") => {
+  if (typeof document === "undefined") return fallback;
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
+  return value || fallback;
+};
+
+export const getThemeColors = () => ({
+  primary: getCssVar("--color-primary", "#2563EB"),
+  secondary: getCssVar("--color-secondary", "#64748B"),
+  accent: getCssVar("--color-accent", "#059669"),
+  bg: getCssVar("--bg-color", "#FFFFFF"),
+  text: getCssVar("--text-color", "#0F172A"),
+  muted: getCssVar("--text-muted", getCssVar("--color-secondary", "#64748B")),
+  border: getCssVar("--border-color", "#E2E8F0"),
+  surface: getCssVar("--surface-color", getCssVar("--footer-bg", "#F8FAFC")),
+  buttonBg: getCssVar("--button-bg", "#2563EB"),
+  buttonText: getCssVar("--button-text", "#FFFFFF"),
+});
+
+/** Chart palette built only from Design Box primary / secondary / accent. */
+export const getThemeChartColors = (count = 8) => {
+  const { primary, secondary, accent } = getThemeColors();
+  const base = [primary, secondary, accent];
+  return Array.from({ length: count }, (_, i) => base[i % base.length]);
+};
+
+export const hexToRgba = (hex, alpha = 1) => {
+  if (!hex) return `rgba(37, 99, 235, ${alpha})`;
+  if (hex.startsWith("rgb")) {
+    return hex.replace(/rgba?\(([^)]+)\)/, (_, body) => {
+      const parts = body.split(",").map((p) => p.trim());
+      return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${alpha})`;
+    });
+  }
+  let h = hex.replace("#", "");
+  if (h.length === 3) {
+    h = h
+      .split("")
+      .map((c) => c + c)
+      .join("");
+  }
+  const num = parseInt(h, 16);
+  if (Number.isNaN(num)) return `rgba(37, 99, 235, ${alpha})`;
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+/** Soft card surface using a Design Box token (primary | secondary | accent). */
+export const themeSoftStyle = (tone = "primary") => {
+  const varName =
+    tone === "secondary"
+      ? "--color-secondary"
+      : tone === "accent"
+        ? "--color-accent"
+        : "--color-primary";
+  return {
+    background: `linear-gradient(135deg, color-mix(in srgb, var(${varName}) 14%, var(--bg-color)), color-mix(in srgb, var(${varName}) 6%, var(--bg-color)))`,
+    borderColor: `color-mix(in srgb, var(${varName}) 35%, var(--border-color))`,
+    color: "var(--text-color)",
+  };
+};
+
+export const themeIconBg = (tone = "primary") => {
+  const varName =
+    tone === "secondary"
+      ? "--color-secondary"
+      : tone === "accent"
+        ? "--color-accent"
+        : "--color-primary";
+  return { backgroundColor: `var(${varName})`, color: "var(--button-text)" };
+};

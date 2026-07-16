@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../../lib/axios";
 import { motion } from "framer-motion";
 import {
-  Search,
   User,
   Mail,
   Phone,
@@ -20,6 +19,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import EmptyState from "../../../../components/ui/EmptyState";
+import SearchField from "../../../../components/ui/SearchField";
 import { safeT } from "../../../../lib/i18nSafe";
 
 const ApplicantsList = () => {
@@ -99,16 +99,14 @@ const ApplicantsList = () => {
 
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex gap-4 mb-6">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder={t("hr.ats.search_applicants") || "Search applicants..."}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          <SearchField
+            className="flex-1"
+            placeholder={t("hr.ats.search_applicants") || "Search applicants..."}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            iconClassName="text-gray-400"
+            inputClassName="rounded-lg border-gray-300 focus:ring-blue-500"
+          />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}

@@ -6,7 +6,6 @@ import axiosInstance from "../../../../lib/axios";
 import { motion } from "framer-motion";
 import {
   Plus,
-  Search,
   Briefcase,
   MapPin,
   Calendar,
@@ -18,6 +17,7 @@ import {
   Loader2,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import SearchField from "../../../../components/ui/SearchField";
 
 const JobPostingsList = () => {
   const { t } = useTranslation();
@@ -101,21 +101,17 @@ const JobPostingsList = () => {
 
         <div className="rounded-2xl shadow-xl p-6" style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)", border: "1px solid" }}>
         <div className="flex gap-4 mb-6">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: "var(--color-secondary)" }} />
-            <input
-              type="text"
-              placeholder={t("hr.ats.search_job_postings") || "Search job postings..."}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-xl border focus:ring-2 focus:outline-none transition-all"
-              style={{
-                borderColor: "var(--border-color)",
-                backgroundColor: "var(--bg-color)",
-                color: "var(--text-color)",
-              }}
-            />
-          </div>
+          <SearchField
+            className="flex-1"
+            placeholder={t("hr.ats.search_job_postings") || "Search job postings..."}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              borderColor: "var(--border-color)",
+              backgroundColor: "var(--bg-color)",
+              color: "var(--text-color)",
+            }}
+          />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}

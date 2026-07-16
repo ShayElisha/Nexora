@@ -1,0 +1,4638 @@
+{
+  "en": {
+    "translation": {
+      "accounting": {
+        "account_types": {
+          "asset": "Asset",
+          "cost_of_goods_sold": "Cost Of Goods Sold",
+          "equity": "Equity",
+          "expense": "Expense",
+          "liability": "Liability",
+          "other_expense": "Other Expense",
+          "other_income": "Other Income",
+          "revenue": "Revenue"
+        }
+      },
+      "activities": {
+        "outcome": "Outcome"
+      },
+      "allSignatures": {
+        "signature": "Signature",
+        "title": "Title"
+      },
+      "auth": {
+        "generic_error": "Generic Error",
+        "hide_password": "Hide Password",
+        "login_failed": "Login Failed",
+        "login_success": "Login Success",
+        "show_password": "Show Password"
+      },
+      "banks": {
+        "actions": "Actions",
+        "add_transaction": "Add Transaction",
+        "all_statuses": "All Statuses",
+        "amount": "Amount",
+        "date": "Date",
+        "description": "Description",
+        "import": "Import",
+        "reference": "Reference",
+        "search_transactions": "Search Transactions",
+        "status": "Status",
+        "transactions": "Transactions",
+        "transactions_reconciled": "Transactions Reconciled",
+        "type": "Type"
+      },
+      "budgets": {
+        "title": "Budgets"
+      },
+      "buttons": {
+        "add_file": "Add File",
+        "delete": "Delete",
+        "delete_image": "Delete Image",
+        "remove": "Remove"
+      },
+      "common": {
+        "april": "April",
+        "august": "August",
+        "back": "Back",
+        "december": "December",
+        "february": "February",
+        "january": "January",
+        "july": "July",
+        "june": "June",
+        "march": "March",
+        "may": "May",
+        "november": "November",
+        "october": "October",
+        "optional": "Optional",
+        "refresh": "Refresh",
+        "september": "September"
+      },
+      "company": {
+        "creating": "Creating"
+      },
+      "createTask": {
+        "employeesInDepartment": "EmployeesInDepartment",
+        "noEmployeesInDepartment": "NoEmployeesInDepartment",
+        "selectDepartmentFirst": "SelectDepartmentFirst"
+      },
+      "crm": {
+        "action_added": "Action Added",
+        "active": "Active",
+        "add_action": "Add Action",
+        "add_retention_action": "Add Retention Action",
+        "all_risks": "All Risks",
+        "all_types": "All Types",
+        "at_risk_customers": "At Risk Customers",
+        "avg_risk_score": "Avg Risk Score",
+        "avg_satisfaction": "Avg Satisfaction",
+        "calculate_risk": "Calculate Risk",
+        "cancel": "Cancel",
+        "confirm_delete_segment": "Confirm Delete Segment",
+        "create_segment": "Create Segment",
+        "create_survey": "Create Survey",
+        "critical_risk": "Critical Risk",
+        "csat": "Csat",
+        "customer_retention": "Customer Retention",
+        "customer_satisfaction": "Customer Satisfaction",
+        "customer_segmentation": "Customer Segmentation",
+        "customers": "Customers",
+        "days_since_last_order": "Days Since Last Order",
+        "detractors": "Detractors",
+        "edit_segment": "Edit Segment",
+        "error_calculating_retention": "Error Calculating Retention",
+        "error_deleting_segment": "Error Deleting Segment",
+        "error_loading_retention": "Error Loading Retention",
+        "error_loading_satisfaction": "Error Loading Satisfaction",
+        "error_loading_segments": "Error Loading Segments",
+        "high_risk": "High Risk",
+        "inactive": "Inactive",
+        "low_risk": "Low Risk",
+        "medium_risk": "Medium Risk",
+        "no_description": "No Description",
+        "no_orders": "No Orders",
+        "no_retention_data": "No Retention Data",
+        "no_segments": "No Segments",
+        "no_surveys": "No Surveys",
+        "nps": "Nps",
+        "nps_distribution": "Nps Distribution",
+        "nps_score": "Nps Score",
+        "passives": "Passives",
+        "promoters": "Promoters",
+        "response_rate": "Response Rate",
+        "retained": "Retained",
+        "retention_calculated": "Retention Calculated",
+        "retention_description": "Retention Description",
+        "risk_distribution": "Risk Distribution",
+        "risk_factors": "Risk Factors",
+        "risk_score": "Risk Score",
+        "satisfaction": "Satisfaction",
+        "satisfaction_description": "Satisfaction Description",
+        "save": "Save",
+        "search_customers": "Search Customers",
+        "search_segments": "Search Segments",
+        "search_surveys": "Search Surveys",
+        "segment_deleted": "Segment Deleted",
+        "segment_distribution": "Segment Distribution",
+        "segment_saved": "Segment Saved",
+        "segment_value": "Segment Value",
+        "segmentation_description": "Segmentation Description",
+        "status": "Status",
+        "survey_created": "Survey Created",
+        "take_action": "Take Action",
+        "total_customers": "Total Customers",
+        "total_surveys": "Total Surveys",
+        "total_value": "Total Value",
+        "unknown_customer": "Unknown Customer"
+      },
+      "customer360": {
+        "activities": "Activities",
+        "all_customer_information": "All Customer Information",
+        "avg_order_value": "Avg Order Value",
+        "back_to_customers": "Back To Customers",
+        "company": "Company",
+        "customer_360": "Customer 360",
+        "customer_since": "Customer Since",
+        "email": "Email",
+        "error_loading": "Error Loading",
+        "files": "Files",
+        "invoice": "Invoice",
+        "invoices": "Invoices",
+        "loading": "Loading",
+        "no_activities": "No Activities",
+        "no_files": "No Files",
+        "no_invoices": "No Invoices",
+        "no_orders": "No Orders",
+        "no_projects": "No Projects",
+        "no_tasks": "No Tasks",
+        "order": "Order",
+        "orders": "Orders",
+        "overview": "Overview",
+        "phone": "Phone",
+        "projects": "Projects",
+        "recent_activities": "Recent Activities",
+        "recent_orders": "Recent Orders",
+        "tasks": "Tasks",
+        "total_orders": "Total Orders",
+        "total_paid": "Total Paid",
+        "total_value": "Total Value"
+      },
+      "dashboard": {
+        "allocated": "Allocated",
+        "count": "Count",
+        "no_data_available": "No Data Available",
+        "spent": "Spent"
+      },
+      "departments": {
+        "title": "Title"
+      },
+      "errors": {
+        "general_error": "General Error",
+        "loading_error": "Loading Error"
+      },
+      "events": {
+        "attachment": {
+          "fileNamePlaceholder": "Enter file name",
+          "fileUrlPlaceholder": "Enter file URL"
+        },
+        "externalParticipant": {
+          "namePlaceholder": "Enter name",
+          "emailPlaceholder": "Enter email",
+          "phonePlaceholder": "Enter phone"
+        }
+      },
+      "finance": {
+        "budget": {
+          "error": "Error"
+        },
+        "edit_record": "Edit Record",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "record_updated": "Record Updated",
+        "salary": {
+          "cancelled": "Cancelled",
+          "editMode": "EditMode",
+          "errorCalculatingTax": "ErrorCalculatingTax",
+          "errorFetchingSalaries": "ErrorFetchingSalaries",
+          "errorFetchingTaxConfigs": "ErrorFetchingTaxConfigs",
+          "errorUpdatingSalary": "ErrorUpdatingSalary",
+          "updatedSuccess": "UpdatedSuccess"
+        },
+        "update": "Update",
+        "update_failed": "Update Failed",
+        "updating": "Updating"
+      },
+      "hr": {
+        "analytics": {
+          "applicants": "Applicants",
+          "leave_requests": "Leave Requests"
+        },
+        "leave": {
+          "request_created": "Leave request created successfully"
+        },
+        "self_service": {
+          "days": "days"
+        }
+      },
+      "inventory": {
+        "add_item": "Add Item",
+        "all_warehouses": "All Warehouses",
+        "attached_files": "Attached Files",
+        "edit_stock_count": "Edit Stock Count",
+        "fill_all_fields": "Fill All Fields",
+        "height": "Height",
+        "insufficient_quantity": "Insufficient Quantity",
+        "invalid_quantity": "Invalid Quantity",
+        "items": "Items",
+        "length": "Length",
+        "max_available": "Max Available",
+        "no_files": "No Files",
+        "no_location": "No Location",
+        "notes": "Notes",
+        "same_warehouse": "Same Warehouse",
+        "select_warehouse": "Select Warehouse",
+        "status": {
+          "in_stock": "In Stock",
+          "low_stock": "Low Stock",
+          "out_of_stock": "Out of Stock",
+          "no_stock": "No Stock"
+        },
+        "stock_count_created": "Stock Count Created",
+        "stock_count_updated": "Stock Count Updated",
+        "total_items": "Total Items",
+        "transfer": "Transfer",
+        "transfer_error": "Transfer Error",
+        "transfer_inventory": "Transfer Inventory",
+        "transfer_notes_placeholder": "Transfer Notes Placeholder",
+        "transfer_subtitle": "Transfer Subtitle",
+        "transfer_success": "Transfer Success",
+        "transferring": "Transferring",
+        "type": "Type",
+        "width": "Width",
+        "status_label": "Status"
+      },
+      "invoices": {
+        "paymentStatus": {
+          "unpaid": "Unpaid",
+          "partiallypaid": "Partially Paid",
+          "paid": "Paid"
+        },
+        "paymentTerms": "PaymentTerms",
+        "paymentStatusLabel": "Payment Status"
+      },
+      "landing": {
+        "how_it_works": {
+          "steps": "Steps",
+          "subtitle": "Subtitle",
+          "title": "Title"
+        },
+        "pages": {
+          "help": {
+            "articles_label": "Articles Label"
+          }
+        },
+        "stats": {
+          "items": "Items"
+        },
+        "trust": {
+          "items": "Items",
+          "subtitle": "Subtitle"
+        },
+        "trusted_by": {
+          "logos": "Logos",
+          "title": "Title"
+        }
+      },
+      "leads": {
+        "add_order_item": "Add Order Item",
+        "assigned_to": "Assigned To",
+        "create_order": "Create Order",
+        "creating_order": "Creating Order",
+        "delivery_date": "Delivery Date",
+        "discount": "Discount",
+        "enter_order_notes": "Enter Order Notes",
+        "global_discount": "Global Discount",
+        "industry": "Industry",
+        "lead_score": "Lead Score",
+        "order_created_error": "Order Created Error",
+        "order_created_success": "Order Created Success",
+        "order_information": "Order Information",
+        "order_items": "Order Items",
+        "order_notes": "Order Notes",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "product": "Product",
+        "quantity": "Quantity",
+        "select_product": "Select Product",
+        "tax_rate": "Tax Rate",
+        "unit_price": "Unit Price",
+        "view_order": "View Order"
+      },
+      "messages": {
+        "signup_failed": "Signup Failed",
+        "signup_success": "Signup Success"
+      },
+      "myShifts": {
+        "totalHours": "TotalHours",
+        "totalShifts": "TotalShifts"
+      },
+      "navbar": {
+        "Signatures": {
+          "clear": "Clear",
+          "employeeIdMissing": "EmployeeIdMissing",
+          "userNotAuthenticated": "UserNotAuthenticated"
+        },
+        "analytics": "Analytics",
+        "budget": "Budget",
+        "inventory_transfer": "Inventory Transfer",
+        "notifications": {
+          "manageNotifications": "ManageNotifications",
+          "notificationMarkReadError": "NotificationMarkReadError",
+          "orderError": "OrderError"
+        }
+      },
+      "notifications": {
+        "fillDetails": "FillDetails",
+        "loading": "Loading"
+      },
+      "optional": "Optional",
+      "order": {
+        "auto_select_price_list": "Auto Select Price List",
+        "city_placeholder": "City Placeholder",
+        "contact_name_placeholder": "Contact Name Placeholder",
+        "contact_phone_placeholder": "Contact Phone Placeholder",
+        "country_placeholder": "Country Placeholder",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "price_list_active": "Price List Active",
+        "shipping_details": "Shipping Details",
+        "shipping_required": "Shipping Required",
+        "state_placeholder": "State Placeholder",
+        "street_placeholder": "Street Placeholder",
+        "use_price_list": "Use Price List",
+        "zip_placeholder": "Zip Placeholder"
+      },
+      "permissions": {
+        "noAccess": "No access"
+      },
+      "procurement": {
+        "add_break": "Add Break",
+        "add_item": "Add Item",
+        "additional_notes": "Additional Notes",
+        "address_placeholder": "Address Placeholder",
+        "at_least_one_item_required": "At Least One Item Required",
+        "auto_select_price_list": "Auto Select Price List",
+        "base_price": "Base Price",
+        "city": "City",
+        "confidential_document": "Confidential Document",
+        "confirm_send_email": "Confirm Send Email",
+        "contact_name": "Contact Name",
+        "contact_person": "Contact Person",
+        "contact_phone": "Contact Phone",
+        "country": "Country",
+        "currency_not_supported": "Currency Not Supported",
+        "customs": "Customs",
+        "delete_success": "Delete Success",
+        "delivery_information": "Delivery Information",
+        "department": "Department",
+        "discount": "Discount",
+        "document_generated": "This document was generated on {{date}} at {{time}}",
+        "expected_delivery": "Expected",
+        "failed_to_generate_pdf": "Failed To Generate Pdf",
+        "failed_to_load_data": "Failed To Load Data",
+        "fetch_exchange_rate_failed": "Fetch Exchange Rate Failed",
+        "fetch_products_failed": "Fetch Products Failed",
+        "fetch_supplier_failed": "Fetch Supplier Failed",
+        "formatted_address": "Formatted Address",
+        "from_buyer": "From (Buyer)",
+        "invalid_quantity": "Invalid Quantity",
+        "invalid_total_cost": "Invalid Total Cost",
+        "invoice_sent": "Invoice Sent",
+        "items_ordered": "Items Ordered",
+        "no_product_selected": "No Product Selected",
+        "no_products": "No Products",
+        "no_quantity_breaks": "No Quantity Breaks",
+        "order_date": "Order Date",
+        "page": "Page",
+        "parties_information": "Parties Information",
+        "payment_information": "Payment Information",
+        "pending_update_failed": "Pending Update Failed",
+        "pending_update_success": "Pending Update Success",
+        "price_list_active": "Price List Active",
+        "process_failed": "Process Failed",
+        "product_added": "Product Added",
+        "quantity_breaks": "Quantity Breaks",
+        "quantity_short": "QTY",
+        "quantity_updated": "Quantity Updated",
+        "required": "Required",
+        "send_email": "Send Email",
+        "shipping": "Shipping",
+        "shipping_address_details": "Shipping Address Details",
+        "showing_results": "Showing Results",
+        "state": "State",
+        "street": "Street",
+        "summary": "Summary",
+        "switch_to_manual_entry": "Switch To Manual Entry",
+        "to_supplier": "To (Supplier)",
+        "total_discount": "Total Discount",
+        "unlimited": "Unlimited",
+        "update_failed": "Update Failed",
+        "update_success": "Update Success",
+        "use_price_list": "Use Price List",
+        "warehouse": "Warehouse",
+        "zip_code": "Zip Code"
+      },
+      "product": {
+        "bom": {
+          "component_id": "Component Id",
+          "creation_error": "Creation Error",
+          "creation_success": "Creation Success",
+          "select_component": "Select Component"
+        },
+        "errors": {
+          "name_required": "Name Required",
+          "price_required": "Price Required",
+          "supplier_required": "Supplier Required"
+        },
+        "fields": {
+          "description": "Description",
+          "image": "Image",
+          "name": "Name",
+          "price": "Price"
+        }
+      },
+      "projects": {
+        "actions": "Actions",
+        "calculated_risk_level": "Calculated Risk Level",
+        "cancel": "Cancel",
+        "create": "Create",
+        "creating": "Creating",
+        "error_creating_risk": "Error Creating Risk",
+        "impact": "Impact",
+        "mitigation_plan": "Mitigation Plan",
+        "probability": "Probability",
+        "project_required": "Project Required",
+        "risk_created": "Risk Created",
+        "risk_level_calculated_automatically": "Risk Level Calculated Automatically",
+        "title_required": "Title Required"
+      },
+      "public": {
+        "about": {
+          "storyParagraphs": "StoryParagraphs",
+          "team": "Team",
+          "values": "Values"
+        },
+        "api": {
+          "endpoints": "Endpoints",
+          "features": "Features"
+        },
+        "blog": {
+          "posts": "Posts"
+        },
+        "careers": {
+          "benefits": "Benefits",
+          "positions": "Positions"
+        },
+        "cookies": {
+          "browsers": "Browsers",
+          "cookieTypes": "CookieTypes"
+        },
+        "customers": {
+          "industries": "Industries",
+          "stats": "Stats",
+          "testimonials": "Testimonials"
+        },
+        "docs": {
+          "categories": "Categories",
+          "content": "Content"
+        },
+        "features": {
+          "items": "Items"
+        },
+        "help": {
+          "categories": "Categories",
+          "faq": "Faq"
+        },
+        "integrations": {
+          "items": "Items"
+        },
+        "partners": {
+          "benefits": "Benefits",
+          "currentPartners": "CurrentPartners",
+          "types": "Types"
+        },
+        "privacy": {
+          "rights": "Rights",
+          "sections": "Sections"
+        },
+        "report": {
+          "bugTypes": "BugTypes",
+          "severityLevels": "SeverityLevels"
+        },
+        "security": {
+          "items": "Items",
+          "standards": "Standards"
+        },
+        "services": {
+          "items": "Items"
+        },
+        "status": {
+          "incidents": "Incidents",
+          "services": "Services",
+          "statusLabels": "StatusLabels"
+        },
+        "terms": {
+          "sections": "Sections"
+        }
+      },
+      "signUpForm": {
+        "buttons": {
+          "add_department": "Add Department",
+          "remove_image": "Remove Image",
+          "upload_image": "Upload Image"
+        },
+        "form": {
+          "image_preview": "Image Preview",
+          "name": "Name"
+        },
+        "messages": {
+          "image_removed": "Image Removed"
+        },
+        "placeholders": {
+          "name": "Name"
+        },
+        "validation": {
+          "name_required": "Name Required"
+        }
+      },
+      "signature_modal": {
+        "no_name": "No Name",
+        "no_signers": "No Signers"
+      },
+      "signupEmployee": {
+        "errors": {
+          "copy_link_failed": "Copy Link Failed"
+        },
+        "messages": {
+          "link_copied": "Link Copied"
+        }
+      },
+      "supplier": {
+        "add_failed": "Add Failed",
+        "added_success": "Added Success",
+        "fetch_failed": "Fetch Failed",
+        "no_attachments": "No Attachments",
+        "no_suppliers": "No Suppliers",
+        "not_authenticated": "Not Authenticated",
+        "save": "Save",
+        "status_update_failed": "Status Update Failed",
+        "update_failed": "Update Failed",
+        "updated_success": "Updated Success",
+        "view_attachments": "View Attachments"
+      },
+      "supportTickets": {
+        "priority": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High",
+          "urgent": "Urgent"
+        },
+        "status": {
+          "open": "Open",
+          "inprogress": "In Progress",
+          "resolved": "Resolved",
+          "closed": "Closed"
+        }
+      },
+      "tasks": {
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "edit_task": "Edit Task",
+        "priority_high": "Priority High",
+        "priority_low": "Priority Low",
+        "priority_medium": "Priority Medium",
+        "update": "Update",
+        "update_error": "Update Error",
+        "updated_success": "Updated Success",
+        "updating": "Updating"
+      },
+      "users": {
+        "admin": "Admin",
+        "department": "Department",
+        "employee": "Employee",
+        "employee_not_found": "Employee Not Found",
+        "error_assigning_role": "Error Assigning Role",
+        "identity": "Identity",
+        "invalid_employee_id": "Invalid Employee Id",
+        "manager": "Manager",
+        "no_role_assigned": "No Role Assigned",
+        "personal_details": "Personal Details",
+        "postal_code": "Postal Code",
+        "role_assigned_successfully": "Role Assigned Successfully",
+        "role_assignment": "Role Assignment",
+        "role_assignment_hint": "Role Assignment Hint",
+        "select_department": "Select Department"
+      },
+      "warehouse": {
+        "fields": {
+          "city": "City",
+          "contactName": "ContactName",
+          "contactPhone": "ContactPhone",
+          "country": "Country",
+          "state": "State",
+          "street": "Street",
+          "zip": "Zip"
+        },
+        "form_errors_address": "Form Errors Address",
+        "status_": "Status",
+        "view_inventory": "View Inventory"
+      }
+    }
+  },
+  "he": {
+    "translation": {
+      "accounting": {
+        "account_types": {
+          "asset": "נכס",
+          "cost_of_goods_sold": "עלות המכר",
+          "equity": "הון",
+          "expense": "הוצאה",
+          "liability": "התחייבות",
+          "other_expense": "הוצאה אחרת",
+          "other_income": "הכנסה אחרת",
+          "revenue": "הכנסה"
+        }
+      },
+      "activities": {
+        "outcome": "תוצאה"
+      },
+      "allSignatures": {
+        "signature": "חתימה",
+        "title": "כל החתימות"
+      },
+      "auth": {
+        "generic_error": "אירעה שגיאה. נסה שוב",
+        "hide_password": "הסתר סיסמה",
+        "login_failed": "ההתחברות נכשלה",
+        "login_success": "התחברת בהצלחה",
+        "show_password": "הצג סיסמה"
+      },
+      "banks": {
+        "actions": "פעולות",
+        "add_transaction": "הוסף תנועה",
+        "all_statuses": "כל הסטטוסים",
+        "amount": "סכום",
+        "date": "תאריך",
+        "description": "תיאור",
+        "import": "ייבוא",
+        "reference": "אסמכתא",
+        "search_transactions": "חיפוש תנועות",
+        "status": "סטטוס",
+        "transactions": "תנועות",
+        "transactions_reconciled": "תנועות שהותאמו",
+        "type": "סוג"
+      },
+      "budgets": {
+        "title": "תקציבים"
+      },
+      "buttons": {
+        "add_file": "הוסף קובץ",
+        "delete": "מחק",
+        "delete_image": "מחק תמונה",
+        "remove": "הסר"
+      },
+      "common": {
+        "april": "אפריל",
+        "august": "אוגוסט",
+        "back": "חזרה",
+        "december": "דצמבר",
+        "february": "פברואר",
+        "january": "ינואר",
+        "july": "יולי",
+        "june": "יוני",
+        "march": "מרץ",
+        "may": "מאי",
+        "november": "נובמבר",
+        "october": "אוקטובר",
+        "optional": "אופציונלי",
+        "refresh": "רענון",
+        "september": "ספטמבר"
+      },
+      "company": {
+        "creating": "יוצר חברה..."
+      },
+      "createTask": {
+        "employeesInDepartment": "עובדים במחלקה",
+        "noEmployeesInDepartment": "אין עובדים במחלקה",
+        "selectDepartmentFirst": "בחר מחלקה תחילה"
+      },
+      "crm": {
+        "action_added": "הפעולה נוספה",
+        "active": "פעיל",
+        "add_action": "הוסף פעולה",
+        "add_retention_action": "הוסף פעולת שימור",
+        "all_risks": "כל רמות הסיכון",
+        "all_types": "כל הסוגים",
+        "at_risk_customers": "לקוחות בסיכון",
+        "avg_risk_score": "ציון סיכון ממוצע",
+        "avg_satisfaction": "שביעות רצון ממוצעת",
+        "calculate_risk": "חשב סיכון",
+        "cancel": "ביטול",
+        "confirm_delete_segment": "למחוק את המקטע?",
+        "create_segment": "צור מקטע",
+        "create_survey": "צור סקר",
+        "critical_risk": "סיכון קריטי",
+        "csat": "CSAT",
+        "customer_retention": "שימור לקוחות",
+        "customer_satisfaction": "שביעות רצון לקוחות",
+        "customer_segmentation": "פילוח לקוחות",
+        "customers": "לקוחות",
+        "days_since_last_order": "ימים מההזמנה האחרונה",
+        "detractors": "מבקרים",
+        "edit_segment": "ערוך מקטע",
+        "error_calculating_retention": "שגיאה בחישוב שימור",
+        "error_deleting_segment": "שגיאה במחיקת מקטע",
+        "error_loading_retention": "שגיאה בטעינת שימור",
+        "error_loading_satisfaction": "שגיאה בטעינת שביעות רצון",
+        "error_loading_segments": "שגיאה בטעינת מקטעים",
+        "high_risk": "סיכון גבוה",
+        "inactive": "לא פעיל",
+        "low_risk": "סיכון נמוך",
+        "medium_risk": "סיכון בינוני",
+        "no_description": "אין תיאור",
+        "no_orders": "אין הזמנות",
+        "no_retention_data": "אין נתוני שימור",
+        "no_segments": "לא נמצאו מקטעים",
+        "no_surveys": "לא נמצאו סקרים",
+        "nps": "NPS",
+        "nps_distribution": "התפלגות NPS",
+        "nps_score": "ציון NPS",
+        "passives": "נייטרליים",
+        "promoters": "ממליצים",
+        "response_rate": "אחוז מענה",
+        "retained": "נשמרו",
+        "retention_calculated": "שימור חושב",
+        "retention_description": "מעקב אחר שימור לקוחות",
+        "risk_distribution": "התפלגות סיכון",
+        "risk_factors": "גורמי סיכון",
+        "risk_score": "ציון סיכון",
+        "satisfaction": "שביעות רצון",
+        "satisfaction_description": "מדדי שביעות רצון לקוחות",
+        "save": "שמור",
+        "search_customers": "חיפוש לקוחות",
+        "search_segments": "חיפוש מקטעים",
+        "search_surveys": "חיפוש סקרים",
+        "segment_deleted": "המקטע נמחק",
+        "segment_distribution": "התפלגות מקטעים",
+        "segment_saved": "המקטע נשמר",
+        "segment_value": "ערך מקטע",
+        "segmentation_description": "ניהול פילוח לקוחות",
+        "status": "סטטוס",
+        "survey_created": "הסקר נוצר",
+        "take_action": "בצע פעולה",
+        "total_customers": "סה״כ לקוחות",
+        "total_surveys": "סה״כ סקרים",
+        "total_value": "סה״כ ערך",
+        "unknown_customer": "לקוח לא ידוע"
+      },
+      "customer360": {
+        "activities": "פעילויות",
+        "all_customer_information": "כל מידע הלקוח",
+        "avg_order_value": "ערך הזמנה ממוצע",
+        "back_to_customers": "חזרה ללקוחות",
+        "company": "חברה",
+        "customer_360": "לקוח 360",
+        "customer_since": "לקוח מאז",
+        "email": "אימייל",
+        "error_loading": "שגיאה בטעינה",
+        "files": "קבצים",
+        "invoice": "חשבונית",
+        "invoices": "חשבוניות",
+        "loading": "טוען...",
+        "no_activities": "אין פעילויות",
+        "no_files": "אין קבצים",
+        "no_invoices": "אין חשבוניות",
+        "no_orders": "אין הזמנות",
+        "no_projects": "אין פרויקטים",
+        "no_tasks": "אין משימות",
+        "order": "הזמנה",
+        "orders": "הזמנות",
+        "overview": "סקירה",
+        "phone": "טלפון",
+        "projects": "פרויקטים",
+        "recent_activities": "פעילויות אחרונות",
+        "recent_orders": "הזמנות אחרונות",
+        "tasks": "משימות",
+        "total_orders": "סה״כ הזמנות",
+        "total_paid": "סה״כ שולם",
+        "total_value": "סה״כ ערך"
+      },
+      "dashboard": {
+        "allocated": "מוקצה",
+        "count": "כמות",
+        "no_data_available": "אין נתונים להצגה",
+        "spent": "נוצל"
+      },
+      "departments": {
+        "title": "מחלקות"
+      },
+      "errors": {
+        "general_error": "אירעה שגיאה",
+        "loading_error": "שגיאה בטעינה"
+      },
+      "events": {
+        "attachment": {
+          "fileNamePlaceholder": "הזן שם קובץ",
+          "fileUrlPlaceholder": "הזן קישור לקובץ"
+        },
+        "externalParticipant": {
+          "namePlaceholder": "הזן שם",
+          "emailPlaceholder": "הזן אימייל",
+          "phonePlaceholder": "הזן טלפון"
+        }
+      },
+      "finance": {
+        "budget": {
+          "error": "שגיאת תקציב"
+        },
+        "edit_record": "עריכת רשומה",
+        "payment_immediate": "מיידי",
+        "payment_net_30": "שוטף + 30",
+        "payment_net_45": "שוטף + 45",
+        "payment_net_60": "שוטף + 60",
+        "payment_net_90": "שוטף + 90",
+        "payment_terms": "תנאי תשלום",
+        "record_updated": "הרשומה עודכנה",
+        "salary": {
+          "cancelled": "בוטל",
+          "editMode": "מצב עריכה",
+          "errorCalculatingTax": "שגיאה בחישוב מס",
+          "errorFetchingSalaries": "שגיאה בטעינת משכורות",
+          "errorFetchingTaxConfigs": "שגיאה בטעינת הגדרות מס",
+          "errorUpdatingSalary": "שגיאה בעדכון משכורת",
+          "updatedSuccess": "המשכורת עודכנה בהצלחה"
+        },
+        "update": "עדכון",
+        "update_failed": "העדכון נכשל",
+        "updating": "מעדכן..."
+      },
+      "hr": {
+        "analytics": {
+          "applicants": "מועמדים",
+          "leave_requests": "בקשות חופשה"
+        },
+        "leave": {
+          "request_created": "בקשת החופשה נוצרה בהצלחה"
+        },
+        "self_service": {
+          "days": "ימים"
+        }
+      },
+      "inventory": {
+        "add_item": "הוסף פריט",
+        "all_warehouses": "כל המחסנים",
+        "attached_files": "קבצים מצורפים",
+        "edit_stock_count": "עריכת ספירת מלאי",
+        "fill_all_fields": "מלא את כל השדות",
+        "height": "גובה",
+        "insufficient_quantity": "אין מספיק מלאי",
+        "invalid_quantity": "כמות לא תקינה",
+        "items": "פריטים",
+        "length": "אורך",
+        "max_available": "מקסימום זמין",
+        "no_files": "אין קבצים",
+        "no_location": "אין מיקום",
+        "notes": "הערות",
+        "same_warehouse": "לא ניתן להעביר לאותו מחסן",
+        "select_warehouse": "בחר מחסן",
+        "status": {
+          "in_stock": "במלאי",
+          "low_stock": "מלאי נמוך",
+          "out_of_stock": "אזל המלאי",
+          "no_stock": "אין מלאי"
+        },
+        "stock_count_created": "ספירת מלאי נוצרה",
+        "stock_count_updated": "ספירת מלאי עודכנה",
+        "total_items": "סה״כ פריטים",
+        "transfer": "העברה",
+        "transfer_error": "ההעברה נכשלה",
+        "transfer_inventory": "העברת מלאי",
+        "transfer_notes_placeholder": "הערות להעברה",
+        "transfer_subtitle": "העבר מלאי בין מחסנים",
+        "transfer_success": "ההעברה בוצעה בהצלחה",
+        "transferring": "מעביר...",
+        "type": "סוג",
+        "width": "רוחב",
+        "status_label": "סטטוס"
+      },
+      "invoices": {
+        "paymentStatus": {
+          "unpaid": "לא שולם",
+          "partiallypaid": "שולם חלקית",
+          "paid": "שולם"
+        },
+        "paymentTerms": "תנאי תשלום",
+        "paymentStatusLabel": "סטטוס תשלום"
+      },
+      "landing": {
+        "how_it_works": {
+          "steps": "שלבים",
+          "subtitle": "תהליך פשוט להתחלה",
+          "title": "איך זה עובד"
+        },
+        "pages": {
+          "help": {
+            "articles_label": "מאמרים"
+          }
+        },
+        "stats": {
+          "items": "סטטיסטיקות"
+        },
+        "trust": {
+          "items": "פריטים",
+          "subtitle": "אבטחה ואמינות"
+        },
+        "trusted_by": {
+          "logos": "לוגואים",
+          "title": "סומכים עלינו"
+        }
+      },
+      "leads": {
+        "add_order_item": "הוסף פריט",
+        "assigned_to": "משויך ל",
+        "create_order": "צור הזמנה",
+        "creating_order": "יוצר הזמנה...",
+        "delivery_date": "תאריך אספקה",
+        "discount": "הנחה",
+        "enter_order_notes": "הזן הערות להזמנה",
+        "global_discount": "הנחה כללית",
+        "industry": "תעשייה",
+        "lead_score": "ציון ליד",
+        "order_created_error": "יצירת ההזמנה נכשלה",
+        "order_created_success": "ההזמנה נוצרה בהצלחה",
+        "order_information": "פרטי הזמנה",
+        "order_items": "פריטי הזמנה",
+        "order_notes": "הערות להזמנה",
+        "payment_immediate": "מיידי",
+        "payment_net_30": "שוטף + 30",
+        "payment_net_45": "שוטף + 45",
+        "payment_net_60": "שוטף + 60",
+        "payment_net_90": "שוטף + 90",
+        "payment_terms": "תנאי תשלום",
+        "product": "מוצר",
+        "quantity": "כמות",
+        "select_product": "בחר מוצר",
+        "tax_rate": "שיעור מס",
+        "unit_price": "מחיר יחידה",
+        "view_order": "צפה בהזמנה"
+      },
+      "messages": {
+        "signup_failed": "ההרשמה נכשלה, אנא נסה שוב",
+        "signup_success": "ההרשמה הושלמה בהצלחה!"
+      },
+      "myShifts": {
+        "totalHours": "סה״כ שעות",
+        "totalShifts": "סה״כ משמרות"
+      },
+      "navbar": {
+        "Signatures": {
+          "clear": "נקה",
+          "employeeIdMissing": "חסר מזהה עובד",
+          "userNotAuthenticated": "המשתמש אינו מחובר"
+        },
+        "analytics": "אנליטיקה",
+        "budget": "תקציב",
+        "inventory_transfer": "העברת מלאי",
+        "notifications": {
+          "manageNotifications": "ניהול התראות",
+          "notificationMarkReadError": "שגיאה בסימון כנקרא",
+          "orderError": "שגיאה בטעינת הזמנה"
+        },
+        "budget_records": "רשומות תקציב",
+        "create_budget_record": "צור רשומת תקציב"
+      },
+      "notifications": {
+        "fillDetails": "מלא פרטים",
+        "loading": "טוען התראות..."
+      },
+      "optional": "אופציונלי",
+      "order": {
+        "auto_select_price_list": "בחירת מחירון אוטומטית",
+        "city_placeholder": "עיר",
+        "contact_name_placeholder": "שם איש קשר",
+        "contact_phone_placeholder": "טלפון איש קשר",
+        "country_placeholder": "מדינה",
+        "payment_immediate": "מיידי",
+        "payment_net_30": "שוטף + 30",
+        "payment_net_45": "שוטף + 45",
+        "payment_net_60": "שוטף + 60",
+        "payment_net_90": "שוטף + 90",
+        "payment_terms": "תנאי תשלום",
+        "price_list_active": "מחירון פעיל",
+        "shipping_details": "פרטי משלוח",
+        "shipping_required": "נדרשים פרטי משלוח",
+        "state_placeholder": "מדינה/מחוז",
+        "street_placeholder": "רחוב",
+        "use_price_list": "השתמש במחירון",
+        "zip_placeholder": "מיקוד"
+      },
+      "permissions": {
+        "noAccess": "אין הרשאה"
+      },
+      "procurement": {
+        "add_break": "הוסף מדרגה",
+        "add_item": "הוסף פריט",
+        "additional_notes": "הערות נוספות",
+        "address_placeholder": "כתובת",
+        "at_least_one_item_required": "נדרש לפחות פריט אחד",
+        "auto_select_price_list": "בחירת מחירון אוטומטית",
+        "base_price": "מחיר בסיס",
+        "city": "עיר",
+        "confidential_document": "מסמך סודי",
+        "confirm_send_email": "לשלוח אימייל?",
+        "contact_name": "שם איש קשר",
+        "contact_person": "איש קשר",
+        "contact_phone": "טלפון איש קשר",
+        "country": "מדינה",
+        "currency_not_supported": "מטבע לא נתמך",
+        "customs": "מכס",
+        "delete_success": "נמחק בהצלחה",
+        "delivery_information": "פרטי משלוח",
+        "department": "מחלקה",
+        "discount": "הנחה",
+        "document_generated": "מסמך זה נוצר ב-{{date}} בשעה {{time}}",
+        "expected_delivery": "צפוי",
+        "failed_to_generate_pdf": "יצירת PDF נכשלה",
+        "failed_to_load_data": "טעינת הנתונים נכשלה",
+        "fetch_exchange_rate_failed": "טעינת שערי חליפין נכשלה",
+        "fetch_products_failed": "טעינת מוצרים נכשלה",
+        "fetch_supplier_failed": "טעינת ספק נכשלה",
+        "formatted_address": "כתובת מפורמטת",
+        "from_buyer": "מאת (רוכש)",
+        "invalid_quantity": "כמות לא תקינה",
+        "invalid_total_cost": "עלות כוללת לא תקינה",
+        "invoice_sent": "Invoice Sent",
+        "items_ordered": "פריטים שהוזמנו",
+        "no_product_selected": "לא נבחר מוצר",
+        "no_products": "אין מוצרים",
+        "no_quantity_breaks": "אין מדרגות כמות",
+        "order_date": "תאריך הזמנה",
+        "page": "עמוד",
+        "parties_information": "פרטי הצדדים",
+        "payment_information": "פרטי תשלום",
+        "pending_update_failed": "עדכון ממתינים נכשל",
+        "pending_update_success": "עודכן בהצלחה",
+        "price_list_active": "מחירון פעיל",
+        "process_failed": "העיבוד נכשל",
+        "product_added": "המוצר נוסף",
+        "quantity_breaks": "מדרגות כמות",
+        "quantity_short": "כמות",
+        "quantity_updated": "הכמות עודכנה",
+        "required": "נדרש",
+        "send_email": "שלח אימייל",
+        "shipping": "משלוח",
+        "shipping_address_details": "פרטי כתובת למשלוח",
+        "showing_results": "מציג תוצאות",
+        "state": "מדינה/מחוז",
+        "street": "רחוב",
+        "summary": "סיכום",
+        "switch_to_manual_entry": "מעבר להזנה ידנית",
+        "to_supplier": "אל (ספק)",
+        "total_discount": "סה״כ הנחה",
+        "unlimited": "ללא הגבלה",
+        "update_failed": "העדכון נכשל",
+        "update_success": "עודכן בהצלחה",
+        "use_price_list": "השתמש במחירון",
+        "warehouse": "מחסן",
+        "zip_code": "מיקוד"
+      },
+      "product": {
+        "bom": {
+          "component_id": "מזהה רכיב",
+          "creation_error": "שגיאה ביצירת עץ מוצר",
+          "creation_success": "עץ המוצר נוצר בהצלחה",
+          "select_component": "בחר רכיב"
+        },
+        "errors": {
+          "name_required": "שם מוצר נדרש",
+          "price_required": "מחיר נדרש",
+          "supplier_required": "ספק נדרש"
+        },
+        "fields": {
+          "description": "Description",
+          "image": "תמונה",
+          "name": "שם",
+          "price": "מחיר"
+        }
+      },
+      "projects": {
+        "actions": "פעולות",
+        "calculated_risk_level": "רמת סיכון מחושבת",
+        "cancel": "ביטול",
+        "create": "צור",
+        "creating": "יוצר...",
+        "error_creating_risk": "שגיאה ביצירת סיכון",
+        "impact": "השפעה",
+        "mitigation_plan": "תוכנית הפחתה",
+        "probability": "הסתברות",
+        "project_required": "פרויקט נדרש",
+        "risk_created": "הסיכון נוצר",
+        "risk_level_calculated_automatically": "רמת הסיכון מחושבת אוטומטית",
+        "title_required": "כותרת נדרשת"
+      },
+      "public": {
+        "about": {
+          "storyParagraphs": "StoryParagraphs",
+          "team": "Team",
+          "values": "Values"
+        },
+        "api": {
+          "endpoints": "Endpoints",
+          "features": "Features"
+        },
+        "blog": {
+          "posts": "Posts"
+        },
+        "careers": {
+          "benefits": "Benefits",
+          "positions": "Positions"
+        },
+        "cookies": {
+          "browsers": "Browsers",
+          "cookieTypes": "CookieTypes"
+        },
+        "customers": {
+          "industries": "Industries",
+          "stats": "Stats",
+          "testimonials": "Testimonials"
+        },
+        "docs": {
+          "categories": "Categories",
+          "content": "Content"
+        },
+        "features": {
+          "items": "Items"
+        },
+        "help": {
+          "categories": "Categories",
+          "faq": "Faq"
+        },
+        "integrations": {
+          "items": "Items"
+        },
+        "partners": {
+          "benefits": "Benefits",
+          "currentPartners": "CurrentPartners",
+          "types": "Types"
+        },
+        "privacy": {
+          "rights": "Rights",
+          "sections": "Sections"
+        },
+        "report": {
+          "bugTypes": "BugTypes",
+          "severityLevels": "SeverityLevels"
+        },
+        "security": {
+          "items": "Items",
+          "standards": "Standards"
+        },
+        "services": {
+          "items": "Items"
+        },
+        "status": {
+          "incidents": "Incidents",
+          "services": "Services",
+          "statusLabels": "StatusLabels"
+        },
+        "terms": {
+          "sections": "Sections"
+        }
+      },
+      "signUpForm": {
+        "buttons": {
+          "add_department": "הוסף מחלקה",
+          "remove_image": "הסר תמונה",
+          "upload_image": "העלה תמונה"
+        },
+        "form": {
+          "image_preview": "תצוגה מקדימה",
+          "name": "שם"
+        },
+        "messages": {
+          "image_removed": "התמונה הוסרה"
+        },
+        "placeholders": {
+          "name": "הזן שם"
+        },
+        "validation": {
+          "name_required": "שם נדרש"
+        }
+      },
+      "signature_modal": {
+        "no_name": "ללא שם",
+        "no_signers": "אין חותמים"
+      },
+      "signupEmployee": {
+        "errors": {
+          "copy_link_failed": "העתקת הקישור נכשלה"
+        },
+        "messages": {
+          "link_copied": "הקישור הועתק"
+        }
+      },
+      "supplier": {
+        "add_failed": "הוספת ספק נכשלה",
+        "added_success": "הספק נוסף בהצלחה",
+        "fetch_failed": "טעינת ספקים נכשלה",
+        "no_attachments": "אין קבצים מצורפים",
+        "no_suppliers": "לא נמצאו ספקים",
+        "not_authenticated": "אינך מחובר",
+        "save": "שמור",
+        "status_update_failed": "עדכון סטטוס נכשל",
+        "update_failed": "עדכון ספק נכשל",
+        "updated_success": "הספק עודכן בהצלחה",
+        "view_attachments": "צפה בקבצים"
+      },
+      "supportTickets": {
+        "priority": {
+          "low": "נמוכה",
+          "medium": "בינונית",
+          "high": "גבוהה",
+          "urgent": "דחוף"
+        },
+        "status": {
+          "open": "פתוח",
+          "inprogress": "בתהליך",
+          "resolved": "נפתר",
+          "closed": "סגור"
+        }
+      },
+      "tasks": {
+        "cancel": "ביטול",
+        "edit": "עריכה",
+        "edit_task": "עריכת משימה",
+        "priority_high": "גבוהה",
+        "priority_low": "נמוכה",
+        "priority_medium": "בינונית",
+        "update": "עדכון",
+        "update_error": "שגיאה בעדכון המשימה",
+        "updated_success": "המשימה עודכנה בהצלחה",
+        "updating": "מעדכן..."
+      },
+      "users": {
+        "admin": "מנהל מערכת",
+        "department": "מחלקה",
+        "employee": "עובד",
+        "employee_not_found": "העובד לא נמצא",
+        "error_assigning_role": "שגיאה בשיוך תפקיד",
+        "identity": "זהות",
+        "invalid_employee_id": "מזהה עובד לא תקין",
+        "manager": "מנהל",
+        "no_role_assigned": "לא שויך תפקיד",
+        "personal_details": "פרטים אישיים",
+        "postal_code": "מיקוד",
+        "role_assigned_successfully": "התפקיד שויך בהצלחה",
+        "role_assignment": "שיוך תפקיד",
+        "role_assignment_hint": "בחר תפקיד לעובד",
+        "select_department": "בחר מחלקה"
+      },
+      "warehouse": {
+        "fields": {
+          "city": "עיר",
+          "contactName": "שם איש קשר",
+          "contactPhone": "טלפון איש קשר",
+          "country": "מדינה",
+          "state": "מדינה/מחוז",
+          "street": "רחוב",
+          "zip": "מיקוד"
+        },
+        "form_errors_address": "יש לתקן שגיאות בכתובת",
+        "status_": "סטטוס",
+        "view_inventory": "צפה במלאי"
+      }
+    }
+  },
+  "ru": {
+    "translation": {
+      "accounting": {
+        "account_types": {
+          "asset": "Asset",
+          "cost_of_goods_sold": "Cost Of Goods Sold",
+          "equity": "Equity",
+          "expense": "Expense",
+          "liability": "Liability",
+          "other_expense": "Other Expense",
+          "other_income": "Other Income",
+          "revenue": "Revenue"
+        }
+      },
+      "activities": {
+        "outcome": "Outcome"
+      },
+      "allSignatures": {
+        "signature": "Signature",
+        "title": "Title"
+      },
+      "auth": {
+        "generic_error": "Generic Error",
+        "hide_password": "Hide Password",
+        "login_failed": "Login Failed",
+        "login_success": "Login Success",
+        "show_password": "Show Password"
+      },
+      "banks": {
+        "actions": "Actions",
+        "add_transaction": "Add Transaction",
+        "all_statuses": "All Statuses",
+        "amount": "Amount",
+        "date": "Date",
+        "description": "Description",
+        "import": "Import",
+        "reference": "Reference",
+        "search_transactions": "Search Transactions",
+        "status": "Status",
+        "transactions": "Transactions",
+        "transactions_reconciled": "Transactions Reconciled",
+        "type": "Type"
+      },
+      "budgets": {
+        "title": "Budgets"
+      },
+      "buttons": {
+        "add_file": "Add File",
+        "delete": "Delete",
+        "delete_image": "Delete Image",
+        "remove": "Remove"
+      },
+      "common": {
+        "april": "April",
+        "august": "August",
+        "back": "Back",
+        "december": "December",
+        "february": "February",
+        "january": "January",
+        "july": "July",
+        "june": "June",
+        "march": "March",
+        "may": "May",
+        "november": "November",
+        "october": "October",
+        "optional": "Optional",
+        "refresh": "Refresh",
+        "september": "September"
+      },
+      "company": {
+        "creating": "Creating"
+      },
+      "createTask": {
+        "employeesInDepartment": "EmployeesInDepartment",
+        "noEmployeesInDepartment": "NoEmployeesInDepartment",
+        "selectDepartmentFirst": "SelectDepartmentFirst"
+      },
+      "crm": {
+        "action_added": "Action Added",
+        "active": "Active",
+        "add_action": "Add Action",
+        "add_retention_action": "Add Retention Action",
+        "all_risks": "All Risks",
+        "all_types": "All Types",
+        "at_risk_customers": "At Risk Customers",
+        "avg_risk_score": "Avg Risk Score",
+        "avg_satisfaction": "Avg Satisfaction",
+        "calculate_risk": "Calculate Risk",
+        "cancel": "Cancel",
+        "confirm_delete_segment": "Confirm Delete Segment",
+        "create_segment": "Create Segment",
+        "create_survey": "Create Survey",
+        "critical_risk": "Critical Risk",
+        "csat": "Csat",
+        "customer_retention": "Customer Retention",
+        "customer_satisfaction": "Customer Satisfaction",
+        "customer_segmentation": "Customer Segmentation",
+        "customers": "Customers",
+        "days_since_last_order": "Days Since Last Order",
+        "detractors": "Detractors",
+        "edit_segment": "Edit Segment",
+        "error_calculating_retention": "Error Calculating Retention",
+        "error_deleting_segment": "Error Deleting Segment",
+        "error_loading_retention": "Error Loading Retention",
+        "error_loading_satisfaction": "Error Loading Satisfaction",
+        "error_loading_segments": "Error Loading Segments",
+        "high_risk": "High Risk",
+        "inactive": "Inactive",
+        "low_risk": "Low Risk",
+        "medium_risk": "Medium Risk",
+        "no_description": "No Description",
+        "no_orders": "No Orders",
+        "no_retention_data": "No Retention Data",
+        "no_segments": "No Segments",
+        "no_surveys": "No Surveys",
+        "nps": "Nps",
+        "nps_distribution": "Nps Distribution",
+        "nps_score": "Nps Score",
+        "passives": "Passives",
+        "promoters": "Promoters",
+        "response_rate": "Response Rate",
+        "retained": "Retained",
+        "retention_calculated": "Retention Calculated",
+        "retention_description": "Retention Description",
+        "risk_distribution": "Risk Distribution",
+        "risk_factors": "Risk Factors",
+        "risk_score": "Risk Score",
+        "satisfaction": "Satisfaction",
+        "satisfaction_description": "Satisfaction Description",
+        "save": "Save",
+        "search_customers": "Search Customers",
+        "search_segments": "Search Segments",
+        "search_surveys": "Search Surveys",
+        "segment_deleted": "Segment Deleted",
+        "segment_distribution": "Segment Distribution",
+        "segment_saved": "Segment Saved",
+        "segment_value": "Segment Value",
+        "segmentation_description": "Segmentation Description",
+        "status": "Status",
+        "survey_created": "Survey Created",
+        "take_action": "Take Action",
+        "total_customers": "Total Customers",
+        "total_surveys": "Total Surveys",
+        "total_value": "Total Value",
+        "unknown_customer": "Unknown Customer"
+      },
+      "customer360": {
+        "activities": "Activities",
+        "all_customer_information": "All Customer Information",
+        "avg_order_value": "Avg Order Value",
+        "back_to_customers": "Back To Customers",
+        "company": "Company",
+        "customer_360": "Customer 360",
+        "customer_since": "Customer Since",
+        "email": "Email",
+        "error_loading": "Error Loading",
+        "files": "Files",
+        "invoice": "Invoice",
+        "invoices": "Invoices",
+        "loading": "Loading",
+        "no_activities": "No Activities",
+        "no_files": "No Files",
+        "no_invoices": "No Invoices",
+        "no_orders": "No Orders",
+        "no_projects": "No Projects",
+        "no_tasks": "No Tasks",
+        "order": "Order",
+        "orders": "Orders",
+        "overview": "Overview",
+        "phone": "Phone",
+        "projects": "Projects",
+        "recent_activities": "Recent Activities",
+        "recent_orders": "Recent Orders",
+        "tasks": "Tasks",
+        "total_orders": "Total Orders",
+        "total_paid": "Total Paid",
+        "total_value": "Total Value"
+      },
+      "dashboard": {
+        "allocated": "Allocated",
+        "count": "Count",
+        "no_data_available": "No Data Available",
+        "spent": "Spent"
+      },
+      "departments": {
+        "title": "Title"
+      },
+      "errors": {
+        "general_error": "General Error",
+        "loading_error": "Loading Error"
+      },
+      "events": {
+        "attachment": {
+          "fileNamePlaceholder": "Введите название файла",
+          "fileUrlPlaceholder": "Введите ссылку на файл"
+        },
+        "externalParticipant": {
+          "namePlaceholder": "Введите имя",
+          "emailPlaceholder": "Введите e-mail",
+          "phonePlaceholder": "Введите телефон"
+        }
+      },
+      "finance": {
+        "budget": {
+          "error": "Error"
+        },
+        "edit_record": "Edit Record",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "record_updated": "Record Updated",
+        "salary": {
+          "cancelled": "Cancelled",
+          "editMode": "EditMode",
+          "errorCalculatingTax": "ErrorCalculatingTax",
+          "errorFetchingSalaries": "ErrorFetchingSalaries",
+          "errorFetchingTaxConfigs": "ErrorFetchingTaxConfigs",
+          "errorUpdatingSalary": "ErrorUpdatingSalary",
+          "updatedSuccess": "UpdatedSuccess"
+        },
+        "update": "Update",
+        "update_failed": "Update Failed",
+        "updating": "Updating"
+      },
+      "hr": {
+        "analytics": {
+          "applicants": "Applicants",
+          "leave_requests": "Leave Requests"
+        },
+        "leave": {
+          "request_created": "Leave request created successfully"
+        },
+        "self_service": {
+          "days": "days"
+        }
+      },
+      "inventory": {
+        "add_item": "Add Item",
+        "all_warehouses": "All Warehouses",
+        "attached_files": "Attached Files",
+        "edit_stock_count": "Edit Stock Count",
+        "fill_all_fields": "Fill All Fields",
+        "height": "Height",
+        "insufficient_quantity": "Insufficient Quantity",
+        "invalid_quantity": "Invalid Quantity",
+        "items": "Items",
+        "length": "Length",
+        "max_available": "Max Available",
+        "no_files": "No Files",
+        "no_location": "No Location",
+        "notes": "Notes",
+        "same_warehouse": "Same Warehouse",
+        "select_warehouse": "Select Warehouse",
+        "status": {
+          "in_stock": "В наличии",
+          "low_stock": "Низкий запас",
+          "out_of_stock": "Нет в наличии",
+          "no_stock": "Нет запаса"
+        },
+        "stock_count_created": "Stock Count Created",
+        "stock_count_updated": "Stock Count Updated",
+        "total_items": "Total Items",
+        "transfer": "Transfer",
+        "transfer_error": "Transfer Error",
+        "transfer_inventory": "Transfer Inventory",
+        "transfer_notes_placeholder": "Transfer Notes Placeholder",
+        "transfer_subtitle": "Transfer Subtitle",
+        "transfer_success": "Transfer Success",
+        "transferring": "Transferring",
+        "type": "Type",
+        "width": "Width",
+        "status_label": "Status"
+      },
+      "invoices": {
+        "paymentStatus": {
+          "unpaid": "Unpaid",
+          "partiallypaid": "Partially Paid",
+          "paid": "Paid"
+        },
+        "paymentTerms": "PaymentTerms",
+        "paymentStatusLabel": "Payment Status"
+      },
+      "landing": {
+        "how_it_works": {
+          "steps": "Steps",
+          "subtitle": "Subtitle",
+          "title": "Title"
+        },
+        "pages": {
+          "help": {
+            "articles_label": "Articles Label"
+          }
+        },
+        "stats": {
+          "items": "Items"
+        },
+        "trust": {
+          "items": "Items",
+          "subtitle": "Subtitle"
+        },
+        "trusted_by": {
+          "logos": "Logos",
+          "title": "Title"
+        }
+      },
+      "leads": {
+        "add_order_item": "Add Order Item",
+        "assigned_to": "Assigned To",
+        "create_order": "Create Order",
+        "creating_order": "Creating Order",
+        "delivery_date": "Delivery Date",
+        "discount": "Discount",
+        "enter_order_notes": "Enter Order Notes",
+        "global_discount": "Global Discount",
+        "industry": "Industry",
+        "lead_score": "Lead Score",
+        "order_created_error": "Order Created Error",
+        "order_created_success": "Order Created Success",
+        "order_information": "Order Information",
+        "order_items": "Order Items",
+        "order_notes": "Order Notes",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "product": "Product",
+        "quantity": "Quantity",
+        "select_product": "Select Product",
+        "tax_rate": "Tax Rate",
+        "unit_price": "Unit Price",
+        "view_order": "View Order"
+      },
+      "messages": {
+        "signup_failed": "Signup Failed",
+        "signup_success": "Signup Success"
+      },
+      "myShifts": {
+        "totalHours": "TotalHours",
+        "totalShifts": "TotalShifts"
+      },
+      "navbar": {
+        "Signatures": {
+          "clear": "Clear",
+          "employeeIdMissing": "EmployeeIdMissing",
+          "userNotAuthenticated": "UserNotAuthenticated"
+        },
+        "analytics": "Analytics",
+        "budget": "Бюджет",
+        "inventory_transfer": "Inventory Transfer",
+        "notifications": {
+          "manageNotifications": "ManageNotifications",
+          "notificationMarkReadError": "NotificationMarkReadError",
+          "orderError": "OrderError"
+        }
+      },
+      "notifications": {
+        "fillDetails": "FillDetails",
+        "loading": "Loading"
+      },
+      "optional": "Optional",
+      "order": {
+        "auto_select_price_list": "Auto Select Price List",
+        "city_placeholder": "City Placeholder",
+        "contact_name_placeholder": "Contact Name Placeholder",
+        "contact_phone_placeholder": "Contact Phone Placeholder",
+        "country_placeholder": "Country Placeholder",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "price_list_active": "Price List Active",
+        "shipping_details": "Shipping Details",
+        "shipping_required": "Shipping Required",
+        "state_placeholder": "State Placeholder",
+        "street_placeholder": "Street Placeholder",
+        "use_price_list": "Use Price List",
+        "zip_placeholder": "Zip Placeholder"
+      },
+      "permissions": {
+        "noAccess": "No access"
+      },
+      "procurement": {
+        "add_break": "Add Break",
+        "add_item": "Add Item",
+        "additional_notes": "Additional Notes",
+        "address_placeholder": "Address Placeholder",
+        "at_least_one_item_required": "At Least One Item Required",
+        "auto_select_price_list": "Auto Select Price List",
+        "base_price": "Base Price",
+        "city": "City",
+        "confidential_document": "Конфиденциальный документ",
+        "confirm_send_email": "Confirm Send Email",
+        "contact_name": "Contact Name",
+        "contact_person": "Контактное лицо",
+        "contact_phone": "Contact Phone",
+        "country": "Country",
+        "currency_not_supported": "Currency Not Supported",
+        "customs": "Таможня",
+        "delete_success": "Delete Success",
+        "delivery_information": "Информация о доставке",
+        "department": "Department",
+        "discount": "Discount",
+        "document_generated": "Этот документ был создан {{date}} в {{time}}",
+        "expected_delivery": "Ожидается",
+        "failed_to_generate_pdf": "Failed To Generate Pdf",
+        "failed_to_load_data": "Failed To Load Data",
+        "fetch_exchange_rate_failed": "Fetch Exchange Rate Failed",
+        "fetch_products_failed": "Fetch Products Failed",
+        "fetch_supplier_failed": "Fetch Supplier Failed",
+        "formatted_address": "Formatted Address",
+        "from_buyer": "От (Покупатель)",
+        "invalid_quantity": "Invalid Quantity",
+        "invalid_total_cost": "Invalid Total Cost",
+        "invoice_sent": "Invoice Sent",
+        "items_ordered": "Заказанные товары",
+        "no_product_selected": "No Product Selected",
+        "no_products": "No Products",
+        "no_quantity_breaks": "No Quantity Breaks",
+        "order_date": "Order Date",
+        "page": "Страница",
+        "parties_information": "Информация о сторонах",
+        "payment_information": "Платежная информация",
+        "pending_update_failed": "Pending Update Failed",
+        "pending_update_success": "Pending Update Success",
+        "price_list_active": "Price List Active",
+        "process_failed": "Process Failed",
+        "product_added": "Product Added",
+        "quantity_breaks": "Quantity Breaks",
+        "quantity_short": "Кол-во",
+        "quantity_updated": "Quantity Updated",
+        "required": "Требуется",
+        "send_email": "Send Email",
+        "shipping": "Доставка",
+        "shipping_address_details": "Shipping Address Details",
+        "showing_results": "Showing Results",
+        "state": "State",
+        "street": "Street",
+        "summary": "Summary",
+        "switch_to_manual_entry": "Switch To Manual Entry",
+        "to_supplier": "К (Поставщик)",
+        "total_discount": "Total Discount",
+        "unlimited": "Unlimited",
+        "update_failed": "Update Failed",
+        "update_success": "Update Success",
+        "use_price_list": "Use Price List",
+        "warehouse": "Warehouse",
+        "zip_code": "Zip Code"
+      },
+      "product": {
+        "bom": {
+          "component_id": "Component Id",
+          "creation_error": "Creation Error",
+          "creation_success": "Creation Success",
+          "select_component": "Select Component"
+        },
+        "errors": {
+          "name_required": "Name Required",
+          "price_required": "Price Required",
+          "supplier_required": "Supplier Required"
+        },
+        "fields": {
+          "description": "Description",
+          "image": "Image",
+          "name": "Name",
+          "price": "Price"
+        }
+      },
+      "projects": {
+        "actions": "Actions",
+        "calculated_risk_level": "Calculated Risk Level",
+        "cancel": "Cancel",
+        "create": "Create",
+        "creating": "Creating",
+        "error_creating_risk": "Error Creating Risk",
+        "impact": "Impact",
+        "mitigation_plan": "Mitigation Plan",
+        "probability": "Probability",
+        "project_required": "Project Required",
+        "risk_created": "Risk Created",
+        "risk_level_calculated_automatically": "Risk Level Calculated Automatically",
+        "title_required": "Title Required"
+      },
+      "public": {
+        "about": {
+          "storyParagraphs": "StoryParagraphs",
+          "team": "Team",
+          "values": "Values"
+        },
+        "api": {
+          "endpoints": "Endpoints",
+          "features": "Features"
+        },
+        "blog": {
+          "posts": "Posts"
+        },
+        "careers": {
+          "benefits": "Benefits",
+          "positions": "Positions"
+        },
+        "cookies": {
+          "browsers": "Browsers",
+          "cookieTypes": "CookieTypes"
+        },
+        "customers": {
+          "industries": "Industries",
+          "stats": "Stats",
+          "testimonials": "Testimonials"
+        },
+        "docs": {
+          "categories": "Categories",
+          "content": "Content"
+        },
+        "features": {
+          "items": "Items"
+        },
+        "help": {
+          "categories": "Categories",
+          "faq": "Faq"
+        },
+        "integrations": {
+          "items": "Items"
+        },
+        "partners": {
+          "benefits": "Benefits",
+          "currentPartners": "CurrentPartners",
+          "types": "Types"
+        },
+        "privacy": {
+          "rights": "Rights",
+          "sections": "Sections"
+        },
+        "report": {
+          "bugTypes": "BugTypes",
+          "severityLevels": "SeverityLevels"
+        },
+        "security": {
+          "items": "Items",
+          "standards": "Standards"
+        },
+        "services": {
+          "items": "Items"
+        },
+        "status": {
+          "incidents": "Incidents",
+          "services": "Services",
+          "statusLabels": "StatusLabels"
+        },
+        "terms": {
+          "sections": "Sections"
+        }
+      },
+      "signUpForm": {
+        "buttons": {
+          "add_department": "Add Department",
+          "remove_image": "Remove Image",
+          "upload_image": "Upload Image"
+        },
+        "form": {
+          "image_preview": "Image Preview",
+          "name": "Name"
+        },
+        "messages": {
+          "image_removed": "Image Removed"
+        },
+        "placeholders": {
+          "name": "Name"
+        },
+        "validation": {
+          "name_required": "Name Required"
+        }
+      },
+      "signature_modal": {
+        "no_name": "No Name",
+        "no_signers": "No Signers"
+      },
+      "signupEmployee": {
+        "errors": {
+          "copy_link_failed": "Copy Link Failed"
+        },
+        "messages": {
+          "link_copied": "Link Copied"
+        }
+      },
+      "supplier": {
+        "add_failed": "Add Failed",
+        "added_success": "Added Success",
+        "fetch_failed": "Fetch Failed",
+        "no_attachments": "No Attachments",
+        "no_suppliers": "No Suppliers",
+        "not_authenticated": "Not Authenticated",
+        "save": "Save",
+        "status_update_failed": "Status Update Failed",
+        "update_failed": "Update Failed",
+        "updated_success": "Updated Success",
+        "view_attachments": "View Attachments"
+      },
+      "supportTickets": {
+        "priority": {
+          "low": "Низкий",
+          "medium": "Средний",
+          "high": "Высокий",
+          "urgent": "Срочный"
+        },
+        "status": {
+          "open": "Открыт",
+          "inprogress": "В процессе",
+          "resolved": "Решено",
+          "closed": "Закрыт"
+        }
+      },
+      "tasks": {
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "edit_task": "Edit Task",
+        "priority_high": "Priority High",
+        "priority_low": "Priority Low",
+        "priority_medium": "Priority Medium",
+        "update": "Update",
+        "update_error": "Update Error",
+        "updated_success": "Updated Success",
+        "updating": "Updating"
+      },
+      "users": {
+        "admin": "Admin",
+        "department": "Department",
+        "employee": "Employee",
+        "employee_not_found": "Employee Not Found",
+        "error_assigning_role": "Error Assigning Role",
+        "identity": "Identity",
+        "invalid_employee_id": "Invalid Employee Id",
+        "manager": "Manager",
+        "no_role_assigned": "No Role Assigned",
+        "personal_details": "Personal Details",
+        "postal_code": "Postal Code",
+        "role_assigned_successfully": "Role Assigned Successfully",
+        "role_assignment": "Role Assignment",
+        "role_assignment_hint": "Role Assignment Hint",
+        "select_department": "Select Department"
+      },
+      "warehouse": {
+        "fields": {
+          "city": "City",
+          "contactName": "ContactName",
+          "contactPhone": "ContactPhone",
+          "country": "Country",
+          "state": "State",
+          "street": "Street",
+          "zip": "Zip"
+        },
+        "form_errors_address": "Form Errors Address",
+        "status_": "Status",
+        "view_inventory": "View Inventory"
+      }
+    }
+  },
+  "ja": {
+    "translation": {
+      "accounting": {
+        "account_types": {
+          "asset": "Asset",
+          "cost_of_goods_sold": "Cost Of Goods Sold",
+          "equity": "Equity",
+          "expense": "Expense",
+          "liability": "Liability",
+          "other_expense": "Other Expense",
+          "other_income": "Other Income",
+          "revenue": "Revenue"
+        }
+      },
+      "activities": {
+        "outcome": "Outcome"
+      },
+      "allSignatures": {
+        "signature": "Signature",
+        "title": "Title"
+      },
+      "auth": {
+        "generic_error": "Generic Error",
+        "hide_password": "Hide Password",
+        "login_failed": "Login Failed",
+        "login_success": "Login Success",
+        "show_password": "Show Password"
+      },
+      "banks": {
+        "actions": "Actions",
+        "add_transaction": "Add Transaction",
+        "all_statuses": "All Statuses",
+        "amount": "Amount",
+        "date": "Date",
+        "description": "Description",
+        "import": "Import",
+        "reference": "Reference",
+        "search_transactions": "Search Transactions",
+        "status": "Status",
+        "transactions": "Transactions",
+        "transactions_reconciled": "Transactions Reconciled",
+        "type": "Type"
+      },
+      "budgets": {
+        "title": "Budgets"
+      },
+      "buttons": {
+        "add_file": "Add File",
+        "delete": "Delete",
+        "delete_image": "Delete Image",
+        "remove": "Remove"
+      },
+      "common": {
+        "april": "April",
+        "august": "August",
+        "back": "Back",
+        "december": "December",
+        "february": "February",
+        "january": "January",
+        "july": "July",
+        "june": "June",
+        "march": "March",
+        "may": "May",
+        "november": "November",
+        "october": "October",
+        "optional": "Optional",
+        "refresh": "Refresh",
+        "september": "September"
+      },
+      "company": {
+        "creating": "Creating"
+      },
+      "createTask": {
+        "employeesInDepartment": "EmployeesInDepartment",
+        "noEmployeesInDepartment": "NoEmployeesInDepartment",
+        "selectDepartmentFirst": "SelectDepartmentFirst"
+      },
+      "crm": {
+        "action_added": "Action Added",
+        "active": "Active",
+        "add_action": "Add Action",
+        "add_retention_action": "Add Retention Action",
+        "all_risks": "All Risks",
+        "all_types": "All Types",
+        "at_risk_customers": "At Risk Customers",
+        "avg_risk_score": "Avg Risk Score",
+        "avg_satisfaction": "Avg Satisfaction",
+        "calculate_risk": "Calculate Risk",
+        "cancel": "Cancel",
+        "confirm_delete_segment": "Confirm Delete Segment",
+        "create_segment": "Create Segment",
+        "create_survey": "Create Survey",
+        "critical_risk": "Critical Risk",
+        "csat": "Csat",
+        "customer_retention": "Customer Retention",
+        "customer_satisfaction": "Customer Satisfaction",
+        "customer_segmentation": "Customer Segmentation",
+        "customers": "Customers",
+        "days_since_last_order": "Days Since Last Order",
+        "detractors": "Detractors",
+        "edit_segment": "Edit Segment",
+        "error_calculating_retention": "Error Calculating Retention",
+        "error_deleting_segment": "Error Deleting Segment",
+        "error_loading_retention": "Error Loading Retention",
+        "error_loading_satisfaction": "Error Loading Satisfaction",
+        "error_loading_segments": "Error Loading Segments",
+        "high_risk": "High Risk",
+        "inactive": "Inactive",
+        "low_risk": "Low Risk",
+        "medium_risk": "Medium Risk",
+        "no_description": "No Description",
+        "no_orders": "No Orders",
+        "no_retention_data": "No Retention Data",
+        "no_segments": "No Segments",
+        "no_surveys": "No Surveys",
+        "nps": "Nps",
+        "nps_distribution": "Nps Distribution",
+        "nps_score": "Nps Score",
+        "passives": "Passives",
+        "promoters": "Promoters",
+        "response_rate": "Response Rate",
+        "retained": "Retained",
+        "retention_calculated": "Retention Calculated",
+        "retention_description": "Retention Description",
+        "risk_distribution": "Risk Distribution",
+        "risk_factors": "Risk Factors",
+        "risk_score": "Risk Score",
+        "satisfaction": "Satisfaction",
+        "satisfaction_description": "Satisfaction Description",
+        "save": "Save",
+        "search_customers": "Search Customers",
+        "search_segments": "Search Segments",
+        "search_surveys": "Search Surveys",
+        "segment_deleted": "Segment Deleted",
+        "segment_distribution": "Segment Distribution",
+        "segment_saved": "Segment Saved",
+        "segment_value": "Segment Value",
+        "segmentation_description": "Segmentation Description",
+        "status": "Status",
+        "survey_created": "Survey Created",
+        "take_action": "Take Action",
+        "total_customers": "Total Customers",
+        "total_surveys": "Total Surveys",
+        "total_value": "Total Value",
+        "unknown_customer": "Unknown Customer"
+      },
+      "customer360": {
+        "activities": "Activities",
+        "all_customer_information": "All Customer Information",
+        "avg_order_value": "Avg Order Value",
+        "back_to_customers": "Back To Customers",
+        "company": "Company",
+        "customer_360": "Customer 360",
+        "customer_since": "Customer Since",
+        "email": "Email",
+        "error_loading": "Error Loading",
+        "files": "Files",
+        "invoice": "Invoice",
+        "invoices": "Invoices",
+        "loading": "Loading",
+        "no_activities": "No Activities",
+        "no_files": "No Files",
+        "no_invoices": "No Invoices",
+        "no_orders": "No Orders",
+        "no_projects": "No Projects",
+        "no_tasks": "No Tasks",
+        "order": "Order",
+        "orders": "Orders",
+        "overview": "Overview",
+        "phone": "Phone",
+        "projects": "Projects",
+        "recent_activities": "Recent Activities",
+        "recent_orders": "Recent Orders",
+        "tasks": "Tasks",
+        "total_orders": "Total Orders",
+        "total_paid": "Total Paid",
+        "total_value": "Total Value"
+      },
+      "dashboard": {
+        "allocated": "Allocated",
+        "count": "Count",
+        "no_data_available": "No Data Available",
+        "spent": "Spent"
+      },
+      "departments": {
+        "title": "Title"
+      },
+      "errors": {
+        "general_error": "General Error",
+        "loading_error": "Loading Error"
+      },
+      "events": {
+        "attachment": {
+          "fileNamePlaceholder": "ファイル名を入力",
+          "fileUrlPlaceholder": "ファイルのリンクを入力"
+        },
+        "externalParticipant": {
+          "namePlaceholder": "名前を入力",
+          "emailPlaceholder": "Eメールを入力",
+          "phonePlaceholder": "電話番号を入力"
+        }
+      },
+      "finance": {
+        "budget": {
+          "error": "Error"
+        },
+        "edit_record": "Edit Record",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "record_updated": "Record Updated",
+        "salary": {
+          "cancelled": "Cancelled",
+          "editMode": "EditMode",
+          "errorCalculatingTax": "ErrorCalculatingTax",
+          "errorFetchingSalaries": "ErrorFetchingSalaries",
+          "errorFetchingTaxConfigs": "ErrorFetchingTaxConfigs",
+          "errorUpdatingSalary": "ErrorUpdatingSalary",
+          "updatedSuccess": "UpdatedSuccess"
+        },
+        "update": "Update",
+        "update_failed": "Update Failed",
+        "updating": "Updating"
+      },
+      "hr": {
+        "analytics": {
+          "applicants": "Applicants",
+          "leave_requests": "Leave Requests"
+        },
+        "leave": {
+          "request_created": "Leave request created successfully"
+        },
+        "self_service": {
+          "days": "days"
+        }
+      },
+      "inventory": {
+        "add_item": "Add Item",
+        "all_warehouses": "All Warehouses",
+        "attached_files": "Attached Files",
+        "edit_stock_count": "Edit Stock Count",
+        "fill_all_fields": "Fill All Fields",
+        "height": "Height",
+        "insufficient_quantity": "Insufficient Quantity",
+        "invalid_quantity": "Invalid Quantity",
+        "items": "Items",
+        "length": "Length",
+        "max_available": "Max Available",
+        "no_files": "No Files",
+        "no_location": "No Location",
+        "notes": "Notes",
+        "same_warehouse": "Same Warehouse",
+        "select_warehouse": "Select Warehouse",
+        "status": {
+          "in_stock": "在庫あり",
+          "low_stock": "在庫不足",
+          "out_of_stock": "Out of Stock",
+          "no_stock": "No Stock"
+        },
+        "stock_count_created": "Stock Count Created",
+        "stock_count_updated": "Stock Count Updated",
+        "total_items": "Total Items",
+        "transfer": "Transfer",
+        "transfer_error": "Transfer Error",
+        "transfer_inventory": "Transfer Inventory",
+        "transfer_notes_placeholder": "Transfer Notes Placeholder",
+        "transfer_subtitle": "Transfer Subtitle",
+        "transfer_success": "Transfer Success",
+        "transferring": "Transferring",
+        "type": "Type",
+        "width": "Width",
+        "status_label": "Status"
+      },
+      "invoices": {
+        "paymentStatus": {
+          "unpaid": "Unpaid",
+          "partiallypaid": "Partially Paid",
+          "paid": "Paid"
+        },
+        "paymentTerms": "PaymentTerms",
+        "paymentStatusLabel": "Payment Status"
+      },
+      "landing": {
+        "how_it_works": {
+          "steps": "Steps",
+          "subtitle": "Subtitle",
+          "title": "Title"
+        },
+        "pages": {
+          "help": {
+            "articles_label": "Articles Label"
+          }
+        },
+        "stats": {
+          "items": "Items"
+        },
+        "trust": {
+          "items": "Items",
+          "subtitle": "Subtitle"
+        },
+        "trusted_by": {
+          "logos": "Logos",
+          "title": "Title"
+        }
+      },
+      "leads": {
+        "add_order_item": "Add Order Item",
+        "assigned_to": "Assigned To",
+        "create_order": "Create Order",
+        "creating_order": "Creating Order",
+        "delivery_date": "Delivery Date",
+        "discount": "Discount",
+        "enter_order_notes": "Enter Order Notes",
+        "global_discount": "Global Discount",
+        "industry": "Industry",
+        "lead_score": "Lead Score",
+        "order_created_error": "Order Created Error",
+        "order_created_success": "Order Created Success",
+        "order_information": "Order Information",
+        "order_items": "Order Items",
+        "order_notes": "Order Notes",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "product": "Product",
+        "quantity": "Quantity",
+        "select_product": "Select Product",
+        "tax_rate": "Tax Rate",
+        "unit_price": "Unit Price",
+        "view_order": "View Order"
+      },
+      "messages": {
+        "signup_failed": "Signup Failed",
+        "signup_success": "Signup Success"
+      },
+      "myShifts": {
+        "totalHours": "TotalHours",
+        "totalShifts": "TotalShifts"
+      },
+      "navbar": {
+        "Signatures": {
+          "clear": "Clear",
+          "employeeIdMissing": "EmployeeIdMissing",
+          "userNotAuthenticated": "UserNotAuthenticated"
+        },
+        "analytics": "Analytics",
+        "budget": "予算",
+        "inventory_transfer": "Inventory Transfer",
+        "notifications": {
+          "manageNotifications": "ManageNotifications",
+          "notificationMarkReadError": "NotificationMarkReadError",
+          "orderError": "OrderError"
+        }
+      },
+      "notifications": {
+        "fillDetails": "FillDetails",
+        "loading": "Loading"
+      },
+      "optional": "Optional",
+      "order": {
+        "auto_select_price_list": "Auto Select Price List",
+        "city_placeholder": "City Placeholder",
+        "contact_name_placeholder": "Contact Name Placeholder",
+        "contact_phone_placeholder": "Contact Phone Placeholder",
+        "country_placeholder": "Country Placeholder",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "price_list_active": "Price List Active",
+        "shipping_details": "Shipping Details",
+        "shipping_required": "Shipping Required",
+        "state_placeholder": "State Placeholder",
+        "street_placeholder": "Street Placeholder",
+        "use_price_list": "Use Price List",
+        "zip_placeholder": "Zip Placeholder"
+      },
+      "permissions": {
+        "noAccess": "No access"
+      },
+      "procurement": {
+        "add_break": "Add Break",
+        "add_item": "Add Item",
+        "additional_notes": "Additional Notes",
+        "address_placeholder": "Address Placeholder",
+        "at_least_one_item_required": "At Least One Item Required",
+        "auto_select_price_list": "Auto Select Price List",
+        "base_price": "Base Price",
+        "city": "City",
+        "confidential_document": "機密文書",
+        "confirm_send_email": "Confirm Send Email",
+        "contact_name": "Contact Name",
+        "contact_person": "連絡先",
+        "contact_phone": "Contact Phone",
+        "country": "Country",
+        "currency_not_supported": "Currency Not Supported",
+        "customs": "税関",
+        "delete_success": "Delete Success",
+        "delivery_information": "配送情報",
+        "department": "Department",
+        "discount": "Discount",
+        "document_generated": "この文書は{{date}}の{{time}}に作成されました",
+        "expected_delivery": "予定",
+        "failed_to_generate_pdf": "Failed To Generate Pdf",
+        "failed_to_load_data": "Failed To Load Data",
+        "fetch_exchange_rate_failed": "Fetch Exchange Rate Failed",
+        "fetch_products_failed": "Fetch Products Failed",
+        "fetch_supplier_failed": "Fetch Supplier Failed",
+        "formatted_address": "Formatted Address",
+        "from_buyer": "発注者",
+        "invalid_quantity": "Invalid Quantity",
+        "invalid_total_cost": "Invalid Total Cost",
+        "invoice_sent": "Invoice Sent",
+        "items_ordered": "注文項目",
+        "no_product_selected": "No Product Selected",
+        "no_products": "No Products",
+        "no_quantity_breaks": "No Quantity Breaks",
+        "order_date": "Order Date",
+        "page": "ページ",
+        "parties_information": "当事者情報",
+        "payment_information": "支払い情報",
+        "pending_update_failed": "Pending Update Failed",
+        "pending_update_success": "Pending Update Success",
+        "price_list_active": "Price List Active",
+        "process_failed": "Process Failed",
+        "product_added": "Product Added",
+        "quantity_breaks": "Quantity Breaks",
+        "quantity_short": "数量",
+        "quantity_updated": "Quantity Updated",
+        "required": "必須",
+        "send_email": "Send Email",
+        "shipping": "配送",
+        "shipping_address_details": "Shipping Address Details",
+        "showing_results": "Showing Results",
+        "state": "State",
+        "street": "Street",
+        "summary": "Summary",
+        "switch_to_manual_entry": "Switch To Manual Entry",
+        "to_supplier": "供給者",
+        "total_discount": "Total Discount",
+        "unlimited": "Unlimited",
+        "update_failed": "Update Failed",
+        "update_success": "Update Success",
+        "use_price_list": "Use Price List",
+        "warehouse": "Warehouse",
+        "zip_code": "Zip Code"
+      },
+      "product": {
+        "bom": {
+          "component_id": "Component Id",
+          "creation_error": "Creation Error",
+          "creation_success": "Creation Success",
+          "select_component": "Select Component"
+        },
+        "errors": {
+          "name_required": "Name Required",
+          "price_required": "Price Required",
+          "supplier_required": "Supplier Required"
+        },
+        "fields": {
+          "description": "Description",
+          "image": "Image",
+          "name": "Name",
+          "price": "Price"
+        }
+      },
+      "projects": {
+        "actions": "Actions",
+        "calculated_risk_level": "Calculated Risk Level",
+        "cancel": "Cancel",
+        "create": "Create",
+        "creating": "Creating",
+        "error_creating_risk": "Error Creating Risk",
+        "impact": "Impact",
+        "mitigation_plan": "Mitigation Plan",
+        "probability": "Probability",
+        "project_required": "Project Required",
+        "risk_created": "Risk Created",
+        "risk_level_calculated_automatically": "Risk Level Calculated Automatically",
+        "title_required": "Title Required"
+      },
+      "public": {
+        "about": {
+          "storyParagraphs": "StoryParagraphs",
+          "team": "Team",
+          "values": "Values"
+        },
+        "api": {
+          "endpoints": "Endpoints",
+          "features": "Features"
+        },
+        "blog": {
+          "posts": "Posts"
+        },
+        "careers": {
+          "benefits": "Benefits",
+          "positions": "Positions"
+        },
+        "cookies": {
+          "browsers": "Browsers",
+          "cookieTypes": "CookieTypes"
+        },
+        "customers": {
+          "industries": "Industries",
+          "stats": "Stats",
+          "testimonials": "Testimonials"
+        },
+        "docs": {
+          "categories": "Categories",
+          "content": "Content"
+        },
+        "features": {
+          "items": "Items"
+        },
+        "help": {
+          "categories": "Categories",
+          "faq": "Faq"
+        },
+        "integrations": {
+          "items": "Items"
+        },
+        "partners": {
+          "benefits": "Benefits",
+          "currentPartners": "CurrentPartners",
+          "types": "Types"
+        },
+        "privacy": {
+          "rights": "Rights",
+          "sections": "Sections"
+        },
+        "report": {
+          "bugTypes": "BugTypes",
+          "severityLevels": "SeverityLevels"
+        },
+        "security": {
+          "items": "Items",
+          "standards": "Standards"
+        },
+        "services": {
+          "items": "Items"
+        },
+        "status": {
+          "incidents": "Incidents",
+          "services": "Services",
+          "statusLabels": "StatusLabels"
+        },
+        "terms": {
+          "sections": "Sections"
+        }
+      },
+      "signUpForm": {
+        "buttons": {
+          "add_department": "Add Department",
+          "remove_image": "Remove Image",
+          "upload_image": "Upload Image"
+        },
+        "form": {
+          "image_preview": "Image Preview",
+          "name": "Name"
+        },
+        "messages": {
+          "image_removed": "Image Removed"
+        },
+        "placeholders": {
+          "name": "Name"
+        },
+        "validation": {
+          "name_required": "Name Required"
+        }
+      },
+      "signature_modal": {
+        "no_name": "No Name",
+        "no_signers": "No Signers"
+      },
+      "signupEmployee": {
+        "errors": {
+          "copy_link_failed": "Copy Link Failed"
+        },
+        "messages": {
+          "link_copied": "Link Copied"
+        }
+      },
+      "supplier": {
+        "add_failed": "Add Failed",
+        "added_success": "Added Success",
+        "fetch_failed": "Fetch Failed",
+        "no_attachments": "No Attachments",
+        "no_suppliers": "No Suppliers",
+        "not_authenticated": "Not Authenticated",
+        "save": "Save",
+        "status_update_failed": "Status Update Failed",
+        "update_failed": "Update Failed",
+        "updated_success": "Updated Success",
+        "view_attachments": "View Attachments"
+      },
+      "supportTickets": {
+        "priority": {
+          "low": "低",
+          "medium": "中",
+          "high": "高",
+          "urgent": "緊急"
+        },
+        "status": {
+          "open": "オープン",
+          "inprogress": "進行中",
+          "resolved": "解決済み",
+          "closed": "クローズ"
+        }
+      },
+      "tasks": {
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "edit_task": "Edit Task",
+        "priority_high": "Priority High",
+        "priority_low": "Priority Low",
+        "priority_medium": "Priority Medium",
+        "update": "Update",
+        "update_error": "Update Error",
+        "updated_success": "Updated Success",
+        "updating": "Updating"
+      },
+      "users": {
+        "admin": "Admin",
+        "department": "Department",
+        "employee": "Employee",
+        "employee_not_found": "Employee Not Found",
+        "error_assigning_role": "Error Assigning Role",
+        "identity": "Identity",
+        "invalid_employee_id": "Invalid Employee Id",
+        "manager": "Manager",
+        "no_role_assigned": "No Role Assigned",
+        "personal_details": "Personal Details",
+        "postal_code": "Postal Code",
+        "role_assigned_successfully": "Role Assigned Successfully",
+        "role_assignment": "Role Assignment",
+        "role_assignment_hint": "Role Assignment Hint",
+        "select_department": "Select Department"
+      },
+      "warehouse": {
+        "fields": {
+          "city": "City",
+          "contactName": "ContactName",
+          "contactPhone": "ContactPhone",
+          "country": "Country",
+          "state": "State",
+          "street": "Street",
+          "zip": "Zip"
+        },
+        "form_errors_address": "Form Errors Address",
+        "status_": "Status",
+        "view_inventory": "View Inventory"
+      }
+    }
+  },
+  "fr": {
+    "translation": {
+      "accounting": {
+        "account_types": {
+          "asset": "Asset",
+          "cost_of_goods_sold": "Cost Of Goods Sold",
+          "equity": "Equity",
+          "expense": "Expense",
+          "liability": "Liability",
+          "other_expense": "Other Expense",
+          "other_income": "Other Income",
+          "revenue": "Revenue"
+        }
+      },
+      "activities": {
+        "outcome": "Outcome"
+      },
+      "allSignatures": {
+        "signature": "Signature",
+        "title": "Title"
+      },
+      "auth": {
+        "generic_error": "Generic Error",
+        "hide_password": "Hide Password",
+        "login_failed": "Login Failed",
+        "login_success": "Login Success",
+        "show_password": "Show Password"
+      },
+      "banks": {
+        "actions": "Actions",
+        "add_transaction": "Add Transaction",
+        "all_statuses": "All Statuses",
+        "amount": "Amount",
+        "date": "Date",
+        "description": "Description",
+        "import": "Import",
+        "reference": "Reference",
+        "search_transactions": "Search Transactions",
+        "status": "Status",
+        "transactions": "Transactions",
+        "transactions_reconciled": "Transactions Reconciled",
+        "type": "Type"
+      },
+      "budgets": {
+        "title": "Budgets"
+      },
+      "buttons": {
+        "add_file": "Add File",
+        "delete": "Delete",
+        "delete_image": "Delete Image",
+        "remove": "Remove"
+      },
+      "common": {
+        "april": "April",
+        "august": "August",
+        "back": "Back",
+        "december": "December",
+        "february": "February",
+        "january": "January",
+        "july": "July",
+        "june": "June",
+        "march": "March",
+        "may": "May",
+        "november": "November",
+        "october": "October",
+        "optional": "Optional",
+        "refresh": "Refresh",
+        "september": "September"
+      },
+      "company": {
+        "creating": "Creating"
+      },
+      "createTask": {
+        "employeesInDepartment": "EmployeesInDepartment",
+        "noEmployeesInDepartment": "NoEmployeesInDepartment",
+        "selectDepartmentFirst": "SelectDepartmentFirst"
+      },
+      "crm": {
+        "action_added": "Action Added",
+        "active": "Active",
+        "add_action": "Add Action",
+        "add_retention_action": "Add Retention Action",
+        "all_risks": "All Risks",
+        "all_types": "All Types",
+        "at_risk_customers": "At Risk Customers",
+        "avg_risk_score": "Avg Risk Score",
+        "avg_satisfaction": "Avg Satisfaction",
+        "calculate_risk": "Calculate Risk",
+        "cancel": "Cancel",
+        "confirm_delete_segment": "Confirm Delete Segment",
+        "create_segment": "Create Segment",
+        "create_survey": "Create Survey",
+        "critical_risk": "Critical Risk",
+        "csat": "Csat",
+        "customer_retention": "Customer Retention",
+        "customer_satisfaction": "Customer Satisfaction",
+        "customer_segmentation": "Customer Segmentation",
+        "customers": "Customers",
+        "days_since_last_order": "Days Since Last Order",
+        "detractors": "Detractors",
+        "edit_segment": "Edit Segment",
+        "error_calculating_retention": "Error Calculating Retention",
+        "error_deleting_segment": "Error Deleting Segment",
+        "error_loading_retention": "Error Loading Retention",
+        "error_loading_satisfaction": "Error Loading Satisfaction",
+        "error_loading_segments": "Error Loading Segments",
+        "high_risk": "High Risk",
+        "inactive": "Inactive",
+        "low_risk": "Low Risk",
+        "medium_risk": "Medium Risk",
+        "no_description": "No Description",
+        "no_orders": "No Orders",
+        "no_retention_data": "No Retention Data",
+        "no_segments": "No Segments",
+        "no_surveys": "No Surveys",
+        "nps": "Nps",
+        "nps_distribution": "Nps Distribution",
+        "nps_score": "Nps Score",
+        "passives": "Passives",
+        "promoters": "Promoters",
+        "response_rate": "Response Rate",
+        "retained": "Retained",
+        "retention_calculated": "Retention Calculated",
+        "retention_description": "Retention Description",
+        "risk_distribution": "Risk Distribution",
+        "risk_factors": "Risk Factors",
+        "risk_score": "Risk Score",
+        "satisfaction": "Satisfaction",
+        "satisfaction_description": "Satisfaction Description",
+        "save": "Save",
+        "search_customers": "Search Customers",
+        "search_segments": "Search Segments",
+        "search_surveys": "Search Surveys",
+        "segment_deleted": "Segment Deleted",
+        "segment_distribution": "Segment Distribution",
+        "segment_saved": "Segment Saved",
+        "segment_value": "Segment Value",
+        "segmentation_description": "Segmentation Description",
+        "status": "Status",
+        "survey_created": "Survey Created",
+        "take_action": "Take Action",
+        "total_customers": "Total Customers",
+        "total_surveys": "Total Surveys",
+        "total_value": "Total Value",
+        "unknown_customer": "Unknown Customer"
+      },
+      "customer360": {
+        "activities": "Activities",
+        "all_customer_information": "All Customer Information",
+        "avg_order_value": "Avg Order Value",
+        "back_to_customers": "Back To Customers",
+        "company": "Company",
+        "customer_360": "Customer 360",
+        "customer_since": "Customer Since",
+        "email": "Email",
+        "error_loading": "Error Loading",
+        "files": "Files",
+        "invoice": "Invoice",
+        "invoices": "Invoices",
+        "loading": "Loading",
+        "no_activities": "No Activities",
+        "no_files": "No Files",
+        "no_invoices": "No Invoices",
+        "no_orders": "No Orders",
+        "no_projects": "No Projects",
+        "no_tasks": "No Tasks",
+        "order": "Order",
+        "orders": "Orders",
+        "overview": "Overview",
+        "phone": "Phone",
+        "projects": "Projects",
+        "recent_activities": "Recent Activities",
+        "recent_orders": "Recent Orders",
+        "tasks": "Tasks",
+        "total_orders": "Total Orders",
+        "total_paid": "Total Paid",
+        "total_value": "Total Value"
+      },
+      "dashboard": {
+        "allocated": "Allocated",
+        "count": "Count",
+        "no_data_available": "No Data Available",
+        "spent": "Spent"
+      },
+      "departments": {
+        "title": "Title"
+      },
+      "errors": {
+        "general_error": "General Error",
+        "loading_error": "Loading Error"
+      },
+      "events": {
+        "attachment": {
+          "fileNamePlaceholder": "Entrez le nom du fichier",
+          "fileUrlPlaceholder": "Entrez le lien du fichier"
+        },
+        "externalParticipant": {
+          "namePlaceholder": "Entrez le nom",
+          "emailPlaceholder": "Entrez l'e-mail",
+          "phonePlaceholder": "Entrez le téléphone"
+        }
+      },
+      "finance": {
+        "budget": {
+          "error": "Error"
+        },
+        "edit_record": "Edit Record",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "record_updated": "Record Updated",
+        "salary": {
+          "cancelled": "Cancelled",
+          "editMode": "EditMode",
+          "errorCalculatingTax": "ErrorCalculatingTax",
+          "errorFetchingSalaries": "ErrorFetchingSalaries",
+          "errorFetchingTaxConfigs": "ErrorFetchingTaxConfigs",
+          "errorUpdatingSalary": "ErrorUpdatingSalary",
+          "updatedSuccess": "UpdatedSuccess"
+        },
+        "update": "Update",
+        "update_failed": "Update Failed",
+        "updating": "Updating"
+      },
+      "hr": {
+        "analytics": {
+          "applicants": "Applicants",
+          "leave_requests": "Leave Requests"
+        },
+        "leave": {
+          "request_created": "Leave request created successfully"
+        },
+        "self_service": {
+          "days": "days"
+        }
+      },
+      "inventory": {
+        "add_item": "Add Item",
+        "all_warehouses": "All Warehouses",
+        "attached_files": "Attached Files",
+        "edit_stock_count": "Edit Stock Count",
+        "fill_all_fields": "Fill All Fields",
+        "height": "Height",
+        "insufficient_quantity": "Insufficient Quantity",
+        "invalid_quantity": "Invalid Quantity",
+        "items": "Items",
+        "length": "Length",
+        "max_available": "Max Available",
+        "no_files": "No Files",
+        "no_location": "No Location",
+        "notes": "Notes",
+        "same_warehouse": "Same Warehouse",
+        "select_warehouse": "Select Warehouse",
+        "status": {
+          "in_stock": "In Stock",
+          "low_stock": "Low Stock",
+          "out_of_stock": "Out of Stock",
+          "no_stock": "No Stock"
+        },
+        "stock_count_created": "Stock Count Created",
+        "stock_count_updated": "Stock Count Updated",
+        "total_items": "Total Items",
+        "transfer": "Transfer",
+        "transfer_error": "Transfer Error",
+        "transfer_inventory": "Transfer Inventory",
+        "transfer_notes_placeholder": "Transfer Notes Placeholder",
+        "transfer_subtitle": "Transfer Subtitle",
+        "transfer_success": "Transfer Success",
+        "transferring": "Transferring",
+        "type": "Type",
+        "width": "Width",
+        "status_label": "Status"
+      },
+      "invoices": {
+        "paymentStatus": {
+          "unpaid": "Unpaid",
+          "partiallypaid": "Partially Paid",
+          "paid": "Paid"
+        },
+        "paymentTerms": "PaymentTerms",
+        "paymentStatusLabel": "Payment Status"
+      },
+      "landing": {
+        "how_it_works": {
+          "steps": "Steps",
+          "subtitle": "Subtitle",
+          "title": "Title"
+        },
+        "pages": {
+          "help": {
+            "articles_label": "Articles Label"
+          }
+        },
+        "stats": {
+          "items": "Items"
+        },
+        "trust": {
+          "items": "Items",
+          "subtitle": "Subtitle"
+        },
+        "trusted_by": {
+          "logos": "Logos",
+          "title": "Title"
+        }
+      },
+      "leads": {
+        "add_order_item": "Add Order Item",
+        "assigned_to": "Assigned To",
+        "create_order": "Create Order",
+        "creating_order": "Creating Order",
+        "delivery_date": "Delivery Date",
+        "discount": "Discount",
+        "enter_order_notes": "Enter Order Notes",
+        "global_discount": "Global Discount",
+        "industry": "Industry",
+        "lead_score": "Lead Score",
+        "order_created_error": "Order Created Error",
+        "order_created_success": "Order Created Success",
+        "order_information": "Order Information",
+        "order_items": "Order Items",
+        "order_notes": "Order Notes",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "product": "Product",
+        "quantity": "Quantity",
+        "select_product": "Select Product",
+        "tax_rate": "Tax Rate",
+        "unit_price": "Unit Price",
+        "view_order": "View Order"
+      },
+      "messages": {
+        "signup_failed": "Signup Failed",
+        "signup_success": "Signup Success"
+      },
+      "myShifts": {
+        "totalHours": "TotalHours",
+        "totalShifts": "TotalShifts"
+      },
+      "navbar": {
+        "Signatures": {
+          "clear": "Clear",
+          "employeeIdMissing": "EmployeeIdMissing",
+          "userNotAuthenticated": "UserNotAuthenticated"
+        },
+        "analytics": "Analytics",
+        "budget": "Budget",
+        "inventory_transfer": "Inventory Transfer",
+        "notifications": {
+          "manageNotifications": "ManageNotifications",
+          "notificationMarkReadError": "NotificationMarkReadError",
+          "orderError": "OrderError"
+        }
+      },
+      "notifications": {
+        "fillDetails": "FillDetails",
+        "loading": "Loading"
+      },
+      "optional": "Optional",
+      "order": {
+        "auto_select_price_list": "Auto Select Price List",
+        "city_placeholder": "City Placeholder",
+        "contact_name_placeholder": "Contact Name Placeholder",
+        "contact_phone_placeholder": "Contact Phone Placeholder",
+        "country_placeholder": "Country Placeholder",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "price_list_active": "Price List Active",
+        "shipping_details": "Shipping Details",
+        "shipping_required": "Shipping Required",
+        "state_placeholder": "State Placeholder",
+        "street_placeholder": "Street Placeholder",
+        "use_price_list": "Use Price List",
+        "zip_placeholder": "Zip Placeholder"
+      },
+      "permissions": {
+        "noAccess": "No access"
+      },
+      "procurement": {
+        "add_break": "Add Break",
+        "add_item": "Add Item",
+        "additional_notes": "Additional Notes",
+        "address_placeholder": "Address Placeholder",
+        "at_least_one_item_required": "At Least One Item Required",
+        "auto_select_price_list": "Auto Select Price List",
+        "base_price": "Base Price",
+        "city": "City",
+        "confidential_document": "Document confidentiel",
+        "confirm_send_email": "Confirm Send Email",
+        "contact_name": "Contact Name",
+        "contact_person": "Personne de contact",
+        "contact_phone": "Contact Phone",
+        "country": "Country",
+        "currency_not_supported": "Currency Not Supported",
+        "customs": "Douane",
+        "delete_success": "Delete Success",
+        "delivery_information": "Informations de livraison",
+        "department": "Department",
+        "discount": "Discount",
+        "document_generated": "Ce document a été généré le {{date}} à {{time}}",
+        "expected_delivery": "Attendu",
+        "failed_to_generate_pdf": "Failed To Generate Pdf",
+        "failed_to_load_data": "Failed To Load Data",
+        "fetch_exchange_rate_failed": "Fetch Exchange Rate Failed",
+        "fetch_products_failed": "Fetch Products Failed",
+        "fetch_supplier_failed": "Fetch Supplier Failed",
+        "formatted_address": "Formatted Address",
+        "from_buyer": "De (Acheteur)",
+        "invalid_quantity": "Invalid Quantity",
+        "invalid_total_cost": "Invalid Total Cost",
+        "invoice_sent": "Invoice Sent",
+        "items_ordered": "Articles commandés",
+        "no_product_selected": "No Product Selected",
+        "no_products": "No Products",
+        "no_quantity_breaks": "No Quantity Breaks",
+        "order_date": "Order Date",
+        "page": "Page",
+        "parties_information": "Informations sur les parties",
+        "payment_information": "Informations de paiement",
+        "pending_update_failed": "Pending Update Failed",
+        "pending_update_success": "Pending Update Success",
+        "price_list_active": "Price List Active",
+        "process_failed": "Process Failed",
+        "product_added": "Product Added",
+        "quantity_breaks": "Quantity Breaks",
+        "quantity_short": "Qté",
+        "quantity_updated": "Quantity Updated",
+        "required": "Requis",
+        "send_email": "Send Email",
+        "shipping": "Expédition",
+        "shipping_address_details": "Shipping Address Details",
+        "showing_results": "Showing Results",
+        "state": "State",
+        "street": "Street",
+        "summary": "Summary",
+        "switch_to_manual_entry": "Switch To Manual Entry",
+        "to_supplier": "À (Fournisseur)",
+        "total_discount": "Total Discount",
+        "unlimited": "Unlimited",
+        "update_failed": "Update Failed",
+        "update_success": "Update Success",
+        "use_price_list": "Use Price List",
+        "warehouse": "Warehouse",
+        "zip_code": "Zip Code"
+      },
+      "product": {
+        "bom": {
+          "component_id": "Component Id",
+          "creation_error": "Creation Error",
+          "creation_success": "Creation Success",
+          "select_component": "Select Component"
+        },
+        "errors": {
+          "name_required": "Name Required",
+          "price_required": "Price Required",
+          "supplier_required": "Supplier Required"
+        },
+        "fields": {
+          "description": "Description",
+          "image": "Image",
+          "name": "Name",
+          "price": "Price"
+        }
+      },
+      "projects": {
+        "actions": "Actions",
+        "calculated_risk_level": "Calculated Risk Level",
+        "cancel": "Cancel",
+        "create": "Create",
+        "creating": "Creating",
+        "error_creating_risk": "Error Creating Risk",
+        "impact": "Impact",
+        "mitigation_plan": "Mitigation Plan",
+        "probability": "Probability",
+        "project_required": "Project Required",
+        "risk_created": "Risk Created",
+        "risk_level_calculated_automatically": "Risk Level Calculated Automatically",
+        "title_required": "Title Required"
+      },
+      "public": {
+        "about": {
+          "storyParagraphs": "StoryParagraphs",
+          "team": "Team",
+          "values": "Values"
+        },
+        "api": {
+          "endpoints": "Endpoints",
+          "features": "Features"
+        },
+        "blog": {
+          "posts": "Posts"
+        },
+        "careers": {
+          "benefits": "Benefits",
+          "positions": "Positions"
+        },
+        "cookies": {
+          "browsers": "Browsers",
+          "cookieTypes": "CookieTypes"
+        },
+        "customers": {
+          "industries": "Industries",
+          "stats": "Stats",
+          "testimonials": "Testimonials"
+        },
+        "docs": {
+          "categories": "Categories",
+          "content": "Content"
+        },
+        "features": {
+          "items": "Items"
+        },
+        "help": {
+          "categories": "Categories",
+          "faq": "Faq"
+        },
+        "integrations": {
+          "items": "Items"
+        },
+        "partners": {
+          "benefits": "Benefits",
+          "currentPartners": "CurrentPartners",
+          "types": "Types"
+        },
+        "privacy": {
+          "rights": "Rights",
+          "sections": "Sections"
+        },
+        "report": {
+          "bugTypes": "BugTypes",
+          "severityLevels": "SeverityLevels"
+        },
+        "security": {
+          "items": "Items",
+          "standards": "Standards"
+        },
+        "services": {
+          "items": "Items"
+        },
+        "status": {
+          "incidents": "Incidents",
+          "services": "Services",
+          "statusLabels": "StatusLabels"
+        },
+        "terms": {
+          "sections": "Sections"
+        }
+      },
+      "signUpForm": {
+        "buttons": {
+          "add_department": "Add Department",
+          "remove_image": "Remove Image",
+          "upload_image": "Upload Image"
+        },
+        "form": {
+          "image_preview": "Image Preview",
+          "name": "Name"
+        },
+        "messages": {
+          "image_removed": "Image Removed"
+        },
+        "placeholders": {
+          "name": "Name"
+        },
+        "validation": {
+          "name_required": "Name Required"
+        }
+      },
+      "signature_modal": {
+        "no_name": "No Name",
+        "no_signers": "No Signers"
+      },
+      "signupEmployee": {
+        "errors": {
+          "copy_link_failed": "Copy Link Failed"
+        },
+        "messages": {
+          "link_copied": "Link Copied"
+        }
+      },
+      "supplier": {
+        "add_failed": "Add Failed",
+        "added_success": "Added Success",
+        "fetch_failed": "Fetch Failed",
+        "no_attachments": "No Attachments",
+        "no_suppliers": "No Suppliers",
+        "not_authenticated": "Not Authenticated",
+        "save": "Save",
+        "status_update_failed": "Status Update Failed",
+        "update_failed": "Update Failed",
+        "updated_success": "Updated Success",
+        "view_attachments": "View Attachments"
+      },
+      "supportTickets": {
+        "priority": {
+          "low": "Faible",
+          "medium": "Moyen",
+          "high": "Élevé",
+          "urgent": "Urgent"
+        },
+        "status": {
+          "open": "Ouvert",
+          "inprogress": "En Cours",
+          "resolved": "Résolu",
+          "closed": "Fermé"
+        }
+      },
+      "tasks": {
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "edit_task": "Edit Task",
+        "priority_high": "Priority High",
+        "priority_low": "Priority Low",
+        "priority_medium": "Priority Medium",
+        "update": "Update",
+        "update_error": "Update Error",
+        "updated_success": "Updated Success",
+        "updating": "Updating"
+      },
+      "users": {
+        "admin": "Admin",
+        "department": "Department",
+        "employee": "Employee",
+        "employee_not_found": "Employee Not Found",
+        "error_assigning_role": "Error Assigning Role",
+        "identity": "Identity",
+        "invalid_employee_id": "Invalid Employee Id",
+        "manager": "Manager",
+        "no_role_assigned": "No Role Assigned",
+        "personal_details": "Personal Details",
+        "postal_code": "Postal Code",
+        "role_assigned_successfully": "Role Assigned Successfully",
+        "role_assignment": "Role Assignment",
+        "role_assignment_hint": "Role Assignment Hint",
+        "select_department": "Select Department"
+      },
+      "warehouse": {
+        "fields": {
+          "city": "City",
+          "contactName": "ContactName",
+          "contactPhone": "ContactPhone",
+          "country": "Country",
+          "state": "State",
+          "street": "Street",
+          "zip": "Zip"
+        },
+        "form_errors_address": "Form Errors Address",
+        "status_": "Status",
+        "view_inventory": "View Inventory"
+      }
+    }
+  },
+  "es": {
+    "translation": {
+      "accounting": {
+        "account_types": {
+          "asset": "Asset",
+          "cost_of_goods_sold": "Cost Of Goods Sold",
+          "equity": "Equity",
+          "expense": "Expense",
+          "liability": "Liability",
+          "other_expense": "Other Expense",
+          "other_income": "Other Income",
+          "revenue": "Revenue"
+        }
+      },
+      "activities": {
+        "outcome": "Outcome"
+      },
+      "allSignatures": {
+        "signature": "Signature",
+        "title": "Title"
+      },
+      "auth": {
+        "generic_error": "Generic Error",
+        "hide_password": "Hide Password",
+        "login_failed": "Login Failed",
+        "login_success": "Login Success",
+        "show_password": "Show Password"
+      },
+      "banks": {
+        "actions": "Actions",
+        "add_transaction": "Add Transaction",
+        "all_statuses": "All Statuses",
+        "amount": "Amount",
+        "date": "Date",
+        "description": "Description",
+        "import": "Import",
+        "reference": "Reference",
+        "search_transactions": "Search Transactions",
+        "status": "Status",
+        "transactions": "Transactions",
+        "transactions_reconciled": "Transactions Reconciled",
+        "type": "Type"
+      },
+      "budgets": {
+        "title": "Budgets"
+      },
+      "buttons": {
+        "add_file": "Add File",
+        "delete": "Delete",
+        "delete_image": "Delete Image",
+        "remove": "Remove"
+      },
+      "common": {
+        "april": "April",
+        "august": "August",
+        "back": "Back",
+        "december": "December",
+        "february": "February",
+        "january": "January",
+        "july": "July",
+        "june": "June",
+        "march": "March",
+        "may": "May",
+        "november": "November",
+        "october": "October",
+        "optional": "Optional",
+        "refresh": "Refresh",
+        "september": "September"
+      },
+      "company": {
+        "creating": "Creating"
+      },
+      "createTask": {
+        "employeesInDepartment": "EmployeesInDepartment",
+        "noEmployeesInDepartment": "NoEmployeesInDepartment",
+        "selectDepartmentFirst": "SelectDepartmentFirst"
+      },
+      "crm": {
+        "action_added": "Action Added",
+        "active": "Active",
+        "add_action": "Add Action",
+        "add_retention_action": "Add Retention Action",
+        "all_risks": "All Risks",
+        "all_types": "All Types",
+        "at_risk_customers": "At Risk Customers",
+        "avg_risk_score": "Avg Risk Score",
+        "avg_satisfaction": "Avg Satisfaction",
+        "calculate_risk": "Calculate Risk",
+        "cancel": "Cancel",
+        "confirm_delete_segment": "Confirm Delete Segment",
+        "create_segment": "Create Segment",
+        "create_survey": "Create Survey",
+        "critical_risk": "Critical Risk",
+        "csat": "Csat",
+        "customer_retention": "Customer Retention",
+        "customer_satisfaction": "Customer Satisfaction",
+        "customer_segmentation": "Customer Segmentation",
+        "customers": "Customers",
+        "days_since_last_order": "Days Since Last Order",
+        "detractors": "Detractors",
+        "edit_segment": "Edit Segment",
+        "error_calculating_retention": "Error Calculating Retention",
+        "error_deleting_segment": "Error Deleting Segment",
+        "error_loading_retention": "Error Loading Retention",
+        "error_loading_satisfaction": "Error Loading Satisfaction",
+        "error_loading_segments": "Error Loading Segments",
+        "high_risk": "High Risk",
+        "inactive": "Inactive",
+        "low_risk": "Low Risk",
+        "medium_risk": "Medium Risk",
+        "no_description": "No Description",
+        "no_orders": "No Orders",
+        "no_retention_data": "No Retention Data",
+        "no_segments": "No Segments",
+        "no_surveys": "No Surveys",
+        "nps": "Nps",
+        "nps_distribution": "Nps Distribution",
+        "nps_score": "Nps Score",
+        "passives": "Passives",
+        "promoters": "Promoters",
+        "response_rate": "Response Rate",
+        "retained": "Retained",
+        "retention_calculated": "Retention Calculated",
+        "retention_description": "Retention Description",
+        "risk_distribution": "Risk Distribution",
+        "risk_factors": "Risk Factors",
+        "risk_score": "Risk Score",
+        "satisfaction": "Satisfaction",
+        "satisfaction_description": "Satisfaction Description",
+        "save": "Save",
+        "search_customers": "Search Customers",
+        "search_segments": "Search Segments",
+        "search_surveys": "Search Surveys",
+        "segment_deleted": "Segment Deleted",
+        "segment_distribution": "Segment Distribution",
+        "segment_saved": "Segment Saved",
+        "segment_value": "Segment Value",
+        "segmentation_description": "Segmentation Description",
+        "status": "Status",
+        "survey_created": "Survey Created",
+        "take_action": "Take Action",
+        "total_customers": "Total Customers",
+        "total_surveys": "Total Surveys",
+        "total_value": "Total Value",
+        "unknown_customer": "Unknown Customer"
+      },
+      "customer360": {
+        "activities": "Activities",
+        "all_customer_information": "All Customer Information",
+        "avg_order_value": "Avg Order Value",
+        "back_to_customers": "Back To Customers",
+        "company": "Company",
+        "customer_360": "Customer 360",
+        "customer_since": "Customer Since",
+        "email": "Email",
+        "error_loading": "Error Loading",
+        "files": "Files",
+        "invoice": "Invoice",
+        "invoices": "Invoices",
+        "loading": "Loading",
+        "no_activities": "No Activities",
+        "no_files": "No Files",
+        "no_invoices": "No Invoices",
+        "no_orders": "No Orders",
+        "no_projects": "No Projects",
+        "no_tasks": "No Tasks",
+        "order": "Order",
+        "orders": "Orders",
+        "overview": "Overview",
+        "phone": "Phone",
+        "projects": "Projects",
+        "recent_activities": "Recent Activities",
+        "recent_orders": "Recent Orders",
+        "tasks": "Tasks",
+        "total_orders": "Total Orders",
+        "total_paid": "Total Paid",
+        "total_value": "Total Value"
+      },
+      "dashboard": {
+        "allocated": "Allocated",
+        "count": "Count",
+        "no_data_available": "No Data Available",
+        "spent": "Spent"
+      },
+      "departments": {
+        "title": "Title"
+      },
+      "errors": {
+        "general_error": "General Error",
+        "loading_error": "Loading Error"
+      },
+      "events": {
+        "attachment": {
+          "fileNamePlaceholder": "Introduce el nombre del archivo",
+          "fileUrlPlaceholder": "Introduce el enlace del archivo"
+        },
+        "externalParticipant": {
+          "namePlaceholder": "Introduce el nombre",
+          "emailPlaceholder": "Introduce el correo electrónico",
+          "phonePlaceholder": "Introduce el teléfono"
+        }
+      },
+      "finance": {
+        "budget": {
+          "error": "Error"
+        },
+        "edit_record": "Edit Record",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "record_updated": "Record Updated",
+        "salary": {
+          "cancelled": "Cancelled",
+          "editMode": "EditMode",
+          "errorCalculatingTax": "ErrorCalculatingTax",
+          "errorFetchingSalaries": "ErrorFetchingSalaries",
+          "errorFetchingTaxConfigs": "ErrorFetchingTaxConfigs",
+          "errorUpdatingSalary": "ErrorUpdatingSalary",
+          "updatedSuccess": "UpdatedSuccess"
+        },
+        "update": "Update",
+        "update_failed": "Update Failed",
+        "updating": "Updating"
+      },
+      "hr": {
+        "analytics": {
+          "applicants": "Applicants",
+          "leave_requests": "Leave Requests"
+        },
+        "leave": {
+          "request_created": "Leave request created successfully"
+        },
+        "self_service": {
+          "days": "days"
+        }
+      },
+      "inventory": {
+        "add_item": "Add Item",
+        "all_warehouses": "All Warehouses",
+        "attached_files": "Attached Files",
+        "edit_stock_count": "Edit Stock Count",
+        "fill_all_fields": "Fill All Fields",
+        "height": "Height",
+        "insufficient_quantity": "Insufficient Quantity",
+        "invalid_quantity": "Invalid Quantity",
+        "items": "Items",
+        "length": "Length",
+        "max_available": "Max Available",
+        "no_files": "No Files",
+        "no_location": "No Location",
+        "notes": "Notes",
+        "same_warehouse": "Same Warehouse",
+        "select_warehouse": "Select Warehouse",
+        "status": {
+          "in_stock": "In Stock",
+          "low_stock": "Low Stock",
+          "out_of_stock": "Out of Stock",
+          "no_stock": "No Stock"
+        },
+        "stock_count_created": "Stock Count Created",
+        "stock_count_updated": "Stock Count Updated",
+        "total_items": "Total Items",
+        "transfer": "Transfer",
+        "transfer_error": "Transfer Error",
+        "transfer_inventory": "Transfer Inventory",
+        "transfer_notes_placeholder": "Transfer Notes Placeholder",
+        "transfer_subtitle": "Transfer Subtitle",
+        "transfer_success": "Transfer Success",
+        "transferring": "Transferring",
+        "type": "Type",
+        "width": "Width",
+        "status_label": "Status"
+      },
+      "invoices": {
+        "paymentStatus": {
+          "unpaid": "Unpaid",
+          "partiallypaid": "Partially Paid",
+          "paid": "Paid"
+        },
+        "paymentTerms": "PaymentTerms",
+        "paymentStatusLabel": "Payment Status"
+      },
+      "landing": {
+        "how_it_works": {
+          "steps": "Steps",
+          "subtitle": "Subtitle",
+          "title": "Title"
+        },
+        "pages": {
+          "help": {
+            "articles_label": "Articles Label"
+          }
+        },
+        "stats": {
+          "items": "Items"
+        },
+        "trust": {
+          "items": "Items",
+          "subtitle": "Subtitle"
+        },
+        "trusted_by": {
+          "logos": "Logos",
+          "title": "Title"
+        }
+      },
+      "leads": {
+        "add_order_item": "Add Order Item",
+        "assigned_to": "Assigned To",
+        "create_order": "Create Order",
+        "creating_order": "Creating Order",
+        "delivery_date": "Delivery Date",
+        "discount": "Discount",
+        "enter_order_notes": "Enter Order Notes",
+        "global_discount": "Global Discount",
+        "industry": "Industry",
+        "lead_score": "Lead Score",
+        "order_created_error": "Order Created Error",
+        "order_created_success": "Order Created Success",
+        "order_information": "Order Information",
+        "order_items": "Order Items",
+        "order_notes": "Order Notes",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "product": "Product",
+        "quantity": "Quantity",
+        "select_product": "Select Product",
+        "tax_rate": "Tax Rate",
+        "unit_price": "Unit Price",
+        "view_order": "View Order"
+      },
+      "messages": {
+        "signup_failed": "Signup Failed",
+        "signup_success": "Signup Success"
+      },
+      "myShifts": {
+        "totalHours": "TotalHours",
+        "totalShifts": "TotalShifts"
+      },
+      "navbar": {
+        "Signatures": {
+          "clear": "Clear",
+          "employeeIdMissing": "EmployeeIdMissing",
+          "userNotAuthenticated": "UserNotAuthenticated"
+        },
+        "analytics": "Analytics",
+        "budget": "Presupuesto",
+        "inventory_transfer": "Inventory Transfer",
+        "notifications": {
+          "manageNotifications": "ManageNotifications",
+          "notificationMarkReadError": "NotificationMarkReadError",
+          "orderError": "OrderError"
+        }
+      },
+      "notifications": {
+        "fillDetails": "FillDetails",
+        "loading": "Loading"
+      },
+      "optional": "Optional",
+      "order": {
+        "auto_select_price_list": "Auto Select Price List",
+        "city_placeholder": "City Placeholder",
+        "contact_name_placeholder": "Contact Name Placeholder",
+        "contact_phone_placeholder": "Contact Phone Placeholder",
+        "country_placeholder": "Country Placeholder",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "price_list_active": "Price List Active",
+        "shipping_details": "Shipping Details",
+        "shipping_required": "Shipping Required",
+        "state_placeholder": "State Placeholder",
+        "street_placeholder": "Street Placeholder",
+        "use_price_list": "Use Price List",
+        "zip_placeholder": "Zip Placeholder"
+      },
+      "permissions": {
+        "noAccess": "No access"
+      },
+      "procurement": {
+        "add_break": "Add Break",
+        "add_item": "Add Item",
+        "additional_notes": "Additional Notes",
+        "address_placeholder": "Address Placeholder",
+        "at_least_one_item_required": "At Least One Item Required",
+        "auto_select_price_list": "Auto Select Price List",
+        "base_price": "Base Price",
+        "city": "City",
+        "confidential_document": "Documento confidencial",
+        "confirm_send_email": "Confirm Send Email",
+        "contact_name": "Contact Name",
+        "contact_person": "Persona de contacto",
+        "contact_phone": "Contact Phone",
+        "country": "Country",
+        "currency_not_supported": "Currency Not Supported",
+        "customs": "Aduana",
+        "delete_success": "Delete Success",
+        "delivery_information": "Información de entrega",
+        "department": "Department",
+        "discount": "Discount",
+        "document_generated": "Este documento fue generado el {{date}} a las {{time}}",
+        "expected_delivery": "Esperado",
+        "failed_to_generate_pdf": "Failed To Generate Pdf",
+        "failed_to_load_data": "Failed To Load Data",
+        "fetch_exchange_rate_failed": "Fetch Exchange Rate Failed",
+        "fetch_products_failed": "Fetch Products Failed",
+        "fetch_supplier_failed": "Fetch Supplier Failed",
+        "formatted_address": "Formatted Address",
+        "from_buyer": "De (Comprador)",
+        "invalid_quantity": "Invalid Quantity",
+        "invalid_total_cost": "Invalid Total Cost",
+        "invoice_sent": "Invoice Sent",
+        "items_ordered": "Artículos pedidos",
+        "no_product_selected": "No Product Selected",
+        "no_products": "No Products",
+        "no_quantity_breaks": "No Quantity Breaks",
+        "order_date": "Order Date",
+        "page": "Página",
+        "parties_information": "Información de las partes",
+        "payment_information": "Información de pago",
+        "pending_update_failed": "Pending Update Failed",
+        "pending_update_success": "Pending Update Success",
+        "price_list_active": "Price List Active",
+        "process_failed": "Process Failed",
+        "product_added": "Product Added",
+        "quantity_breaks": "Quantity Breaks",
+        "quantity_short": "Cant.",
+        "quantity_updated": "Quantity Updated",
+        "required": "Requerido",
+        "send_email": "Send Email",
+        "shipping": "Envío",
+        "shipping_address_details": "Shipping Address Details",
+        "showing_results": "Showing Results",
+        "state": "State",
+        "street": "Street",
+        "summary": "Summary",
+        "switch_to_manual_entry": "Switch To Manual Entry",
+        "to_supplier": "A (Proveedor)",
+        "total_discount": "Total Discount",
+        "unlimited": "Unlimited",
+        "update_failed": "Update Failed",
+        "update_success": "Update Success",
+        "use_price_list": "Use Price List",
+        "warehouse": "Warehouse",
+        "zip_code": "Zip Code"
+      },
+      "product": {
+        "bom": {
+          "component_id": "Component Id",
+          "creation_error": "Creation Error",
+          "creation_success": "Creation Success",
+          "select_component": "Select Component"
+        },
+        "errors": {
+          "name_required": "Name Required",
+          "price_required": "Price Required",
+          "supplier_required": "Supplier Required"
+        },
+        "fields": {
+          "description": "Description",
+          "image": "Image",
+          "name": "Name",
+          "price": "Price"
+        }
+      },
+      "projects": {
+        "actions": "Actions",
+        "calculated_risk_level": "Calculated Risk Level",
+        "cancel": "Cancel",
+        "create": "Create",
+        "creating": "Creating",
+        "error_creating_risk": "Error Creating Risk",
+        "impact": "Impact",
+        "mitigation_plan": "Mitigation Plan",
+        "probability": "Probability",
+        "project_required": "Project Required",
+        "risk_created": "Risk Created",
+        "risk_level_calculated_automatically": "Risk Level Calculated Automatically",
+        "title_required": "Title Required"
+      },
+      "public": {
+        "about": {
+          "storyParagraphs": "StoryParagraphs",
+          "team": "Team",
+          "values": "Values"
+        },
+        "api": {
+          "endpoints": "Endpoints",
+          "features": "Features"
+        },
+        "blog": {
+          "posts": "Posts"
+        },
+        "careers": {
+          "benefits": "Benefits",
+          "positions": "Positions"
+        },
+        "cookies": {
+          "browsers": "Browsers",
+          "cookieTypes": "CookieTypes"
+        },
+        "customers": {
+          "industries": "Industries",
+          "stats": "Stats",
+          "testimonials": "Testimonials"
+        },
+        "docs": {
+          "categories": "Categories",
+          "content": "Content"
+        },
+        "features": {
+          "items": "Items"
+        },
+        "help": {
+          "categories": "Categories",
+          "faq": "Faq"
+        },
+        "integrations": {
+          "items": "Items"
+        },
+        "partners": {
+          "benefits": "Benefits",
+          "currentPartners": "CurrentPartners",
+          "types": "Types"
+        },
+        "privacy": {
+          "rights": "Rights",
+          "sections": "Sections"
+        },
+        "report": {
+          "bugTypes": "BugTypes",
+          "severityLevels": "SeverityLevels"
+        },
+        "security": {
+          "items": "Items",
+          "standards": "Standards"
+        },
+        "services": {
+          "items": "Items"
+        },
+        "status": {
+          "incidents": "Incidents",
+          "services": "Services",
+          "statusLabels": "StatusLabels"
+        },
+        "terms": {
+          "sections": "Sections"
+        }
+      },
+      "signUpForm": {
+        "buttons": {
+          "add_department": "Add Department",
+          "remove_image": "Remove Image",
+          "upload_image": "Upload Image"
+        },
+        "form": {
+          "image_preview": "Image Preview",
+          "name": "Name"
+        },
+        "messages": {
+          "image_removed": "Image Removed"
+        },
+        "placeholders": {
+          "name": "Name"
+        },
+        "validation": {
+          "name_required": "Name Required"
+        }
+      },
+      "signature_modal": {
+        "no_name": "No Name",
+        "no_signers": "No Signers"
+      },
+      "signupEmployee": {
+        "errors": {
+          "copy_link_failed": "Copy Link Failed"
+        },
+        "messages": {
+          "link_copied": "Link Copied"
+        }
+      },
+      "supplier": {
+        "add_failed": "Add Failed",
+        "added_success": "Added Success",
+        "fetch_failed": "Fetch Failed",
+        "no_attachments": "No Attachments",
+        "no_suppliers": "No Suppliers",
+        "not_authenticated": "Not Authenticated",
+        "save": "Save",
+        "status_update_failed": "Status Update Failed",
+        "update_failed": "Update Failed",
+        "updated_success": "Updated Success",
+        "view_attachments": "View Attachments"
+      },
+      "supportTickets": {
+        "priority": {
+          "low": "Baja",
+          "medium": "Media",
+          "high": "Alta",
+          "urgent": "Urgente"
+        },
+        "status": {
+          "open": "Abierto",
+          "inprogress": "En Progreso",
+          "resolved": "Resuelto",
+          "closed": "Cerrado"
+        }
+      },
+      "tasks": {
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "edit_task": "Edit Task",
+        "priority_high": "Priority High",
+        "priority_low": "Priority Low",
+        "priority_medium": "Priority Medium",
+        "update": "Update",
+        "update_error": "Update Error",
+        "updated_success": "Updated Success",
+        "updating": "Updating"
+      },
+      "users": {
+        "admin": "Admin",
+        "department": "Department",
+        "employee": "Employee",
+        "employee_not_found": "Employee Not Found",
+        "error_assigning_role": "Error Assigning Role",
+        "identity": "Identity",
+        "invalid_employee_id": "Invalid Employee Id",
+        "manager": "Manager",
+        "no_role_assigned": "No Role Assigned",
+        "personal_details": "Personal Details",
+        "postal_code": "Postal Code",
+        "role_assigned_successfully": "Role Assigned Successfully",
+        "role_assignment": "Role Assignment",
+        "role_assignment_hint": "Role Assignment Hint",
+        "select_department": "Select Department"
+      },
+      "warehouse": {
+        "fields": {
+          "city": "City",
+          "contactName": "ContactName",
+          "contactPhone": "ContactPhone",
+          "country": "Country",
+          "state": "State",
+          "street": "Street",
+          "zip": "Zip"
+        },
+        "form_errors_address": "Form Errors Address",
+        "status_": "Status",
+        "view_inventory": "View Inventory"
+      }
+    }
+  },
+  "ar": {
+    "translation": {
+      "accounting": {
+        "account_types": {
+          "asset": "Asset",
+          "cost_of_goods_sold": "Cost Of Goods Sold",
+          "equity": "Equity",
+          "expense": "Expense",
+          "liability": "Liability",
+          "other_expense": "Other Expense",
+          "other_income": "Other Income",
+          "revenue": "Revenue"
+        }
+      },
+      "activities": {
+        "outcome": "Outcome"
+      },
+      "allSignatures": {
+        "signature": "Signature",
+        "title": "Title"
+      },
+      "auth": {
+        "generic_error": "Generic Error",
+        "hide_password": "Hide Password",
+        "login_failed": "Login Failed",
+        "login_success": "Login Success",
+        "show_password": "Show Password"
+      },
+      "banks": {
+        "actions": "Actions",
+        "add_transaction": "Add Transaction",
+        "all_statuses": "All Statuses",
+        "amount": "Amount",
+        "date": "Date",
+        "description": "Description",
+        "import": "Import",
+        "reference": "Reference",
+        "search_transactions": "Search Transactions",
+        "status": "Status",
+        "transactions": "Transactions",
+        "transactions_reconciled": "Transactions Reconciled",
+        "type": "Type"
+      },
+      "budgets": {
+        "title": "Budgets"
+      },
+      "buttons": {
+        "add_file": "Add File",
+        "delete": "Delete",
+        "delete_image": "Delete Image",
+        "remove": "Remove"
+      },
+      "common": {
+        "april": "April",
+        "august": "August",
+        "back": "Back",
+        "december": "December",
+        "february": "February",
+        "january": "January",
+        "july": "July",
+        "june": "June",
+        "march": "March",
+        "may": "May",
+        "november": "November",
+        "october": "October",
+        "optional": "Optional",
+        "refresh": "Refresh",
+        "september": "September"
+      },
+      "company": {
+        "creating": "Creating"
+      },
+      "createTask": {
+        "employeesInDepartment": "EmployeesInDepartment",
+        "noEmployeesInDepartment": "NoEmployeesInDepartment",
+        "selectDepartmentFirst": "SelectDepartmentFirst"
+      },
+      "crm": {
+        "action_added": "Action Added",
+        "active": "Active",
+        "add_action": "Add Action",
+        "add_retention_action": "Add Retention Action",
+        "all_risks": "All Risks",
+        "all_types": "All Types",
+        "at_risk_customers": "At Risk Customers",
+        "avg_risk_score": "Avg Risk Score",
+        "avg_satisfaction": "Avg Satisfaction",
+        "calculate_risk": "Calculate Risk",
+        "cancel": "Cancel",
+        "confirm_delete_segment": "Confirm Delete Segment",
+        "create_segment": "Create Segment",
+        "create_survey": "Create Survey",
+        "critical_risk": "Critical Risk",
+        "csat": "Csat",
+        "customer_retention": "Customer Retention",
+        "customer_satisfaction": "Customer Satisfaction",
+        "customer_segmentation": "Customer Segmentation",
+        "customers": "Customers",
+        "days_since_last_order": "Days Since Last Order",
+        "detractors": "Detractors",
+        "edit_segment": "Edit Segment",
+        "error_calculating_retention": "Error Calculating Retention",
+        "error_deleting_segment": "Error Deleting Segment",
+        "error_loading_retention": "Error Loading Retention",
+        "error_loading_satisfaction": "Error Loading Satisfaction",
+        "error_loading_segments": "Error Loading Segments",
+        "high_risk": "High Risk",
+        "inactive": "Inactive",
+        "low_risk": "Low Risk",
+        "medium_risk": "Medium Risk",
+        "no_description": "No Description",
+        "no_orders": "No Orders",
+        "no_retention_data": "No Retention Data",
+        "no_segments": "No Segments",
+        "no_surveys": "No Surveys",
+        "nps": "Nps",
+        "nps_distribution": "Nps Distribution",
+        "nps_score": "Nps Score",
+        "passives": "Passives",
+        "promoters": "Promoters",
+        "response_rate": "Response Rate",
+        "retained": "Retained",
+        "retention_calculated": "Retention Calculated",
+        "retention_description": "Retention Description",
+        "risk_distribution": "Risk Distribution",
+        "risk_factors": "Risk Factors",
+        "risk_score": "Risk Score",
+        "satisfaction": "Satisfaction",
+        "satisfaction_description": "Satisfaction Description",
+        "save": "Save",
+        "search_customers": "Search Customers",
+        "search_segments": "Search Segments",
+        "search_surveys": "Search Surveys",
+        "segment_deleted": "Segment Deleted",
+        "segment_distribution": "Segment Distribution",
+        "segment_saved": "Segment Saved",
+        "segment_value": "Segment Value",
+        "segmentation_description": "Segmentation Description",
+        "status": "Status",
+        "survey_created": "Survey Created",
+        "take_action": "Take Action",
+        "total_customers": "Total Customers",
+        "total_surveys": "Total Surveys",
+        "total_value": "Total Value",
+        "unknown_customer": "Unknown Customer"
+      },
+      "customer360": {
+        "activities": "Activities",
+        "all_customer_information": "All Customer Information",
+        "avg_order_value": "Avg Order Value",
+        "back_to_customers": "Back To Customers",
+        "company": "Company",
+        "customer_360": "Customer 360",
+        "customer_since": "Customer Since",
+        "email": "Email",
+        "error_loading": "Error Loading",
+        "files": "Files",
+        "invoice": "Invoice",
+        "invoices": "Invoices",
+        "loading": "Loading",
+        "no_activities": "No Activities",
+        "no_files": "No Files",
+        "no_invoices": "No Invoices",
+        "no_orders": "No Orders",
+        "no_projects": "No Projects",
+        "no_tasks": "No Tasks",
+        "order": "Order",
+        "orders": "Orders",
+        "overview": "Overview",
+        "phone": "Phone",
+        "projects": "Projects",
+        "recent_activities": "Recent Activities",
+        "recent_orders": "Recent Orders",
+        "tasks": "Tasks",
+        "total_orders": "Total Orders",
+        "total_paid": "Total Paid",
+        "total_value": "Total Value"
+      },
+      "dashboard": {
+        "allocated": "Allocated",
+        "count": "Count",
+        "no_data_available": "No Data Available",
+        "spent": "Spent"
+      },
+      "departments": {
+        "title": "Title"
+      },
+      "errors": {
+        "general_error": "General Error",
+        "loading_error": "Loading Error"
+      },
+      "events": {
+        "attachment": {
+          "fileNamePlaceholder": "أدخل اسم الملف",
+          "fileUrlPlaceholder": "أدخل رابط الملف"
+        },
+        "externalParticipant": {
+          "namePlaceholder": "أدخل الاسم",
+          "emailPlaceholder": "أدخل البريد الإلكتروني",
+          "phonePlaceholder": "أدخل الهاتف"
+        }
+      },
+      "finance": {
+        "budget": {
+          "error": "Error"
+        },
+        "edit_record": "Edit Record",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "record_updated": "Record Updated",
+        "salary": {
+          "cancelled": "Cancelled",
+          "editMode": "EditMode",
+          "errorCalculatingTax": "ErrorCalculatingTax",
+          "errorFetchingSalaries": "ErrorFetchingSalaries",
+          "errorFetchingTaxConfigs": "ErrorFetchingTaxConfigs",
+          "errorUpdatingSalary": "ErrorUpdatingSalary",
+          "updatedSuccess": "UpdatedSuccess"
+        },
+        "update": "Update",
+        "update_failed": "Update Failed",
+        "updating": "Updating"
+      },
+      "hr": {
+        "analytics": {
+          "applicants": "Applicants",
+          "leave_requests": "Leave Requests"
+        },
+        "leave": {
+          "request_created": "Leave request created successfully"
+        },
+        "self_service": {
+          "days": "days"
+        }
+      },
+      "inventory": {
+        "add_item": "Add Item",
+        "all_warehouses": "All Warehouses",
+        "attached_files": "Attached Files",
+        "edit_stock_count": "Edit Stock Count",
+        "fill_all_fields": "Fill All Fields",
+        "height": "Height",
+        "insufficient_quantity": "Insufficient Quantity",
+        "invalid_quantity": "Invalid Quantity",
+        "items": "Items",
+        "length": "Length",
+        "max_available": "Max Available",
+        "no_files": "No Files",
+        "no_location": "No Location",
+        "notes": "Notes",
+        "same_warehouse": "Same Warehouse",
+        "select_warehouse": "Select Warehouse",
+        "status": {
+          "in_stock": "In Stock",
+          "low_stock": "Low Stock",
+          "out_of_stock": "Out of Stock",
+          "no_stock": "No Stock"
+        },
+        "stock_count_created": "Stock Count Created",
+        "stock_count_updated": "Stock Count Updated",
+        "total_items": "Total Items",
+        "transfer": "Transfer",
+        "transfer_error": "Transfer Error",
+        "transfer_inventory": "Transfer Inventory",
+        "transfer_notes_placeholder": "Transfer Notes Placeholder",
+        "transfer_subtitle": "Transfer Subtitle",
+        "transfer_success": "Transfer Success",
+        "transferring": "Transferring",
+        "type": "Type",
+        "width": "Width",
+        "status_label": "Status"
+      },
+      "invoices": {
+        "paymentStatus": {
+          "unpaid": "Unpaid",
+          "partiallypaid": "Partially Paid",
+          "paid": "Paid"
+        },
+        "paymentTerms": "PaymentTerms",
+        "paymentStatusLabel": "Payment Status"
+      },
+      "landing": {
+        "how_it_works": {
+          "steps": "Steps",
+          "subtitle": "Subtitle",
+          "title": "Title"
+        },
+        "pages": {
+          "help": {
+            "articles_label": "Articles Label"
+          }
+        },
+        "stats": {
+          "items": "Items"
+        },
+        "trust": {
+          "items": "Items",
+          "subtitle": "Subtitle"
+        },
+        "trusted_by": {
+          "logos": "Logos",
+          "title": "Title"
+        }
+      },
+      "leads": {
+        "add_order_item": "Add Order Item",
+        "assigned_to": "Assigned To",
+        "create_order": "Create Order",
+        "creating_order": "Creating Order",
+        "delivery_date": "Delivery Date",
+        "discount": "Discount",
+        "enter_order_notes": "Enter Order Notes",
+        "global_discount": "Global Discount",
+        "industry": "Industry",
+        "lead_score": "Lead Score",
+        "order_created_error": "Order Created Error",
+        "order_created_success": "Order Created Success",
+        "order_information": "Order Information",
+        "order_items": "Order Items",
+        "order_notes": "Order Notes",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "product": "Product",
+        "quantity": "Quantity",
+        "select_product": "Select Product",
+        "tax_rate": "Tax Rate",
+        "unit_price": "Unit Price",
+        "view_order": "View Order"
+      },
+      "messages": {
+        "signup_failed": "Signup Failed",
+        "signup_success": "Signup Success"
+      },
+      "myShifts": {
+        "totalHours": "TotalHours",
+        "totalShifts": "TotalShifts"
+      },
+      "navbar": {
+        "Signatures": {
+          "clear": "Clear",
+          "employeeIdMissing": "EmployeeIdMissing",
+          "userNotAuthenticated": "UserNotAuthenticated"
+        },
+        "analytics": "Analytics",
+        "budget": "الميزانية",
+        "inventory_transfer": "Inventory Transfer",
+        "notifications": {
+          "manageNotifications": "ManageNotifications",
+          "notificationMarkReadError": "NotificationMarkReadError",
+          "orderError": "OrderError"
+        }
+      },
+      "notifications": {
+        "fillDetails": "FillDetails",
+        "loading": "Loading"
+      },
+      "optional": "Optional",
+      "order": {
+        "auto_select_price_list": "Auto Select Price List",
+        "city_placeholder": "City Placeholder",
+        "contact_name_placeholder": "Contact Name Placeholder",
+        "contact_phone_placeholder": "Contact Phone Placeholder",
+        "country_placeholder": "Country Placeholder",
+        "payment_immediate": "Payment Immediate",
+        "payment_net_30": "Payment Net 30",
+        "payment_net_45": "Payment Net 45",
+        "payment_net_60": "Payment Net 60",
+        "payment_net_90": "Payment Net 90",
+        "payment_terms": "Payment Terms",
+        "price_list_active": "Price List Active",
+        "shipping_details": "Shipping Details",
+        "shipping_required": "Shipping Required",
+        "state_placeholder": "State Placeholder",
+        "street_placeholder": "Street Placeholder",
+        "use_price_list": "Use Price List",
+        "zip_placeholder": "Zip Placeholder"
+      },
+      "permissions": {
+        "noAccess": "No access"
+      },
+      "procurement": {
+        "add_break": "Add Break",
+        "add_item": "Add Item",
+        "additional_notes": "Additional Notes",
+        "address_placeholder": "Address Placeholder",
+        "at_least_one_item_required": "At Least One Item Required",
+        "auto_select_price_list": "Auto Select Price List",
+        "base_price": "Base Price",
+        "city": "City",
+        "confidential_document": "وثيقة سرية",
+        "confirm_send_email": "Confirm Send Email",
+        "contact_name": "Contact Name",
+        "contact_person": "الشخص المسؤول",
+        "contact_phone": "Contact Phone",
+        "country": "Country",
+        "currency_not_supported": "Currency Not Supported",
+        "customs": "الجمرك",
+        "delete_success": "Delete Success",
+        "delivery_information": "معلومات التسليم",
+        "department": "Department",
+        "discount": "Discount",
+        "document_generated": "تم إنشاء هذه الوثيقة في {{date}} الساعة {{time}}",
+        "expected_delivery": "متوقع",
+        "failed_to_generate_pdf": "Failed To Generate Pdf",
+        "failed_to_load_data": "Failed To Load Data",
+        "fetch_exchange_rate_failed": "Fetch Exchange Rate Failed",
+        "fetch_products_failed": "Fetch Products Failed",
+        "fetch_supplier_failed": "Fetch Supplier Failed",
+        "formatted_address": "Formatted Address",
+        "from_buyer": "من (المشتري)",
+        "invalid_quantity": "Invalid Quantity",
+        "invalid_total_cost": "Invalid Total Cost",
+        "invoice_sent": "Invoice Sent",
+        "items_ordered": "العناصر المطلوبة",
+        "no_product_selected": "No Product Selected",
+        "no_products": "No Products",
+        "no_quantity_breaks": "No Quantity Breaks",
+        "order_date": "Order Date",
+        "page": "صفحة",
+        "parties_information": "معلومات الأطراف",
+        "payment_information": "معلومات الدفع",
+        "pending_update_failed": "Pending Update Failed",
+        "pending_update_success": "Pending Update Success",
+        "price_list_active": "Price List Active",
+        "process_failed": "Process Failed",
+        "product_added": "Product Added",
+        "quantity_breaks": "Quantity Breaks",
+        "quantity_short": "الكمية",
+        "quantity_updated": "Quantity Updated",
+        "required": "مطلوب",
+        "send_email": "Send Email",
+        "shipping": "الشحن",
+        "shipping_address_details": "Shipping Address Details",
+        "showing_results": "Showing Results",
+        "state": "State",
+        "street": "Street",
+        "summary": "Summary",
+        "switch_to_manual_entry": "Switch To Manual Entry",
+        "to_supplier": "إلى (المورد)",
+        "total_discount": "Total Discount",
+        "unlimited": "Unlimited",
+        "update_failed": "Update Failed",
+        "update_success": "Update Success",
+        "use_price_list": "Use Price List",
+        "warehouse": "Warehouse",
+        "zip_code": "Zip Code"
+      },
+      "product": {
+        "bom": {
+          "component_id": "Component Id",
+          "creation_error": "Creation Error",
+          "creation_success": "Creation Success",
+          "select_component": "Select Component"
+        },
+        "errors": {
+          "name_required": "Name Required",
+          "price_required": "Price Required",
+          "supplier_required": "Supplier Required"
+        },
+        "fields": {
+          "description": "Description",
+          "image": "Image",
+          "name": "Name",
+          "price": "Price"
+        }
+      },
+      "projects": {
+        "actions": "Actions",
+        "calculated_risk_level": "Calculated Risk Level",
+        "cancel": "Cancel",
+        "create": "Create",
+        "creating": "Creating",
+        "error_creating_risk": "Error Creating Risk",
+        "impact": "Impact",
+        "mitigation_plan": "Mitigation Plan",
+        "probability": "Probability",
+        "project_required": "Project Required",
+        "risk_created": "Risk Created",
+        "risk_level_calculated_automatically": "Risk Level Calculated Automatically",
+        "title_required": "Title Required"
+      },
+      "public": {
+        "about": {
+          "storyParagraphs": "StoryParagraphs",
+          "team": "Team",
+          "values": "Values"
+        },
+        "api": {
+          "endpoints": "Endpoints",
+          "features": "Features"
+        },
+        "blog": {
+          "posts": "Posts"
+        },
+        "careers": {
+          "benefits": "Benefits",
+          "positions": "Positions"
+        },
+        "cookies": {
+          "browsers": "Browsers",
+          "cookieTypes": "CookieTypes"
+        },
+        "customers": {
+          "industries": "Industries",
+          "stats": "Stats",
+          "testimonials": "Testimonials"
+        },
+        "docs": {
+          "categories": "Categories",
+          "content": "Content"
+        },
+        "features": {
+          "items": "Items"
+        },
+        "help": {
+          "categories": "Categories",
+          "faq": "Faq"
+        },
+        "integrations": {
+          "items": "Items"
+        },
+        "partners": {
+          "benefits": "Benefits",
+          "currentPartners": "CurrentPartners",
+          "types": "Types"
+        },
+        "privacy": {
+          "rights": "Rights",
+          "sections": "Sections"
+        },
+        "report": {
+          "bugTypes": "BugTypes",
+          "severityLevels": "SeverityLevels"
+        },
+        "security": {
+          "items": "Items",
+          "standards": "Standards"
+        },
+        "services": {
+          "items": "Items"
+        },
+        "status": {
+          "incidents": "Incidents",
+          "services": "Services",
+          "statusLabels": "StatusLabels"
+        },
+        "terms": {
+          "sections": "Sections"
+        }
+      },
+      "signUpForm": {
+        "buttons": {
+          "add_department": "Add Department",
+          "remove_image": "Remove Image",
+          "upload_image": "Upload Image"
+        },
+        "form": {
+          "image_preview": "Image Preview",
+          "name": "Name"
+        },
+        "messages": {
+          "image_removed": "Image Removed"
+        },
+        "placeholders": {
+          "name": "Name"
+        },
+        "validation": {
+          "name_required": "Name Required"
+        }
+      },
+      "signature_modal": {
+        "no_name": "No Name",
+        "no_signers": "No Signers"
+      },
+      "signupEmployee": {
+        "errors": {
+          "copy_link_failed": "Copy Link Failed"
+        },
+        "messages": {
+          "link_copied": "Link Copied"
+        }
+      },
+      "supplier": {
+        "add_failed": "Add Failed",
+        "added_success": "Added Success",
+        "fetch_failed": "Fetch Failed",
+        "no_attachments": "No Attachments",
+        "no_suppliers": "No Suppliers",
+        "not_authenticated": "Not Authenticated",
+        "save": "Save",
+        "status_update_failed": "Status Update Failed",
+        "update_failed": "Update Failed",
+        "updated_success": "Updated Success",
+        "view_attachments": "View Attachments"
+      },
+      "supportTickets": {
+        "priority": {
+          "low": "منخفض",
+          "medium": "متوسط",
+          "high": "عالي",
+          "urgent": "عاجل"
+        },
+        "status": {
+          "open": "مفتوح",
+          "inprogress": "قيد التنفيذ",
+          "resolved": "تم الحل",
+          "closed": "مغلق"
+        }
+      },
+      "tasks": {
+        "cancel": "Cancel",
+        "edit": "Edit",
+        "edit_task": "Edit Task",
+        "priority_high": "Priority High",
+        "priority_low": "Priority Low",
+        "priority_medium": "Priority Medium",
+        "update": "Update",
+        "update_error": "Update Error",
+        "updated_success": "Updated Success",
+        "updating": "Updating"
+      },
+      "users": {
+        "admin": "Admin",
+        "department": "Department",
+        "employee": "Employee",
+        "employee_not_found": "Employee Not Found",
+        "error_assigning_role": "Error Assigning Role",
+        "identity": "Identity",
+        "invalid_employee_id": "Invalid Employee Id",
+        "manager": "Manager",
+        "no_role_assigned": "No Role Assigned",
+        "personal_details": "Personal Details",
+        "postal_code": "Postal Code",
+        "role_assigned_successfully": "Role Assigned Successfully",
+        "role_assignment": "Role Assignment",
+        "role_assignment_hint": "Role Assignment Hint",
+        "select_department": "Select Department"
+      },
+      "warehouse": {
+        "fields": {
+          "city": "City",
+          "contactName": "ContactName",
+          "contactPhone": "ContactPhone",
+          "country": "Country",
+          "state": "State",
+          "street": "Street",
+          "zip": "Zip"
+        },
+        "form_errors_address": "Form Errors Address",
+        "status_": "Status",
+        "view_inventory": "View Inventory"
+      }
+    }
+  }
+}

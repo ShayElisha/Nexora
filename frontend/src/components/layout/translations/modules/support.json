@@ -65,7 +65,8 @@
         "creating": "Creating...",
         "createdSuccessfully": "Support ticket created successfully!",
         "failedToCreate": "Failed to create support ticket",
-        "fillRequiredFields": "Please fill in all required fields"
+        "fillRequiredFields": "Please fill in all required fields",
+        "statusLabel": "Status"
       },
       "invoices": {
         "title": "Invoices",
@@ -210,7 +211,8 @@
         "creating": "יוצר...",
         "createdSuccessfully": "כרטיס התמיכה נוצר בהצלחה!",
         "failedToCreate": "נכשל ביצירת כרטיס תמיכה",
-        "fillRequiredFields": "אנא מלא את כל השדות הנדרשים"
+        "fillRequiredFields": "אנא מלא את כל השדות הנדרשים",
+        "statusLabel": "סטטוס"
       },
       "invoices": {
         "title": "חשבוניות",
@@ -355,7 +357,8 @@
         "creating": "Создание...",
         "createdSuccessfully": "Тикет поддержки успешно создан!",
         "failedToCreate": "Не удалось создать тикет поддержки",
-        "fillRequiredFields": "Пожалуйста, заполните все обязательные поля"
+        "fillRequiredFields": "Пожалуйста, заполните все обязательные поля",
+        "statusLabel": "Статус"
       },
       "invoices": {
         "title": "Invoices",
@@ -500,7 +503,8 @@
         "creating": "作成中...",
         "createdSuccessfully": "サポートチケットが正常に作成されました！",
         "failedToCreate": "サポートチケットの作成に失敗しました",
-        "fillRequiredFields": "すべての必須フィールドに入力してください"
+        "fillRequiredFields": "すべての必須フィールドに入力してください",
+        "statusLabel": "ステータス"
       },
       "invoices": {
         "title": "Invoices",
@@ -645,7 +649,8 @@
         "creating": "Création...",
         "createdSuccessfully": "Ticket de support créé avec succès !",
         "failedToCreate": "Échec de la création du ticket de support",
-        "fillRequiredFields": "Veuillez remplir tous les champs obligatoires"
+        "fillRequiredFields": "Veuillez remplir tous les champs obligatoires",
+        "statusLabel": "Statut"
       },
       "invoices": {
         "title": "Invoices",
@@ -790,7 +795,8 @@
         "creating": "Creando...",
         "createdSuccessfully": "¡Ticket de soporte creado exitosamente!",
         "failedToCreate": "Error al crear ticket de soporte",
-        "fillRequiredFields": "Por favor complete todos los campos obligatorios"
+        "fillRequiredFields": "Por favor complete todos los campos obligatorios",
+        "statusLabel": "Estado"
       },
       "invoices": {
         "title": "Invoices",
@@ -935,7 +941,8 @@
         "creating": "جارٍ الإنشاء...",
         "createdSuccessfully": "تم إنشاء تذكرة الدعم بنجاح!",
         "failedToCreate": "فشل إنشاء تذكرة الدعم",
-        "fillRequiredFields": "يرجى ملء جميع الحقول المطلوبة"
+        "fillRequiredFields": "يرجى ملء جميع الحقول المطلوبة",
+        "statusLabel": "الحالة"
       },
       "invoices": {
         "title": "Invoices",

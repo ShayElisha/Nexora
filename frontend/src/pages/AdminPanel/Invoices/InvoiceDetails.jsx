@@ -165,7 +165,7 @@ const InvoiceDetails = () => {
                 </span>
                 {invoice.paymentStatus && (
                   <span className="text-sm text-gray-500">
-                    {t("invoices.paymentStatus")}:{" "}
+                    {t("invoices.paymentStatusLabel", { defaultValue: "סטטוס תשלום" })}:{" "}
                     {t(`invoices.paymentStatus.${invoice.paymentStatus.toLowerCase().replace(' ', '')}`)}
                   </span>
                 )}

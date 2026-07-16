@@ -159,7 +159,7 @@ const InventoryMovementsList = () => {
                         <th className="text-left p-3 font-semibold" style={{ color: "var(--text-color)" }}>{t("inventory.from_warehouse") || "From"}</th>
                         <th className="text-left p-3 font-semibold" style={{ color: "var(--text-color)" }}>{t("inventory.to_warehouse") || "To"}</th>
                         <th className="text-left p-3 font-semibold" style={{ color: "var(--text-color)" }}>{t("inventory.date") || "Date"}</th>
-                        <th className="text-left p-3 font-semibold" style={{ color: "var(--text-color)" }}>{t("inventory.status") || "Status"}</th>
+                        <th className="text-left p-3 font-semibold" style={{ color: "var(--text-color)" }}>{t("inventory.status_label", { defaultValue: "סטטוס" })}</th>
                         <th className="text-left p-3 font-semibold" style={{ color: "var(--text-color)" }}>{t("inventory.actions") || "Actions"}</th>
                       </tr>
                     </thead>

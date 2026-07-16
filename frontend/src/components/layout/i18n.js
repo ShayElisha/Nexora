@@ -153,6 +153,9 @@ i18n
   .init({
     resources,
     fallbackLng: "en", // שפה ברירת מחדל
+    supportedLngs: ["en", "he", "ru", "ja", "fr", "es", "ar"],
+    nonExplicitSupportedLngs: true, // he-IL → he
+    load: "languageOnly", // ignore region codes
     defaultNS: "translation",
     ns: ["translation"],
     interpolation: {
@@ -170,6 +173,7 @@ i18n
         "subdomain",
       ],
       caches: ["localStorage", "cookie"],
+      convertDetectedLanguage: (lng) => String(lng || "en").split("-")[0],
     },
     react: {
       useSuspense: false,

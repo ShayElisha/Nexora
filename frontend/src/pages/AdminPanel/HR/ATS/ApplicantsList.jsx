@@ -141,12 +141,12 @@ const ApplicantsList = () => {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{t("hr.ats.name") || "Name"}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{t("hr.ats.email") || "Email"}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{t("hr.ats.phone") || "Phone"}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{t("hr.ats.job_posting") || "Job Posting"}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{t("hr.ats.status") || "Status"}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{t("hr.ats.application_date") || "Application Date"}</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.name", "שם")}</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.email", "אימייל")}</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.phone", "טלפון")}</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.job_posting", "משרה")}</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.status", "סטטוס")}</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.application_date", "תאריך הגשה")}</th>
                 <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "common.actions", "פעולות")}</th>
               </tr>
             </thead>

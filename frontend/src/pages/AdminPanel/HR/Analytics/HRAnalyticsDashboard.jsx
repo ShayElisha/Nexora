@@ -28,6 +28,8 @@ import {
   Legend,
 } from "chart.js";
 import { Bar, Pie, Line } from "react-chartjs-2";
+import EmptyState from "../../../../components/ui/EmptyState";
+import { safeT } from "../../../../lib/i18nSafe";
 
 ChartJS.register(
   CategoryScale,
@@ -39,6 +41,34 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend
+);
+
+const hasChartData = (chartData) =>
+  Array.isArray(chartData?.datasets?.[0]?.data) &&
+  chartData.datasets[0].data.some((v) => Number(v) > 0);
+
+const ChartPanel = ({ title, chartData, emptyTitle, children }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="rounded-xl shadow-lg p-6"
+    style={{
+      backgroundColor: "var(--bg-color)",
+      borderColor: "var(--border-color)",
+      border: "1px solid",
+    }}
+  >
+    <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--text-color)" }}>
+      {title}
+    </h3>
+    <div style={{ height: "350px", position: "relative" }}>
+      {hasChartData(chartData) ? (
+        children
+      ) : (
+        <EmptyState icon={BarChart3} title={emptyTitle} compact />
+      )}
+    </div>
+  </motion.div>
 );
 
 const HRAnalyticsDashboard = () => {
@@ -81,7 +111,7 @@ const HRAnalyticsDashboard = () => {
     labels: employeesData.byDepartment?.map((d) => d.department?.name || "Unknown") || [],
     datasets: [
       {
-        label: t("hr.analytics.employees") || "Employees",
+        label: safeT(t, "hr.analytics.employees", "עובדים"),
         data: employeesData.byDepartment?.map((d) => d.count) || [],
         backgroundColor: [
           "rgba(59, 130, 246, 0.5)",
@@ -171,196 +201,138 @@ const HRAnalyticsDashboard = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl shadow-lg p-6"
-          style={{
-            backgroundColor: "var(--bg-color)",
-            borderColor: "var(--border-color)",
-            border: "1px solid",
-          }}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm" style={{ color: "var(--color-secondary)" }}>{t("hr.analytics.total_employees") || "Total Employees"}</p>
-              <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>{employeesData.total || 0}</p>
-              <p className="text-sm mt-1" style={{ color: "#10b981" }}>
-                {employeesData.active || 0} {t("hr.analytics.active") || "active"}
-              </p>
+        {[
+          {
+            label: safeT(t, "hr.analytics.total_employees", "סה״כ עובדים"),
+            value: employeesData.total || 0,
+            badge: `${employeesData.active || 0} ${safeT(t, "hr.analytics.active", "פעיל")}`,
+            badgeColor: "#10b981",
+            Icon: Users,
+            iconColor: "var(--color-primary)",
+          },
+          {
+            label: safeT(t, "hr.analytics.total_applicants", "סה״כ מועמדים"),
+            value: recruitmentData.totalApplicants || 0,
+            badge: `${recruitmentData.averageTimeToHire?.toFixed(1) || 0} ${safeT(t, "hr.analytics.avg_days_to_hire", "ימים ממוצע לגיוס")}`,
+            badgeColor: "var(--color-primary)",
+            Icon: Briefcase,
+            iconColor: "#10b981",
+          },
+          {
+            label: safeT(t, "hr.analytics.total_courses", "סה״כ קורסים"),
+            value: learningData.totalCourses || 0,
+            badge: `${learningData.completionRate?.toFixed(1) || 0}% ${safeT(t, "hr.analytics.completion_rate", "שיעור השלמה")}`,
+            badgeColor: "#a855f7",
+            Icon: BookOpen,
+            iconColor: "#a855f7",
+          },
+          {
+            label: safeT(t, "hr.analytics.attendance_rate", "שיעור נוכחות"),
+            value: `${attendanceData.averageRate?.toFixed(1) || 0}%`,
+            badge: `${attendanceData.lateArrivals || 0} ${safeT(t, "hr.analytics.late_arrivals", "איחורים")}`,
+            badgeColor: "#f59e0b",
+            Icon: Calendar,
+            iconColor: "#f59e0b",
+          },
+        ].map((kpi, index) => (
+          <motion.div
+            key={kpi.label}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 }}
+            className="rounded-xl shadow-lg p-6"
+            style={{
+              backgroundColor: "var(--bg-color)",
+              borderColor: "var(--border-color)",
+              border: "1px solid",
+            }}
+          >
+            <div className="flex items-start justify-between gap-4 h-full">
+              <div className="min-w-0 flex-1 flex flex-col gap-1">
+                <p className="text-sm leading-snug" style={{ color: "var(--color-secondary)" }}>
+                  {kpi.label}
+                </p>
+                <p className="text-3xl font-bold leading-none" style={{ color: "var(--text-color)" }}>
+                  {kpi.value}
+                </p>
+                <p className="text-sm mt-1 leading-snug" style={{ color: kpi.badgeColor }}>
+                  {kpi.badge}
+                </p>
+              </div>
+              <kpi.Icon className="w-10 h-10 shrink-0" style={{ color: kpi.iconColor }} />
             </div>
-            <Users className="w-12 h-12" style={{ color: "var(--color-primary)" }} />
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl shadow-lg p-6"
-          style={{
-            backgroundColor: "var(--bg-color)",
-            borderColor: "var(--border-color)",
-            border: "1px solid",
-          }}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm" style={{ color: "var(--color-secondary)" }}>{t("hr.analytics.total_applicants") || "Total Applicants"}</p>
-              <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>{recruitmentData.totalApplicants || 0}</p>
-              <p className="text-sm mt-1" style={{ color: "var(--color-primary)" }}>
-                {recruitmentData.averageTimeToHire?.toFixed(1) || 0} {t("hr.analytics.avg_days_to_hire") || "avg days to hire"}
-              </p>
-            </div>
-            <Briefcase className="w-12 h-12" style={{ color: "#10b981" }} />
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl shadow-lg p-6"
-          style={{
-            backgroundColor: "var(--bg-color)",
-            borderColor: "var(--border-color)",
-            border: "1px solid",
-          }}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm" style={{ color: "var(--color-secondary)" }}>{t("hr.analytics.total_courses") || "Total Courses"}</p>
-              <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>{learningData.totalCourses || 0}</p>
-              <p className="text-sm mt-1" style={{ color: "#a855f7" }}>
-                {learningData.completionRate?.toFixed(1) || 0}% {t("hr.analytics.completion_rate") || "completion rate"}
-              </p>
-            </div>
-            <BookOpen className="w-12 h-12" style={{ color: "#a855f7" }} />
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl shadow-lg p-6"
-          style={{
-            backgroundColor: "var(--bg-color)",
-            borderColor: "var(--border-color)",
-            border: "1px solid",
-          }}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm" style={{ color: "var(--color-secondary)" }}>{t("hr.analytics.attendance_rate") || "Attendance Rate"}</p>
-              <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>
-                {attendanceData.averageRate?.toFixed(1) || 0}%
-              </p>
-              <p className="text-sm mt-1" style={{ color: "#f59e0b" }}>
-                {attendanceData.lateArrivals || 0} {t("hr.analytics.late_arrivals") || "late arrivals"}
-              </p>
-            </div>
-            <Calendar className="w-12 h-12" style={{ color: "#f59e0b" }} />
-          </div>
-        </motion.div>
+          </motion.div>
+        ))}
       </div>
 
       {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl shadow-lg p-6"
-          style={{
-            backgroundColor: "var(--bg-color)",
-            borderColor: "var(--border-color)",
-            border: "1px solid",
-          }}
+        <ChartPanel
+          title={safeT(t, "hr.analytics.employees_by_department", "עובדים לפי מחלקה")}
+          chartData={employeesByDeptData}
+          emptyTitle={safeT(t, "hr.analytics.no_chart_data", "אין נתונים להצגה")}
         >
-          <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--text-color)" }}>
-            {t("hr.analytics.employees_by_department") || "Employees by Department"}
-          </h3>
-          <div style={{ height: "350px", position: "relative" }}>
-            <Bar 
-              data={employeesByDeptData} 
-              options={{ 
-                responsive: true, 
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: {
-                    display: true,
-                    position: "top",
+          <Bar
+            data={employeesByDeptData}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              layout: { padding: { left: 8, right: 8, top: 8, bottom: 8 } },
+              plugins: {
+                legend: { display: true, position: "top" },
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: { padding: 8, maxTicksLimit: 6 },
+                  afterFit: (scale) => {
+                    scale.width = Math.max(scale.width, 48);
                   },
                 },
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                  },
+                x: {
+                  ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8 },
                 },
-              }} 
-            />
-          </div>
-        </motion.div>
+              },
+            }}
+          />
+        </ChartPanel>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl shadow-lg p-6"
-          style={{
-            backgroundColor: "var(--bg-color)",
-            borderColor: "var(--border-color)",
-            border: "1px solid",
-          }}
+        <ChartPanel
+          title={safeT(t, "hr.analytics.applicants_by_status", "מועמדים לפי סטטוס")}
+          chartData={applicantsByStatusData}
+          emptyTitle={safeT(t, "hr.analytics.no_chart_data", "אין נתונים להצגה")}
         >
-          <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--text-color)" }}>
-            {t("hr.analytics.applicants_by_status") || "Applicants by Status"}
-          </h3>
-          <div style={{ height: "350px", position: "relative" }}>
-            <Pie 
-              data={applicantsByStatusData} 
-              options={{ 
-                responsive: true, 
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: {
-                    display: true,
-                    position: "bottom",
-                  },
-                },
-              }} 
-            />
-          </div>
-        </motion.div>
+          <Pie
+            data={applicantsByStatusData}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: true, position: "bottom" },
+              },
+            }}
+          />
+        </ChartPanel>
       </div>
 
       {/* Charts Row 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl shadow-lg p-6"
-          style={{
-            backgroundColor: "var(--bg-color)",
-            borderColor: "var(--border-color)",
-            border: "1px solid",
-          }}
+        <ChartPanel
+          title={safeT(t, "hr.analytics.leave_by_type", "בקשות חופשה לפי סוג")}
+          chartData={leaveByTypeData}
+          emptyTitle={safeT(t, "hr.analytics.no_chart_data", "אין נתונים להצגה")}
         >
-          <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--text-color)" }}>
-            {t("hr.analytics.leave_by_type") || "Leave Requests by Type"}
-          </h3>
-          <div style={{ height: "350px", position: "relative" }}>
-            <Pie 
-              data={leaveByTypeData} 
-              options={{ 
-                responsive: true, 
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: {
-                    display: true,
-                    position: "bottom",
-                  },
-                },
-              }} 
-            />
-          </div>
-        </motion.div>
+          <Pie
+            data={leaveByTypeData}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: true, position: "bottom" },
+              },
+            }}
+          />
+        </ChartPanel>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -15,7 +15,11 @@
         "export": "Export",
         "import": "Import",
         "yes": "Yes",
-        "no": "No"
+        "no": "No",
+        "add": "Add",
+        "actions": "Actions",
+        "view": "View",
+        "no_data": "No data available"
       },
       "buttons": {
         "submit": "Submit",
@@ -99,7 +103,11 @@
         "export": "ייצוא",
         "import": "ייבא",
         "yes": "כן",
-        "no": "לא"
+        "no": "לא",
+        "add": "הוסף",
+        "actions": "פעולות",
+        "view": "צפייה",
+        "no_data": "אין נתונים להצגה"
       },
       "buttons": {
         "submit": "שלח",
@@ -183,7 +191,11 @@
         "export": "Экспорт",
         "import": "Импорт",
         "yes": "Да",
-        "no": "Нет"
+        "no": "Нет",
+        "add": "Добавить",
+        "actions": "Действия",
+        "view": "Просмотр",
+        "no_data": "Нет данных"
       },
       "buttons": {
         "submit": "Отправить",
@@ -267,7 +279,11 @@
         "export": "エクスポート",
         "import": "インポート",
         "yes": "はい",
-        "no": "いいえ"
+        "no": "いいえ",
+        "add": "追加",
+        "actions": "操作",
+        "view": "表示",
+        "no_data": "データがありません"
       },
       "buttons": {
         "submit": "送信",
@@ -351,7 +367,11 @@
         "export": "Exporter",
         "import": "Importer",
         "yes": "Oui",
-        "no": "Non"
+        "no": "Non",
+        "add": "Ajouter",
+        "actions": "Actions",
+        "view": "Voir",
+        "no_data": "Aucune donnée"
       },
       "buttons": {
         "submit": "Envoyer",
@@ -435,7 +455,11 @@
         "export": "Exportar",
         "import": "Importar",
         "yes": "Sí",
-        "no": "No"
+        "no": "No",
+        "add": "Añadir",
+        "actions": "Acciones",
+        "view": "Ver",
+        "no_data": "Sin datos"
       },
       "buttons": {
         "submit": "Enviar",
@@ -519,7 +543,11 @@
         "export": "تصدير",
         "import": "استيراد",
         "yes": "نعم",
-        "no": "لا"
+        "no": "لا",
+        "add": "إضافة",
+        "actions": "إجراءات",
+        "view": "عرض",
+        "no_data": "لا توجد بيانات"
       },
       "buttons": {
         "submit": "إرسال",

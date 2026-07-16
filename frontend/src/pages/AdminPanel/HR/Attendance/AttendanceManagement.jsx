@@ -15,7 +15,6 @@ import {
   Search,
   Loader2,
   User,
-  DollarSign,
   TrendingUp,
   Moon,
   Percent,
@@ -28,6 +27,8 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { EmptyTableRow } from "../../../../components/ui/EmptyState";
+import { safeT } from "../../../../lib/i18nSafe";
 
 const AttendanceManagement = () => {
   const { t } = useTranslation();
@@ -505,12 +506,21 @@ const AttendanceManagement = () => {
               border: "1px solid",
             }}
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm" style={{ color: "var(--color-secondary)" }}>{t("hr.attendance.total_pay") || "Total Pay"}</p>
+            <div className="flex items-center justify-between gap-4">
+              <div className="min-w-0 flex-1 flex flex-col gap-1">
+                <p className="text-sm" style={{ color: "var(--color-secondary)" }}>{safeT(t, "hr.attendance.total_pay", "סה״כ תשלום")}</p>
                 <p className="text-2xl font-bold" style={{ color: "#10b981" }}>₪{statistics?.totalPay || 0}</p>
               </div>
-              <DollarSign className="w-8 h-8" style={{ color: "#10b981" }} />
+              <div
+                className="flex items-center justify-center w-10 h-10 rounded-full shrink-0 text-lg font-bold"
+                style={{
+                  backgroundColor: "color-mix(in srgb, #10b981 15%, transparent)",
+                  color: "#10b981",
+                }}
+                aria-hidden
+              >
+                ₪
+              </div>
             </div>
           </motion.div>
 
@@ -702,7 +712,14 @@ const AttendanceManagement = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedShifts.map((shift) => {
+                {paginatedShifts.length === 0 ? (
+                  <EmptyTableRow
+                    colSpan={10}
+                    icon={Calendar}
+                    title={safeT(t, "hr.attendance.no_records", "לא נמצאו רשומות")}
+                  />
+                ) : (
+                  paginatedShifts.map((shift) => {
                   const isExpanded = expandedShifts.has(shift._id);
                   return (
                     <React.Fragment key={shift._id}>
@@ -885,19 +902,11 @@ const AttendanceManagement = () => {
                       )}
                     </React.Fragment>
                   );
-                })}
+                })
+                )}
               </tbody>
             </table>
           </div>
-
-          {filteredShifts.length === 0 && (
-            <div className="text-center py-12">
-              <Calendar className="w-16 h-16 mx-auto mb-4" style={{ color: "var(--color-secondary)" }} />
-              <p className="text-lg" style={{ color: "var(--color-secondary)" }}>
-                {t("hr.attendance.no_records") || "No attendance records found"}
-              </p>
-            </div>
-          )}
 
           {/* Pagination */}
           {filteredShifts.length > 0 && (

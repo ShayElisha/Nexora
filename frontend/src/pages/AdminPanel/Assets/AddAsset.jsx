@@ -19,6 +19,9 @@ import {
   Building2,
   User,
 } from "lucide-react";
+import FormActions from "../../../components/ui/FormActions";
+import DateInput from "../../../components/ui/DateInput";
+import { safeT } from "../../../lib/i18nSafe";
 
 const AddAsset = () => {
   const { t } = useTranslation();
@@ -262,20 +265,21 @@ const AddAsset = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <div className="flex border-b" style={{ borderColor: "var(--border-color)" }}>
+          <div className="flex flex-wrap border-b overflow-x-auto" style={{ borderColor: "var(--border-color)" }}>
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
+                  type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className="flex items-center gap-2 px-6 py-4 border-b-2 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-3 border-b-2 transition-all duration-200 whitespace-nowrap"
                   style={{
                     borderBottomColor: activeTab === tab.id ? "var(--color-primary)" : "transparent",
                     color: activeTab === tab.id ? "var(--color-primary)" : "var(--color-secondary)",
                   }}
                 >
-                  <Icon size={20} />
+                  <Icon size={18} />
                   {tab.label}
                 </button>
               );
@@ -503,16 +507,9 @@ const AddAsset = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-bold mb-2" style={{ color: "var(--text-color)" }}>{t("assets.fields.purchase_date")}</label>
-                    <input
-                      type="date"
+                    <DateInput
                       value={formData.purchaseDate}
                       onChange={(e) => handleChange("purchaseDate", e.target.value)}
-                      className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
-                      style={{
-                        borderColor: "var(--border-color)",
-                        backgroundColor: "var(--bg-color)",
-                        color: "var(--text-color)",
-                      }}
                     />
                   </div>
 
@@ -580,31 +577,17 @@ const AddAsset = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-bold mb-2" style={{ color: "var(--text-color)" }}>{t("assets.fields.warranty_start")}</label>
-                    <input
-                      type="date"
+                    <DateInput
                       value={formData.warrantyStartDate}
                       onChange={(e) => handleChange("warrantyStartDate", e.target.value)}
-                      className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
-                      style={{
-                        borderColor: "var(--border-color)",
-                        backgroundColor: "var(--bg-color)",
-                        color: "var(--text-color)",
-                      }}
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-bold mb-2" style={{ color: "var(--text-color)" }}>{t("assets.fields.warranty_end")}</label>
-                    <input
-                      type="date"
+                    <DateInput
                       value={formData.warrantyEndDate}
                       onChange={(e) => handleChange("warrantyEndDate", e.target.value)}
-                      className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
-                      style={{
-                        borderColor: "var(--border-color)",
-                        backgroundColor: "var(--bg-color)",
-                        color: "var(--text-color)",
-                      }}
                     />
                   </div>
 
@@ -790,42 +773,18 @@ const AddAsset = () => {
               </div>
             )}
 
-            {/* Submit Buttons */}
-            <div className="flex justify-end gap-4 mt-8 pt-6 border-t" style={{ borderColor: "var(--border-color)" }}>
-              <button
-                type="button"
-                onClick={() => navigate("/dashboard/assets")}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all hover:scale-105"
-                style={{
-                  backgroundColor: "var(--border-color)",
-                  color: "var(--text-color)",
-                }}
-              >
-                <X size={20} />
-                {t("assets.cancel")}
-              </button>
-              <button
-                type="submit"
-                disabled={saving}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold shadow-lg transition-all hover:scale-105 disabled:opacity-50"
-                style={{
-                  backgroundColor: "var(--color-primary)",
-                  color: "var(--button-text)",
-                }}
-              >
-                {saving ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-t-2 border-white rounded-full animate-spin" />
-                    {t("assets.saving")}
-                  </>
-                ) : (
-                  <>
-                    <Save size={20} />
-                    {isEdit ? t("assets.update") : t("assets.create")}
-                  </>
-                )}
-              </button>
-            </div>
+            <FormActions
+              onCancel={() => navigate("/dashboard/assets")}
+              loading={saving}
+              submitLabel={
+                isEdit
+                  ? safeT(t, "assets.update", "עדכן")
+                  : safeT(t, "assets.create", "צור")
+              }
+              cancelLabel={safeT(t, "assets.cancel", "ביטול")}
+              submitIcon={Save}
+              cancelIcon={X}
+            />
           </form>
         </motion.div>
       </div>

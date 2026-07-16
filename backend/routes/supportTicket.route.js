@@ -2,6 +2,7 @@ import express from "express";
 import {
   createSupportTicket,
   getSupportTickets,
+  getAllSupportTicketsForSuperAdmin,
   getSupportTicketById,
   updateSupportTicket,
   addComment,
@@ -12,6 +13,9 @@ const router = express.Router();
 
 // יצירת כרטיס תמיכה חדש
 router.post("/", createSupportTicket);
+
+// SuperAdmin panel — list all tickets without Nexora employee session
+router.get("/superadmin/all", getAllSupportTicketsForSuperAdmin);
 
 // קבלת כל כרטיסי התמיכה
 router.get("/", getSupportTickets);

@@ -227,10 +227,10 @@ const CreateJobPosting = () => {
                     color: "var(--text-color)",
                   }}
                 >
-                  <option value="full-time">{t("hr.ats.full_time") || "Full Time"}</option>
-                  <option value="part-time">{t("hr.ats.part_time") || "Part Time"}</option>
-                  <option value="contract">{t("hr.ats.contract") || "Contract"}</option>
-                  <option value="internship">{t("hr.ats.internship") || "Internship"}</option>
+                  <option value="full-time">{safeT(t, "hr.ats.full_time", "משרה מלאה")}</option>
+                  <option value="part-time">{safeT(t, "hr.ats.part_time", "משרה חלקית")}</option>
+                  <option value="contract">{safeT(t, "hr.ats.contract", "חוזה")}</option>
+                  <option value="internship">{safeT(t, "hr.ats.internship", "התמחות")}</option>
                 </select>
               </div>
             </div>
@@ -324,7 +324,7 @@ const CreateJobPosting = () => {
                     backgroundColor: "var(--bg-color)",
                     color: "var(--text-color)",
                   }}
-                  placeholder={t("hr.ats.add_requirement") || "Add requirement..."}
+                  placeholder={safeT(t, "hr.ats.add_requirement", "הוסף דרישה...")}
                 />
                 <InlineAddButton
                   onClick={addRequirement}
@@ -372,7 +372,7 @@ const CreateJobPosting = () => {
                     backgroundColor: "var(--bg-color)",
                     color: "var(--text-color)",
                   }}
-                  placeholder={t("hr.ats.add_responsibility") || "Add responsibility..."}
+                  placeholder={safeT(t, "hr.ats.add_responsibility", "הוסף אחריות...")}
                 />
                 <InlineAddButton
                   onClick={addResponsibility}

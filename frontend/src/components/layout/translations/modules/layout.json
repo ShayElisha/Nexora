@@ -893,10 +893,7 @@
         "banks": "בנקים",
         "bank_accounts": "חשבונות בנק",
         "add_bank_account": "הוסף חשבון בנק",
-        "budget": {
-          "budget_records": "רשומות תקציב",
-          "create_budget_record": "צור רשומת תקציב"
-        },
+        "budget": "תקציב",
         "procurement": "רכש",
         "create_procurement_record": "צור רשומת רכש",
         "procurement_advanced": "רכש מתקדם",

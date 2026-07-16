@@ -187,7 +187,8 @@
           "submit_request": "Submit Request",
           "bereavement": "Bereavement",
           "unpaid": "Unpaid",
-          "other": "Other"
+          "other": "Other",
+          "request_created": "Leave request created successfully"
         },
         "analytics": {
           "dashboard": "HR Analytics Dashboard",
@@ -218,7 +219,9 @@
           "total_overtime": "Total Overtime",
           "absences": "Absences",
           "employees": "Employees",
-          "no_chart_data": "No data available for this chart"
+          "no_chart_data": "No data available for this chart",
+          "applicants": "Applicants",
+          "leave_requests": "Leave Requests"
         },
         "self_service": {
           "employee_portal": "Employee Self-Service Portal",
@@ -246,7 +249,8 @@
           "hours": "Hours",
           "my_courses": "My Courses",
           "leave_requests": "Leave Requests",
-          "performance_reviews": "Performance Reviews"
+          "performance_reviews": "Performance Reviews",
+          "days": "days"
         }
       }
     }
@@ -420,7 +424,7 @@
           "vacation": "חופשה",
           "sick": "מחלה",
           "personal": "אישי",
-          "maternity": "א Muternity",
+          "maternity": "חופשת לידה",
           "paternity": "אבהות",
           "start_date": "תאריך התחלה",
           "end_date": "תאריך סיום",
@@ -439,7 +443,8 @@
           "submit_request": "שלח בקשה",
           "bereavement": "אבל",
           "unpaid": "ללא תשלום",
-          "other": "אחר"
+          "other": "אחר",
+          "request_created": "בקשת החופשה נוצרה בהצלחה"
         },
         "analytics": {
           "dashboard": "לוח בקרת HR",
@@ -470,7 +475,9 @@
           "total_overtime": "סה\"כ שעות נוספות",
           "absences": "היעדרויות",
           "employees": "עובדים",
-          "no_chart_data": "אין נתונים להצגה בגרף זה"
+          "no_chart_data": "אין נתונים להצגה בגרף זה",
+          "applicants": "מועמדים",
+          "leave_requests": "בקשות חופשה"
         },
         "self_service": {
           "employee_portal": "פורטל שירות עצמי לעובדים",
@@ -498,7 +505,8 @@
           "hours": "שעות",
           "my_courses": "הקורסים שלי",
           "leave_requests": "בקשות חופשה",
-          "performance_reviews": "ביקורות ביצועים"
+          "performance_reviews": "ביקורות ביצועים",
+          "days": "ימים"
         }
       }
     }
@@ -689,7 +697,8 @@
           "submit_request": "Отправить запрос",
           "bereavement": "Траур",
           "unpaid": "Неоплачиваемый",
-          "other": "Другое"
+          "other": "Другое",
+          "request_created": "Leave request created successfully"
         },
         "analytics": {
           "dashboard": "Панель аналитики HR",
@@ -720,7 +729,9 @@
           "total_overtime": "Всего сверхурочных",
           "absences": "Отсутствия",
           "employees": "Сотрудники",
-          "no_chart_data": "Нет данных для графика"
+          "no_chart_data": "Нет данных для графика",
+          "applicants": "Applicants",
+          "leave_requests": "Leave Requests"
         },
         "self_service": {
           "employee_portal": "Портал самообслуживания сотрудников",
@@ -748,7 +759,8 @@
           "hours": "Часы",
           "my_courses": "Мои курсы",
           "leave_requests": "Запросы на отпуск",
-          "performance_reviews": "Обзоры производительности"
+          "performance_reviews": "Обзоры производительности",
+          "days": "days"
         }
       }
     }
@@ -939,7 +951,8 @@
           "submit_request": "申請を提出",
           "bereavement": "忌引",
           "unpaid": "無給",
-          "other": "その他"
+          "other": "その他",
+          "request_created": "Leave request created successfully"
         },
         "analytics": {
           "dashboard": "HR分析ダッシュボード",
@@ -970,7 +983,9 @@
           "total_overtime": "総残業時間",
           "absences": "欠席",
           "employees": "従業員",
-          "no_chart_data": "このグラフのデータがありません"
+          "no_chart_data": "このグラフのデータがありません",
+          "applicants": "Applicants",
+          "leave_requests": "Leave Requests"
         },
         "self_service": {
           "employee_portal": "従業員セルフサービスポータル",
@@ -998,7 +1013,8 @@
           "hours": "時間",
           "my_courses": "マイコース",
           "leave_requests": "休暇申請",
-          "performance_reviews": "パフォーマンスレビュー"
+          "performance_reviews": "パフォーマンスレビュー",
+          "days": "days"
         }
       }
     }
@@ -1189,7 +1205,8 @@
           "submit_request": "Soumettre la demande",
           "bereavement": "Deuil",
           "unpaid": "Non payé",
-          "other": "Autre"
+          "other": "Autre",
+          "request_created": "Leave request created successfully"
         },
         "analytics": {
           "dashboard": "Tableau de bord analytique RH",
@@ -1220,7 +1237,9 @@
           "total_overtime": "Total des heures supplémentaires",
           "absences": "Absences",
           "employees": "Employés",
-          "no_chart_data": "Aucune donnée pour ce graphique"
+          "no_chart_data": "Aucune donnée pour ce graphique",
+          "applicants": "Applicants",
+          "leave_requests": "Leave Requests"
         },
         "self_service": {
           "employee_portal": "Portail libre-service des employés",
@@ -1248,7 +1267,8 @@
           "hours": "Heures",
           "my_courses": "Mes cours",
           "leave_requests": "Demandes de congé",
-          "performance_reviews": "Évaluations de performance"
+          "performance_reviews": "Évaluations de performance",
+          "days": "days"
         }
       }
     }
@@ -1439,7 +1459,8 @@
           "submit_request": "Enviar solicitud",
           "bereavement": "Duelo",
           "unpaid": "Sin pago",
-          "other": "Otro"
+          "other": "Otro",
+          "request_created": "Leave request created successfully"
         },
         "analytics": {
           "dashboard": "Panel de análisis de RRHH",
@@ -1470,7 +1491,9 @@
           "total_overtime": "Total de horas extras",
           "absences": "Ausencias",
           "employees": "Empleados",
-          "no_chart_data": "No hay datos para este gráfico"
+          "no_chart_data": "No hay datos para este gráfico",
+          "applicants": "Applicants",
+          "leave_requests": "Leave Requests"
         },
         "self_service": {
           "employee_portal": "Portal de autoservicio para empleados",
@@ -1498,7 +1521,8 @@
           "hours": "Horas",
           "my_courses": "Mis cursos",
           "leave_requests": "Solicitudes de permiso",
-          "performance_reviews": "Revisiones de rendimiento"
+          "performance_reviews": "Revisiones de rendimiento",
+          "days": "days"
         }
       }
     }
@@ -1689,7 +1713,8 @@
           "submit_request": "إرسال الطلب",
           "bereavement": "حداد",
           "unpaid": "غير مدفوع",
-          "other": "أخرى"
+          "other": "أخرى",
+          "request_created": "Leave request created successfully"
         },
         "analytics": {
           "dashboard": "لوحة تحليلات الموارد البشرية",
@@ -1720,7 +1745,9 @@
           "total_overtime": "إجمالي ساعات العمل الإضافية",
           "absences": "الغيابات",
           "employees": "الموظفون",
-          "no_chart_data": "لا توجد بيانات لهذا الرسم البياني"
+          "no_chart_data": "لا توجد بيانات لهذا الرسم البياني",
+          "applicants": "Applicants",
+          "leave_requests": "Leave Requests"
         },
         "self_service": {
           "employee_portal": "بوابة الخدمة الذاتية للموظفين",
@@ -1748,7 +1775,8 @@
           "hours": "الساعات",
           "my_courses": "دوراتي",
           "leave_requests": "طلبات الإجازة",
-          "performance_reviews": "مراجعات الأداء"
+          "performance_reviews": "مراجعات الأداء",
+          "days": "days"
         }
       }
     }

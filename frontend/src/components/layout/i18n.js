@@ -37,10 +37,12 @@ import shiftsTranslations from "./translations/modules/shifts.json";
 import landingTranslations from "./translations/modules/landing.json";
 import landingLocalesTranslations from "./translations/modules/landing-locales.json";
 import publicPagesTranslations from "./translations/modules/publicPages.json";
+import fillGapsTranslations from "./translations/modules/fillGaps.json";
 
 // Merge all translation modules
 // IMPORTANT: projectsTranslations must come AFTER crmTranslations to avoid conflicts
 // because crm.json has a simple "projects" string that would overwrite the projects object
+// fillGapsTranslations must be LAST — only supplies keys missing from other modules
 const translationModules = [
   commonTranslations,
   authTranslations,
@@ -75,6 +77,7 @@ const translationModules = [
   landingTranslations,
   landingLocalesTranslations,
   publicPagesTranslations,
+  fillGapsTranslations,
 ];
 
 // Helper function for deep merge
@@ -174,6 +177,13 @@ i18n
     debug: false, // Set to true for debugging
     returnEmptyString: false,
     returnNull: false,
+    // Never surface raw "a.b.c" keys in the UI
+    parseMissingKeyHandler: (key) => {
+      const leaf = String(key || "").split(".").pop() || String(key || "");
+      return leaf
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+    },
   });
 
 

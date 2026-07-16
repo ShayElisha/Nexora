@@ -157,7 +157,7 @@ const StockCountsList = () => {
                         <th className="text-left p-3 font-semibold" style={{ color: "var(--text-color)" }}>{t("inventory.count_date") || "Count Date"}</th>
                         <th className="text-left p-3 font-semibold" style={{ color: "var(--text-color)" }}>{t("inventory.items_counted") || "Items"}</th>
                         <th className="text-left p-3 font-semibold" style={{ color: "var(--text-color)" }}>{t("inventory.variance") || "Variance"}</th>
-                        <th className="text-left p-3 font-semibold" style={{ color: "var(--text-color)" }}>{t("inventory.status") || "Status"}</th>
+                        <th className="text-left p-3 font-semibold" style={{ color: "var(--text-color)" }}>{t("inventory.status_label", { defaultValue: "סטטוס" })}</th>
                         <th className="text-left p-3 font-semibold" style={{ color: "var(--text-color)" }}>{t("inventory.actions") || "Actions"}</th>
                       </tr>
                     </thead>

@@ -166,7 +166,7 @@ const SupportTicketDetails = () => {
         {/* Status and Priority */}
         <div className="flex gap-4 mb-6">
           <div className="flex-1">
-            <label className="block text-sm font-semibold mb-2">{t("supportTickets.status")}</label>
+            <label className="block text-sm font-semibold mb-2">{t("supportTickets.statusLabel", { defaultValue: "סטטוס" })}</label>
             <div
               className={`px-4 py-2 rounded-lg border text-center font-semibold ${getStatusColor(
                 ticket.status
@@ -176,7 +176,7 @@ const SupportTicketDetails = () => {
             </div>
           </div>
           <div className="flex-1">
-            <label className="block text-sm font-semibold mb-2">{t("supportTickets.priority")}</label>
+            <label className="block text-sm font-semibold mb-2">{t("supportTickets.priorityLabel", { defaultValue: "עדיפות" })}</label>
             <div
               className={`px-4 py-2 rounded-lg border text-center font-semibold ${getStatusColor(
                 ticket.status

@@ -673,7 +673,7 @@ const Events = () => {
               selectedEvent.externalParticipants.length > 0 &&
               selectedEvent.externalParticipants[0].name !== "" &&
               renderField(
-                t("events.externalParticipant"),
+                t("events.externalParticipantLabel"),
                 `${selectedEvent.externalParticipants[0].name}${
                   selectedEvent.externalParticipants[0].email
                     ? " (" + selectedEvent.externalParticipants[0].email + ")"
@@ -707,7 +707,7 @@ const Events = () => {
               selectedEvent.attachments.length > 0 &&
               selectedEvent.attachments[0].fileName !== "" &&
               renderField(
-                t("events.attachment"),
+                t("events.attachmentLabel"),
                 `${selectedEvent.attachments[0].fileName}: ${selectedEvent.attachments[0].fileUrl}`
               )}
             {renderField(t("events.notes"), selectedEvent.notes)}

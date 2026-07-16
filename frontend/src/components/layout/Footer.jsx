@@ -80,7 +80,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 hover:-translate-y-1 shadow-lg hover:shadow-xl"
+                  className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 hover:-translate-y-1 shadow-lg hover:shadow-xl leading-none"
                   style={{
                     backgroundColor: 'white',
                     color: social.color
@@ -94,7 +94,7 @@ const Footer = () => {
                     e.currentTarget.style.color = social.color;
                   }}
                 >
-                  <social.Icon size={20} strokeWidth={2} />
+                  <social.Icon size={18} strokeWidth={2} className="block shrink-0" />
                 </a>
               ))}
             </div>
@@ -199,15 +199,15 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div 
-          className="pt-8 border-t border-white/20 flex flex-col md:flex-row justify-between items-center gap-4"
+          className="pt-8 border-t border-white/20 flex flex-col items-center gap-4 text-center"
         >
           <p 
-            className={`text-sm text-white w-full md:w-auto ${isRTL ? "text-center md:text-right" : "text-center md:text-left"}`}
+            className="text-sm text-white"
             style={{ opacity: 0.8 }}
           >
             © {new Date().getFullYear()} {t("footer.company_name")}. {t("footer.all_rights_reserved")}
           </p>
-          <div className="flex gap-6 justify-center">
+          <div className="flex flex-wrap gap-6 justify-center">
             {[
               { label: t("footer.terms"), url: '/terms' },
               { label: t("footer.privacy_policy"), url: '/privacy' },

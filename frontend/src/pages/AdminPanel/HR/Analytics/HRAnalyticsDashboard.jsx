@@ -29,6 +29,7 @@ import {
 } from "chart.js";
 import { Bar, Pie, Line } from "react-chartjs-2";
 import EmptyState from "../../../../components/ui/EmptyState";
+import DateInput from "../../../../components/ui/DateInput";
 import { safeT } from "../../../../lib/i18nSafe";
 
 ChartJS.register(
@@ -174,27 +175,15 @@ const HRAnalyticsDashboard = () => {
         {/* Date Range Filter */}
         <div className="rounded-xl shadow-lg p-4 mb-6" style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)", border: "1px solid" }}>
         <div className="flex gap-4">
-          <input
-            type="date"
+          <DateInput
             value={dateRange.start}
             onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-            className="px-4 py-2 rounded-xl border focus:ring-2 focus:outline-none transition-all"
-            style={{
-              borderColor: "var(--border-color)",
-              backgroundColor: "var(--bg-color)",
-              color: "var(--text-color)",
-            }}
+            className="px-4 py-2"
           />
-          <input
-            type="date"
+          <DateInput
             value={dateRange.end}
             onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-            className="px-4 py-2 rounded-xl border focus:ring-2 focus:outline-none transition-all"
-            style={{
-              borderColor: "var(--border-color)",
-              backgroundColor: "var(--bg-color)",
-              color: "var(--text-color)",
-            }}
+            className="px-4 py-2"
           />
         </div>
       </div>

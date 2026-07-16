@@ -28,6 +28,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { EmptyTableRow } from "../../../../components/ui/EmptyState";
+import EmptyState from "../../../../components/ui/EmptyState";
 import { safeT } from "../../../../lib/i18nSafe";
 
 const AttendanceManagement = () => {
@@ -468,12 +469,12 @@ const AttendanceManagement = () => {
               border: "1px solid",
             }}
           >
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-center justify-between gap-4">
+              <div className="min-w-0 flex-1 flex flex-col gap-1">
                 <p className="text-sm" style={{ color: "var(--color-secondary)" }}>{t("hr.attendance.total_shifts") || "Total Shifts"}</p>
                 <p className="text-2xl font-bold" style={{ color: "var(--text-color)" }}>{statistics?.totalShifts || 0}</p>
               </div>
-              <Calendar className="w-8 h-8" style={{ color: "var(--color-primary)" }} />
+              <Calendar className="w-8 h-8 shrink-0" style={{ color: "var(--color-primary)" }} />
             </div>
           </motion.div>
 
@@ -487,12 +488,12 @@ const AttendanceManagement = () => {
               border: "1px solid",
             }}
           >
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-center justify-between gap-4">
+              <div className="min-w-0 flex-1 flex flex-col gap-1">
                 <p className="text-sm" style={{ color: "var(--color-secondary)" }}>{t("hr.attendance.total_hours") || "Total Hours"}</p>
                 <p className="text-2xl font-bold" style={{ color: "var(--text-color)" }}>{statistics?.totalHours || 0}h</p>
               </div>
-              <Clock className="w-8 h-8" style={{ color: "var(--color-primary)" }} />
+              <Clock className="w-8 h-8 shrink-0" style={{ color: "var(--color-primary)" }} />
             </div>
           </motion.div>
 
@@ -534,12 +535,12 @@ const AttendanceManagement = () => {
               border: "1px solid",
             }}
           >
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-center justify-between gap-4">
+              <div className="min-w-0 flex-1 flex flex-col gap-1">
                 <p className="text-sm" style={{ color: "var(--color-secondary)" }}>{t("hr.attendance.overtime_hours") || "Overtime Hours"}</p>
                 <p className="text-2xl font-bold" style={{ color: "#f59e0b" }}>{statistics?.overtimeHours || 0}h</p>
               </div>
-              <TrendingUp className="w-8 h-8" style={{ color: "#f59e0b" }} />
+              <TrendingUp className="w-8 h-8 shrink-0" style={{ color: "#f59e0b" }} />
             </div>
           </motion.div>
         </div>

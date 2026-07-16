@@ -19,7 +19,7 @@ import {
   Briefcase,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { EmptyTableRow } from "../../../../components/ui/EmptyState";
+import EmptyState from "../../../../components/ui/EmptyState";
 import { safeT } from "../../../../lib/i18nSafe";
 
 const ApplicantsList = () => {
@@ -137,28 +137,28 @@ const ApplicantsList = () => {
           </select>
         </div>
 
+        {filteredApplicants.length === 0 ? (
+          <EmptyState
+            icon={User}
+            title={safeT(t, "hr.ats.no_applicants", "לא נמצאו מועמדים")}
+            description={safeT(t, "hr.ats.no_applicants_hint", "מועמדים חדשים יופיעו כאן לאחר הגשת מועמדות")}
+          />
+        ) : (
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.name", "שם")}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.email", "אימייל")}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.phone", "טלפון")}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.job_posting", "משרה")}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.status", "סטטוס")}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.application_date", "תאריך הגשה")}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "common.actions", "פעולות")}</th>
+                <th className="text-start py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.name", "שם")}</th>
+                <th className="text-start py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.email", "אימייל")}</th>
+                <th className="text-start py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.phone", "טלפון")}</th>
+                <th className="text-start py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.job_posting", "משרה")}</th>
+                <th className="text-start py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.status", "סטטוס")}</th>
+                <th className="text-start py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.application_date", "תאריך הגשה")}</th>
+                <th className="text-start py-3 px-4 font-semibold text-gray-700">{safeT(t, "common.actions", "פעולות")}</th>
               </tr>
             </thead>
             <tbody>
-              {filteredApplicants.length === 0 ? (
-                <EmptyTableRow
-                  colSpan={7}
-                  icon={User}
-                  title={safeT(t, "hr.ats.no_applicants", "לא נמצאו מועמדים")}
-                />
-              ) : (
-                filteredApplicants.map((applicant) => (
+                {filteredApplicants.map((applicant) => (
                 <motion.tr
                   key={applicant._id}
                   initial={{ opacity: 0 }}
@@ -222,11 +222,11 @@ const ApplicantsList = () => {
                     </div>
                   </td>
                 </motion.tr>
-              ))
-              )}
+              ))}
             </tbody>
           </table>
         </div>
+        )}
       </div>
     </div>
   );

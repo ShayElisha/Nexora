@@ -10,9 +10,11 @@ import {
   FileText,
   Save,
   X,
-  Loader2,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import FormActions from "../../../../components/ui/FormActions";
+import DateInput from "../../../../components/ui/DateInput";
+import { safeT } from "../../../../lib/i18nSafe";
 
 const CreateLeaveRequest = () => {
   const { t } = useTranslation();
@@ -128,40 +130,26 @@ const CreateLeaveRequest = () => {
             </select>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-color)" }}>
-                {t("hr.leave.start_date") || "Start Date"} *
+                {safeT(t, "hr.leave.start_date", "Start Date")} *
               </label>
-              <input
-                type="date"
+              <DateInput
                 value={formData.startDate}
                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
-                style={{
-                  borderColor: "var(--border-color)",
-                  backgroundColor: "var(--bg-color)",
-                  color: "var(--text-color)",
-                }}
                 required
               />
             </div>
 
             <div>
               <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-color)" }}>
-                {t("hr.leave.end_date") || "End Date"} *
+                {safeT(t, "hr.leave.end_date", "End Date")} *
               </label>
-              <input
-                type="date"
+              <DateInput
                 value={formData.endDate}
                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                 min={formData.startDate}
-                className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
-                style={{
-                  borderColor: "var(--border-color)",
-                  backgroundColor: "var(--bg-color)",
-                  color: "var(--text-color)",
-                }}
                 required
               />
             </div>
@@ -196,43 +184,14 @@ const CreateLeaveRequest = () => {
             />
           </div>
 
-          <div className="flex gap-4 pt-4">
-            <motion.button
-              type="submit"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              disabled={createMutation.isLoading}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all shadow-lg"
-              style={{
-                background: "linear-gradient(to right, var(--color-primary), var(--color-secondary))",
-                color: "var(--button-text)",
-              }}
-            >
-              {createMutation.isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <Save className="w-5 h-5" />
-              )}
-              {t("hr.leave.submit_request") || "Submit Request"}
-            </motion.button>
-
-            <motion.button
-              type="button"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => navigate(-1)}
-              className="px-6 py-3 rounded-xl font-semibold transition-all"
-              style={{
-                backgroundColor: "var(--footer-bg)",
-                color: "var(--text-color)",
-                borderColor: "var(--border-color)",
-                border: "1px solid",
-              }}
-            >
-              <X className="w-5 h-5 inline mr-2" />
-              {t("common.cancel") || "Cancel"}
-            </motion.button>
-          </div>
+          <FormActions
+            onCancel={() => navigate(-1)}
+            loading={createMutation.isLoading}
+            submitLabel={safeT(t, "hr.leave.submit_request", "שלח בקשה")}
+            cancelLabel={safeT(t, "common.cancel", "ביטול")}
+            submitIcon={Save}
+            cancelIcon={X}
+          />
         </div>
       </motion.form>
       </div>

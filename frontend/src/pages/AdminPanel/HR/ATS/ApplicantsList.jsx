@@ -19,6 +19,8 @@ import {
   Briefcase,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { EmptyTableRow } from "../../../../components/ui/EmptyState";
+import { safeT } from "../../../../lib/i18nSafe";
 
 const ApplicantsList = () => {
   const { t } = useTranslation();
@@ -145,11 +147,18 @@ const ApplicantsList = () => {
                 <th className="text-left py-3 px-4 font-semibold text-gray-700">{t("hr.ats.job_posting") || "Job Posting"}</th>
                 <th className="text-left py-3 px-4 font-semibold text-gray-700">{t("hr.ats.status") || "Status"}</th>
                 <th className="text-left py-3 px-4 font-semibold text-gray-700">{t("hr.ats.application_date") || "Application Date"}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{t("common.actions") || "Actions"}</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "common.actions", "פעולות")}</th>
               </tr>
             </thead>
             <tbody>
-              {filteredApplicants.map((applicant) => (
+              {filteredApplicants.length === 0 ? (
+                <EmptyTableRow
+                  colSpan={7}
+                  icon={User}
+                  title={safeT(t, "hr.ats.no_applicants", "לא נמצאו מועמדים")}
+                />
+              ) : (
+                filteredApplicants.map((applicant) => (
                 <motion.tr
                   key={applicant._id}
                   initial={{ opacity: 0 }}
@@ -213,19 +222,11 @@ const ApplicantsList = () => {
                     </div>
                   </td>
                 </motion.tr>
-              ))}
+              ))
+              )}
             </tbody>
           </table>
         </div>
-
-        {filteredApplicants.length === 0 && (
-          <div className="text-center py-12">
-            <User className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">
-              {t("hr.ats.no_applicants") || "No applicants found"}
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );

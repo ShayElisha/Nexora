@@ -11,11 +11,13 @@ import {
   FileText,
   Save,
   X,
-  Loader2,
   DollarSign,
   Users,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import FormActions, { InlineAddButton } from "../../../../components/ui/FormActions";
+import DateInput from "../../../../components/ui/DateInput";
+import { safeT } from "../../../../lib/i18nSafe";
 
 const CreateJobPosting = () => {
   const { t } = useTranslation();
@@ -114,10 +116,10 @@ const CreateJobPosting = () => {
             </div>
             <div>
               <h1 className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>
-                {t("hr.ats.create_job_posting") || "Create Job Posting"}
+                {safeT(t, "hr.ats.create_job_posting", "צור משרה חדשה")}
               </h1>
-              <p className="text-gray-600 mt-1">
-                {t("hr.ats.create_new_job_posting") || "Create a new job posting"}
+              <p className="mt-1" style={{ color: "var(--color-secondary)" }}>
+                {safeT(t, "hr.ats.create_new_job_posting", "צור משרה חדשה")}
               </p>
             </div>
           </div>
@@ -139,7 +141,7 @@ const CreateJobPosting = () => {
             {/* Title */}
             <div>
               <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-color)" }}>
-                {t("hr.ats.job_title") || "Job Title"} *
+                {safeT(t, "hr.ats.job_title", "כותרת המשרה")} *
               </label>
               <input
                 type="text"
@@ -159,7 +161,7 @@ const CreateJobPosting = () => {
             {/* Description */}
             <div>
               <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-color)" }}>
-                {t("hr.ats.description") || "Description"} *
+                {safeT(t, "hr.ats.description", "תיאור")} *
               </label>
               <textarea
                 value={formData.description}
@@ -176,10 +178,10 @@ const CreateJobPosting = () => {
             </div>
 
             {/* Department, Location, Employment Type */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-color)" }}>
-                  {t("hr.ats.department") || "Department"}
+                  {safeT(t, "hr.ats.department", "מחלקה")}
                 </label>
                 <input
                   type="text"
@@ -196,7 +198,7 @@ const CreateJobPosting = () => {
 
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-color)" }}>
-                  {t("hr.ats.location") || "Location"}
+                  {safeT(t, "hr.ats.location", "מיקום")}
                 </label>
                 <input
                   type="text"
@@ -213,7 +215,7 @@ const CreateJobPosting = () => {
 
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-color)" }}>
-                  {t("hr.ats.employment_type") || "Employment Type"}
+                  {safeT(t, "hr.ats.employment_type", "סוג העסקה")}
                 </label>
                 <select
                   value={formData.employmentType}
@@ -237,7 +239,7 @@ const CreateJobPosting = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-color)" }}>
-                  {t("hr.ats.salary_min") || "Min Salary"}
+                  {safeT(t, "hr.ats.salary_min", "שכר מינימום")}
                 </label>
                 <input
                   type="number"
@@ -259,7 +261,7 @@ const CreateJobPosting = () => {
 
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-color)" }}>
-                  {t("hr.ats.salary_max") || "Max Salary"}
+                  {safeT(t, "hr.ats.salary_max", "שכר מקסימום")}
                 </label>
                 <input
                   type="number"
@@ -281,7 +283,7 @@ const CreateJobPosting = () => {
 
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-color)" }}>
-                  {t("hr.ats.currency") || "Currency"}
+                  {safeT(t, "hr.ats.currency", "מטבע")}
                 </label>
                 <select
                   value={formData.salaryRange.currency}
@@ -308,7 +310,7 @@ const CreateJobPosting = () => {
             {/* Requirements */}
             <div>
               <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-color)" }}>
-                {t("hr.ats.requirements") || "Requirements"}
+                {safeT(t, "hr.ats.requirements", "דרישות")}
               </label>
               <div className="flex gap-2 mb-3">
                 <input
@@ -324,17 +326,10 @@ const CreateJobPosting = () => {
                   }}
                   placeholder={t("hr.ats.add_requirement") || "Add requirement..."}
                 />
-                <button
-                  type="button"
+                <InlineAddButton
                   onClick={addRequirement}
-                  className="px-4 py-2 rounded-xl font-medium transition-all"
-                  style={{
-                    backgroundColor: "var(--color-primary)",
-                    color: "var(--button-text)",
-                  }}
-                >
-                  {t("common.add") || "Add"}
-                </button>
+                  label={safeT(t, "common.add", "הוסף")}
+                />
               </div>
               <div className="space-y-2">
                 {formData.requirements.map((req, index) => (
@@ -363,7 +358,7 @@ const CreateJobPosting = () => {
             {/* Responsibilities */}
             <div>
               <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-color)" }}>
-                {t("hr.ats.responsibilities") || "Responsibilities"}
+                {safeT(t, "hr.ats.responsibilities", "אחריות")}
               </label>
               <div className="flex gap-2 mb-3">
                 <input
@@ -379,17 +374,10 @@ const CreateJobPosting = () => {
                   }}
                   placeholder={t("hr.ats.add_responsibility") || "Add responsibility..."}
                 />
-                <button
-                  type="button"
+                <InlineAddButton
                   onClick={addResponsibility}
-                  className="px-4 py-2 rounded-xl font-medium transition-all"
-                  style={{
-                    backgroundColor: "var(--color-primary)",
-                    color: "var(--button-text)",
-                  }}
-                >
-                  {t("common.add") || "Add"}
-                </button>
+                  label={safeT(t, "common.add", "הוסף")}
+                />
               </div>
               <div className="space-y-2">
                 {formData.responsibilities.map((resp, index) => (
@@ -416,27 +404,20 @@ const CreateJobPosting = () => {
             </div>
 
             {/* Closing Date & Status */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-color)" }}>
-                  {t("hr.ats.closing_date") || "Closing Date"}
+                  {safeT(t, "hr.ats.closing_date", "תאריך סגירה")}
                 </label>
-                <input
-                  type="date"
+                <DateInput
                   value={formData.closingDate}
                   onChange={(e) => setFormData({ ...formData, closingDate: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
-                  style={{
-                    borderColor: "var(--border-color)",
-                    backgroundColor: "var(--bg-color)",
-                    color: "var(--text-color)",
-                  }}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: "var(--text-color)" }}>
-                  {t("hr.ats.status") || "Status"}
+                  {safeT(t, "hr.ats.status", "סטטוס")}
                 </label>
                 <select
                   value={formData.status}
@@ -448,50 +429,20 @@ const CreateJobPosting = () => {
                     color: "var(--text-color)",
                   }}
                 >
-                  <option value="draft">{t("hr.ats.draft") || "Draft"}</option>
-                  <option value="published">{t("hr.ats.published") || "Published"}</option>
+                  <option value="draft">{safeT(t, "hr.ats.draft", "טיוטה")}</option>
+                  <option value="published">{safeT(t, "hr.ats.published", "פורסם")}</option>
                 </select>
               </div>
             </div>
 
-            {/* Buttons */}
-            <div className="flex gap-4 pt-4">
-              <motion.button
-                type="submit"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                disabled={createMutation.isLoading}
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all shadow-lg"
-                style={{
-                  background: "linear-gradient(to right, var(--color-primary), var(--color-secondary))",
-                  color: "var(--button-text)",
-                }}
-              >
-                {createMutation.isLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <Save className="w-5 h-5" />
-                )}
-                {t("common.save") || "Save"}
-              </motion.button>
-
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => navigate(-1)}
-                className="px-6 py-3 rounded-xl font-semibold transition-all"
-                style={{
-                  backgroundColor: "var(--footer-bg)",
-                  color: "var(--text-color)",
-                  borderColor: "var(--border-color)",
-                  border: "1px solid",
-                }}
-              >
-                <X className="w-5 h-5 inline mr-2" />
-                {t("common.cancel") || "Cancel"}
-              </motion.button>
-            </div>
+            <FormActions
+              onCancel={() => navigate(-1)}
+              loading={createMutation.isLoading}
+              submitLabel={safeT(t, "common.save", "שמור")}
+              cancelLabel={safeT(t, "common.cancel", "ביטול")}
+              submitIcon={Save}
+              cancelIcon={X}
+            />
           </div>
         </motion.form>
       </div>

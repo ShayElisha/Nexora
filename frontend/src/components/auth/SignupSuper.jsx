@@ -202,7 +202,7 @@ const PasswordField = ({
       {ariaRequired && <span aria-hidden="true">*</span>}
     </label>
     <div className="relative mt-2">
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary">
+      <div className="absolute start-4 top-1/2 -translate-y-1/2 text-secondary">
         {icon}
       </div>
       <input
@@ -212,7 +212,7 @@ const PasswordField = ({
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
         value={formik.values[name]}
-        className={`w-full h-12 pl-12 pr-12 border border-border-color rounded-lg text-text placeholder-secondary/50 focus:ring-2 focus:ring-primary focus:border-primary bg-bg/50 transition-all duration-300 ${
+        className={`w-full h-12 ps-12 pe-12 border border-border-color rounded-lg text-text placeholder-secondary/50 focus:ring-2 focus:ring-primary focus:border-primary bg-bg/50 transition-all duration-300 ${
           formik.touched[name] && formik.errors[name]
             ? "border-red-500 focus:ring-red-500 focus:border-red-500"
             : ""
@@ -228,7 +228,7 @@ const PasswordField = ({
       <button
         type="button"
         onClick={() => setShowPassword(!showPassword)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 text-secondary hover:text-text focus:outline-none transition-colors duration-300"
+        className="absolute end-4 top-1/2 -translate-y-1/2 text-secondary hover:text-text focus:outline-none transition-colors duration-300"
         aria-label={
           showPassword
             ? t("signUpForm.aria.hide_password")

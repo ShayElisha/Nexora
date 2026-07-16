@@ -109,7 +109,7 @@ const LoginForm = () => {
           {t("auth.password")}
         </label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
             <FiLock 
               className="h-5 w-5 transition-colors duration-300" 
               style={{ color: 'var(--color-secondary)' }}
@@ -128,7 +128,7 @@ const LoginForm = () => {
               color: 'var(--text-color)',
               borderColor: formik.errors.password && formik.touched.password ? '#ef4444' : 'var(--border-color)',
             }}
-            className={`block w-full pl-10 pr-12 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+            className={`block w-full ps-10 pe-12 py-3 rounded-xl border-2 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
               formik.errors.password && formik.touched.password
                 ? "border-red-500 focus:ring-red-500"
                 : ""
@@ -142,7 +142,7 @@ const LoginForm = () => {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center transition-colors duration-300"
+            className="absolute inset-y-0 end-0 flex items-center pe-3 transition-colors duration-300"
             style={{ color: 'var(--color-secondary)' }}
             onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-accent)'}
             onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-secondary)'}

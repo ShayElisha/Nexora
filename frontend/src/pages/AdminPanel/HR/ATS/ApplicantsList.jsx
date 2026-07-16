@@ -5,21 +5,17 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../../../lib/axios";
 import { motion } from "framer-motion";
 import {
-  Search,
   User,
   Mail,
   Phone,
-  FileText,
-  Calendar,
-  Filter,
   Eye,
   Edit,
   Trash2,
   Loader2,
-  Briefcase,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { EmptyTableRow } from "../../../../components/ui/EmptyState";
+import EmptyState from "../../../../components/ui/EmptyState";
+import SearchField from "../../../../components/ui/SearchField";
 import { safeT } from "../../../../lib/i18nSafe";
 
 const ApplicantsList = () => {
@@ -49,16 +45,19 @@ const ApplicantsList = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["applicants"]);
-      toast.success(t("hr.ats.applicant_deleted") || "Applicant deleted");
+      toast.success(safeT(t, "hr.ats.applicant_deleted", "המועמד נמחק"));
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || "Failed to delete applicant");
     },
   });
 
-  const filteredApplicants = applicants.filter((applicant) =>
-    `${applicant.firstName} ${applicant.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    applicant.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredApplicants = applicants.filter(
+    (applicant) =>
+      `${applicant.firstName} ${applicant.lastName}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      applicant.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusColor = (status) => {
@@ -76,156 +75,265 @@ const ApplicantsList = () => {
     return colors[status] || colors.applied;
   };
 
+  const fieldStyle = {
+    borderColor: "var(--border-color)",
+    backgroundColor: "var(--bg-color)",
+    color: "var(--text-color)",
+  };
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      <div
+        className="flex items-center justify-center min-h-[50vh]"
+        style={{ backgroundColor: "var(--bg-color)" }}
+      >
+        <Loader2
+          className="w-8 h-8 animate-spin"
+          style={{ color: "var(--color-primary)" }}
+        />
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            {t("hr.ats.applicants") || "Applicants"}
+    <div
+      className="min-h-screen p-4 sm:p-6 lg:p-8"
+      style={{ backgroundColor: "var(--bg-color)" }}
+    >
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-6">
+          <h1
+            className="text-3xl font-bold"
+            style={{ color: "var(--text-color)" }}
+          >
+            {safeT(t, "hr.ats.applicants", "מועמדים")}
           </h1>
-          <p className="text-gray-600 mt-1">
-            {t("hr.ats.manage_applicants") || "Manage and track job applicants"}
+          <p className="mt-1" style={{ color: "var(--color-secondary)" }}>
+            {safeT(t, "hr.ats.manage_applicants", "נהל ועקוב אחר מועמדים")}
           </p>
         </div>
-      </div>
 
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="flex gap-4 mb-6">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder={t("hr.ats.search_applicants") || "Search applicants..."}
+        <div
+          className="rounded-2xl shadow-xl p-6"
+          style={{
+            backgroundColor: "var(--bg-color)",
+            borderColor: "var(--border-color)",
+            border: "1px solid",
+          }}
+        >
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <SearchField
+              className="flex-1"
+              placeholder={safeT(
+                t,
+                "hr.ats.search_applicants",
+                "חפש מועמדים..."
+              )}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              style={fieldStyle}
             />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-4 py-2 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+              style={fieldStyle}
+            >
+              <option value="all">
+                {safeT(t, "hr.ats.all_statuses", "כל הסטטוסים")}
+              </option>
+              <option value="applied">
+                {safeT(t, "hr.ats.applied", "הוגש")}
+              </option>
+              <option value="screening">
+                {safeT(t, "hr.ats.screening", "סינון")}
+              </option>
+              <option value="interview_scheduled">
+                {safeT(t, "hr.ats.interview_scheduled", "ראיון נקבע")}
+              </option>
+              <option value="interviewed">
+                {safeT(t, "hr.ats.interviewed", "רואיין")}
+              </option>
+              <option value="offer_extended">
+                {safeT(t, "hr.ats.offer_extended", "הצעה נשלחה")}
+              </option>
+              <option value="offer_accepted">
+                {safeT(t, "hr.ats.offer_accepted", "הצעה התקבלה")}
+              </option>
+              <option value="rejected">
+                {safeT(t, "hr.ats.rejected", "נדחה")}
+              </option>
+            </select>
+            <select
+              value={stageFilter}
+              onChange={(e) => setStageFilter(e.target.value)}
+              className="px-4 py-2 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+              style={fieldStyle}
+            >
+              <option value="all">
+                {safeT(t, "hr.ats.all_stages", "כל השלבים")}
+              </option>
+              <option value="application">
+                {safeT(t, "hr.ats.application", "הגשה")}
+              </option>
+              <option value="phone_screen">
+                {safeT(t, "hr.ats.phone_screen", "שיחת טלפון")}
+              </option>
+              <option value="technical_interview">
+                {safeT(t, "hr.ats.technical_interview", "ראיון טכני")}
+              </option>
+              <option value="final_interview">
+                {safeT(t, "hr.ats.final_interview", "ראיון סופי")}
+              </option>
+              <option value="offer">{safeT(t, "hr.ats.offer", "הצעה")}</option>
+            </select>
           </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">{t("hr.ats.all_statuses") || "All Statuses"}</option>
-            <option value="applied">{t("hr.ats.applied") || "Applied"}</option>
-            <option value="screening">{t("hr.ats.screening") || "Screening"}</option>
-            <option value="interview_scheduled">{t("hr.ats.interview_scheduled") || "Interview Scheduled"}</option>
-            <option value="interviewed">{t("hr.ats.interviewed") || "Interviewed"}</option>
-            <option value="offer_extended">{t("hr.ats.offer_extended") || "Offer Extended"}</option>
-            <option value="offer_accepted">{t("hr.ats.offer_accepted") || "Offer Accepted"}</option>
-            <option value="rejected">{t("hr.ats.rejected") || "Rejected"}</option>
-          </select>
-          <select
-            value={stageFilter}
-            onChange={(e) => setStageFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">{t("hr.ats.all_stages") || "All Stages"}</option>
-            <option value="application">{t("hr.ats.application") || "Application"}</option>
-            <option value="phone_screen">{t("hr.ats.phone_screen") || "Phone Screen"}</option>
-            <option value="technical_interview">{t("hr.ats.technical_interview") || "Technical Interview"}</option>
-            <option value="final_interview">{t("hr.ats.final_interview") || "Final Interview"}</option>
-            <option value="offer">{t("hr.ats.offer") || "Offer"}</option>
-          </select>
-        </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.name", "שם")}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.email", "אימייל")}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.phone", "טלפון")}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.job_posting", "משרה")}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.status", "סטטוס")}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "hr.ats.application_date", "תאריך הגשה")}</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">{safeT(t, "common.actions", "פעולות")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredApplicants.length === 0 ? (
-                <EmptyTableRow
-                  colSpan={7}
-                  icon={User}
-                  title={safeT(t, "hr.ats.no_applicants", "לא נמצאו מועמדים")}
-                />
-              ) : (
-                filteredApplicants.map((applicant) => (
-                <motion.tr
-                  key={applicant._id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="border-b border-gray-100 hover:bg-gray-50"
-                >
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-2">
-                      <User className="w-5 h-5 text-gray-400" />
-                      <span className="font-medium">
-                        {applicant.firstName} {applicant.lastName}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-gray-400" />
-                      {applicant.email}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-gray-400" />
-                      {applicant.phone}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4">
-                    {applicant.jobPostingId?.title || "-"}
-                  </td>
-                  <td className="py-3 px-4">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(applicant.status)}`}>
-                      {applicant.status?.replace("_", " ")}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4">
-                    {new Date(applicant.applicationDate).toLocaleDateString()}
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => navigate(`/dashboard/hr/ats/applicants/${applicant._id}`)}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded"
-                        title={t("common.view") || "View"}
+          {filteredApplicants.length === 0 ? (
+            <div
+              className="rounded-xl border"
+              style={{
+                backgroundColor: "var(--footer-bg)",
+                borderColor: "var(--border-color)",
+              }}
+            >
+              <EmptyState
+                icon={User}
+                title={safeT(t, "hr.ats.no_applicants", "לא נמצאו מועמדים")}
+                description={safeT(
+                  t,
+                  "hr.ats.no_applicants_hint",
+                  "מועמדים חדשים יופיעו כאן לאחר הגשת מועמדות"
+                )}
+              />
+            </div>
+          ) : (
+            <div className="overflow-x-auto rounded-xl border" style={{ borderColor: "var(--border-color)" }}>
+              <table className="w-full">
+                <thead style={{ backgroundColor: "var(--footer-bg)" }}>
+                  <tr style={{ borderBottom: "1px solid var(--border-color)" }}>
+                    {[
+                      ["hr.ats.name", "שם"],
+                      ["hr.ats.email", "אימייל"],
+                      ["hr.ats.phone", "טלפון"],
+                      ["hr.ats.job_posting", "משרה"],
+                      ["hr.ats.status", "סטטוס"],
+                      ["hr.ats.application_date", "תאריך הגשה"],
+                      ["common.actions", "פעולות"],
+                    ].map(([key, fb]) => (
+                      <th
+                        key={key}
+                        className="text-start py-3 px-4 font-semibold"
+                        style={{ color: "var(--text-color)" }}
                       >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => navigate(`/dashboard/hr/ats/applicants/${applicant._id}/edit`)}
-                        className="p-2 text-gray-600 hover:bg-gray-50 rounded"
-                        title={t("common.edit") || "Edit"}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => deleteMutation.mutate(applicant._id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded"
-                        title={t("common.delete") || "Delete"}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </motion.tr>
-              ))
-              )}
-            </tbody>
-          </table>
+                        {safeT(t, key, fb)}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredApplicants.map((applicant) => (
+                    <motion.tr
+                      key={applicant._id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="transition-colors"
+                      style={{ borderBottom: "1px solid var(--border-color)" }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "var(--footer-bg)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }}
+                    >
+                      <td className="py-3 px-4" style={{ color: "var(--text-color)" }}>
+                        <div className="flex items-center gap-2">
+                          <User
+                            className="w-5 h-5"
+                            style={{ color: "var(--color-secondary)" }}
+                          />
+                          <span className="font-medium">
+                            {applicant.firstName} {applicant.lastName}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4" style={{ color: "var(--text-color)" }}>
+                        <div className="flex items-center gap-2">
+                          <Mail
+                            className="w-4 h-4"
+                            style={{ color: "var(--color-secondary)" }}
+                          />
+                          {applicant.email}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4" style={{ color: "var(--text-color)" }}>
+                        <div className="flex items-center gap-2">
+                          <Phone
+                            className="w-4 h-4"
+                            style={{ color: "var(--color-secondary)" }}
+                          />
+                          {applicant.phone}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4" style={{ color: "var(--text-color)" }}>
+                        {applicant.jobPostingId?.title || "-"}
+                      </td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(applicant.status)}`}
+                        >
+                          {applicant.status?.replace("_", " ")}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4" style={{ color: "var(--text-color)" }}>
+                        {new Date(applicant.applicationDate).toLocaleDateString()}
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              navigate(
+                                `/dashboard/hr/ats/applicants/${applicant._id}`
+                              )
+                            }
+                            className="p-2 rounded-lg transition-all hover:opacity-80"
+                            style={{ color: "var(--color-primary)" }}
+                            title={safeT(t, "common.view", "צפייה")}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              navigate(
+                                `/dashboard/hr/ats/applicants/${applicant._id}/edit`
+                              )
+                            }
+                            className="p-2 rounded-lg transition-all hover:opacity-80"
+                            style={{ color: "var(--color-secondary)" }}
+                            title={safeT(t, "common.edit", "עריכה")}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              deleteMutation.mutate(applicant._id)
+                            }
+                            className="p-2 rounded-lg transition-all hover:opacity-80 text-red-600"
+                            title={safeT(t, "common.delete", "מחק")}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -233,4 +341,3 @@ const ApplicantsList = () => {
 };
 
 export default ApplicantsList;
-

@@ -57,7 +57,8 @@
           "add_requirement": "Add requirement...",
           "add_responsibility": "Add responsibility...",
           "closing_date": "Closing Date",
-          "job_posting_created": "Job posting created successfully"
+          "job_posting_created": "Job posting created successfully",
+          "no_applicants_hint": "New applicants will appear here after submissions"
         },
         "lms": {
           "courses": "Courses",
@@ -153,7 +154,8 @@
           "value": "Value",
           "hourly_rate": "Hourly Rate",
           "amount": "Amount",
-          "total": "Total"
+          "total": "Total",
+          "no_records_hint": "Try adjusting the date range or filters"
         },
         "leave": {
           "leave_requests": "Leave Requests",
@@ -313,7 +315,8 @@
           "add_requirement": "הוסף דרישה...",
           "add_responsibility": "הוסף אחריות...",
           "closing_date": "תאריך סגירה",
-          "job_posting_created": "המשרה נוצרה בהצלחה"
+          "job_posting_created": "המשרה נוצרה בהצלחה",
+          "no_applicants_hint": "מועמדים חדשים יופיעו כאן לאחר הגשת מועמדות"
         },
         "lms": {
           "courses": "קורסים",
@@ -409,7 +412,8 @@
           "value": "ערך",
           "hourly_rate": "תעריף שעתי",
           "amount": "סכום",
-          "total": "סה\"כ"
+          "total": "סה\"כ",
+          "no_records_hint": "נסה לשנות את טווח התאריכים או את הסינון"
         },
         "leave": {
           "leave_requests": "בקשות חופשה",

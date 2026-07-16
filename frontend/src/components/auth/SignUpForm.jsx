@@ -1000,7 +1000,7 @@ const PasswordField = ({
     </label>
     <div className="relative">
       <div 
-        className="absolute left-4 top-1/2 -translate-y-1/2"
+        className="absolute start-4 top-1/2 -translate-y-1/2"
         style={{ color: 'var(--color-secondary)' }}
       >
         {icon}
@@ -1012,7 +1012,7 @@ const PasswordField = ({
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
         value={formik.values[name]}
-        className="w-full h-12 pl-12 pr-12 rounded-xl shadow-md transition-all duration-300 focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
+        className="w-full h-12 ps-12 pe-12 rounded-xl shadow-md transition-all duration-300 focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
         style={{
           backgroundColor: 'var(--bg-color)',
           color: 'var(--text-color)',
@@ -1044,7 +1044,7 @@ const PasswordField = ({
       <button
         type="button"
         onClick={() => setShowPassword(!showPassword)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors duration-300 focus:outline-none"
+        className="absolute end-4 top-1/2 -translate-y-1/2 transition-colors duration-300 focus:outline-none"
         style={{ color: 'var(--color-secondary)' }}
         onMouseEnter={(e) => e.target.style.color = 'var(--color-accent)'}
         onMouseLeave={(e) => e.target.style.color = 'var(--color-secondary)'}

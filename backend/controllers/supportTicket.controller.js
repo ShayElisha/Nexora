@@ -86,13 +86,49 @@ export const createSupportTicket = async (req, res) => {
   }
 };
 
+const populateTicketQuery = (query) =>
+  query
+    .populate("createdBy", "name email role")
+    .populate("assignedTo", "name email role")
+    .populate("companyId", "name")
+    .populate("comments.userId", "name email role")
+    .sort({ createdAt: -1 });
+
+/**
+ * Extract JWT from cookie or Authorization Bearer header
+ */
+const extractAuthToken = (req) => {
+  const cookieToken = req.cookies?.["auth_token"];
+  if (cookieToken) return cookieToken;
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith("Bearer ")) return authHeader.slice(7);
+  return null;
+};
+
+/**
+ * All tickets for SuperAdmin panel (no Nexora employee cookie required)
+ */
+export const getAllSupportTicketsForSuperAdmin = async (_req, res) => {
+  try {
+    const tickets = await populateTicketQuery(SupportTicket.find({}));
+    return res.status(200).json({ success: true, data: tickets });
+  } catch (error) {
+    console.error("Error fetching support tickets for superadmin:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching support tickets",
+      error: error.message,
+    });
+  }
+};
+
 /**
  * Get Support Tickets
  * מחזיר את כל כרטיסי התמיכה של החברה (למנהל) או כל הכרטיסים (ל-SuperAdmin)
  */
 export const getSupportTickets = async (req, res) => {
   try {
-    const token = req.cookies["auth_token"];
+    const token = extractAuthToken(req);
     if (!token) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
@@ -107,12 +143,7 @@ export const getSupportTickets = async (req, res) => {
       query = { companyId };
     }
 
-    const tickets = await SupportTicket.find(query)
-      .populate("createdBy", "name email role")
-      .populate("assignedTo", "name email role")
-      .populate("companyId", "name")
-      .populate("comments.userId", "name email role")
-      .sort({ createdAt: -1 });
+    const tickets = await populateTicketQuery(SupportTicket.find(query));
 
     return res.status(200).json({ success: true, data: tickets });
   } catch (error) {

@@ -3,100 +3,102 @@ export const DESIGN_THEMES = {
     "--color-primary": "#2563EB",
     "--color-secondary": "#64748B",
     "--color-accent": "#059669",
-    "--bg-color": "#FFFFFF",
-    "--text-color": "#0F172A",
+    "--bg-color": "#F8FAFC", // Soft Slate 50
+    "--text-color": "#1E293B", // Softer Text (Slate 800)
     "--button-bg": "#2563EB",
     "--button-text": "#FFFFFF",
     "--border-color": "#E2E8F0",
-    "--footer-bg": "#F8FAFC",
+    "--footer-bg": "#FFFFFF", // Pure White Surface
   },
   royal: {
     "--color-primary": "#7C3AED",
     "--color-secondary": "#A855F7",
     "--color-accent": "#EC4899",
-    "--bg-color": "#FEFBFF",
-    "--text-color": "#1E1B4B",
+    "--bg-color": "#F5F3FF",
+    "--text-color": "#1E1B4B", // Deep Purple Text
     "--button-bg": "#7C3AED",
     "--button-text": "#FFFFFF",
     "--border-color": "#E9D5FF",
-    "--footer-bg": "#F3E8FF",
+    "--footer-bg": "#FFFFFF",
   },
   opulent: {
     "--color-primary": "#DC2626",
     "--color-secondary": "#F59E0B",
     "--color-accent": "#059669",
-    "--bg-color": "#FFFBEB",
-    "--text-color": "#451A03",
+    "--bg-color": "#FAFAF9",
+    "--text-color": "#292524", // Stone 800 (Softened from harsh brown)
     "--button-bg": "#DC2626",
     "--button-text": "#FFFFFF",
-    "--border-color": "#FED7AA",
-    "--footer-bg": "#FEF3C7",
+    "--border-color": "#E7E5E4",
+    "--footer-bg": "#FFFFFF",
   },
   elegant: {
     "--color-primary": "#374151",
     "--color-secondary": "#6B7280",
     "--color-accent": "#9CA3AF",
-    "--bg-color": "#FAFAFA",
-    "--text-color": "#111827",
+    "--bg-color": "#F3F4F6",
+    "--text-color": "#1F2937",
     "--button-bg": "#374151",
     "--button-text": "#FFFFFF",
     "--border-color": "#E5E7EB",
-    "--footer-bg": "#F3F4F6",
+    "--footer-bg": "#FFFFFF",
   },
   modern: {
     "--color-primary": "#0EA5E9",
     "--color-secondary": "#06B6D4",
     "--color-accent": "#10B981",
-    "--bg-color": "#FFFFFF",
-    "--text-color": "#0F172A",
+    "--bg-color": "#F0F9FF",
+    "--text-color": "#1E293B",
     "--button-bg": "#0EA5E9",
     "--button-text": "#FFFFFF",
-    "--border-color": "#E0F2FE",
-    "--footer-bg": "#F0F9FF",
+    "--border-color": "#BAE6FD",
+    "--footer-bg": "#FFFFFF",
   },
   vintage: {
     "--color-primary": "#92400E",
     "--color-secondary": "#B45309",
     "--color-accent": "#D97706",
     "--bg-color": "#FFFBEB",
-    "--text-color": "#451A03",
+    "--text-color": "#292524", // Softer dark stone
     "--button-bg": "#92400E",
     "--button-text": "#FFFFFF",
-    "--border-color": "#FED7AA",
-    "--footer-bg": "#FEF3C7",
+    "--border-color": "#FDE68A",
+    "--footer-bg": "#FFFFFF",
   },
-  midnight: {
-    "--color-primary": "#3B82F6",
-    "--color-secondary": "#6366F1",
+  // Replaced 'midnight' with 'azure' (Bright, deep blue tech theme)
+  azure: {
+    "--color-primary": "#1D4ED8",
+    "--color-secondary": "#3B82F6",
     "--color-accent": "#8B5CF6",
-    "--bg-color": "#0F172A",
-    "--text-color": "#F1F5F9",
-    "--button-bg": "#3B82F6",
+    "--bg-color": "#EFF6FF",
+    "--text-color": "#1E3A8A",
+    "--button-bg": "#1D4ED8",
     "--button-text": "#FFFFFF",
-    "--border-color": "#334155",
-    "--footer-bg": "#1E293B",
+    "--border-color": "#BFDBFE",
+    "--footer-bg": "#FFFFFF",
   },
-  neon: {
-    "--color-primary": "#00F5FF",
-    "--color-secondary": "#FF00FF",
-    "--color-accent": "#00FF00",
-    "--bg-color": "#0A0A0A",
-    "--text-color": "#FFFFFF",
-    "--button-bg": "#00F5FF",
-    "--button-text": "#0A0A0A",
-    "--border-color": "#FF00FF",
-    "--footer-bg": "#1A1A1A",
+  // Replaced 'neon' with 'cyberLight' (Bright tech theme with vibrant accents)
+  cyberLight: {
+    "--color-primary": "#06B6D4",
+    "--color-secondary": "#D946EF",
+    "--color-accent": "#10B981",
+    "--bg-color": "#FDF4FF",
+    "--text-color": "#1E293B",
+    "--button-bg": "#06B6D4",
+    "--button-text": "#FFFFFF",
+    "--border-color": "#F0ABFC",
+    "--footer-bg": "#FFFFFF",
   },
   sunsetGold: {
     "--color-primary": "#D97706",
     "--color-secondary": "#F59E0B",
     "--color-accent": "#FCD34D",
-    "--bg-color": "#FFFBEB",
-    "--text-color": "#451A03",
+    "--bg-color": "#FEF3C7",
+    "--text-color": "#292524",
     "--button-bg": "#D97706",
     "--button-text": "#FFFFFF",
-    "--border-color": "#FED7AA",
-    "--footer-bg": "#FEF3C7",
+    "--border-color": "#FDE68A",
+    "--footer-bg": "#FFFFFF",
   },
   glacier: {
     "--color-primary": "#0F766E",
@@ -107,18 +109,18 @@ export const DESIGN_THEMES = {
     "--button-bg": "#0F766E",
     "--button-text": "#FFFFFF",
     "--border-color": "#99F6E4",
-    "--footer-bg": "#CCFBF1",
+    "--footer-bg": "#FFFFFF",
   },
   coco: {
     "--color-primary": "#7C2D12",
     "--color-secondary": "#EA580C",
     "--color-accent": "#FB923C",
     "--bg-color": "#FFF7ED",
-    "--text-color": "#431407",
+    "--text-color": "#292524", // Softened from harsh deep brown
     "--button-bg": "#7C2D12",
     "--button-text": "#FFFFFF",
-    "--border-color": "#FED7AA",
-    "--footer-bg": "#FFEDD5",
+    "--border-color": "#FFEDD5",
+    "--footer-bg": "#FFFFFF",
   },
   ocean: {
     "--color-primary": "#0369A1",
@@ -129,7 +131,7 @@ export const DESIGN_THEMES = {
     "--button-bg": "#0369A1",
     "--button-text": "#FFFFFF",
     "--border-color": "#BAE6FD",
-    "--footer-bg": "#E0F2FE",
+    "--footer-bg": "#FFFFFF",
   },
   forest: {
     "--color-primary": "#166534",
@@ -140,40 +142,40 @@ export const DESIGN_THEMES = {
     "--button-bg": "#166534",
     "--button-text": "#FFFFFF",
     "--border-color": "#BBF7D0",
-    "--footer-bg": "#DCFCE7",
+    "--footer-bg": "#FFFFFF",
   },
   lavender: {
     "--color-primary": "#7C2D92",
     "--color-secondary": "#A855F7",
     "--color-accent": "#C084FC",
     "--bg-color": "#FAF5FF",
-    "--text-color": "#581C87",
+    "--text-color": "#1E293B",
     "--button-bg": "#7C2D92",
     "--button-text": "#FFFFFF",
-    "--border-color": "#DDD6FE",
-    "--footer-bg": "#EDE9FE",
+    "--border-color": "#E9D5FF",
+    "--footer-bg": "#FFFFFF",
   },
   coral: {
     "--color-primary": "#E11D48",
     "--color-secondary": "#F43F5E",
     "--color-accent": "#FB7185",
     "--bg-color": "#FFF1F2",
-    "--text-color": "#881337",
+    "--text-color": "#292524",
     "--button-bg": "#E11D48",
     "--button-text": "#FFFFFF",
     "--border-color": "#FECDD3",
-    "--footer-bg": "#FFE4E6",
+    "--footer-bg": "#FFFFFF",
   },
   slate: {
     "--color-primary": "#475569",
     "--color-secondary": "#64748B",
     "--color-accent": "#94A3B8",
-    "--bg-color": "#F8FAFC",
+    "--bg-color": "#F1F5F9",
     "--text-color": "#1E293B",
     "--button-bg": "#475569",
     "--button-text": "#FFFFFF",
     "--border-color": "#CBD5E1",
-    "--footer-bg": "#F1F5F9",
+    "--footer-bg": "#FFFFFF",
   },
 };
 
@@ -184,21 +186,24 @@ export const notifyThemeChange = (themeName) => {
 };
 
 export const applyDesignTheme = (themeName) => {
-  const theme = DESIGN_THEMES[themeName];
+  const theme = DESIGN_THEMES[themeName] || DESIGN_THEMES["default"];
   if (!theme) return;
   const root = document.documentElement;
   Object.entries(theme).forEach(([key, value]) => {
     root.style.setProperty(key, value);
   });
+  // Surface is now strictly the footer-bg (which is white across the board)
   root.style.setProperty(
     "--surface-color",
-    theme["--footer-bg"] || theme["--bg-color"]
+    theme["--footer-bg"] || "#FFFFFF"
   );
   root.style.setProperty("--text-muted", theme["--color-secondary"]);
   root.style.setProperty("--radius", "10px");
+  
+  // Softened shadow to fit lighter modern themes
   root.style.setProperty(
     "--shadow",
-    `0 24px 48px -12px color-mix(in srgb, ${theme["--text-color"]} 14%, transparent), 0 0 0 1px color-mix(in srgb, ${theme["--border-color"]} 70%, transparent)`
+    `0 10px 25px -5px color-mix(in srgb, ${theme["--text-color"]} 8%, transparent), 0 0 0 1px color-mix(in srgb, ${theme["--border-color"]} 50%, transparent)`
   );
   document.body.style.backgroundColor = theme["--bg-color"];
 };
@@ -236,11 +241,11 @@ export const getThemeColors = () => ({
   primary: getCssVar("--color-primary", "#2563EB"),
   secondary: getCssVar("--color-secondary", "#64748B"),
   accent: getCssVar("--color-accent", "#059669"),
-  bg: getCssVar("--bg-color", "#FFFFFF"),
-  text: getCssVar("--text-color", "#0F172A"),
+  bg: getCssVar("--bg-color", "#F8FAFC"),
+  text: getCssVar("--text-color", "#1E293B"),
   muted: getCssVar("--text-muted", getCssVar("--color-secondary", "#64748B")),
   border: getCssVar("--border-color", "#E2E8F0"),
-  surface: getCssVar("--surface-color", getCssVar("--footer-bg", "#F8FAFC")),
+  surface: getCssVar("--surface-color", getCssVar("--footer-bg", "#FFFFFF")),
   buttonBg: getCssVar("--button-bg", "#2563EB"),
   buttonText: getCssVar("--button-text", "#FFFFFF"),
 });
@@ -284,8 +289,8 @@ export const themeSoftStyle = (tone = "primary") => {
         ? "--color-accent"
         : "--color-primary";
   return {
-    background: `linear-gradient(135deg, color-mix(in srgb, var(${varName}) 14%, var(--bg-color)), color-mix(in srgb, var(${varName}) 6%, var(--bg-color)))`,
-    borderColor: `color-mix(in srgb, var(${varName}) 35%, var(--border-color))`,
+    background: `linear-gradient(135deg, color-mix(in srgb, var(${varName}) 8%, var(--surface-color)), color-mix(in srgb, var(${varName}) 3%, var(--surface-color)))`,
+    borderColor: `color-mix(in srgb, var(${varName}) 25%, var(--border-color))`,
     color: "var(--text-color)",
   };
 };

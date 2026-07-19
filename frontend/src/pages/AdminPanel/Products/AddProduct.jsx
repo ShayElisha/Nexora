@@ -12,9 +12,7 @@ import {
   Plus, 
   Trash2, 
   Layers, 
-  AlertCircle,
-  CheckCircle,
-  Box
+  AlertCircle
 } from "lucide-react";
 
 // רכיב משנה ל-BOM
@@ -393,9 +391,9 @@ const AddProduct = () => {
       type: "select",
       label: t("product.fields.productType"),
       options: [
-        { value: "purchase", label: "purchase" },
-        { value: "sale", label: "sale" },
-        { value: "both", label: "both" },
+        { value: "purchase", label: t("inventory.purchase") },
+        { value: "sale", label: t("inventory.sale") },
+        { value: "both", label: t("inventory.both") },
       ],
     },
   ];
@@ -452,38 +450,17 @@ const AddProduct = () => {
           transition={{ delay: 0.1 }}
         >
           <ProductForm
-          fieldDefinitions={fieldDefinitions}
-          formData={formData}
-          errors={errors}
-          isLoading={productIsLoading}
-          suppliers={suppliers}
-          suppliersIsLoading={suppliersIsLoading}
-          handleChange={handleChange}
-          handleSubmit={handleSubmit}
-          isSale={formData.productType === "sale"}
-        />
-
-          <div
-            className="mt-6 rounded-xl p-6 shadow-md border"
-            style={{
-              background: "linear-gradient(to right, rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.1))",
-              borderColor: "var(--border-color)",
-            }}
-          >
-            <div className="flex items-center justify-center gap-3">
-              <div className="p-3 rounded-lg shadow-sm" style={{ backgroundColor: "var(--bg-color)" }}>
-                <Box style={{ color: "var(--color-primary)" }} size={28} />
-              </div>
-              <div className="text-center">
-                <p className="text-sm font-medium mb-1" style={{ color: "var(--color-secondary)" }}>
-                  {t("product.fields.volume")}
-                </p>
-                <p className="text-3xl font-bold" style={{ color: "var(--color-primary)" }}>
-                  {calculateVolume().toFixed(3)} m³
-                </p>
-              </div>
-            </div>
-          </div>
+            fieldDefinitions={fieldDefinitions}
+            formData={formData}
+            errors={errors}
+            isLoading={productIsLoading}
+            suppliers={suppliers}
+            suppliersIsLoading={suppliersIsLoading}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+            isSale={formData.productType === "sale"}
+            volume={calculateVolume()}
+          />
         </motion.div>
 
         {(formData.productType === "sale" ||

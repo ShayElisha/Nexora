@@ -155,7 +155,8 @@ const CreateProductionOrder = () => {
               {/* Product Selection */}
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-color)" }}>
-                  מוצר לייצור *
+                  מוצר לייצור
+                  <span className="text-red-500 ms-1" aria-hidden="true">*</span>
                 </label>
                 <select
                   value={formData.productId}
@@ -189,7 +190,8 @@ const CreateProductionOrder = () => {
               {/* Quantity */}
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-color)" }}>
-                  כמות לייצור *
+                  כמות לייצור
+                  <span className="text-red-500 ms-1" aria-hidden="true">*</span>
                 </label>
                 <input
                   type="number"
@@ -209,20 +211,31 @@ const CreateProductionOrder = () => {
               {/* Due Date */}
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-color)" }}>
-                  תאריך יעד *
+                  תאריך יעד
+                  <span className="text-red-500 ms-1" aria-hidden="true">*</span>
                 </label>
-                <input
-                  type="date"
-                  value={formData.dueDate}
-                  onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg border"
-                  style={{
-                    borderColor: "var(--border-color)",
-                    backgroundColor: "var(--bg-color)",
-                    color: "var(--text-color)",
-                  }}
-                  required
-                />
+                {/* עטיפה מותאמת RTL: אייקון קבוע בצד ההתחלה ומחוון הדפדפן המקורי מוסתר */}
+                <div className="relative">
+                  <Calendar
+                    size={18}
+                    className="absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                    style={{ color: "var(--text-color-secondary)" }}
+                  />
+                  <input
+                    type="date"
+                    dir="rtl"
+                    value={formData.dueDate}
+                    onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                    onClick={(e) => e.currentTarget.showPicker?.()}
+                    className="w-full px-4 py-2 ps-10 rounded-lg border cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden"
+                    style={{
+                      borderColor: "var(--border-color)",
+                      backgroundColor: "var(--bg-color)",
+                      color: "var(--text-color)",
+                    }}
+                    required
+                  />
+                </div>
               </div>
 
               {/* Priority */}
@@ -316,12 +329,12 @@ const CreateProductionOrder = () => {
             </div>
           )}
 
-          {/* Submit Button */}
-          <div className="flex gap-4">
+          {/* Form Actions - compact, aligned to the end of the form flow */}
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="flex-1 px-6 py-3 rounded-lg font-medium transition-all hover:opacity-80"
+              className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition-all hover:opacity-80"
               style={{
                 backgroundColor: "var(--border-color)",
                 color: "var(--text-color)",
@@ -332,7 +345,7 @@ const CreateProductionOrder = () => {
             <button
               type="submit"
               disabled={createMutation.isPending || !bomData}
-              className="flex-1 px-6 py-3 rounded-lg font-medium transition-all hover:opacity-80 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition-all hover:opacity-80 flex items-center justify-center gap-2"
               style={{
                 backgroundColor: "var(--color-primary)",
                 color: "var(--button-text)",

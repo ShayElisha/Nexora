@@ -1,19 +1,29 @@
 import { 
   Loader, 
-  Package, 
-  DollarSign, 
   FileText, 
-  Barcode, 
-  Tag, 
-  Image, 
-  Paperclip,
   Ruler,
-  Layers,
   Truck,
   Info,
-  CheckCircle2
+  CheckCircle2,
+  Box
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+
+// שדות חובה בטופס
+const REQUIRED_FIELDS = ["productName", "unitPrice"];
+
+const FieldLabel = ({ name, children }) => (
+  <label
+    htmlFor={name}
+    className="block text-sm font-semibold mb-2"
+    style={{ color: "var(--text-color)" }}
+  >
+    {children}
+    {REQUIRED_FIELDS.includes(name) && (
+      <span className="text-red-500 ms-1" aria-hidden="true">*</span>
+    )}
+  </label>
+);
 
 const ProductForm = ({
   fieldDefinitions,
@@ -25,24 +35,9 @@ const ProductForm = ({
   handleChange,
   handleSubmit,
   isSale,
+  volume = 0,
 }) => {
   const { t } = useTranslation();
-
-  // מיפוי אייקונים לשדות
-  const fieldIcons = {
-    sku: Barcode,
-    barcode: Barcode,
-    productName: Package,
-    unitPrice: DollarSign,
-    category: Tag,
-    productDescription: FileText,
-    productImage: Image,
-    attachments: Paperclip,
-    length: Ruler,
-    width: Ruler,
-    height: Ruler,
-    productType: Layers,
-  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8"
@@ -62,58 +57,51 @@ const ProductForm = ({
           <h3 className="text-xl font-bold" style={{ color: "var(--text-color)" }}>מידע בסיסי</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {fieldDefinitions.slice(0, 5).map(({ name, type, label, options, multiple }) => {
-            const Icon = fieldIcons[name];
-            return (
-              <div key={name} className="group">
-                <label className="block text-sm font-bold mb-2 flex items-center gap-2" style={{ color: "var(--text-color)" }}>
-                  {Icon && <Icon size={16} style={{ color: "var(--color-secondary)" }} />}
-                  {t(`product.fields.${name}`)}
-                  {['productName', 'unitPrice'].includes(name) && (
-                    <span className="text-red-500">*</span>
-                  )}
-                </label>
-                {type === "select" ? (
-                  <select
-                    name={name}
-                    value={formData[name] || ""}
-                    onChange={handleChange}
-                    className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-200"
-                    style={{
-                      borderColor: "var(--border-color)",
-                      backgroundColor: "var(--bg-color)",
-                      color: "var(--text-color)",
-                    }}
-                  >
-                    {options.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    type={type}
-                    name={name}
-                    value={type !== "file" ? (formData[name] || "") : undefined}
-                    onChange={handleChange}
-                    className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-200"
-                    style={{
-                      borderColor: "var(--border-color)",
-                      backgroundColor: "var(--bg-color)",
-                      color: "var(--text-color)",
-                    }}
-                    {...(multiple ? { multiple: true } : {})}
-                  />
-                )}
-                {errors[name] && (
-                  <p className="mt-2 text-sm flex items-center gap-1" style={{ color: "#ef4444" }}>
-                    <span className="font-medium">⚠</span> {t(errors[name])}
-                  </p>
-                )}
-              </div>
-            );
-          })}
+          {fieldDefinitions.slice(0, 5).map(({ name, type, options, multiple }) => (
+            <div key={name} className="group">
+              <FieldLabel name={name}>{t(`product.fields.${name}`)}</FieldLabel>
+              {type === "select" ? (
+                <select
+                  id={name}
+                  name={name}
+                  value={formData[name] || ""}
+                  onChange={handleChange}
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-200"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  {options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  id={name}
+                  type={type}
+                  name={name}
+                  value={type !== "file" ? (formData[name] || "") : undefined}
+                  onChange={handleChange}
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-200"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                  {...(multiple ? { multiple: true } : {})}
+                />
+              )}
+              {errors[name] && (
+                <p className="mt-2 text-sm" style={{ color: "#ef4444" }}>
+                  {t(errors[name])}
+                </p>
+              )}
+            </div>
+          ))}
         </div>
       </div>
 
@@ -132,16 +120,13 @@ const ProductForm = ({
           <h3 className="text-xl font-bold" style={{ color: "var(--text-color)" }}>תיאור וקבצים</h3>
         </div>
         <div className="space-y-6">
-          {fieldDefinitions.slice(5, 8).map(({ name, type, label, multiple }) => {
-            const Icon = fieldIcons[name];
+          {fieldDefinitions.slice(5, 8).map(({ name, type, multiple }) => {
             return (
               <div key={name}>
-                <label className="block text-sm font-bold mb-2 flex items-center gap-2" style={{ color: "var(--text-color)" }}>
-                  {Icon && <Icon size={16} style={{ color: "var(--color-secondary)" }} />}
-                  {t(`product.fields.${name}`)}
-                </label>
+                <FieldLabel name={name}>{t(`product.fields.${name}`)}</FieldLabel>
                 {type === "textarea" ? (
                   <textarea
+                    id={name}
                     name={name}
                     value={formData[name] || ""}
                     onChange={handleChange}
@@ -157,6 +142,7 @@ const ProductForm = ({
                 ) : type === "file" ? (
                   <div className="relative">
                     <input
+                      id={name}
                       type={type}
                       name={name}
                       onChange={handleChange}
@@ -191,50 +177,60 @@ const ProductForm = ({
           <h3 className="text-xl font-bold" style={{ color: "var(--text-color)" }}>מידות ותכונות</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {fieldDefinitions.slice(8).map(({ name, type, label, options }) => {
-            const Icon = fieldIcons[name];
-            return (
-              <div key={name}>
-                <label className="block text-sm font-bold mb-2 flex items-center gap-2" style={{ color: "var(--text-color)" }}>
-                  {Icon && <Icon size={16} style={{ color: "var(--color-secondary)" }} />}
-                  {t(`product.fields.${name}`)}
-                </label>
-                {type === "select" ? (
-                  <select
-                    name={name}
-                    value={formData[name] || ""}
-                    onChange={handleChange}
-                    className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-200"
-                    style={{
-                      borderColor: "var(--border-color)",
-                      backgroundColor: "var(--bg-color)",
-                      color: "var(--text-color)",
-                    }}
-                  >
-                    {options.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    type={type}
-                    name={name}
-                    value={formData[name] || ""}
-                    onChange={handleChange}
-                    className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-200"
-                    style={{
-                      borderColor: "var(--border-color)",
-                      backgroundColor: "var(--bg-color)",
-                      color: "var(--text-color)",
-                    }}
-                    placeholder="0"
-                  />
-                )}
-              </div>
-            );
-          })}
+          {fieldDefinitions.slice(8).map(({ name, type, options }) => (
+            <div key={name}>
+              <FieldLabel name={name}>{t(`product.fields.${name}`)}</FieldLabel>
+              {type === "select" ? (
+                <select
+                  id={name}
+                  name={name}
+                  value={formData[name] || ""}
+                  onChange={handleChange}
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-200"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                >
+                  {options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  id={name}
+                  type={type}
+                  name={name}
+                  value={formData[name] || ""}
+                  onChange={handleChange}
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-200"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
+                  placeholder="0"
+                />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Live volume calculation, derived from the dimension fields above */}
+        <div
+          className="mt-6 flex items-center gap-3 rounded-xl border px-4 py-3"
+          style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+        >
+          <Box size={20} style={{ color: "var(--color-primary)" }} />
+          <span className="text-sm font-medium" style={{ color: "var(--color-secondary)" }}>
+            {t("product.fields.volume")}:
+          </span>
+          <span className="text-lg font-bold" style={{ color: "var(--color-primary)" }}>
+            {volume.toFixed(3)} m³
+          </span>
         </div>
       </div>
 
@@ -253,16 +249,20 @@ const ProductForm = ({
           <h3 className="text-xl font-bold" style={{ color: "var(--text-color)" }}>ספק</h3>
         </div>
         <div>
-          <label className="block text-sm font-bold mb-2 flex items-center gap-2" style={{ color: "var(--text-color)" }}>
-            <Truck size={16} style={{ color: "var(--color-secondary)" }} />
+          <label
+            htmlFor="supplierId"
+            className="block text-sm font-semibold mb-2"
+            style={{ color: "var(--text-color)" }}
+          >
             {t("product.fields.supplier")}
-            {!isSale && <span className="text-red-500">*</span>}
+            {!isSale && <span className="text-red-500 ms-1" aria-hidden="true">*</span>}
           </label>
           <select
+            id="supplierId"
             name="supplierId"
             value={formData.supplierId || ""}
             onChange={handleChange}
-            className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
             style={{
               borderColor: "var(--border-color)",
               backgroundColor: "var(--bg-color)",
@@ -289,32 +289,32 @@ const ProductForm = ({
             </p>
           )}
           {errors.supplierId && (
-            <p className="mt-2 text-sm flex items-center gap-1" style={{ color: "#ef4444" }}>
-              <span className="font-medium">⚠</span> {t(errors.supplierId)}
+            <p className="mt-2 text-sm" style={{ color: "#ef4444" }}>
+              {t(errors.supplierId)}
             </p>
           )}
         </div>
       </div>
 
-      {/* Submit Button */}
-      <div className="pt-4">
+      {/* Submit Button - always the final element of the form flow */}
+      <div className="pt-4 flex justify-end">
         <button
           type="submit"
-          className="w-full font-bold py-4 px-6 rounded-xl focus:outline-none focus:ring-4 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl flex items-center justify-center gap-3 text-lg"
+          className="w-full sm:w-auto px-8 h-12 font-semibold rounded-xl focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
           style={{
-            background: "linear-gradient(to right, var(--color-primary), #14b8a6)",
+            backgroundColor: "var(--color-primary)",
             color: "var(--button-text)",
           }}
           disabled={isLoading}
         >
           {isLoading ? (
             <>
-              <Loader className="w-6 h-6 animate-spin" />
-              <span>מעבד...</span>
+              <Loader className="w-5 h-5 animate-spin" />
+              <span>{t("product.processing")}</span>
             </>
           ) : (
             <>
-              <CheckCircle2 className="w-6 h-6" />
+              <CheckCircle2 className="w-5 h-5" />
               <span>{t("product.add_product_button")}</span>
             </>
           )}

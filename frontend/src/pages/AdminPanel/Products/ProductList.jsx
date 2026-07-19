@@ -1697,11 +1697,11 @@ const ProductList = () => {
           </div>
 
           {/* Filters and Search */}
-          <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <select
               value={filterProductType}
               onChange={(e) => setFilterProductType(e.target.value)}
-              className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+              className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
               style={{
                 borderColor: "var(--border-color)",
                 backgroundColor: "var(--bg-color)",
@@ -1722,7 +1722,12 @@ const ProductList = () => {
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="w-full p-3 p-3 rounded-xl border focus:outline-none focus:ring-2"
+              className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
+              style={{
+                borderColor: "var(--border-color)",
+                backgroundColor: "var(--bg-color)",
+                color: "var(--text-color)",
+              }}
             >
               <option value="all">
                 {t("inventory.filter_all_categories")}
@@ -1740,7 +1745,12 @@ const ProductList = () => {
             <select
               value={filterSupplier}
               onChange={(e) => setFilterSupplier(e.target.value)}
-              className="w-full p-3 p-3 rounded-xl border focus:outline-none focus:ring-2"
+              className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
+              style={{
+                borderColor: "var(--border-color)",
+                backgroundColor: "var(--bg-color)",
+                color: "var(--text-color)",
+              }}
             >
               <option value="all">{t("inventory.filter_all_suppliers")}</option>
               {Array.from(
@@ -1756,7 +1766,12 @@ const ProductList = () => {
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
-              className="w-full p-3 p-3 rounded-xl border focus:outline-none focus:ring-2"
+              className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
+              style={{
+                borderColor: "var(--border-color)",
+                backgroundColor: "var(--bg-color)",
+                color: "var(--text-color)",
+              }}
             >
               <option value="">{t("inventory.sort_by")}</option>
               <option value="productName_asc">
@@ -1819,7 +1834,7 @@ const ProductList = () => {
           </div>
           <div className="mb-6 relative">
             <Search
-              className="absolute left-3 top-1/2 transform -translate-y-1/2"
+              className="absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none"
               size={20}
               style={{ color: "var(--color-secondary)" }}
             />
@@ -1828,7 +1843,7 @@ const ProductList = () => {
               placeholder={t("inventory.search_placeholder")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2"
+              className="w-full h-11 ps-10 pe-4 rounded-xl border focus:outline-none focus:ring-2"
               style={{
                 borderColor: "var(--border-color)",
                 backgroundColor: "var(--bg-color)",
@@ -1845,7 +1860,7 @@ const ProductList = () => {
                 style={{ borderColor: "var(--border-color)", borderTopColor: "var(--color-primary)" }}
               />
               <p className="mt-4 text-lg" style={{ color: "var(--text-color)" }}>
-                Loading products...
+                {t("inventory.loading_products")}
               </p>
             </div>
           ) : (

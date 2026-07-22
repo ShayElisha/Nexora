@@ -184,10 +184,10 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
 
   if (employeesLoading || departmentsLoading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
         <motion.div
           className="rounded-2xl p-8 shadow-2xl"
-          style={{ backgroundColor: 'var(--bg-color)' }}
+          style={{ backgroundColor: 'var(--surface-color)' }}
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
         >
@@ -198,10 +198,10 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}>
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 p-4">
       <motion.div
         className="rounded-2xl p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl border"
-        style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+        style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
@@ -237,7 +237,7 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
                   <motion.div
                     key={idx}
                     className="flex justify-between items-center p-4 rounded-xl border"
-                    style={{ backgroundColor: 'var(--border-color)', borderColor: 'var(--border-color)' }}
+                    style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: idx * 0.05 }}
@@ -266,12 +266,12 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                 {t("projects.name")}
               </label>
               <input
                 {...register("name", { required: true })}
-                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-opacity-50"
                 style={{ 
                   borderColor: 'var(--border-color)', 
                   backgroundColor: 'var(--bg-color)', 
@@ -288,7 +288,7 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                 {t("projects.description")}
               </label>
               <textarea
@@ -301,14 +301,14 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <Calendar className="inline mr-2" size={16} />
                   {t("projects.start")}
                 </label>
                 <input
                   type="date"
                   {...register("startDate", { required: true })}
-                  className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 />
                 {errors.startDate && (
@@ -316,14 +316,14 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
                 )}
               </div>
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <Calendar className="inline mr-2" size={16} />
                   {t("projects.end")}
                 </label>
                 <input
                   type="date"
                   {...register("endDate", { required: true })}
-                  className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 />
                 {errors.endDate && (
@@ -334,25 +334,25 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
 
             <div className="grid grid-cols-2 gap-4">
             <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <DollarSign className="inline mr-2" size={16} />
                 {t("projects.budget")}
               </label>
               <input
                 type="number"
                 {...register("budget", { min: 0 })}
-                  className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
             <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <Target className="inline mr-2" size={16} />
                 {t("projects.priority")}
               </label>
               <select
                 {...register("priority")}
-                  className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               >
                 <option value="Low">{t("project.priority_low")}</option>
@@ -363,7 +363,7 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                 <TrendingUp className="inline mr-2" size={16} />
                 {t("projects.progress")} ({watch("progress")}%)
               </label>
@@ -376,13 +376,13 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                 {t("projects.tags")}
               </label>
               <input
                 {...register("tags")}
                 placeholder={t("projects.tags_placeholder")}
-                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
               <p className="text-xs mt-1" style={{ color: 'var(--color-secondary)' }}>
@@ -391,13 +391,13 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                 <Building2 className="inline mr-2" size={16} />
                 {t("projects.department")}
               </label>
               <select
                 {...register("departmentId", { required: true })}
-                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               >
                 <option value="">{t("project.select_department")}</option>
@@ -415,13 +415,13 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
             {departmentId && (
               <>
                 <div>
-                  <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                     <User className="inline mr-2" size={16} />
                     {t("projects.project_manager")}
                   </label>
                   <select
                     {...register("projectManager", { required: true })}
-                    className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                    className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                     style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                   >
                     <option value="">
@@ -446,7 +446,7 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                     <Users className="inline mr-2" size={16} />
                     {t("projects.team_members")}
                   </label>
@@ -478,18 +478,18 @@ const ProjectModal = ({ project, isOpen, onClose, isTeamModal = false }) => {
               </>
             )}
 
-            <div className="mt-6 flex justify-end gap-4">
+            <div className="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-3 rounded-xl font-bold transition-all hover:scale-105"
+                className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition-all hover:scale-105"
                 style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
               >
                 {t("projects.close")}
               </button>
               <button
                 type="submit"
-                className="px-6 py-3 rounded-xl font-bold shadow-lg transition-all hover:scale-105"
+                className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium shadow-lg transition-all hover:scale-105"
                 style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
               >
                 {t("projects.save")}
@@ -610,7 +610,7 @@ const ProjectsList = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-purple-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))' }}>
               <Briefcase size={28} color="white" />
             </div>
             <div>
@@ -626,8 +626,8 @@ const ProjectsList = () => {
           {/* Statistics Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <motion.div
-              className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -642,8 +642,8 @@ const ProjectsList = () => {
             </motion.div>
 
             <motion.div
-              className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -658,8 +658,8 @@ const ProjectsList = () => {
             </motion.div>
 
             <motion.div
-              className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -674,8 +674,8 @@ const ProjectsList = () => {
             </motion.div>
 
             <motion.div
-              className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -693,16 +693,16 @@ const ProjectsList = () => {
           </div>
 
           {/* Filters */}
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex-1 min-w-[200px]">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="md:col-span-2">
               <div className="relative">
-                <Search size={20} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--color-secondary)' }} />
+                <Search size={20} className="absolute start-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--color-secondary)' }} />
                 <input
                   type="text"
                   placeholder={t("projects.search_placeholder")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2"
+                  className="w-full h-11 ps-10 pe-4 rounded-xl border focus:outline-none focus:ring-2"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 />
               </div>
@@ -711,7 +711,7 @@ const ProjectsList = () => {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-3 rounded-xl border focus:outline-none focus:ring-2"
+              className="h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
               style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
             >
               <option value="all">{t("projects.all_status")}</option>
@@ -722,7 +722,7 @@ const ProjectsList = () => {
             <select
               value={filterPriority}
               onChange={(e) => setFilterPriority(e.target.value)}
-              className="px-4 py-3 rounded-xl border focus:outline-none focus:ring-2"
+              className="h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
               style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
             >
               <option value="all">{t("projects.all_priorities")}</option>
@@ -752,7 +752,7 @@ const ProjectsList = () => {
                 <motion.div
                 key={project._id}
                   className="rounded-2xl shadow-lg border overflow-hidden flex flex-col"
-                  style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                  style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
@@ -810,7 +810,7 @@ const ProjectsList = () => {
                           ? "bg-red-100 text-red-700"
                           : project.priority === "Medium"
                           ? "bg-blue-100 text-blue-700"
-                          : "bg-gray-100 text-gray-700"
+                          : "bg-[var(--bg-secondary)] text-[var(--text-color)]"
                       }`}>
                         {translatePriority(project.priority)}
                       </span>

@@ -70,7 +70,7 @@ const ApplicantsList = () => {
       offer_accepted: "bg-emerald-100 text-emerald-800",
       offer_declined: "bg-orange-100 text-orange-800",
       rejected: "bg-red-100 text-red-800",
-      withdrawn: "bg-gray-100 text-gray-800",
+      withdrawn: "bg-[var(--bg-secondary)] text-[var(--text-color)]",
     };
     return colors[status] || colors.applied;
   };
@@ -101,22 +101,30 @@ const ApplicantsList = () => {
       style={{ backgroundColor: "var(--bg-color)" }}
     >
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <h1
-            className="text-3xl font-bold"
-            style={{ color: "var(--text-color)" }}
+        <div className="mb-6 flex items-center gap-4">
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+            style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
           >
-            {safeT(t, "hr.ats.applicants", "מועמדים")}
-          </h1>
-          <p className="mt-1" style={{ color: "var(--color-secondary)" }}>
-            {safeT(t, "hr.ats.manage_applicants", "נהל ועקוב אחר מועמדים")}
-          </p>
+            <User size={28} color="white" />
+          </div>
+          <div>
+            <h1
+              className="text-4xl font-bold"
+              style={{ color: "var(--text-color)" }}
+            >
+              {safeT(t, "hr.ats.applicants", "מועמדים")}
+            </h1>
+            <p className="mt-1 text-lg" style={{ color: "var(--color-secondary)" }}>
+              {safeT(t, "hr.ats.manage_applicants", "נהל ועקוב אחר מועמדים")}
+            </p>
+          </div>
         </div>
 
         <div
           className="rounded-2xl shadow-xl p-6"
           style={{
-            backgroundColor: "var(--bg-color)",
+            backgroundColor: "var(--surface-color)",
             borderColor: "var(--border-color)",
             border: "1px solid",
           }}
@@ -136,7 +144,7 @@ const ApplicantsList = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+              className="h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
               style={fieldStyle}
             >
               <option value="all">
@@ -167,7 +175,7 @@ const ApplicantsList = () => {
             <select
               value={stageFilter}
               onChange={(e) => setStageFilter(e.target.value)}
-              className="px-4 py-2 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+              className="h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
               style={fieldStyle}
             >
               <option value="all">

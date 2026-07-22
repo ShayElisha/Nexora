@@ -38,9 +38,9 @@ const SalesPipeline = () => {
   const getStageColor = (stage) => {
     const colors = {
       Prospecting: {
-        bg: "bg-gray-500",
-        card: "bg-gray-50 dark:bg-gray-800",
-        text: "text-gray-700 dark:text-gray-300",
+        bg: "bg-[var(--color-secondary)]",
+        card: "bg-[var(--bg-secondary)]",
+        text: "text-[var(--text-color)]",
       },
       Qualification: {
         bg: "bg-blue-500",
@@ -83,7 +83,7 @@ const SalesPipeline = () => {
   const avgDealSize = totalCount > 0 ? (totalAmount / totalCount).toFixed(0) : 0;
 
   return (
-    <div className="p-6" style={{ backgroundColor: "var(--bg-color)", minHeight: "100vh" }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -91,20 +91,22 @@ const SalesPipeline = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1
-            className="text-3xl font-bold mb-2"
-            style={{
-              background: "linear-gradient(135deg, var(--color-primary), var(--color-secondary))",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            {t("sales.pipeline") || "Sales Pipeline"}
-          </h1>
-          <p className="text-sm" style={{ color: "var(--color-secondary)" }}>
-            {t("sales.pipeline_description") || "Visualize and track your sales pipeline performance"}
-          </p>
+          <div className="flex items-center gap-4">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
+            >
+              <Target size={28} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: "var(--text-color)" }}>
+                {t("sales.pipeline") || "Sales Pipeline"}
+              </h1>
+              <p className="text-lg" style={{ color: "var(--color-secondary)" }}>
+                {t("sales.pipeline_description") || "Visualize and track your sales pipeline performance"}
+              </p>
+            </div>
+          </div>
         </motion.div>
 
         {/* KPI Cards */}
@@ -112,7 +114,7 @@ const SalesPipeline = () => {
           <motion.div
             className="rounded-2xl shadow-lg border p-6"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
             }}
             initial={{ opacity: 0, y: 20 }}
@@ -139,7 +141,7 @@ const SalesPipeline = () => {
           <motion.div
             className="rounded-2xl shadow-lg border p-6"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
             }}
             initial={{ opacity: 0, y: 20 }}
@@ -166,7 +168,7 @@ const SalesPipeline = () => {
           <motion.div
             className="rounded-2xl shadow-lg border p-6"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
             }}
             initial={{ opacity: 0, y: 20 }}
@@ -195,7 +197,7 @@ const SalesPipeline = () => {
           <motion.div
             className="rounded-2xl shadow-lg border p-6"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
             }}
             initial={{ opacity: 0, y: 20 }}
@@ -250,7 +252,7 @@ const SalesPipeline = () => {
           <motion.div
             className="rounded-2xl shadow-lg border p-6"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
             }}
             initial={{ opacity: 0, y: 20 }}
@@ -318,7 +320,7 @@ const SalesPipeline = () => {
                               </div>
                               {opp.probability && (
                                 <div className="mt-2">
-                                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                                  <div className="w-full bg-[var(--bg-secondary)] rounded-full h-1.5">
                                     <div
                                       className="h-1.5 rounded-full"
                                       style={{

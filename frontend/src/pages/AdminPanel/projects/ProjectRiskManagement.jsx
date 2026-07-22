@@ -149,20 +149,26 @@ const ProjectRiskManagement = () => {
   }
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-6" style={{ backgroundColor: 'var(--bg-color)' }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
+      <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
-            {t("projects.risk_management")}
-          </h1>
-          <p className="mt-1" style={{ color: 'var(--color-secondary)' }}>
-            {t("projects.risk_management_description")}
-          </p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))' }}>
+            <AlertTriangle size={28} color="white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
+              {t("projects.risk_management")}
+            </h1>
+            <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
+              {t("projects.risk_management_description")}
+            </p>
+          </div>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg transition"
+          className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition"
           style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
         >
           <Plus className="w-5 h-5" />
@@ -175,8 +181,8 @@ const ProjectRiskManagement = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-lg shadow p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          className="rounded-2xl p-6 shadow-lg border"
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -195,8 +201,8 @@ const ProjectRiskManagement = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="rounded-lg shadow p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          className="rounded-2xl p-6 shadow-lg border"
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -215,8 +221,8 @@ const ProjectRiskManagement = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="rounded-lg shadow p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          className="rounded-2xl p-6 shadow-lg border"
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -235,8 +241,8 @@ const ProjectRiskManagement = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="rounded-lg shadow p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          className="rounded-2xl p-6 shadow-lg border"
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -253,17 +259,17 @@ const ProjectRiskManagement = () => {
       </div>
 
       {/* Filters */}
-      <div className="rounded-lg shadow p-4 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
+      <div className="rounded-2xl p-6 shadow-lg border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="md:col-span-2">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
               <input
                 type="text"
                 placeholder={t("projects.search_risks")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2"
+                className="w-full h-11 ps-10 pe-4 border rounded-xl focus:ring-2"
                 style={{ 
                   borderColor: 'var(--border-color)', 
                   backgroundColor: 'var(--bg-color)', 
@@ -276,7 +282,7 @@ const ProjectRiskManagement = () => {
           <select
             value={selectedProject}
             onChange={(e) => setSelectedProject(e.target.value)}
-            className="px-4 py-2 border rounded-lg focus:ring-2"
+            className="h-11 px-4 border rounded-xl focus:ring-2"
             style={{ 
               borderColor: 'var(--border-color)', 
               backgroundColor: 'var(--bg-color)', 
@@ -294,7 +300,7 @@ const ProjectRiskManagement = () => {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border rounded-lg focus:ring-2"
+            className="h-11 px-4 border rounded-xl focus:ring-2"
             style={{ 
               borderColor: 'var(--border-color)', 
               backgroundColor: 'var(--bg-color)', 
@@ -312,7 +318,7 @@ const ProjectRiskManagement = () => {
           <select
             value={filterRiskLevel}
             onChange={(e) => setFilterRiskLevel(e.target.value)}
-            className="px-4 py-2 border rounded-lg focus:ring-2"
+            className="h-11 px-4 border rounded-xl focus:ring-2"
             style={{ 
               borderColor: 'var(--border-color)', 
               backgroundColor: 'var(--bg-color)', 
@@ -330,10 +336,10 @@ const ProjectRiskManagement = () => {
       </div>
 
       {/* Risks Table */}
-      <div className="rounded-lg shadow overflow-hidden border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+      <div className="rounded-2xl border overflow-hidden shadow-lg" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead style={{ backgroundColor: 'var(--footer-bg)' }}>
+            <thead style={{ backgroundColor: 'var(--bg-secondary)' }}>
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase" style={{ color: 'var(--text-color)' }}>
                   {t("projects.risk")}
@@ -355,7 +361,7 @@ const ProjectRiskManagement = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+            <tbody className="divide-y" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
               {filteredRisks.map((risk) => (
                 <tr key={risk._id} style={{ borderColor: 'var(--border-color)' }} className="hover:opacity-80">
                   <td className="px-6 py-4">
@@ -417,7 +423,7 @@ const ProjectRiskManagement = () => {
       </div>
 
       {filteredRisks.length === 0 && (
-        <div className="text-center py-12">
+        <div className="text-center py-16">
           <AlertTriangle className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
           <p style={{ color: 'var(--color-secondary)' }}>
             {t("projects.no_risks")}
@@ -428,15 +434,15 @@ const ProjectRiskManagement = () => {
       {/* Create Risk Modal */}
       <AnimatePresence>
         {showCreateModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             >
-              <div className="sticky top-0 flex items-center justify-between p-6 border-b" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+              <div className="sticky top-0 flex items-center justify-between p-6 border-b" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
                 <h2 className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
                   {t("projects.add_risk")}
                 </h2>
@@ -454,8 +460,8 @@ const ProjectRiskManagement = () => {
 
               <form onSubmit={formik.handleSubmit} className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-color)' }}>
-                    {t("projects.title")} *
+                  <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
+                    {t("projects.title")}<span className="text-red-500 ms-1">*</span>
                   </label>
                   <input
                     type="text"
@@ -463,7 +469,7 @@ const ProjectRiskManagement = () => {
                     value={formik.values.title}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2"
+                    className="w-full h-11 px-4 border rounded-xl focus:ring-2"
                     style={{ 
                       borderColor: formik.errors.title && formik.touched.title ? '#ef4444' : 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -477,15 +483,15 @@ const ProjectRiskManagement = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-color)' }}>
-                    {t("projects.project")} *
+                  <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
+                    {t("projects.project")}<span className="text-red-500 ms-1">*</span>
                   </label>
                   <select
                     name="projectId"
                     value={formik.values.projectId}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2"
+                    className="w-full h-11 px-4 border rounded-xl focus:ring-2"
                     style={{ 
                       borderColor: formik.errors.projectId && formik.touched.projectId ? '#ef4444' : 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -506,7 +512,7 @@ const ProjectRiskManagement = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-color)' }}>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                     {t("projects.description")}
                   </label>
                   <textarea
@@ -515,7 +521,7 @@ const ProjectRiskManagement = () => {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     rows={3}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2"
+                    className="w-full p-3 border rounded-xl focus:ring-2"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -527,14 +533,14 @@ const ProjectRiskManagement = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("projects.category")}
                     </label>
                     <select
                       name="category"
                       value={formik.values.category}
                       onChange={formik.handleChange}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2"
+                      className="w-full h-11 px-4 border rounded-xl focus:ring-2"
                       style={{ 
                         borderColor: 'var(--border-color)', 
                         backgroundColor: 'var(--bg-color)', 
@@ -553,14 +559,14 @@ const ProjectRiskManagement = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("projects.status")}
                     </label>
                     <select
                       name="status"
                       value={formik.values.status}
                       onChange={formik.handleChange}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2"
+                      className="w-full h-11 px-4 border rounded-xl focus:ring-2"
                       style={{ 
                         borderColor: 'var(--border-color)', 
                         backgroundColor: 'var(--bg-color)', 
@@ -579,14 +585,14 @@ const ProjectRiskManagement = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("projects.probability") || "Probability"}
                     </label>
                     <select
                       name="probability"
                       value={formik.values.probability}
                       onChange={formik.handleChange}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2"
+                      className="w-full h-11 px-4 border rounded-xl focus:ring-2"
                       style={{ 
                         borderColor: 'var(--border-color)', 
                         backgroundColor: 'var(--bg-color)', 
@@ -601,14 +607,14 @@ const ProjectRiskManagement = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("projects.impact") || "Impact"}
                     </label>
                     <select
                       name="impact"
                       value={formik.values.impact}
                       onChange={formik.handleChange}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2"
+                      className="w-full h-11 px-4 border rounded-xl focus:ring-2"
                       style={{ 
                         borderColor: 'var(--border-color)', 
                         backgroundColor: 'var(--bg-color)', 
@@ -624,7 +630,7 @@ const ProjectRiskManagement = () => {
                 </div>
 
                 {/* Auto-calculated Risk Level Display */}
-                <div className="p-4 rounded-lg border" style={{ backgroundColor: 'var(--footer-bg)', borderColor: 'var(--border-color)' }}>
+                <div className="p-4 rounded-lg border" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
@@ -643,7 +649,7 @@ const ProjectRiskManagement = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-color)' }}>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                     {t("projects.mitigation_plan") || "Mitigation Plan"}
                   </label>
                   <textarea
@@ -652,7 +658,7 @@ const ProjectRiskManagement = () => {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     rows={3}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2"
+                    className="w-full p-3 border rounded-xl focus:ring-2"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -662,14 +668,14 @@ const ProjectRiskManagement = () => {
                   />
                 </div>
 
-                <div className="flex justify-end gap-4 pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
+                <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
                   <button
                     type="button"
                     onClick={() => {
                       setShowCreateModal(false);
                       formik.resetForm();
                     }}
-                    className="px-4 py-2 rounded-lg transition"
+                    className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition"
                     style={{ 
                       backgroundColor: 'var(--border-color)', 
                       color: 'var(--text-color)' 
@@ -680,7 +686,7 @@ const ProjectRiskManagement = () => {
                   <button
                     type="submit"
                     disabled={createMutation.isLoading}
-                    className="px-4 py-2 rounded-lg transition disabled:opacity-50"
+                    className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition disabled:opacity-50"
                     style={{ 
                       backgroundColor: 'var(--color-primary)', 
                       color: 'var(--button-text)' 
@@ -694,6 +700,7 @@ const ProjectRiskManagement = () => {
           </div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 };

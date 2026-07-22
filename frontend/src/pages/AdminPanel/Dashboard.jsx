@@ -1750,10 +1750,10 @@ const Dashboard = () => {
             {/* Divider */}
             <div className="relative py-8">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t-2 border-gray-300"></div>
+                <div className="w-full border-t-2 border-[var(--border-color)]"></div>
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-white px-6 py-2 text-sm font-semibold text-gray-500 rounded-full shadow-md border border-gray-300">
+                <span className="bg-[var(--surface-color)] px-6 py-2 text-sm font-semibold text-[var(--color-secondary)] rounded-full shadow-md border border-[var(--border-color)]">
                   📈 דוחות מפורטים מטה
                 </span>
               </div>
@@ -1792,7 +1792,7 @@ const Dashboard = () => {
                 variants={cardVariant}
                 className="rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border"
                 style={{ 
-                  backgroundColor: 'var(--bg-color)',
+                  backgroundColor: "var(--surface-color)",
                   borderColor: 'var(--border-color)'
                 }}
                 initial="hidden"
@@ -1838,7 +1838,7 @@ const Dashboard = () => {
           <div 
             className="rounded-2xl shadow-lg p-6 border"
             style={{ 
-              backgroundColor: 'var(--bg-color)',
+              backgroundColor: "var(--surface-color)",
               borderColor: 'var(--border-color)'
             }}
           >
@@ -1982,7 +1982,7 @@ const Dashboard = () => {
           <div 
             className="rounded-2xl shadow-lg p-6 border"
             style={{ 
-              backgroundColor: 'var(--bg-color)',
+              backgroundColor: "var(--surface-color)",
               borderColor: 'var(--border-color)'
             }}
           >
@@ -2069,7 +2069,7 @@ const Dashboard = () => {
                     variants={cardVariant}
                     className="rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border"
                     style={{ 
-                      backgroundColor: 'var(--bg-color)',
+                      backgroundColor: "var(--surface-color)",
                       borderColor: 'var(--border-color)'
                     }}
                     whileHover={{ y: -5 }}
@@ -2121,7 +2121,7 @@ const Dashboard = () => {
                 variants={cardVariant}
                 className="rounded-2xl shadow-lg p-6 border"
                 style={{ 
-                  backgroundColor: 'var(--bg-color)',
+                  backgroundColor: "var(--surface-color)",
                   borderColor: 'var(--border-color)'
                 }}
               >
@@ -2261,7 +2261,7 @@ const Dashboard = () => {
                         className={`px-4 py-2 rounded-lg transition-all duration-200 ${
                           currentPage[category] === page
                             ? "bg-gradient-to-r from-primary to-secondary text-button-text shadow-lg"
-                            : "bg-gray-100 text-secondary hover:bg-gray-200"
+                            : "bg-[var(--bg-secondary)] text-secondary hover:bg-[var(--border-color)]"
                         }`}
                       >
                         {page}
@@ -2270,7 +2270,7 @@ const Dashboard = () => {
 
                     {getPaginationRange(category).showEllipsis && (
                       <>
-                        <span className="px-3 py-2 text-gray-500">...</span>
+                        <span className="px-3 py-2 text-[var(--color-secondary)]">...</span>
                         <button
                           onClick={() =>
                             handlePageChange(
@@ -2282,7 +2282,7 @@ const Dashboard = () => {
                             currentPage[category] ===
                             getPaginationRange(category).totalPages
                               ? "bg-gradient-to-r from-primary to-secondary text-button-text shadow-lg"
-                              : "bg-gray-100 text-secondary hover:bg-gray-200"
+                              : "bg-[var(--bg-secondary)] text-secondary hover:bg-[var(--border-color)]"
                           }`}
                         >
                           {getPaginationRange(category).totalPages}
@@ -2295,7 +2295,7 @@ const Dashboard = () => {
                       disabled={
                         (currentPage[category] || 1) === getTotalPages(category)
                       }
-                      className="px-4 py-2 rounded-lg bg-gray-100 text-secondary hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-1"
+                      className="px-4 py-2 rounded-lg bg-[var(--bg-secondary)] text-secondary hover:bg-[var(--border-color)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-1"
                     >
                       <span>{t("dashboard.next")}</span>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2333,7 +2333,7 @@ const Dashboard = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
         >
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+          <div className="bg-[var(--surface-color)] rounded-2xl shadow-lg p-8 border border-[var(--border-color)]">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div>
                 <h3 className="text-lg font-semibold mb-4">{t("dashboard.dashboard_overview")}</h3>

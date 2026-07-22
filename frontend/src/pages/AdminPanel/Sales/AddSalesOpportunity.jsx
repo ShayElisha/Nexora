@@ -159,7 +159,7 @@ const AddSalesOpportunity = () => {
   };
 
   return (
-    <div className="p-6" style={{ backgroundColor: "var(--bg-color)", minHeight: "100vh" }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }}>
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <motion.div
@@ -175,24 +175,26 @@ const AddSalesOpportunity = () => {
             <ArrowLeft size={18} />
             {t("common.back") || "Back"}
           </button>
-          <h1
-            className="text-3xl font-bold mb-2"
-            style={{
-              background: "linear-gradient(135deg, var(--color-primary), var(--color-secondary))",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            {isEdit
-              ? t("sales.edit_opportunity") || "Edit Sales Opportunity"
-              : t("sales.add_opportunity") || "Add Sales Opportunity"}
-          </h1>
-          <p className="text-sm" style={{ color: "var(--color-secondary)" }}>
-            {isEdit
-              ? t("sales.update_opportunity_desc") || "Update opportunity details"
-              : t("sales.create_opportunity_desc") || "Create a new sales opportunity"}
-          </p>
+          <div className="flex items-center gap-4">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
+            >
+              <Plus size={28} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: "var(--text-color)" }}>
+                {isEdit
+                  ? t("sales.edit_opportunity") || "Edit Sales Opportunity"
+                  : t("sales.add_opportunity") || "Add Sales Opportunity"}
+              </h1>
+              <p className="text-lg" style={{ color: "var(--color-secondary)" }}>
+                {isEdit
+                  ? t("sales.update_opportunity_desc") || "Update opportunity details"
+                  : t("sales.create_opportunity_desc") || "Create a new sales opportunity"}
+              </p>
+            </div>
+          </div>
         </motion.div>
 
         {/* Form Card */}
@@ -200,7 +202,7 @@ const AddSalesOpportunity = () => {
           onSubmit={handleSubmit}
           className="rounded-2xl shadow-lg border p-6 md:p-8"
           style={{
-            backgroundColor: "var(--bg-color)",
+            backgroundColor: "var(--surface-color)",
             borderColor: "var(--border-color)",
           }}
           initial={{ opacity: 0, y: 20 }}
@@ -222,7 +224,7 @@ const AddSalesOpportunity = () => {
                   required
                   value={formData.opportunityName}
                   onChange={(e) => setFormData({ ...formData, opportunityName: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -238,7 +240,7 @@ const AddSalesOpportunity = () => {
                 <select
                   value={formData.leadId}
                   onChange={(e) => setFormData({ ...formData, leadId: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -260,7 +262,7 @@ const AddSalesOpportunity = () => {
                 <select
                   value={formData.customerId}
                   onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -283,7 +285,7 @@ const AddSalesOpportunity = () => {
                   required
                   value={formData.stage}
                   onChange={(e) => setFormData({ ...formData, stage: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -307,7 +309,7 @@ const AddSalesOpportunity = () => {
                   required
                   value={formData.assignedTo}
                   onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -340,7 +342,7 @@ const AddSalesOpportunity = () => {
                   step="0.01"
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
-                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -356,7 +358,7 @@ const AddSalesOpportunity = () => {
                 <select
                   value={formData.currency}
                   onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -378,14 +380,14 @@ const AddSalesOpportunity = () => {
                   max="100"
                   value={formData.probability}
                   onChange={(e) => setFormData({ ...formData, probability: parseInt(e.target.value) || 0 })}
-                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
                     color: "var(--text-color)",
                   }}
                 />
-                <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div className="mt-2 w-full bg-[var(--border-color)] bg-[var(--bg-secondary)] rounded-full h-2">
                   <div
                     className="h-2 rounded-full transition-all"
                     style={{
@@ -403,7 +405,7 @@ const AddSalesOpportunity = () => {
                   type="date"
                   value={formData.expectedCloseDate}
                   onChange={(e) => setFormData({ ...formData, expectedCloseDate: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -418,7 +420,7 @@ const AddSalesOpportunity = () => {
                 <select
                   value={formData.source}
                   onChange={(e) => setFormData({ ...formData, source: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -443,7 +445,7 @@ const AddSalesOpportunity = () => {
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -577,7 +579,7 @@ const AddSalesOpportunity = () => {
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+              className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all"
               style={{
                 borderColor: "var(--border-color)",
                 backgroundColor: "var(--bg-color)",
@@ -612,7 +614,7 @@ const AddSalesOpportunity = () => {
               className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl border shadow-md hover:shadow-lg transition-all"
               style={{
                 borderColor: "var(--border-color)",
-                backgroundColor: "var(--bg-color)",
+                backgroundColor: "var(--surface-color)",
                 color: "var(--text-color)",
               }}
               whileHover={{ scale: 1.02 }}

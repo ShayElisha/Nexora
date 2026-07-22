@@ -641,7 +641,7 @@ const CreateTrackingModal = ({ order, onClose, onSubmit, isLoading }) => {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-[var(--surface-color)] rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
       >
         <h2 className="text-xl font-semibold mb-4" style={{ color: "var(--text-color)" }}>

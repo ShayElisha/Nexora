@@ -43,7 +43,7 @@ const TrackDelivery = () => {
     "Out for Delivery": { bg: "bg-purple-100", text: "text-purple-800", icon: Package },
     Delivered: { bg: "bg-green-100", text: "text-green-800", icon: CheckCircle },
     Exception: { bg: "bg-red-100", text: "text-red-800", icon: AlertCircle },
-    Returned: { bg: "bg-gray-100", text: "text-gray-800", icon: Package },
+    Returned: { bg: "bg-[var(--bg-secondary)]", text: "text-[var(--text-color)]", icon: Package },
   };
 
   const statusLabels = {
@@ -142,10 +142,10 @@ const TrackDelivery = () => {
                     {tracking.trackingNumber}
                   </p>
                 </div>
-                <div className={`p-4 rounded-lg ${statusColors[tracking.shippingStatus]?.bg || "bg-gray-100"}`}>
+                <div className={`p-4 rounded-lg ${statusColors[tracking.shippingStatus]?.bg || "bg-[var(--bg-secondary)]"}`}>
                   {(statusColors[tracking.shippingStatus]?.icon || Package)({
                     size: 32,
-                    className: statusColors[tracking.shippingStatus]?.text || "text-gray-800",
+                    className: statusColors[tracking.shippingStatus]?.text || "text-[var(--text-color)]",
                   })}
                 </div>
               </div>

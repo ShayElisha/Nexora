@@ -166,7 +166,7 @@ const GlobalVacationCalculator = () => {
         {/* Header */}
         <motion.div className="mb-8" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-teal-500 to-cyan-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <CalendarDays size={28} color="white" />
             </div>
             <div>
@@ -183,7 +183,7 @@ const GlobalVacationCalculator = () => {
         {/* Main Form */}
         <motion.div
           className="rounded-2xl shadow-lg p-6 lg:p-8 border mb-8"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
           variants={cardVariant}
           initial="hidden"
           animate="visible"
@@ -337,7 +337,7 @@ const GlobalVacationCalculator = () => {
                 <button
                   type="button"
                   onClick={addCustomSeniorityRule}
-                  className="px-4 py-2 rounded-xl font-medium transition-all hover:scale-105 flex items-center gap-2 mt-2"
+                  className="px-4 h-11 rounded-lg font-medium transition-all hover:scale-105 flex items-center gap-2 mt-2"
                   style={{ backgroundColor: 'var(--color-accent)', color: 'var(--button-text)' }}
                 >
                   <Plus size={18} />
@@ -362,14 +362,14 @@ const GlobalVacationCalculator = () => {
         {selectedEmployee && (
           <motion.div
             className="rounded-2xl shadow-lg p-6 border mb-8"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
             variants={cardVariant}
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.4 }}
           >
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-green-500 to-emerald-600">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
                 <Award size={24} color="white" />
               </div>
               <div>
@@ -388,7 +388,7 @@ const GlobalVacationCalculator = () => {
         {selectedEmployee?.vacationHistory?.length > 0 && (
           <motion.div
             className="rounded-2xl shadow-lg p-6 border"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
             variants={cardVariant}
             initial="hidden"
             animate="visible"

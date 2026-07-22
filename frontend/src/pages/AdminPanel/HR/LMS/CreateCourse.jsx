@@ -89,7 +89,7 @@ const CreateCourse = () => {
             <div
               className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
               style={{
-                background: "linear-gradient(to right, var(--color-primary), var(--color-secondary))",
+                background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
               }}
             >
               <BookOpen className="w-7 h-7" style={{ color: "var(--button-text)" }} />
@@ -98,7 +98,7 @@ const CreateCourse = () => {
               <h1 className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>
                 {t("hr.lms.create_course") || "Create Course"}
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-[var(--color-secondary)] mt-1">
                 {t("hr.lms.create_new_course") || "Create a new training course"}
               </p>
             </div>
@@ -110,7 +110,7 @@ const CreateCourse = () => {
           onSubmit={handleSubmit}
           className="rounded-2xl shadow-xl p-6 sm:p-8"
           style={{
-            backgroundColor: "var(--bg-color)",
+            backgroundColor: "var(--surface-color)",
             borderColor: "var(--border-color)",
             border: "1px solid",
           }}
@@ -127,7 +127,7 @@ const CreateCourse = () => {
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                 style={{
                   borderColor: "var(--border-color)",
                   backgroundColor: "var(--bg-color)",
@@ -146,7 +146,7 @@ const CreateCourse = () => {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={6}
-                className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                 style={{
                   borderColor: "var(--border-color)",
                   backgroundColor: "var(--bg-color)",
@@ -166,7 +166,7 @@ const CreateCourse = () => {
                   type="text"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -183,7 +183,7 @@ const CreateCourse = () => {
                   type="number"
                   value={formData.duration}
                   onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -200,7 +200,7 @@ const CreateCourse = () => {
                   type="text"
                   value={formData.instructor}
                   onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -219,7 +219,7 @@ const CreateCourse = () => {
                 <select
                   value={formData.enrollmentType}
                   onChange={(e) => setFormData({ ...formData, enrollmentType: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -239,7 +239,7 @@ const CreateCourse = () => {
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -260,7 +260,7 @@ const CreateCourse = () => {
                     type="number"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    className="flex-1 px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                    className="flex-1 h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                     style={{
                       borderColor: "var(--border-color)",
                       backgroundColor: "var(--bg-color)",
@@ -318,7 +318,7 @@ const CreateCourse = () => {
                       })
                     }
                     rows={3}
-                    className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                    className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                     style={{
                       borderColor: "var(--border-color)",
                       backgroundColor: "var(--bg-color)",
@@ -340,7 +340,7 @@ const CreateCourse = () => {
                   value={newMaterial}
                   onChange={(e) => setNewMaterial(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addMaterial())}
-                  className="flex-1 px-4 py-2 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                  className="flex-1 h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -391,9 +391,9 @@ const CreateCourse = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 disabled={createMutation.isLoading}
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all shadow-lg"
+                className="flex-1 flex items-center justify-center gap-2 px-6 h-11 rounded-lg font-medium transition-all shadow-lg"
                 style={{
-                  background: "linear-gradient(to right, var(--color-primary), var(--color-secondary))",
+                  background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
                   color: "var(--button-text)",
                 }}
               >
@@ -410,7 +410,7 @@ const CreateCourse = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => navigate(-1)}
-                className="px-6 py-3 rounded-xl font-semibold transition-all"
+                className="px-6 h-11 rounded-lg font-medium transition-all"
                 style={{
                   backgroundColor: "var(--footer-bg)",
                   color: "var(--text-color)",

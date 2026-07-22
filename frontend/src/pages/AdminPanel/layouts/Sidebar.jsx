@@ -350,7 +350,7 @@ const Sidebar = () => {
               </span>
               <span className="truncate font-medium">{item.text}</span>
               {isActiveLink(item.to) && (
-                <div className={`${isRTL ? "mr-auto" : "ml-auto"} w-1.5 h-1.5 bg-white rounded-full animate-pulse`}></div>
+                <div className={`${isRTL ? "mr-auto" : "ml-auto"} w-1.5 h-1.5 bg-[var(--surface-color)] rounded-full animate-pulse`}></div>
               )}
             </Link>
           ) : (
@@ -427,7 +427,7 @@ const Sidebar = () => {
                   <span className="truncate">{link.label}</span>
                   {isActiveLink(link.to) && (
                     <div className={`${isRTL ? "mr-auto" : "ml-auto"}`}>
-                      <div className="w-2 h-2 bg-white rounded-full animate-pulse shadow-lg"></div>
+                      <div className="w-2 h-2 bg-[var(--surface-color)] rounded-full animate-pulse shadow-lg"></div>
                     </div>
                   )}
                 </Link>

@@ -63,54 +63,86 @@ const Success = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white px-4">
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 opacity-20"></div>
-      {isLoading ? (
-        <div className="flex flex-col items-center justify-center h-screen">
-          {/* Loader */}
-          <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-
-          {/* Text */}
-          <p className="mt-4 text-lg font-medium text-gray-700">
-            Processing your payment...
-          </p>
-        </div>
-      ) : error ? (
-        <>
-          <ExclamationCircleIcon className="w-16 h-16 text-red-500 mb-4" />
-          <h1 className="text-3xl font-bold text-red-600 mb-4">
-            Payment Failed
-          </h1>
-          <p className="text-lg text-gray-700 mb-8">{error}</p>
-          <button
-            onClick={handleReturnHome}
-            className="px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-          >
-            Return to Home
-          </button>
-        </>
-      ) : (
-        <>
-          <CheckCircleIcon className="w-16 h-16 text-green-500 mb-4 animate-bounce" />
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
-            Payment Successful!
-          </h1>
-          <p className="text-lg text-gray-700 mb-6 text-center max-w-2xl">
-            Thank you for your purchase. Your transaction has been successfully
-            completed, and your subscription is now active.
-          </p>
-          <p className="text-base text-gray-600 mb-8 text-center max-w-2xl">
-            An invoice has been sent to your registered email. Please check your
-            inbox for payment details and further instructions.
-          </p>
-          <button
-            onClick={handleReturnHome}
-            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold shadow-lg transition-all"
-          >
-            Return to Dashboard
-          </button>
-        </>
-      )}
+    <div
+      className="flex flex-col items-center justify-center min-h-screen px-4"
+      style={{ backgroundColor: "var(--bg-color)" }}
+    >
+      <div
+        className="text-center p-8 rounded-2xl shadow-lg max-w-2xl w-full border"
+        style={{
+          backgroundColor: "var(--surface-color)",
+          borderColor: "var(--border-color)",
+        }}
+      >
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-8">
+            <div
+              className="w-12 h-12 border-4 border-t-transparent rounded-full animate-spin"
+              style={{ borderColor: "var(--color-primary)", borderTopColor: "transparent" }}
+            ></div>
+            <p
+              className="mt-4 text-lg font-medium"
+              style={{ color: "var(--text-color)" }}
+            >
+              Processing your payment...
+            </p>
+          </div>
+        ) : error ? (
+          <>
+            <ExclamationCircleIcon className="w-16 h-16 text-red-500 mb-4 mx-auto" />
+            <h1 className="text-3xl font-bold text-red-600 mb-4">
+              Payment Failed
+            </h1>
+            <p className="text-lg mb-8" style={{ color: "var(--text-color)" }}>
+              {error}
+            </p>
+            <button
+              onClick={handleReturnHome}
+              className="px-4 py-2 rounded-lg font-semibold text-sm"
+              style={{
+                backgroundColor: "var(--bg-secondary)",
+                color: "var(--text-color)",
+              }}
+            >
+              Return to Home
+            </button>
+          </>
+        ) : (
+          <>
+            <CheckCircleIcon className="w-16 h-16 text-green-500 mb-4 mx-auto animate-bounce" />
+            <h1
+              className="text-4xl font-extrabold mb-4"
+              style={{ color: "var(--text-color)" }}
+            >
+              Payment Successful!
+            </h1>
+            <p
+              className="text-lg mb-6 text-center max-w-2xl mx-auto"
+              style={{ color: "var(--text-color)" }}
+            >
+              Thank you for your purchase. Your transaction has been successfully
+              completed, and your subscription is now active.
+            </p>
+            <p
+              className="text-base mb-8 text-center max-w-2xl mx-auto"
+              style={{ color: "var(--color-secondary)" }}
+            >
+              An invoice has been sent to your registered email. Please check your
+              inbox for payment details and further instructions.
+            </p>
+            <button
+              onClick={handleReturnHome}
+              className="px-4 py-2 rounded-lg font-semibold text-sm shadow transition-all"
+              style={{
+                backgroundColor: "var(--color-primary)",
+                color: "var(--button-text)",
+              }}
+            >
+              Return to Dashboard
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 };

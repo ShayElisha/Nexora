@@ -54,7 +54,7 @@ const ChartPanel = ({ title, chartData, emptyTitle, children }) => (
     animate={{ opacity: 1, y: 0 }}
     className="rounded-xl shadow-lg p-6"
     style={{
-      backgroundColor: "var(--bg-color)",
+      backgroundColor: "var(--surface-color)",
       borderColor: "var(--border-color)",
       border: "1px solid",
     }}
@@ -163,17 +163,25 @@ const HRAnalyticsDashboard = () => {
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }}>
       <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>
-            {t("hr.analytics.dashboard") || "HR Analytics Dashboard"}
-          </h1>
-          <p className="mt-1" style={{ color: "var(--color-secondary)" }}>
-            {t("hr.analytics.comprehensive_insights") || "Comprehensive insights into your HR operations"}
-          </p>
+        <div className="flex items-center gap-4 mb-6">
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+            style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
+          >
+            <Users size={28} className="text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold" style={{ color: "var(--text-color)" }}>
+              {t("hr.analytics.dashboard") || "HR Analytics Dashboard"}
+            </h1>
+            <p className="text-lg mt-1" style={{ color: "var(--color-secondary)" }}>
+              {t("hr.analytics.comprehensive_insights") || "Comprehensive insights into your HR operations"}
+            </p>
+          </div>
         </div>
 
         {/* Date Range Filter */}
-        <div className="rounded-xl shadow-lg p-4 mb-6" style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)", border: "1px solid" }}>
+        <div className="rounded-xl shadow-lg p-4 mb-6" style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)", border: "1px solid" }}>
         <div className="flex gap-4">
           <DateInput
             value={dateRange.start}
@@ -231,7 +239,7 @@ const HRAnalyticsDashboard = () => {
             transition={{ delay: index * 0.05 }}
             className="rounded-xl shadow-lg p-6"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
               border: "1px solid",
             }}
@@ -328,7 +336,7 @@ const HRAnalyticsDashboard = () => {
           animate={{ opacity: 1, y: 0 }}
           className="rounded-xl shadow-lg p-6"
           style={{
-            backgroundColor: "var(--bg-color)",
+            backgroundColor: "var(--surface-color)",
             borderColor: "var(--border-color)",
             border: "1px solid",
           }}
@@ -358,7 +366,7 @@ const HRAnalyticsDashboard = () => {
           animate={{ opacity: 1, y: 0 }}
           className="rounded-xl shadow-lg p-6"
           style={{
-            backgroundColor: "var(--bg-color)",
+            backgroundColor: "var(--surface-color)",
             borderColor: "var(--border-color)",
             border: "1px solid",
           }}
@@ -387,7 +395,7 @@ const HRAnalyticsDashboard = () => {
           animate={{ opacity: 1, y: 0 }}
           className="rounded-xl shadow-lg p-6"
           style={{
-            backgroundColor: "var(--bg-color)",
+            backgroundColor: "var(--surface-color)",
             borderColor: "var(--border-color)",
             border: "1px solid",
           }}
@@ -420,7 +428,7 @@ const HRAnalyticsDashboard = () => {
           animate={{ opacity: 1, y: 0 }}
           className="rounded-xl shadow-lg p-6"
           style={{
-            backgroundColor: "var(--bg-color)",
+            backgroundColor: "var(--surface-color)",
             borderColor: "var(--border-color)",
             border: "1px solid",
           }}

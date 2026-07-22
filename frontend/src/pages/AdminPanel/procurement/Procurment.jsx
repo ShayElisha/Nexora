@@ -821,7 +821,7 @@ const Procurement = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-pink-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Package size={28} color="white" />
             </div>
             <div>
@@ -839,7 +839,7 @@ const Procurement = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <motion.div
             className="rounded-2xl shadow-lg p-6 border"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -861,7 +861,7 @@ const Procurement = () => {
 
           <motion.div
             className="rounded-2xl shadow-lg p-6 border"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -883,7 +883,7 @@ const Procurement = () => {
 
           <motion.div
             className="rounded-2xl shadow-lg p-6 border"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
@@ -905,7 +905,7 @@ const Procurement = () => {
 
           <motion.div
             className="rounded-2xl shadow-lg p-6 border"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
@@ -929,20 +929,20 @@ const Procurement = () => {
         {/* Search, Sort, and Filter */}
         <motion.div
           className="mb-6 rounded-2xl shadow-lg p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-3.5 text-gray-400" size={20} />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2" size={20} style={{ color: 'var(--color-secondary)' }} />
           <input
             type="text"
             placeholder={t("procurement.search_placeholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className="w-full h-11 ps-10 pe-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 style={{ 
                   borderColor: 'var(--border-color)', 
                   backgroundColor: 'var(--bg-color)', 
@@ -954,7 +954,7 @@ const Procurement = () => {
           <select
             value={sortOption}
             onChange={(e) => setSortOption(e.target.value)}
-                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 style={{ 
                   borderColor: 'var(--border-color)', 
                   backgroundColor: 'var(--bg-color)', 
@@ -989,11 +989,11 @@ const Procurement = () => {
           </select>
             </div>
             <div className="relative">
-              <Filter className="absolute left-3 top-3.5 text-gray-400" size={20} />
+              <Filter className="absolute start-3 top-1/2 -translate-y-1/2" size={20} style={{ color: 'var(--color-secondary)' }} />
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full pl-10 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className="w-full h-11 ps-10 pe-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 style={{ 
                   borderColor: 'var(--border-color)', 
                   backgroundColor: 'var(--bg-color)', 
@@ -1026,7 +1026,7 @@ const Procurement = () => {
                   <motion.div
                   key={record._id}
                     className="rounded-2xl shadow-lg p-6 border hover:shadow-xl transition-shadow"
-                    style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                    style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
@@ -1133,7 +1133,7 @@ const Procurement = () => {
           </>
         ) : (
           <motion.div
-            className="text-center py-12"
+            className="text-center py-16"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
@@ -1156,7 +1156,7 @@ const Procurement = () => {
             >
               <motion.div
                 className="rounded-2xl shadow-2xl w-full max-w-4xl h-5/6 flex flex-col border"
-                style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
                 initial={{ scale: 0.9, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 20 }}
@@ -1195,7 +1195,7 @@ const Procurement = () => {
             >
               <motion.div
                 className="rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto border"
-                style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
                 initial={{ scale: 0.9, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 20 }}
@@ -1349,32 +1349,32 @@ const Procurement = () => {
                 </h3>
                       <div className="overflow-x-auto rounded-xl border" style={{ borderColor: 'var(--border-color)' }}>
                         <table className="w-full">
-                          <thead className="bg-gradient-to-r from-purple-500 to-pink-600">
+                          <thead style={{ backgroundColor: 'var(--color-primary)' }}>
                             <tr>
-                              <th className="py-3 px-4 text-sm font-semibold text-white text-left">
+                              <th className="py-3 px-4 text-sm font-semibold text-left" style={{ color: 'var(--button-text)' }}>
                           {t("procurement.product_name")}
                         </th>
-                              <th className="py-3 px-4 text-sm font-semibold text-white text-left">
+                              <th className="py-3 px-4 text-sm font-semibold text-left" style={{ color: 'var(--button-text)' }}>
                           {t("procurement.sku")}
                         </th>
-                              <th className="py-3 px-4 text-sm font-semibold text-white text-left">
+                              <th className="py-3 px-4 text-sm font-semibold text-left" style={{ color: 'var(--button-text)' }}>
                           {t("procurement.category")}
                         </th>
-                              <th className="py-3 px-4 text-sm font-semibold text-white text-left">
+                              <th className="py-3 px-4 text-sm font-semibold text-left" style={{ color: 'var(--button-text)' }}>
                           {t("procurement.quantity")}
                         </th>
-                              <th className="py-3 px-4 text-sm font-semibold text-white text-left">
+                              <th className="py-3 px-4 text-sm font-semibold text-left" style={{ color: 'var(--button-text)' }}>
                           {t("procurement.unit_price")}
                         </th>
-                              <th className="py-3 px-4 text-sm font-semibold text-white text-left">
+                              <th className="py-3 px-4 text-sm font-semibold text-left" style={{ color: 'var(--button-text)' }}>
                           {t("procurement.total")}
                         </th>
-                              <th className="py-3 px-4 text-sm font-semibold text-white text-left">
+                              <th className="py-3 px-4 text-sm font-semibold text-left" style={{ color: 'var(--button-text)' }}>
                           {t("procurement.actions")}
                         </th>
                       </tr>
                     </thead>
-                          <tbody style={{ backgroundColor: 'var(--bg-color)' }}>
+                          <tbody style={{ backgroundColor: 'var(--surface-color)' }}>
                       {formData.products?.map((product, index) => (
                         <tr
                           key={index}
@@ -1460,7 +1460,7 @@ const Procurement = () => {
                       </div>
                 </div>
 
-                    <div className="rounded-xl p-4 border" style={{ backgroundColor: 'var(--border-color)', borderColor: 'var(--border-color)' }}>
+                    <div className="rounded-xl p-4 border" style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
                       <h3 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
                         <Plus size={20} />
                   {t("procurement.AddNewProduct")}
@@ -1619,10 +1619,10 @@ const Procurement = () => {
                       </div>
                 </div>
 
-                    <div className="flex justify-end gap-4">
+                    <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
                   <button
                     type="button"
-                        className="px-6 py-3 rounded-xl font-bold transition-all hover:scale-105 flex items-center gap-2"
+                        className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition-all hover:scale-105 flex items-center justify-center gap-2"
                         style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
                     onClick={() => setIsModalOpen(false)}
                   >
@@ -1631,7 +1631,7 @@ const Procurement = () => {
                   </button>
                   <button
                     type="button"
-                        className="px-6 py-3 rounded-xl font-bold transition-all hover:scale-105 flex items-center gap-2"
+                        className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition-all hover:scale-105 flex items-center justify-center gap-2"
                         style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
                     onClick={handleModalSave}
                   >

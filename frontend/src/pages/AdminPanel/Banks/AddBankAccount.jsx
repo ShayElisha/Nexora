@@ -119,7 +119,13 @@ const AddBankAccount = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-purple-600">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{
+                background:
+                  "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
+              }}
+            >
               <CreditCard size={28} color="white" />
             </div>
             <div>
@@ -136,7 +142,7 @@ const AddBankAccount = () => {
         <motion.form
           onSubmit={handleSubmit}
           className="rounded-2xl shadow-lg border p-6 sm:p-8"
-          style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+          style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -144,15 +150,16 @@ const AddBankAccount = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
               <label className="block text-sm font-bold mb-2" style={{ color: "var(--text-color)" }}>
-                <CreditCard className="inline mr-2" size={16} />
-                {t("accounting.account_name")} *
+                <CreditCard className="inline me-2" size={16} />
+                {t("accounting.account_name")}
+                <span className="text-red-500 ms-1">*</span>
               </label>
               <input
                 type="text"
                 required
                 value={formData.accountName}
                 onChange={(e) => setFormData({ ...formData, accountName: e.target.value })}
-                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                 style={{
                   borderColor: "var(--border-color)",
                   backgroundColor: "var(--bg-color)",
@@ -163,15 +170,16 @@ const AddBankAccount = () => {
             </div>
             <div>
               <label className="block text-sm font-bold mb-2" style={{ color: "var(--text-color)" }}>
-                <Building2 className="inline mr-2" size={16} />
-                {t("accounting.bank_name")} *
+                <Building2 className="inline me-2" size={16} />
+                {t("accounting.bank_name")}
+                <span className="text-red-500 ms-1">*</span>
               </label>
               <input
                 type="text"
                 required
                 value={formData.bankName}
                 onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
-                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                 style={{
                   borderColor: "var(--border-color)",
                   backgroundColor: "var(--bg-color)",
@@ -182,15 +190,16 @@ const AddBankAccount = () => {
             </div>
             <div>
               <label className="block text-sm font-bold mb-2" style={{ color: "var(--text-color)" }}>
-                <Hash className="inline mr-2" size={16} />
-                {t("accounting.account_number")} *
+                <Hash className="inline me-2" size={16} />
+                {t("accounting.account_number")}
+                <span className="text-red-500 ms-1">*</span>
               </label>
               <input
                 type="text"
                 required
                 value={formData.accountNumber}
                 onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
-                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                 style={{
                   borderColor: "var(--border-color)",
                   backgroundColor: "var(--bg-color)",
@@ -201,14 +210,14 @@ const AddBankAccount = () => {
             </div>
             <div>
               <label className="block text-sm font-bold mb-2" style={{ color: "var(--text-color)" }}>
-                <MapPin className="inline mr-2" size={16} />
+                <MapPin className="inline me-2" size={16} />
                 {t("accounting.branch_number")}
               </label>
               <input
                 type="text"
                 value={formData.branchNumber}
                 onChange={(e) => setFormData({ ...formData, branchNumber: e.target.value })}
-                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                 style={{
                   borderColor: "var(--border-color)",
                   backgroundColor: "var(--bg-color)",
@@ -219,13 +228,13 @@ const AddBankAccount = () => {
             </div>
             <div>
               <label className="block text-sm font-bold mb-2" style={{ color: "var(--text-color)" }}>
-                <Type className="inline mr-2" size={16} />
+                <Type className="inline me-2" size={16} />
                 {t("accounting.account_type")}
               </label>
               <select
                 value={formData.accountType}
                 onChange={(e) => setFormData({ ...formData, accountType: e.target.value })}
-                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                 style={{
                   borderColor: "var(--border-color)",
                   backgroundColor: "var(--bg-color)",
@@ -241,13 +250,13 @@ const AddBankAccount = () => {
             </div>
             <div>
               <label className="block text-sm font-bold mb-2" style={{ color: "var(--text-color)" }}>
-                <DollarSign className="inline mr-2" size={16} />
+                <DollarSign className="inline me-2" size={16} />
                 {t("accounting.currency")}
               </label>
               <select
                 value={formData.currency}
                 onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                 style={{
                   borderColor: "var(--border-color)",
                   backgroundColor: "var(--bg-color)",
@@ -263,7 +272,7 @@ const AddBankAccount = () => {
             </div>
             <div>
               <label className="block text-sm font-bold mb-2" style={{ color: "var(--text-color)" }}>
-                <DollarSign className="inline mr-2" size={16} />
+                <DollarSign className="inline me-2" size={16} />
                 {t("accounting.opening_balance")}
               </label>
               <input
@@ -271,7 +280,7 @@ const AddBankAccount = () => {
                 step="0.01"
                 value={formData.openingBalance}
                 onChange={(e) => setFormData({ ...formData, openingBalance: parseFloat(e.target.value) || 0 })}
-                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                 style={{
                   borderColor: "var(--border-color)",
                   backgroundColor: "var(--bg-color)",
@@ -282,13 +291,13 @@ const AddBankAccount = () => {
             </div>
             <div>
               <label className="block text-sm font-bold mb-2" style={{ color: "var(--text-color)" }}>
-                <LinkIcon className="inline mr-2" size={16} />
+                <LinkIcon className="inline me-2" size={16} />
                 {t("accounting.link_account")}
               </label>
               <select
                 value={formData.accountId}
                 onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
-                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                 style={{
                   borderColor: "var(--border-color)",
                   backgroundColor: "var(--bg-color)",
@@ -309,7 +318,7 @@ const AddBankAccount = () => {
 
           <div className="mb-6">
             <label className="block text-sm font-bold mb-2" style={{ color: "var(--text-color)" }}>
-              <FileText className="inline mr-2" size={16} />
+              <FileText className="inline me-2" size={16} />
               {t("accounting.notes")}
             </label>
             <textarea
@@ -326,11 +335,11 @@ const AddBankAccount = () => {
             />
           </div>
 
-          <div className="flex gap-4 justify-end">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
             <button
               type="button"
               onClick={() => navigate("/dashboard/banks/accounts")}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all hover:scale-105"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 h-11 rounded-lg font-medium transition-all hover:scale-105"
               style={{
                 backgroundColor: "var(--border-color)",
                 color: "var(--text-color)",
@@ -342,7 +351,7 @@ const AddBankAccount = () => {
             <button
               type="submit"
               disabled={mutation.isLoading}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold shadow-lg transition-all hover:scale-105 disabled:opacity-50"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 h-11 rounded-lg font-medium shadow-lg transition-all hover:scale-105 disabled:opacity-50"
               style={{
                 backgroundColor: "var(--color-primary)",
                 color: "var(--button-text)",

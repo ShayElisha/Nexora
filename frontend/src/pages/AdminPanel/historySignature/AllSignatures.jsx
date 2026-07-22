@@ -139,7 +139,7 @@ const AllSignatures = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-indigo-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <FileSignature size={28} color="white" />
             </div>
             <div>
@@ -168,7 +168,7 @@ const AllSignatures = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -188,7 +188,7 @@ const AllSignatures = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -208,7 +208,7 @@ const AllSignatures = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -228,7 +228,7 @@ const AllSignatures = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -287,7 +287,7 @@ const AllSignatures = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               className="rounded-2xl shadow-lg border overflow-hidden"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
             >
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -397,7 +397,7 @@ const AllSignatures = () => {
                                     }
                                   />
                                 ) : (
-                                    <div className="w-10 h-10 flex items-center justify-center bg-gray-200 text-gray-500 text-xs rounded">
+                                    <div className="w-10 h-10 flex items-center justify-center bg-[var(--border-color)] text-[var(--color-secondary)] text-xs rounded">
                                       N/A
                                   </div>
                                 )}
@@ -467,7 +467,7 @@ const AllSignatures = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               className="rounded-2xl shadow-lg border overflow-hidden"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
             >
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -567,7 +567,7 @@ const AllSignatures = () => {
                                     }
                                   />
                                 ) : (
-                                    <div className="w-10 h-10 flex items-center justify-center bg-gray-200 text-gray-500 text-xs rounded">
+                                    <div className="w-10 h-10 flex items-center justify-center bg-[var(--border-color)] text-[var(--color-secondary)] text-xs rounded">
                                       N/A
                                   </div>
                                 )}
@@ -601,7 +601,7 @@ const AllSignatures = () => {
                                   : displayStatus === "rejected"
                                   ? "bg-red-100 text-red-700"
                                   : displayStatus === "draft"
-                                  ? "bg-gray-100 text-gray-700"
+                                  ? "bg-[var(--bg-secondary)] text-[var(--text-color)]"
                                   : "bg-yellow-100 text-yellow-700"
                               }`}
                             >
@@ -635,7 +635,7 @@ const AllSignatures = () => {
             >
               <motion.div
                 className="rounded-2xl p-6 max-w-4xl w-full shadow-2xl border relative"
-                style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
                 onClick={(e) => e.stopPropagation()}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}

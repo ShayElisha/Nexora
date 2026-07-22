@@ -121,9 +121,9 @@ const MyShifts = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-4">
-            <div 
+            <div
               className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
-              style={{ backgroundColor: 'var(--color-primary)' }}
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
             >
               <User size={28} style={{ color: 'var(--button-text)' }} />
             </div>
@@ -146,14 +146,14 @@ const MyShifts = () => {
               value: stats.totalShifts, 
               icon: Briefcase, 
               color: "#3b82f6",
-              gradient: "from-blue-500 to-blue-600"
+              gradient: "from-[var(--color-primary)] to-[var(--color-primary)]"
             },
             { 
               label: t("myShifts.totalHours"), 
               value: stats.totalHours.toFixed(1), 
               icon: Clock, 
               color: "#10b981",
-              gradient: "from-green-500 to-green-600"
+              gradient: "from-[var(--color-accent)] to-[var(--color-accent)]"
             },
             { 
               label: t("myShifts.totalEarnings"), 
@@ -167,7 +167,7 @@ const MyShifts = () => {
               value: `${stats.avgJobPercentage}%`, 
               icon: PieChart, 
               color: "#8b5cf6",
-              gradient: "from-purple-500 to-purple-600"
+              gradient: "from-[var(--color-secondary)] to-[var(--color-secondary)]"
             },
           ].map((stat, index) => (
             <motion.div
@@ -178,7 +178,7 @@ const MyShifts = () => {
               transition={{ delay: index * 0.1 }}
               className="rounded-2xl shadow-lg p-6 border hover:shadow-xl transition-all"
               style={{ 
-                backgroundColor: 'var(--bg-color)',
+                backgroundColor: "var(--surface-color)",
                 borderColor: 'var(--border-color)'
               }}
               whileHover={{ y: -5 }}
@@ -205,7 +205,7 @@ const MyShifts = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <motion.div
             className="rounded-2xl shadow-lg p-6 border"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
@@ -220,7 +220,7 @@ const MyShifts = () => {
 
           <motion.div
             className="rounded-2xl shadow-lg p-6 border"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.5 }}
@@ -247,7 +247,7 @@ const MyShifts = () => {
         ) : shifts.length === 0 ? (
           <motion.div
             className="text-center py-16 rounded-2xl shadow-lg"
-            style={{ backgroundColor: 'var(--bg-color)' }}
+            style={{ backgroundColor: "var(--surface-color)" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
@@ -267,7 +267,7 @@ const MyShifts = () => {
                 transition={{ delay: index * 0.05 }}
                 className="rounded-2xl shadow-lg overflow-hidden border hover:shadow-xl transition-all"
                 style={{ 
-                  backgroundColor: 'var(--bg-color)',
+                  backgroundColor: "var(--surface-color)",
                   borderColor: 'var(--border-color)'
                 }}
               >
@@ -415,7 +415,7 @@ const MyShifts = () => {
                             transition={{ delay: idx * 0.1 }}
                             className="p-4 rounded-xl border hover:shadow-lg transition-all"
                             style={{ 
-                              backgroundColor: 'var(--bg-color)',
+                              backgroundColor: "var(--surface-color)",
                               borderColor: 'var(--color-primary)'
                             }}
                           >

@@ -1422,7 +1422,7 @@ const AddProcurement = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-cyan-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <ShoppingCart size={28} color="white" />
             </div>
             <div className="flex-1">
@@ -1440,7 +1440,7 @@ const AddProcurement = () => {
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
-              className="mb-4 p-4 bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-300 rounded-xl shadow-lg"
+              className="mb-4 p-4 bg-[var(--bg-secondary)] border-2 border-[var(--border-color)] rounded-xl shadow-lg"
             >
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -1451,16 +1451,16 @@ const AddProcurement = () => {
                     ⚠️ התראת מלאי נמוך - {inventoryInfo.productName}
                   </h3>
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-white p-3 rounded-lg border border-orange-200">
-                      <p className="text-xs text-gray-600">מלאי נוכחי:</p>
+                    <div className="bg-[var(--surface-color)] p-3 rounded-lg border border-[var(--border-color)]">
+                      <p className="text-xs text-[var(--color-secondary)]">מלאי נוכחי:</p>
                       <p className="text-xl font-bold text-red-600">{inventoryInfo.currentQuantity}</p>
                     </div>
-                    <div className="bg-white p-3 rounded-lg border border-orange-200">
-                      <p className="text-xs text-gray-600">מלאי מינימלי:</p>
+                    <div className="bg-[var(--surface-color)] p-3 rounded-lg border border-[var(--border-color)]">
+                      <p className="text-xs text-[var(--color-secondary)]">מלאי מינימלי:</p>
                       <p className="text-xl font-bold text-orange-600">{inventoryInfo.minStockLevel}</p>
                     </div>
-                    <div className="bg-white p-3 rounded-lg border border-green-200">
-                      <p className="text-xs text-gray-600">כמות מומלצת להזמנה:</p>
+                    <div className="bg-[var(--surface-color)] p-3 rounded-lg border border-[var(--border-color)]">
+                      <p className="text-xs text-[var(--color-secondary)]">כמות מומלצת להזמנה:</p>
                       <p className="text-xl font-bold text-green-600">{inventoryInfo.reorderQuantity}</p>
                     </div>
                   </div>
@@ -1490,7 +1490,8 @@ const AddProcurement = () => {
             </div>
             <div className="w-full h-3 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--border-color)' }}>
               <motion.div
-                className="h-full bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full"
+                className="h-full rounded-full"
+                style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
                 initial={{ width: 0 }}
                 animate={{ width: `${getFormCompletionPercentage()}%` }}
                 transition={{ duration: 0.5 }}
@@ -1559,7 +1560,7 @@ const AddProcurement = () => {
       {/* Supplier Section */}
         <motion.div
           className="mb-6 rounded-2xl shadow-lg p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -1577,7 +1578,7 @@ const AddProcurement = () => {
         {(selectedSupplier || formData.supplierName) && (
             <motion.div
               className="mt-4 p-4 rounded-xl border"
-              style={{ backgroundColor: 'var(--border-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
             >
@@ -1624,7 +1625,7 @@ const AddProcurement = () => {
       {/* Payment and Shipping Section */}
         <motion.div
           className="mb-6 rounded-2xl shadow-lg p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -1657,7 +1658,7 @@ const AddProcurement = () => {
         >
         <button
           onClick={() => setShowSignatureModal(true)}
-            className="px-6 py-3 rounded-xl font-bold shadow-lg transition-all hover:scale-105 flex items-center gap-2"
+            className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-2"
             style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
         >
             <Users size={20} />
@@ -1666,7 +1667,7 @@ const AddProcurement = () => {
         {newSigners.length > 0 && (
             <motion.div
               className="mt-4 rounded-xl shadow-lg p-4 border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
             >
@@ -1710,7 +1711,7 @@ const AddProcurement = () => {
       {/* Products Section */}
         <motion.div
           className="mb-6 rounded-2xl shadow-lg p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
@@ -1746,7 +1747,7 @@ const AddProcurement = () => {
                 <h3 className="text-xl font-bold" style={{ color: 'var(--text-color)' }}>
               {t("procurement.products_list")}
             </h3>
-                <div className="px-4 py-2 rounded-lg" style={{ backgroundColor: 'var(--border-color)' }}>
+                <div className="px-4 py-2 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                   <span className="text-sm font-medium" style={{ color: 'var(--text-color)' }}>
                     {products.length} {t("procurement.products")}
                   </span>
@@ -1754,35 +1755,35 @@ const AddProcurement = () => {
               </div>
               <div className="overflow-x-auto rounded-xl border" style={{ borderColor: 'var(--border-color)' }}>
                 <table className="min-w-full">
-                  <thead className="bg-gradient-to-r from-blue-500 to-cyan-600">
+                  <thead style={{ backgroundColor: 'var(--color-primary)' }}>
                     <tr>
-                      <th className="py-3 px-4 text-left text-sm font-bold text-white">
+                      <th className="py-3 px-4 text-left text-sm font-bold" style={{ color: 'var(--button-text)' }}>
                         #
                       </th>
-                      <th className="py-3 px-4 text-left text-sm font-bold text-white">
+                      <th className="py-3 px-4 text-left text-sm font-bold" style={{ color: 'var(--button-text)' }}>
                       {t("procurement.name")}
                     </th>
-                      <th className="py-3 px-4 text-left text-sm font-bold text-white">
+                      <th className="py-3 px-4 text-left text-sm font-bold" style={{ color: 'var(--button-text)' }}>
                       {t("procurement.sku")}
                     </th>
-                      <th className="py-3 px-4 text-left text-sm font-bold text-white">
+                      <th className="py-3 px-4 text-left text-sm font-bold" style={{ color: 'var(--button-text)' }}>
                       {t("procurement.category")}
                     </th>
-                      <th className="py-3 px-4 text-left text-sm font-bold text-white">
+                      <th className="py-3 px-4 text-left text-sm font-bold" style={{ color: 'var(--button-text)' }}>
                       {t("procurement.quantity")}
                     </th>
-                      <th className="py-3 px-4 text-left text-sm font-bold text-white">
+                      <th className="py-3 px-4 text-left text-sm font-bold" style={{ color: 'var(--button-text)' }}>
                       {t("procurement.unit_price")}
                     </th>
-                      <th className="py-3 px-4 text-left text-sm font-bold text-white">
+                      <th className="py-3 px-4 text-left text-sm font-bold" style={{ color: 'var(--button-text)' }}>
                       {t("procurement.total")}
                     </th>
-                      <th className="py-3 px-4 text-center text-sm font-bold text-white">
+                      <th className="py-3 px-4 text-center text-sm font-bold" style={{ color: 'var(--button-text)' }}>
                         {t("procurement.actions")}
                     </th>
                   </tr>
                 </thead>
-                  <tbody style={{ backgroundColor: 'var(--bg-color)' }}>
+                  <tbody style={{ backgroundColor: 'var(--surface-color)' }}>
                     <AnimatePresence>
                   {products.map((p, index) => (
                         <motion.tr
@@ -1848,7 +1849,7 @@ const AddProcurement = () => {
         {products.length > 0 && (
           <motion.div
             className="mb-6 rounded-2xl shadow-lg p-6 border"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
@@ -1861,7 +1862,7 @@ const AddProcurement = () => {
       </div>
             
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--border-color)' }}>
+              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                 <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
                   {t("procurement.supplier")}
                 </p>
@@ -1870,7 +1871,7 @@ const AddProcurement = () => {
                 </p>
               </div>
               
-              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--border-color)' }}>
+              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                 <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
                   {t("procurement.total_products")}
                 </p>
@@ -1879,7 +1880,7 @@ const AddProcurement = () => {
                 </p>
               </div>
               
-              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--border-color)' }}>
+              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                 <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
                   {t("procurement.total_discount", { defaultValue: "Total Discount" })}
                 </p>
@@ -1905,7 +1906,7 @@ const AddProcurement = () => {
                 </p>
               </div>
               
-              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--border-color)' }}>
+              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                 <p className="text-sm font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
                   {t("procurement.total_cost")}
                 </p>
@@ -1916,12 +1917,12 @@ const AddProcurement = () => {
             </div>
 
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-color)' }}>
+              <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                 <p className="text-sm" style={{ color: 'var(--text-color)' }}>
                   <strong>{t("procurement.payment_method")}:</strong> {formData.PaymentMethod || '-'}
                 </p>
               </div>
-              <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-color)' }}>
+              <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                 <p className="text-sm" style={{ color: 'var(--text-color)' }}>
                   <strong>{t("procurement.signers")}:</strong> {newSigners.length || 0}
                 </p>
@@ -1946,7 +1947,7 @@ const AddProcurement = () => {
               !hasShippingAddress ||
               products.length === 0
             }
-            className="px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all hover:scale-105 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
         >
             <Eye size={24} />

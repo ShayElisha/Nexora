@@ -172,7 +172,7 @@ const AddSupplierInvoice = () => {
   };
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--bg-color)' }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -183,7 +183,7 @@ const AddSupplierInvoice = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate("/dashboard/procurement/supplier-invoices")}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
               style={{ color: 'var(--text-color)' }}
             >
               <ArrowLeft size={24} />
@@ -194,7 +194,7 @@ const AddSupplierInvoice = () => {
                   ? t("procurement.edit_supplier_invoice") || "Edit Supplier Invoice"
                   : t("procurement.add_supplier_invoice") || "Add Supplier Invoice"}
               </h1>
-              <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-secondary)' }}>
                 {t("procurement.fill_invoice_details") || "Fill in the details below to create a supplier invoice"}
               </p>
             </div>
@@ -202,7 +202,7 @@ const AddSupplierInvoice = () => {
         </div>
 
         {/* Form Card */}
-        <form onSubmit={handleSubmit} className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+        <form onSubmit={handleSubmit} className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           <div className="p-6 space-y-6">
             {/* Basic Information Section */}
             <div>
@@ -218,7 +218,7 @@ const AddSupplierInvoice = () => {
                     required
                     value={formData.supplierId}
                     onChange={(e) => setFormData({ ...formData, supplierId: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -243,7 +243,7 @@ const AddSupplierInvoice = () => {
                     required
                     value={formData.supplierInvoiceNumber}
                     onChange={(e) => setFormData({ ...formData, supplierInvoiceNumber: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -261,7 +261,7 @@ const AddSupplierInvoice = () => {
                     required
                     value={formData.invoiceDate}
                     onChange={(e) => setFormData({ ...formData, invoiceDate: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -279,7 +279,7 @@ const AddSupplierInvoice = () => {
                     required
                     value={formData.dueDate}
                     onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -295,7 +295,7 @@ const AddSupplierInvoice = () => {
                   <select
                     value={formData.currency}
                     onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -315,7 +315,7 @@ const AddSupplierInvoice = () => {
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -342,7 +342,7 @@ const AddSupplierInvoice = () => {
                 <button
                   type="button"
                   onClick={addItem}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-white hover:opacity-90 transition"
+                  className="flex items-center gap-2 px-4 h-11 rounded-lg text-white hover:opacity-90 transition"
                   style={{ backgroundColor: 'var(--color-primary)' }}
                 >
                   <Plus size={18} />
@@ -351,7 +351,7 @@ const AddSupplierInvoice = () => {
               </div>
               {formData.items.length === 0 ? (
                 <div className="text-center py-8 border-2 border-dashed rounded-lg" style={{ borderColor: 'var(--border-color)' }}>
-                  <p style={{ color: 'var(--text-secondary)' }}>
+                  <p style={{ color: 'var(--color-secondary)' }}>
                     {t("procurement.no_items") || "No items added yet. Click 'Add Item' to get started."}
                   </p>
                 </div>
@@ -363,7 +363,7 @@ const AddSupplierInvoice = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="p-4 rounded-lg border"
-                      style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)' }}
+                      style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--surface-color)' }}
                     >
                       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                         <div className="md:col-span-2">
@@ -374,7 +374,7 @@ const AddSupplierInvoice = () => {
                             required
                             value={item.productId}
                             onChange={(e) => updateItem(index, "productId", e.target.value)}
-                            className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                            className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                             style={{ 
                               borderColor: 'var(--border-color)', 
                               backgroundColor: 'var(--bg-color)', 
@@ -399,7 +399,7 @@ const AddSupplierInvoice = () => {
                             min="1"
                             value={item.quantity}
                             onChange={(e) => updateItem(index, "quantity", parseFloat(e.target.value) || 0)}
-                            className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                            className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                             style={{ 
                               borderColor: 'var(--border-color)', 
                               backgroundColor: 'var(--bg-color)', 
@@ -418,7 +418,7 @@ const AddSupplierInvoice = () => {
                             min="0"
                             value={item.unitPrice}
                             onChange={(e) => updateItem(index, "unitPrice", parseFloat(e.target.value) || 0)}
-                            className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                            className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                             style={{ 
                               borderColor: 'var(--border-color)', 
                               backgroundColor: 'var(--bg-color)', 
@@ -436,7 +436,7 @@ const AddSupplierInvoice = () => {
                             step="0.01"
                             value={item.totalPrice}
                             readOnly
-                            className="w-full px-4 py-2 rounded-lg border"
+                            className="w-full px-4 h-11 rounded-lg border"
                             style={{ 
                               borderColor: 'var(--border-color)', 
                               backgroundColor: 'var(--bg-secondary)', 
@@ -448,7 +448,7 @@ const AddSupplierInvoice = () => {
                           <button
                             type="button"
                             onClick={() => removeItem(index)}
-                            className="w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                            className="w-full p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                           >
                             <Trash2 size={18} className="text-red-500 mx-auto" />
                           </button>
@@ -537,7 +537,7 @@ const AddSupplierInvoice = () => {
               <button
                 type="submit"
                 disabled={mutation.isLoading}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg text-white hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 h-11 rounded-lg text-white hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: 'var(--color-primary)' }}
               >
                 {mutation.isLoading ? (
@@ -555,7 +555,7 @@ const AddSupplierInvoice = () => {
               <button
                 type="button"
                 onClick={() => navigate("/dashboard/procurement/supplier-invoices")}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                className="flex items-center gap-2 px-6 h-11 rounded-lg border hover:bg-[var(--bg-secondary)] transition"
                 style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
               >
                 <X size={20} />

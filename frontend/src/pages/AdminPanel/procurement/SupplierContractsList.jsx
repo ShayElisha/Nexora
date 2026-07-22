@@ -58,13 +58,13 @@ const SupplierContractsList = () => {
 
   const getStatusColor = (status) => {
     const colors = {
-      Draft: "bg-gray-100 text-gray-800",
+      Draft: "bg-[var(--bg-secondary)] text-[var(--text-color)]",
       Active: "bg-green-100 text-green-800",
       Expired: "bg-red-100 text-red-800",
       Terminated: "bg-orange-100 text-orange-800",
       Renewed: "bg-blue-100 text-blue-800",
     };
-    return colors[status] || "bg-gray-100 text-gray-800";
+    return colors[status] || "bg-[var(--bg-secondary)] text-[var(--text-color)]";
   };
 
   if (isLoading) {
@@ -96,24 +96,32 @@ const SupplierContractsList = () => {
   }
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--bg-color)' }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-7xl mx-auto"
       >
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
-              {t("procurement.supplier_contracts") || "Supplier Contracts"}
-            </h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
-              {t("procurement.supplier_contracts_description") || "Manage and track supplier contracts"}
-            </p>
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
+            >
+              <FileText size={28} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
+                {t("procurement.supplier_contracts") || "Supplier Contracts"}
+              </h1>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-secondary)' }}>
+                {t("procurement.supplier_contracts_description") || "Manage and track supplier contracts"}
+              </p>
+            </div>
           </div>
           <button
             onClick={() => navigate("/dashboard/procurement/supplier-contracts/add")}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-white hover:opacity-90 transition"
+            className="flex items-center gap-2 px-4 h-11 rounded-lg text-white hover:opacity-90 transition"
             style={{ backgroundColor: 'var(--color-primary)' }}
           >
             <Plus size={20} />
@@ -121,17 +129,17 @@ const SupplierContractsList = () => {
           </button>
         </div>
 
-        <div className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+        <div className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           <div className="p-6">
             <div className="flex flex-col md:flex-row gap-4 mb-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={20} style={{ color: 'var(--text-secondary)' }} />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={20} style={{ color: 'var(--color-secondary)' }} />
                 <input
                   type="text"
                   placeholder={t("procurement.search_contracts") || "Search contracts..."}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                  className="w-full pl-10 pr-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                   style={{ 
                     borderColor: 'var(--border-color)', 
                     backgroundColor: 'var(--bg-color)', 
@@ -143,7 +151,7 @@ const SupplierContractsList = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                className="px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                 style={{ 
                   borderColor: 'var(--border-color)', 
                   backgroundColor: 'var(--bg-color)', 
@@ -164,8 +172,8 @@ const SupplierContractsList = () => {
           {filteredContracts.length === 0 ? (
             <div className="px-6 pb-6">
               <div className="text-center py-12 border-2 border-dashed rounded-lg" style={{ borderColor: 'var(--border-color)' }}>
-                <FileText size={64} className="mx-auto mb-4" style={{ color: 'var(--text-secondary)' }} />
-                <p style={{ color: 'var(--text-secondary)' }}>
+                <FileText size={64} className="mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
+                <p style={{ color: 'var(--color-secondary)' }}>
                   {t("procurement.no_contracts") || "No contracts found"}
                 </p>
               </div>
@@ -205,7 +213,7 @@ const SupplierContractsList = () => {
                   {filteredContracts.map((contract) => (
                     <motion.tr
                       key={contract._id}
-                      className="border-b hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                      className="border-b hover:bg-[var(--bg-secondary)] transition"
                       style={{ borderColor: 'var(--border-color)' }}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -244,7 +252,7 @@ const SupplierContractsList = () => {
                         <div className="flex gap-2">
                           <button
                             onClick={() => navigate(`/dashboard/procurement/supplier-contracts/${contract._id}`)}
-                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                            className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                             style={{ color: 'var(--color-primary)' }}
                           >
                             <Edit size={18} />
@@ -256,7 +264,7 @@ const SupplierContractsList = () => {
                                 deleteMutation.mutate(contract._id);
                               }
                             }}
-                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                            className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                           >
                             <Trash2 size={18} className="text-red-500" />
                           </button>

@@ -109,7 +109,7 @@ const CreateJobPosting = () => {
             <div
               className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
               style={{
-                background: "linear-gradient(to right, var(--color-primary), var(--color-secondary))",
+                background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
               }}
             >
               <Briefcase className="w-7 h-7" style={{ color: "var(--button-text)" }} />
@@ -130,7 +130,7 @@ const CreateJobPosting = () => {
           onSubmit={handleSubmit}
           className="rounded-2xl shadow-xl p-6 sm:p-8"
           style={{
-            backgroundColor: "var(--bg-color)",
+            backgroundColor: "var(--surface-color)",
             borderColor: "var(--border-color)",
             border: "1px solid",
           }}
@@ -147,7 +147,7 @@ const CreateJobPosting = () => {
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                 style={{
                   borderColor: "var(--border-color)",
                   backgroundColor: "var(--bg-color)",
@@ -167,7 +167,7 @@ const CreateJobPosting = () => {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={6}
-                className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                 style={{
                   borderColor: "var(--border-color)",
                   backgroundColor: "var(--bg-color)",
@@ -187,7 +187,7 @@ const CreateJobPosting = () => {
                   type="text"
                   value={formData.department}
                   onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -204,7 +204,7 @@ const CreateJobPosting = () => {
                   type="text"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -220,7 +220,7 @@ const CreateJobPosting = () => {
                 <select
                   value={formData.employmentType}
                   onChange={(e) => setFormData({ ...formData, employmentType: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -250,7 +250,7 @@ const CreateJobPosting = () => {
                       salaryRange: { ...formData.salaryRange, min: e.target.value },
                     })
                   }
-                  className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -272,7 +272,7 @@ const CreateJobPosting = () => {
                       salaryRange: { ...formData.salaryRange, max: e.target.value },
                     })
                   }
-                  className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -293,7 +293,7 @@ const CreateJobPosting = () => {
                       salaryRange: { ...formData.salaryRange, currency: e.target.value },
                     })
                   }
-                  className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -318,7 +318,7 @@ const CreateJobPosting = () => {
                   value={newRequirement}
                   onChange={(e) => setNewRequirement(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addRequirement())}
-                  className="flex-1 px-4 py-2 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                  className="flex-1 h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -366,7 +366,7 @@ const CreateJobPosting = () => {
                   value={newResponsibility}
                   onChange={(e) => setNewResponsibility(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addResponsibility())}
-                  className="flex-1 px-4 py-2 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                  className="flex-1 h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -422,7 +422,7 @@ const CreateJobPosting = () => {
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",

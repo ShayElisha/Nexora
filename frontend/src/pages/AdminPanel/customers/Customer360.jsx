@@ -117,7 +117,7 @@ const Customer360 = () => {
         <div className="mb-6 flex items-center gap-4">
           <button
             onClick={() => navigate("/dashboard/customers")}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="p-2 rounded-lg hover:bg-[var(--bg-secondary)]"
             style={{ color: 'var(--text-color)' }}
           >
             <ArrowLeft size={24} />
@@ -136,7 +136,7 @@ const Customer360 = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6"
+          className="bg-[var(--surface-color)] bg-[var(--surface-color)] rounded-lg shadow-md p-6 mb-6"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div>
@@ -187,7 +187,7 @@ const Customer360 = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4"
+            className="bg-[var(--surface-color)] bg-[var(--surface-color)] rounded-lg shadow-md p-4"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -206,7 +206,7 @@ const Customer360 = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4"
+            className="bg-[var(--surface-color)] bg-[var(--surface-color)] rounded-lg shadow-md p-4"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -225,7 +225,7 @@ const Customer360 = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4"
+            className="bg-[var(--surface-color)] bg-[var(--surface-color)] rounded-lg shadow-md p-4"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -244,7 +244,7 @@ const Customer360 = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4"
+            className="bg-[var(--surface-color)] bg-[var(--surface-color)] rounded-lg shadow-md p-4"
           >
             <div className="flex items-center justify-between">
               <div>
@@ -261,7 +261,7 @@ const Customer360 = () => {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md mb-6">
+        <div className="bg-[var(--surface-color)] bg-[var(--surface-color)] rounded-lg shadow-md mb-6">
           <div className="flex flex-wrap border-b" style={{ borderColor: 'var(--border-color)' }}>
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -272,7 +272,7 @@ const Customer360 = () => {
                   className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors ${
                     activeTab === tab.id
                       ? "border-b-2"
-                      : "hover:bg-gray-50 dark:hover:bg-gray-700"
+                      : "hover:bg-[var(--bg-secondary)] hover:bg-[var(--bg-secondary)]"
                   }`}
                   style={{
                     borderBottomColor: activeTab === tab.id ? 'var(--color-primary)' : 'transparent',
@@ -299,7 +299,7 @@ const Customer360 = () => {
                     {orders.slice(0, 5).map((order) => (
                       <div
                         key={order._id}
-                        className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                        className="flex items-center justify-between p-3 rounded-lg hover:bg-[var(--bg-secondary)] hover:bg-[var(--bg-secondary)]"
                       >
                         <div>
                           <p className="font-medium" style={{ color: 'var(--text-color)' }}>
@@ -315,7 +315,7 @@ const Customer360 = () => {
                               ? "bg-green-100 text-green-800"
                               : order.status === "Pending"
                               ? "bg-yellow-100 text-yellow-800"
-                              : "bg-gray-100 text-gray-800"
+                              : "bg-[var(--bg-secondary)] text-[var(--text-color)]"
                           }`}
                         >
                           {order.status}
@@ -339,7 +339,7 @@ const Customer360 = () => {
                     {activities.slice(0, 5).map((activity) => (
                       <div
                         key={activity._id}
-                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+                        className="flex items-center gap-3 p-3 rounded-lg hover:bg-[var(--bg-secondary)] hover:bg-[var(--bg-secondary)]"
                       >
                         <Activity size={18} style={{ color: 'var(--color-primary)' }} />
                         <div className="flex-1">
@@ -389,7 +389,7 @@ const Customer360 = () => {
                               ? "bg-green-100 text-green-800"
                               : order.status === "Pending"
                               ? "bg-yellow-100 text-yellow-800"
-                              : "bg-gray-100 text-gray-800"
+                              : "bg-[var(--bg-secondary)] text-[var(--text-color)]"
                           }`}
                         >
                           {order.status}
@@ -508,7 +508,7 @@ const Customer360 = () => {
                             ? "bg-green-100 text-green-800"
                             : task.status === "In Progress"
                             ? "bg-blue-100 text-blue-800"
-                            : "bg-gray-100 text-gray-800"
+                            : "bg-[var(--bg-secondary)] text-[var(--text-color)]"
                         }`}
                       >
                         {task.status}
@@ -552,7 +552,7 @@ const Customer360 = () => {
                             ? "bg-green-100 text-green-800"
                             : project.status === "Active"
                             ? "bg-blue-100 text-blue-800"
-                            : "bg-gray-100 text-gray-800"
+                            : "bg-[var(--bg-secondary)] text-[var(--text-color)]"
                         }`}
                       >
                         {project.status}

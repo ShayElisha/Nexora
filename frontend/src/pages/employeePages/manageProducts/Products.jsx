@@ -184,7 +184,7 @@ const Products = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--bg-color)' }}>
         <Loader2 className="w-12 h-12 animate-spin" style={{ color: 'var(--color-primary)' }} />
       </div>
     );
@@ -192,7 +192,7 @@ const Products = () => {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--bg-color)' }}>
         <div className="bg-red-50 border-2 border-red-200 rounded-xl p-8 text-center">
           <p className="text-red-600 text-xl font-bold">{t("products.error", { error })}</p>
         </div>
@@ -216,7 +216,7 @@ const Products = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div
-          className="rounded-2xl shadow-lg p-6 bg-gradient-to-br from-blue-50 to-indigo-100 border-2 hover:shadow-xl transition-all"
+          className="rounded-2xl shadow-lg p-6 bg-[var(--surface-color)] border-2 hover:shadow-xl transition-all"
           style={{ borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
@@ -229,7 +229,7 @@ const Products = () => {
         </div>
 
         <div
-          className="rounded-2xl shadow-lg p-6 bg-gradient-to-br from-green-50 to-emerald-100 border-2 hover:shadow-xl transition-all"
+          className="rounded-2xl shadow-lg p-6 bg-[var(--surface-color)] border-2 hover:shadow-xl transition-all"
           style={{ borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
@@ -242,7 +242,7 @@ const Products = () => {
         </div>
 
         <div
-          className="rounded-2xl shadow-lg p-6 bg-gradient-to-br from-purple-50 to-pink-100 border-2 hover:shadow-xl transition-all"
+          className="rounded-2xl shadow-lg p-6 bg-[var(--surface-color)] border-2 hover:shadow-xl transition-all"
           style={{ borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
@@ -256,7 +256,7 @@ const Products = () => {
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-2xl shadow-lg p-6 mb-8" style={{ borderColor: 'var(--border-color)', border: '2px solid' }}>
+      <div className="bg-[var(--surface-color)] rounded-2xl shadow-lg p-6 mb-8" style={{ borderColor: 'var(--border-color)', border: '2px solid' }}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Search */}
           <div className="md:col-span-2">
@@ -306,11 +306,11 @@ const Products = () => {
         {filteredProducts.map((product) => (
           <div
             key={product._id}
-            className="bg-white rounded-2xl shadow-lg overflow-hidden border-2 hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
+            className="bg-[var(--surface-color)] rounded-2xl shadow-lg overflow-hidden border-2 hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]"
             style={{ borderColor: 'var(--border-color)' }}
           >
             {/* Product Image */}
-            <div className="relative h-48 overflow-hidden bg-gray-100">
+            <div className="relative h-48 overflow-hidden bg-[var(--bg-secondary)]">
               <img
                 src={product.productImage}
                 alt={product.productName}
@@ -354,13 +354,13 @@ const Products = () => {
               </div>
 
               {/* Price and Stock */}
-              <div className="flex items-center justify-between mb-4 p-3 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200">
+              <div className="flex items-center justify-between mb-4 p-3 rounded-xl bg-[var(--bg-secondary)] border-2 border-[var(--border-color)]">
                 <div className="flex items-center gap-2">
                   <DollarSign className="w-5 h-5 text-green-600" />
                   <span className="text-xl font-bold text-green-700">${product.unitPrice}</span>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-gray-600">{t("products.in_stock")}</p>
+                  <p className="text-xs text-[var(--color-secondary)]">{t("products.in_stock")}</p>
                   <p className="text-lg font-bold text-orange-600">{product.inventory?.quantity || 0}</p>
                 </div>
               </div>
@@ -396,19 +396,19 @@ const Products = () => {
 
       {/* Review Cart Section */}
       {cartItems.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-lg p-8 border-2" style={{ borderColor: 'var(--border-color)' }}>
+        <div className="bg-[var(--surface-color)] rounded-2xl shadow-lg p-8 border-2" style={{ borderColor: 'var(--border-color)' }}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold flex items-center gap-3" style={{ color: 'var(--text-color)' }}>
               <ShoppingCart className="w-7 h-7" style={{ color: 'var(--color-primary)' }} />
               {t("products.cartSummary")}
             </h2>
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2 rounded-full font-bold shadow-lg">
+            <div className="px-6 py-2 rounded-full font-bold shadow-lg" style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}>
               {totalItems} {t("products.items")}
             </div>
           </div>
 
           {/* Cart Items Preview */}
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 mb-6 border-2 border-blue-200">
+          <div className="bg-[var(--bg-secondary)] rounded-xl p-6 mb-6 border-2 border-[var(--border-color)]">
             <div className="space-y-3">
               {cartItems.map(([productId, quantity]) => {
                 const product = products.find((p) => p._id === productId);
@@ -422,8 +422,8 @@ const Products = () => {
                         className="w-12 h-12 rounded-lg object-cover"
                       />
                       <div>
-                        <p className="font-semibold text-gray-800">{product.productName}</p>
-                        <p className="text-sm text-gray-500">{quantity} × ${product.unitPrice}</p>
+                        <p className="font-semibold text-[var(--text-color)]">{product.productName}</p>
+                        <p className="text-sm text-[var(--color-secondary)]">{quantity} × ${product.unitPrice}</p>
                       </div>
                     </div>
                     <p className="text-lg font-bold text-blue-600">
@@ -436,7 +436,7 @@ const Products = () => {
 
             {/* Total */}
             <div className="mt-4 pt-4 border-t-2 border-blue-300 flex items-center justify-between">
-              <span className="text-xl font-bold text-gray-800">{t("products.total")}:</span>
+              <span className="text-xl font-bold text-[var(--text-color)]">{t("products.total")}:</span>
               <span className="text-3xl font-extrabold text-blue-600">${totalCost.toFixed(2)}</span>
             </div>
           </div>
@@ -444,9 +444,10 @@ const Products = () => {
           {/* Submit Button */}
           <button
             onClick={() => setShowModal(true)}
-            className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3"
+            className="w-full sm:w-auto px-4 py-2 rounded-xl font-bold text-sm shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+            style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}
           >
-            <Receipt className="w-6 h-6" />
+            <Receipt className="w-5 h-5" />
             {t("products.review_update_inventory")}
           </button>
         </div>
@@ -455,7 +456,7 @@ const Products = () => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+          <div className="bg-[var(--surface-color)] rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             {/* Modal Header */}
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-3xl font-extrabold flex items-center gap-3" style={{ color: 'var(--text-color)' }}>
@@ -464,9 +465,9 @@ const Products = () => {
               </h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="p-2 rounded-full hover:bg-gray-100 transition-all"
+                className="p-2 rounded-full hover:bg-[var(--bg-secondary)] transition-all"
               >
-                <X className="w-6 h-6 text-gray-500" />
+                <X className="w-6 h-6 text-[var(--color-secondary)]" />
               </button>
             </div>
 
@@ -495,14 +496,14 @@ const Products = () => {
             </div>
 
             {/* Cart Summary */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 mb-6 border-2 border-blue-200">
+            <div className="bg-[var(--bg-secondary)] rounded-2xl p-6 mb-6 border-2 border-[var(--border-color)]">
               <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-blue-700">
                 <ShoppingCart className="w-6 h-6" />
                 {t("products.modal.Cart_Summary")}
               </h3>
 
               {cartItems.length === 0 ? (
-                <p className="text-center text-gray-500 py-4">{t("products.modal.no_products")}</p>
+                <p className="text-center text-[var(--color-secondary)] py-4">{t("products.modal.no_products")}</p>
               ) : (
                 <div className="space-y-3">
                   {cartItems.map(([productId, quantity]) => {
@@ -512,11 +513,11 @@ const Products = () => {
                     return (
                       <div
                         key={productId}
-                        className="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-blue-200"
+                        className="flex items-center justify-between p-4 bg-[var(--surface-color)] rounded-xl border-2 border-[var(--border-color)]"
                       >
                         <div className="flex-1">
-                          <p className="font-bold text-gray-800">{product.productName}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="font-bold text-[var(--text-color)]">{product.productName}</p>
+                          <p className="text-sm text-[var(--color-secondary)]">
                             {quantity} × ${product.unitPrice}
                           </p>
                         </div>
@@ -536,9 +537,9 @@ const Products = () => {
                   })}
 
                   {/* Total */}
-                  <div className="pt-4 border-t-2 border-blue-200">
+                  <div className="pt-4 border-t-2 border-[var(--border-color)]">
                     <div className="flex items-center justify-between">
-                      <span className="text-xl font-bold text-gray-800">{t("products.total")}:</span>
+                      <span className="text-xl font-bold text-[var(--text-color)]">{t("products.total")}:</span>
                       <span className="text-3xl font-extrabold text-blue-600">
                         ${totalCost.toFixed(2)}
                       </span>
@@ -552,7 +553,7 @@ const Products = () => {
             <button
               onClick={handleSubmitInventoryUpdate}
               disabled={updating || !selectedBudget || cartItems.length === 0}
-              className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold hover:shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold hover:shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {updating ? (
                 <>

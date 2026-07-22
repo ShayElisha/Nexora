@@ -157,7 +157,7 @@ const ProductionOrderDetails = () => {
       case "On Hold":
         return "bg-orange-100 text-orange-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-[var(--bg-secondary)] text-[var(--text-color)]";
     }
   };
 
@@ -172,7 +172,7 @@ const ProductionOrderDetails = () => {
       case "low":
         return "bg-green-500 text-white";
       default:
-        return "bg-gray-500 text-white";
+        return "bg-[var(--color-secondary)] text-white";
     }
   };
 
@@ -221,7 +221,7 @@ const ProductionOrderDetails = () => {
             >
               <ArrowLeft size={20} style={{ color: "var(--text-color)" }} />
             </button>
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-purple-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Factory size={28} color="white" />
             </div>
             <div className="flex-1">
@@ -405,7 +405,7 @@ const ProductionOrderDetails = () => {
                   {order.missingComponents.map((component, index) => (
                     <div
                       key={index}
-                      className="p-4 rounded-lg bg-white border border-red-200"
+                      className="p-4 rounded-lg bg-[var(--surface-color)] border border-red-200"
                     >
                       <p className="font-medium text-red-800">{component.componentName}</p>
                       <p className="text-sm text-red-600">
@@ -540,7 +540,7 @@ const ProductionOrderDetails = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
+            className="bg-[var(--surface-color)] rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
             style={{ backgroundColor: "var(--bg-color)" }}
           >
             <div className="flex items-center justify-between mb-4">
@@ -549,7 +549,7 @@ const ProductionOrderDetails = () => {
               </h2>
               <button
                 onClick={() => setShowProcurementModal(false)}
-                className="p-2 rounded-lg hover:bg-gray-100"
+                className="p-2 rounded-lg hover:bg-[var(--bg-secondary)]"
               >
                 <X size={20} style={{ color: "var(--text-color)" }} />
               </button>

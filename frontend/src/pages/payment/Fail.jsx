@@ -27,7 +27,10 @@ const Fail = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 px-4 relative overflow-hidden">
+    <div
+      className="flex flex-col items-center justify-center min-h-screen px-4 relative overflow-hidden"
+      style={{ backgroundColor: "var(--bg-color)" }}
+    >
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 right-10 w-72 h-72 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
@@ -35,7 +38,10 @@ const Fail = () => {
         <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="text-center animate-fadeIn relative z-10 bg-white p-12 rounded-3xl shadow-2xl max-w-3xl">
+      <div
+        className="text-center animate-fadeIn relative z-10 p-8 sm:p-12 rounded-3xl shadow-2xl max-w-3xl border"
+        style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
+      >
         {/* Failed Icon with Animation */}
         <div className="relative inline-block mb-6">
           <div className="absolute inset-0 bg-red-200 rounded-full blur-2xl opacity-50 animate-pulse"></div>
@@ -53,17 +59,17 @@ const Fail = () => {
 
         <div className="flex items-center justify-center gap-2 mb-6">
           <AlertTriangle className="w-5 h-5 text-orange-500" />
-          <p className="text-xl text-gray-600 font-medium">
+          <p className="text-xl text-[var(--color-secondary)] font-medium">
             No charges were made
           </p>
         </div>
 
         {/* Info Box */}
-        <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 mb-8 border-2 border-orange-200">
-          <p className="text-lg text-gray-700 mb-4">
+        <div className="bg-[var(--bg-secondary)] rounded-2xl p-6 mb-8 border-2 border-[var(--border-color)]">
+          <p className="text-lg text-[var(--text-color)] mb-4">
             Your payment was not completed. This could happen for several reasons:
           </p>
-          <ul className="text-left space-y-2 text-gray-600">
+          <ul className="text-left space-y-2 text-[var(--color-secondary)]">
             <li className="flex items-start gap-2">
               <span className="text-orange-500 mt-1">•</span>
               <span>You cancelled the transaction</span>
@@ -81,7 +87,7 @@ const Fail = () => {
 
         {/* Info Messages */}
         <div className="space-y-4 mb-8">
-          <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="bg-blue-50 border-2 border-[var(--border-color)] rounded-xl p-4 flex items-center gap-3">
             <CreditCard className="w-6 h-6 text-blue-600" />
             <p className="text-blue-800 font-medium text-left">
               Your card was not charged. You can try again anytime.
@@ -96,32 +102,35 @@ const Fail = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
             onClick={handleTryAgain}
-            className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold hover:shadow-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+            className="px-4 py-2 rounded-xl font-bold text-sm hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+            style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}
           >
-            <RefreshCw className="w-5 h-5" />
+            <RefreshCw className="w-4 h-4" />
             Try Again
           </button>
           <button
             onClick={handleContactSupport}
-            className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:shadow-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+            className="px-4 py-2 rounded-xl font-bold text-sm hover:shadow-lg transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+            style={{ backgroundColor: "var(--color-accent)", color: "var(--button-text)" }}
           >
-            <HelpCircle className="w-5 h-5" />
+            <HelpCircle className="w-4 h-4" />
             Contact Support
           </button>
           <button
             onClick={handleReturnHome}
-            className="px-8 py-4 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+            className="px-4 py-2 rounded-xl font-bold text-sm hover:opacity-80 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+            style={{ backgroundColor: "var(--bg-secondary)", color: "var(--text-color)" }}
           >
-            <Home className="w-5 h-5" />
+            <Home className="w-4 h-4" />
             Return Home
           </button>
         </div>
 
         {/* Footer Note */}
-        <p className="mt-8 text-sm text-gray-500">
+        <p className="mt-8 text-sm text-[var(--color-secondary)]">
           Don't worry - you can always upgrade your plan later!
         </p>
       </div>

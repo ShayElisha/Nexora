@@ -80,7 +80,7 @@ const SickDays = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="absolute left-8 top-0 rounded-xl shadow-2xl p-4 w-64 z-50 border"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
           >
             <p className="text-sm" style={{ color: 'var(--text-color)' }}>{text}</p>
           </motion.div>
@@ -99,7 +99,7 @@ const SickDays = () => {
       <div className="max-w-6xl mx-auto">
         <motion.div className="mb-8" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-red-500 to-pink-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Heart size={28} color="white" />
             </div>
             <div>
@@ -116,7 +116,7 @@ const SickDays = () => {
         {/* Add Policy Form */}
         <motion.div
           className="rounded-2xl shadow-lg p-6 lg:p-8 border mb-8"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
           variants={cardVariant}
           initial="hidden"
           animate="visible"
@@ -246,7 +246,7 @@ const SickDays = () => {
         {/* Policies List */}
         <motion.div
           className="rounded-2xl shadow-lg p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
           variants={cardVariant}
           initial="hidden"
           animate="visible"

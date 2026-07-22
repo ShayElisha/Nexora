@@ -185,6 +185,21 @@ export const notifyThemeChange = (themeName) => {
   );
 };
 
+/** Convert a hex color to an "r, g, b" triplet for rgba(var(--x-rgb), a) usage. */
+const hexToRgbTriplet = (hex, fallback = "37, 99, 235") => {
+  if (!hex) return fallback;
+  let h = hex.replace("#", "");
+  if (h.length === 3) {
+    h = h
+      .split("")
+      .map((c) => c + c)
+      .join("");
+  }
+  const num = parseInt(h, 16);
+  if (Number.isNaN(num)) return fallback;
+  return `${(num >> 16) & 255}, ${(num >> 8) & 255}, ${num & 255}`;
+};
+
 export const applyDesignTheme = (themeName) => {
   const theme = DESIGN_THEMES[themeName] || DESIGN_THEMES["default"];
   if (!theme) return;
@@ -199,7 +214,29 @@ export const applyDesignTheme = (themeName) => {
   );
   root.style.setProperty("--text-muted", theme["--color-secondary"]);
   root.style.setProperty("--radius", "10px");
-  
+
+  // Aliases used widely across pages - keep every spelling in sync with the theme
+  root.style.setProperty("--text-secondary", theme["--color-secondary"]);
+  root.style.setProperty("--text-color-secondary", theme["--color-secondary"]);
+  root.style.setProperty("--card-bg", theme["--footer-bg"] || "#FFFFFF");
+  root.style.setProperty(
+    "--bg-secondary",
+    `color-mix(in srgb, ${theme["--border-color"]} 30%, ${theme["--footer-bg"] || "#FFFFFF"})`
+  );
+  root.style.setProperty("--color-danger", "#EF4444");
+  root.style.setProperty(
+    "--color-primary-light",
+    `color-mix(in srgb, ${theme["--color-primary"]} 15%, ${theme["--footer-bg"] || "#FFFFFF"})`
+  );
+  root.style.setProperty(
+    "--color-primary-rgb",
+    hexToRgbTriplet(theme["--color-primary"])
+  );
+  root.style.setProperty(
+    "--color-accent-rgb",
+    hexToRgbTriplet(theme["--color-accent"], "5, 150, 105")
+  );
+
   // Softened shadow to fit lighter modern themes
   root.style.setProperty(
     "--shadow",

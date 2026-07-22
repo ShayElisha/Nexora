@@ -29,9 +29,9 @@ const getStatusColor = (status) => {
     case "Resolved":
       return "bg-green-100 text-green-700 border-green-300";
     case "Closed":
-      return "bg-gray-100 text-gray-700 border-gray-300";
+      return "bg-[var(--bg-secondary)] text-[var(--text-color)] border-[var(--border-color)]";
     default:
-      return "bg-gray-100 text-gray-700 border-gray-300";
+      return "bg-[var(--bg-secondary)] text-[var(--text-color)] border-[var(--border-color)]";
   }
 };
 
@@ -127,7 +127,7 @@ const SupportTicketDetails = () => {
 
   return (
     <div
-      className="min-h-screen p-6"
+      className="min-h-screen p-4 sm:p-6 lg:p-8"
       style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
     >
       <div className="max-w-4xl mx-auto">
@@ -137,20 +137,28 @@ const SupportTicketDetails = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => navigate("/dashboard/support-tickets")}
-            className="p-2 rounded-lg border"
+            className="p-2 h-11 w-11 flex items-center justify-center rounded-lg border"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
             }}
           >
             <ArrowLeft size={20} />
           </motion.button>
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shrink-0"
+            style={{
+              background:
+                "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
+            }}
+          >
+            <Ticket size={28} className="text-white" />
+          </div>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold flex items-center gap-3">
-              <span className="text-3xl">{getCategoryIcon(ticket.category)}</span>
+            <h1 className="text-4xl font-bold" style={{ color: "var(--text-color)" }}>
               {ticket.title}
             </h1>
-            <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+            <div className="flex items-center gap-4 mt-2 text-sm" style={{ color: "var(--color-secondary)" }}>
               <span className="flex items-center gap-1">
                 <User size={16} />
                 {ticket.createdBy?.name || t("supportTickets.unknown")}
@@ -168,7 +176,7 @@ const SupportTicketDetails = () => {
           <div className="flex-1">
             <label className="block text-sm font-semibold mb-2">{t("supportTickets.statusLabel", { defaultValue: "סטטוס" })}</label>
             <div
-              className={`px-4 py-2 rounded-lg border text-center font-semibold ${getStatusColor(
+              className={`px-4 h-11 flex items-center justify-center rounded-lg border font-semibold ${getStatusColor(
                 ticket.status
               )}`}
             >
@@ -178,7 +186,7 @@ const SupportTicketDetails = () => {
           <div className="flex-1">
             <label className="block text-sm font-semibold mb-2">{t("supportTickets.priorityLabel", { defaultValue: "עדיפות" })}</label>
             <div
-              className={`px-4 py-2 rounded-lg border text-center font-semibold ${getStatusColor(
+              className={`px-4 h-11 flex items-center justify-center rounded-lg border font-semibold ${getStatusColor(
                 ticket.status
               )}`}
             >
@@ -188,9 +196,15 @@ const SupportTicketDetails = () => {
         </div>
 
         {/* Description */}
-        <div className="mb-6 p-6 rounded-lg border" style={{ borderColor: "var(--border-color)" }}>
+        <div
+          className="mb-6 rounded-2xl p-6 shadow-lg border"
+          style={{
+            backgroundColor: "var(--surface-color)",
+            borderColor: "var(--border-color)",
+          }}
+        >
           <h2 className="text-lg font-semibold mb-3">{t("supportTickets.description")}</h2>
-          <p className="text-gray-300 whitespace-pre-wrap">{ticket.description}</p>
+          <p className="whitespace-pre-wrap" style={{ color: "var(--text-color)" }}>{ticket.description}</p>
         </div>
 
         {/* Comments Section */}
@@ -208,9 +222,9 @@ const SupportTicketDetails = () => {
                   key={index}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-4 rounded-lg border"
+                  className="rounded-2xl p-6 shadow-lg border"
                   style={{
-                    backgroundColor: "var(--bg-color)",
+                    backgroundColor: "var(--surface-color)",
                     borderColor: "var(--border-color)",
                   }}
                 >
@@ -222,16 +236,16 @@ const SupportTicketDetails = () => {
                       <p className="font-semibold">
                         {comment.userId?.name || t("supportTickets.unknown")}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs" style={{ color: "var(--color-secondary)" }}>
                         {format(new Date(comment.createdAt), "MMM d, yyyy 'at' h:mm a")}
                       </p>
                     </div>
                   </div>
-                  <p className="text-gray-300 mt-2">{comment.comment}</p>
+                  <p className="mt-2" style={{ color: "var(--text-color)" }}>{comment.comment}</p>
                 </motion.div>
               ))
             ) : (
-              <p className="text-gray-500 text-center py-8">{t("supportTickets.noComments")}</p>
+              <p className="text-center py-8" style={{ color: "var(--color-secondary)" }}>{t("supportTickets.noComments")}</p>
             )}
           </div>
 
@@ -242,7 +256,7 @@ const SupportTicketDetails = () => {
               onChange={(e) => setNewComment(e.target.value)}
               placeholder={t("supportTickets.addCommentPlaceholder")}
               rows={3}
-              className="w-full px-4 py-3 rounded-lg border resize-none"
+              className="w-full px-4 py-3 rounded-xl border resize-none"
               style={{
                 backgroundColor: "var(--bg-color)",
                 borderColor: "var(--border-color)",
@@ -254,8 +268,11 @@ const SupportTicketDetails = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               disabled={addCommentMutation.isLoading}
-              className="flex items-center gap-2 px-6 py-2 rounded-lg font-semibold text-white"
-              style={{ backgroundColor: "var(--color-primary)" }}
+              className="flex items-center gap-2 px-6 h-11 rounded-lg font-medium"
+              style={{
+                backgroundColor: "var(--color-primary)",
+                color: "var(--button-text)",
+              }}
             >
               {addCommentMutation.isLoading ? (
                 <>

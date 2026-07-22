@@ -136,7 +136,7 @@ const AddSupplySchedule = () => {
   };
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--bg-color)' }} dir={direction}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }} dir={direction}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -147,7 +147,7 @@ const AddSupplySchedule = () => {
           <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <button
               onClick={() => navigate("/dashboard/procurement/supply-schedules")}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
               style={{ color: 'var(--text-color)' }}
             >
               <ArrowLeft size={24} className={isRTL ? 'rotate-180' : ''} />
@@ -158,7 +158,7 @@ const AddSupplySchedule = () => {
                   ? t("procurement.edit_supply_schedule") || "Edit Supply Schedule"
                   : t("procurement.add_supply_schedule") || "Add Supply Schedule"}
               </h1>
-              <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-secondary)' }}>
                 {t("procurement.fill_schedule_details") || "Fill in the details below to create a supply schedule"}
               </p>
             </div>
@@ -166,7 +166,7 @@ const AddSupplySchedule = () => {
         </div>
 
         {/* Form Card */}
-        <form onSubmit={handleSubmit} className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+        <form onSubmit={handleSubmit} className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           <div className="p-6 space-y-6">
             {/* Basic Information Section */}
             <div>
@@ -182,7 +182,7 @@ const AddSupplySchedule = () => {
                     required
                     value={formData.supplierId}
                     onChange={(e) => setFormData({ ...formData, supplierId: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -205,7 +205,7 @@ const AddSupplySchedule = () => {
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -230,7 +230,7 @@ const AddSupplySchedule = () => {
                     required
                     value={formData.startDate}
                     onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -247,7 +247,7 @@ const AddSupplySchedule = () => {
                     type="date"
                     value={formData.endDate}
                     onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -268,7 +268,7 @@ const AddSupplySchedule = () => {
                 <button
                   type="button"
                   onClick={addScheduleItem}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-white hover:opacity-90 transition"
+                  className="flex items-center gap-2 px-4 h-11 rounded-lg text-white hover:opacity-90 transition"
                   style={{ backgroundColor: 'var(--color-primary)' }}
                 >
                   <Plus size={18} />
@@ -277,7 +277,7 @@ const AddSupplySchedule = () => {
               </div>
               {formData.schedule.length === 0 ? (
                 <div className="text-center py-8 border-2 border-dashed rounded-lg" style={{ borderColor: 'var(--border-color)' }}>
-                  <p style={{ color: 'var(--text-secondary)' }}>
+                  <p style={{ color: 'var(--color-secondary)' }}>
                     {t("procurement.no_schedule_items") || "No schedule items added yet. Click 'Add Schedule Item' to get started."}
                   </p>
                 </div>
@@ -289,7 +289,7 @@ const AddSupplySchedule = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="p-4 rounded-lg border"
-                      style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)' }}
+                      style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--surface-color)' }}
                     >
                       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                         <div className="md:col-span-2">
@@ -300,7 +300,7 @@ const AddSupplySchedule = () => {
                             required
                             value={item.productId}
                             onChange={(e) => updateScheduleItem(index, "productId", e.target.value)}
-                            className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                            className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                             style={{ 
                               borderColor: 'var(--border-color)', 
                               backgroundColor: 'var(--bg-color)', 
@@ -326,7 +326,7 @@ const AddSupplySchedule = () => {
                             min="1"
                             value={item.quantity}
                             onChange={(e) => updateScheduleItem(index, "quantity", parseFloat(e.target.value) || 0)}
-                            className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                            className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                             style={{ 
                               borderColor: 'var(--border-color)', 
                               backgroundColor: 'var(--bg-color)', 
@@ -344,7 +344,7 @@ const AddSupplySchedule = () => {
                             required
                             value={item.deliveryDate}
                             onChange={(e) => updateScheduleItem(index, "deliveryDate", e.target.value)}
-                            className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                            className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                             style={{ 
                               borderColor: 'var(--border-color)', 
                               backgroundColor: 'var(--bg-color)', 
@@ -360,7 +360,7 @@ const AddSupplySchedule = () => {
                           <select
                             value={item.warehouseId}
                             onChange={(e) => updateScheduleItem(index, "warehouseId", e.target.value)}
-                            className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                            className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                             style={{ 
                               borderColor: 'var(--border-color)', 
                               backgroundColor: 'var(--bg-color)', 
@@ -380,7 +380,7 @@ const AddSupplySchedule = () => {
                           <button
                             type="button"
                             onClick={() => removeScheduleItem(index)}
-                            className="w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                            className="w-full p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                           >
                             <Trash2 size={18} className="text-red-500 mx-auto" />
                           </button>
@@ -420,7 +420,7 @@ const AddSupplySchedule = () => {
               <button
                 type="submit"
                 disabled={mutation.isLoading}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg text-white hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 h-11 rounded-lg text-white hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: 'var(--color-primary)' }}
               >
                 {mutation.isLoading ? (
@@ -438,7 +438,7 @@ const AddSupplySchedule = () => {
               <button
                 type="button"
                 onClick={() => navigate("/dashboard/procurement/supply-schedules")}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                className="flex items-center gap-2 px-6 h-11 rounded-lg border hover:bg-[var(--bg-secondary)] transition"
                 style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
               >
                 <X size={20} />

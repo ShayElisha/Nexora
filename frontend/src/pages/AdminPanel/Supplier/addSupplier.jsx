@@ -147,7 +147,7 @@ const AddSupplier = ({ authUser }) => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-indigo-500 to-purple-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Truck size={28} color="white" />
             </div>
             <div>
@@ -469,7 +469,7 @@ const AddSupplier = ({ authUser }) => {
                     onChange={handleInputChange}
                     className="sr-only peer"
                   />
-                  <div className="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
+                  <div className="w-14 h-7 bg-[var(--border-color)] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-[var(--surface-color)] after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-[var(--surface-color)] after:border-[var(--border-color)] after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
                   <span className="mr-3 text-sm font-bold" style={{ color: supplierData.IsActive ? "#16a34a" : "#dc2626" }}>
                     {supplierData.IsActive ? t("supplier.active") : t("supplier.inactive")}
                   </span>

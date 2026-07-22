@@ -67,7 +67,7 @@ const UpdateBudgetModal = ({ budget, onClose }) => {
       <div className="absolute inset-0 bg-black bg-opacity-60" />
       <motion.div
         className="relative rounded-2xl p-6 w-full max-w-lg z-10 shadow-2xl border"
-        style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+        style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
         initial={{ scale: 0.9, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         onClick={(e) => e.stopPropagation()}
@@ -86,7 +86,7 @@ const UpdateBudgetModal = ({ budget, onClose }) => {
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+            <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
               {t("finance.budget.department_project_name")}
             </label>
             <input
@@ -94,14 +94,14 @@ const UpdateBudgetModal = ({ budget, onClose }) => {
               name="departmentOrProjectName"
               value={formData.departmentOrProjectName}
               onChange={handleChange}
-              className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
               style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               required
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
           <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
               {t("finance.budget.budget_amount")}
             </label>
             <input
@@ -109,12 +109,12 @@ const UpdateBudgetModal = ({ budget, onClose }) => {
               name="amount"
               value={formData.amount}
               onChange={handleChange}
-                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
             />
           </div>
           <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
               {t("finance.budget.currency")}
             </label>
             <input
@@ -122,14 +122,14 @@ const UpdateBudgetModal = ({ budget, onClose }) => {
               name="currency"
               value={formData.currency}
               onChange={handleChange}
-                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
             />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                 {t("finance.budget.start_date")}
               </label>
               <input
@@ -137,12 +137,12 @@ const UpdateBudgetModal = ({ budget, onClose }) => {
                 name="startDate"
                 value={formData.startDate}
                 onChange={handleChange}
-                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                 {t("finance.budget.end_date")}
               </label>
               <input
@@ -150,13 +150,13 @@ const UpdateBudgetModal = ({ budget, onClose }) => {
                 name="endDate"
                 value={formData.endDate}
                 onChange={handleChange}
-                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+            <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
               {t("finance.budget.notes")}
             </label>
             <textarea
@@ -164,15 +164,15 @@ const UpdateBudgetModal = ({ budget, onClose }) => {
               value={formData.notes}
               onChange={handleChange}
               rows="3"
-              className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
               style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
             />
           </div>
-          <div className="flex gap-4 pt-2">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 rounded-xl font-bold transition-all hover:scale-105"
+              className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition-all hover:scale-105"
               style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
             >
               {t("finance.budget.cancel")}
@@ -180,7 +180,7 @@ const UpdateBudgetModal = ({ budget, onClose }) => {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-6 py-3 rounded-xl font-bold transition-all hover:scale-105 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition-all hover:scale-105 disabled:opacity-50 flex items-center justify-center gap-2"
               style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
             >
               {loading ? <><motion.div className="w-5 h-5 border-2 border-t-2 border-white rounded-full" animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} /> {t("finance.budget.updating")}</> : <><Save size={20} /> {t("finance.budget.update_budget")}</>}
@@ -261,7 +261,7 @@ const Budgets = () => {
         <motion.div className="mb-8" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-indigo-600">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
                 <Wallet size={28} color="white" />
               </div>
               <div>
@@ -275,7 +275,7 @@ const Budgets = () => {
             </div>
             <Link to="/dashboard/finance/add-budget">
               <button
-                className="px-6 py-3 rounded-xl font-bold shadow-lg transition-all hover:scale-105 flex items-center gap-2"
+                className="px-6 h-11 rounded-lg font-medium shadow-lg transition-all hover:scale-105 flex items-center gap-2"
                 style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
               >
                 <Plus size={20} />
@@ -300,7 +300,7 @@ const Budgets = () => {
               animate="visible"
               transition={{ delay: index * 0.1 }}
               className="rounded-2xl shadow-lg p-6 border hover:shadow-xl transition-all"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               whileHover={{ y: -5 }}
             >
               <div className="flex items-center justify-between mb-4">
@@ -321,19 +321,19 @@ const Budgets = () => {
         {/* Search */}
         <motion.div
           className="mb-8 rounded-2xl shadow-lg p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={20} style={{ color: 'var(--color-secondary)' }} />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2" size={20} style={{ color: 'var(--color-secondary)' }} />
           <input
             type="text"
               placeholder={t("finance.budget.search_placeholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              className="w-full h-11 ps-10 pe-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
               style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
           />
         </div>
@@ -343,8 +343,8 @@ const Budgets = () => {
         <div className="grid grid-cols-1 gap-4">
               {filteredBudgets.length === 0 ? (
             <motion.div
-              className="text-center py-16 rounded-2xl shadow-lg"
-              style={{ backgroundColor: 'var(--bg-color)' }}
+              className="text-center py-16 rounded-2xl shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
@@ -366,14 +366,14 @@ const Budgets = () => {
                   animate="visible"
                   transition={{ delay: index * 0.05 }}
                   className="rounded-2xl shadow-lg overflow-hidden border hover:shadow-xl transition-all"
-                  style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                  style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
                 >
                   <div className="p-6">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
                       {/* Budget Info */}
                       <div className="lg:col-span-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-500">
+                          <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
                             <Wallet size={24} color="white" />
                           </div>
                           <div>

@@ -222,7 +222,8 @@ const AddFinance = () => {
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
-              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-indigo-600"
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
             >
               <Plus size={28} color="white" />
             </div>
@@ -241,7 +242,7 @@ const AddFinance = () => {
         <motion.div
           className="rounded-2xl shadow-lg p-6 lg:p-8 border"
           style={{ 
-            backgroundColor: 'var(--bg-color)',
+            backgroundColor: 'var(--surface-color)',
             borderColor: 'var(--border-color)'
           }}
           variants={cardVariant}
@@ -252,7 +253,7 @@ const AddFinance = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Record Type Selection */}
             <div>
-              <label className="block text-sm font-bold mb-3" style={{ color: 'var(--text-color)' }}>
+              <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--text-color)' }}>
                 <Building className="inline mr-2" size={18} />
                 {t("finance.record_type")}
               </label>
@@ -286,7 +287,7 @@ const AddFinance = () => {
             {/* Dynamic Fields Based on Record Type */}
             {formData.recordType === "supplier" && suppliersOptions.length > 0 && (
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   {t("finance.supplier")}
                 </label>
                 <Select
@@ -302,7 +303,7 @@ const AddFinance = () => {
 
             {formData.recordType === "employee" && employeesOptions.length > 0 && (
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   {t("finance.employee")}
                 </label>
                 <Select
@@ -318,7 +319,7 @@ const AddFinance = () => {
 
             {formData.recordType === "customer" && customersOptions.length > 0 && (
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   {t("finance.customer")}
                 </label>
                 <Select
@@ -334,14 +335,14 @@ const AddFinance = () => {
 
             {formData.recordType === "other" && (
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   {t("finance.other_details")}
                 </label>
                 <textarea
                   name="otherDetails"
                   value={formData.otherDetails}
                   onChange={handleChange}
-                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   style={{ 
                     borderColor: 'var(--border-color)',
                     backgroundColor: 'var(--bg-color)',
@@ -357,7 +358,7 @@ const AddFinance = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Date */}
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <Calendar className="inline mr-2" size={16} />
                   {t("finance.transaction_date")}
                 </label>
@@ -366,7 +367,7 @@ const AddFinance = () => {
                   name="transactionDate"
                   value={formData.transactionDate}
                   onChange={handleChange}
-                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   style={{ 
                     borderColor: 'var(--border-color)',
                     backgroundColor: 'var(--bg-color)',
@@ -378,7 +379,7 @@ const AddFinance = () => {
 
               {/* Transaction Type */}
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   {t("finance.transaction_type")}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -409,7 +410,7 @@ const AddFinance = () => {
 
               {/* Amount */}
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <DollarSign className="inline mr-2" size={16} />
                   {t("finance.amount")}
                 </label>
@@ -419,7 +420,7 @@ const AddFinance = () => {
                   value={formData.transactionAmount}
                   onChange={handleChange}
                   step="0.01"
-                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   style={{ 
                     borderColor: 'var(--border-color)',
                     backgroundColor: 'var(--bg-color)',
@@ -431,14 +432,14 @@ const AddFinance = () => {
 
               {/* Currency */}
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   {t("finance.budget.currency")}
                 </label>
                 <select
                   name="transactionCurrency"
                   value={formData.transactionCurrency}
                   onChange={handleChange}
-                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   style={{ 
                     borderColor: 'var(--border-color)',
                     backgroundColor: 'var(--bg-color)',
@@ -459,7 +460,7 @@ const AddFinance = () => {
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <Tag className="inline mr-2" size={16} />
                   {t("finance.Category")}
                 </label>
@@ -468,7 +469,7 @@ const AddFinance = () => {
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   style={{ 
                     borderColor: 'var(--border-color)',
                     backgroundColor: 'var(--bg-color)',
@@ -481,7 +482,7 @@ const AddFinance = () => {
 
               {/* Bank Account */}
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <CreditCard className="inline mr-2" size={16} />
                   {t("finance.Bank_Account")}
                 </label>
@@ -490,7 +491,7 @@ const AddFinance = () => {
                   name="bankAccount"
                   value={formData.bankAccount}
                   onChange={handleChange}
-                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   style={{ 
                     borderColor: 'var(--border-color)',
                     backgroundColor: 'var(--bg-color)',
@@ -503,14 +504,14 @@ const AddFinance = () => {
 
               {/* Status */}
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   {t("finance.Transaction_Status")}
                 </label>
                 <select
                   name="transactionStatus"
                   value={formData.transactionStatus}
                   onChange={handleChange}
-                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   style={{ 
                     borderColor: 'var(--border-color)',
                     backgroundColor: 'var(--bg-color)',
@@ -526,7 +527,7 @@ const AddFinance = () => {
 
               {/* Invoice Number */}
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <FileText className="inline mr-2" size={16} />
                   {t("finance.Invoice_Number")}
                 </label>
@@ -535,7 +536,7 @@ const AddFinance = () => {
                   name="invoiceNumber"
                   value={formData.invoiceNumber}
                   onChange={handleChange}
-                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   style={{ 
                     borderColor: 'var(--border-color)',
                     backgroundColor: 'var(--bg-color)',
@@ -547,7 +548,7 @@ const AddFinance = () => {
 
               {/* Payment Terms */}
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <DollarSign className="inline mr-2" size={16} />
                   {t("finance.payment_terms") || "Payment Terms"}
                 </label>
@@ -555,7 +556,7 @@ const AddFinance = () => {
                   name="paymentTerms"
                   value={formData.paymentTerms}
                   onChange={handleChange}
-                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   style={{ 
                     borderColor: 'var(--border-color)',
                     backgroundColor: 'var(--bg-color)',
@@ -573,14 +574,14 @@ const AddFinance = () => {
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                 {t("finance.Transaction_Description")}
               </label>
               <textarea
                 name="transactionDescription"
                 value={formData.transactionDescription}
                 onChange={handleChange}
-                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                 style={{ 
                   borderColor: 'var(--border-color)',
                   backgroundColor: 'var(--bg-color)',
@@ -593,7 +594,7 @@ const AddFinance = () => {
 
             {/* File Upload */}
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                 <Upload className="inline mr-2" size={16} />
                 {t("finance.attachment")}
               </label>
@@ -613,11 +614,11 @@ const AddFinance = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="pt-4">
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4">
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-4 px-6 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
+                className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium shadow-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
                 style={{
                   backgroundColor: 'var(--color-primary)',
                   color: 'var(--button-text)'

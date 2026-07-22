@@ -68,7 +68,13 @@ const BankAccountList = () => {
         >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-purple-600">
+              <div
+                className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+                style={{
+                  background:
+                    "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
+                }}
+              >
                 <CreditCard size={28} color="white" />
               </div>
               <div>
@@ -82,7 +88,7 @@ const BankAccountList = () => {
             </div>
             <button
               onClick={() => navigate("/dashboard/banks/accounts/add")}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold shadow-lg transition-all hover:scale-105"
+              className="flex items-center gap-2 px-6 h-11 rounded-lg font-medium shadow-lg transition-all hover:scale-105"
               style={{
                 backgroundColor: "var(--color-primary)",
                 color: "var(--button-text)",
@@ -96,7 +102,7 @@ const BankAccountList = () => {
 
         <motion.div
           className="rounded-2xl shadow-lg border p-6 mb-6"
-          style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+          style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -104,7 +110,7 @@ const BankAccountList = () => {
           <div className="mb-6">
             <div className="flex-1 relative">
               <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                className="absolute start-3 top-1/2 -translate-y-1/2"
                 size={20}
                 style={{ color: "var(--color-secondary)" }}
               />
@@ -113,7 +119,7 @@ const BankAccountList = () => {
                 placeholder={t("accounting.search_accounts")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2"
+                className="w-full h-11 ps-10 pe-4 rounded-xl border focus:outline-none focus:ring-2"
                 style={{
                   borderColor: "var(--border-color)",
                   backgroundColor: "var(--bg-color)",
@@ -143,7 +149,7 @@ const BankAccountList = () => {
                     key={account._id}
                     className="rounded-2xl shadow-lg border overflow-hidden flex flex-col cursor-pointer transition-all hover:scale-105"
                     style={{
-                      backgroundColor: "var(--bg-color)",
+                      backgroundColor: "var(--surface-color)",
                       borderColor: "var(--border-color)",
                     }}
                     initial={{ opacity: 0, y: 20 }}

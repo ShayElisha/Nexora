@@ -147,7 +147,7 @@ const SalesTrends = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-[var(--bg-color)] rounded-2xl shadow-lg p-6 border border-[var(--border-color)]"
+      className="bg-[var(--surface-color)] rounded-2xl shadow-lg p-6 border border-[var(--border-color)]"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
@@ -172,7 +172,7 @@ const SalesTrends = () => {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               viewType === "line"
                 ? "bg-primary text-button-text shadow-md"
-                : "bg-gray-100 text-secondary hover:bg-gray-200"
+                : "bg-[var(--bg-secondary)] text-secondary hover:bg-[var(--border-color)]"
             }`}
           >
             גרף קו
@@ -182,7 +182,7 @@ const SalesTrends = () => {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               viewType === "bar"
                 ? "bg-primary text-button-text shadow-md"
-                : "bg-gray-100 text-secondary hover:bg-gray-200"
+                : "bg-[var(--bg-secondary)] text-secondary hover:bg-[var(--border-color)]"
             }`}
           >
             עמודות
@@ -255,7 +255,7 @@ const SalesTrends = () => {
             {data.byStatus.map((status, index) => (
               <div
                 key={index}
-                className="bg-gray-50 rounded-lg p-3 border border-[var(--border-color)]"
+                className="bg-[var(--bg-secondary)] rounded-lg p-3 border border-[var(--border-color)]"
               >
                 <div className="text-xs text-secondary">{status._id}</div>
                 <div className="text-lg font-bold">

@@ -45,15 +45,15 @@ const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, scheduleNumber, isRTL,
       isOpen={isOpen}
       onRequestClose={onClose}
       className="fixed inset-0 flex items-center justify-center z-50"
-      overlayClassName="fixed inset-0 bg-black bg-opacity-50"
+      overlayClassName="fixed inset-0 bg-black bg-opacity-60"
       contentLabel="Delete Confirmation"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full mx-4"
-        style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+        className="rounded-2xl shadow-2xl p-6 max-w-md w-full mx-4"
+        style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-bold" style={{ color: 'var(--text-color)' }}>
@@ -61,28 +61,28 @@ const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, scheduleNumber, isRTL,
           </h3>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+            className="p-2 rounded-lg hover:bg-bg transition"
           >
             <X size={20} style={{ color: 'var(--text-color)' }} />
           </button>
         </div>
-        <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
+        <p className="mb-6" style={{ color: 'var(--color-secondary)' }}>
           {t("procurement.delete_confirm_message", { scheduleNumber }) || `Are you sure you want to delete schedule ${scheduleNumber}? This action cannot be undone.`}
         </p>
-        <div className={`flex gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition"
+            style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
+          >
+            {t("procurement.cancel_button") || "Cancel"}
+          </button>
           <button
             onClick={onConfirm}
-            className="flex-1 px-4 py-2 rounded-lg text-white hover:opacity-90 transition"
+            className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium text-white hover:opacity-90 transition"
             style={{ backgroundColor: '#ef4444' }}
           >
             {t("procurement.delete_button") || "Delete"}
-          </button>
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-            style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
-          >
-            {t("procurement.cancel_button") || "Cancel"}
           </button>
         </div>
       </motion.div>
@@ -116,24 +116,24 @@ const ScheduleDetailsModal = ({ isOpen, onClose, schedule, isRTL, textAlign, t }
       isOpen={isOpen}
       onRequestClose={onClose}
       className="fixed inset-0 flex items-center justify-center z-50 p-4"
-      overlayClassName="fixed inset-0 bg-black bg-opacity-50"
+      overlayClassName="fixed inset-0 bg-black bg-opacity-60"
       contentLabel="Schedule Details"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white dark:bg-gray-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-        style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+        className="rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
       >
-        <div className="p-6 border-b sticky top-0 z-10" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)' }}>
+        <div className="p-6 border-b sticky top-0 z-10" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--surface-color)' }}>
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
               {schedule.scheduleNumber}
             </h2>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              className="p-2 rounded-lg hover:bg-bg transition"
             >
               <X size={24} style={{ color: 'var(--text-color)' }} />
             </button>
@@ -148,23 +148,23 @@ const ScheduleDetailsModal = ({ isOpen, onClose, schedule, isRTL, textAlign, t }
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t("procurement.supplier") || "Supplier"}</p>
+                <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>{t("procurement.supplier") || "Supplier"}</p>
                 <p className="font-medium" style={{ color: 'var(--text-color)' }}>{schedule.supplierName}</p>
               </div>
               <div>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t("procurement.status") || "Status"}</p>
+                <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>{t("procurement.status") || "Status"}</p>
                 <span className={`px-2 py-1 rounded text-sm ${getStatusColor(schedule.status)}`}>
                   {schedule.status}
                 </span>
               </div>
               <div>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t("procurement.start_date") || "Start Date"}</p>
+                <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>{t("procurement.start_date") || "Start Date"}</p>
                 <p className="font-medium" style={{ color: 'var(--text-color)' }}>
                   {schedule.startDate ? new Date(schedule.startDate).toLocaleDateString() : "-"}
                 </p>
               </div>
               <div>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t("procurement.end_date") || "End Date"}</p>
+                <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>{t("procurement.end_date") || "End Date"}</p>
                 <p className="font-medium" style={{ color: 'var(--text-color)' }}>
                   {schedule.endDate ? new Date(schedule.endDate).toLocaleDateString() : "-"}
                 </p>
@@ -182,7 +182,7 @@ const ScheduleDetailsModal = ({ isOpen, onClose, schedule, isRTL, textAlign, t }
                 {calculateProgress()}%
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--bg-secondary)' }}>
               <div
                 className="bg-green-500 h-2 rounded-full transition-all"
                 style={{ width: `${calculateProgress()}%` }}
@@ -201,11 +201,11 @@ const ScheduleDetailsModal = ({ isOpen, onClose, schedule, isRTL, textAlign, t }
                   <div
                     key={idx}
                     className="p-4 rounded-lg border"
-                    style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)' }}
+                    style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-secondary)' }}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <Calendar size={16} style={{ color: 'var(--text-secondary)' }} />
+                        <Calendar size={16} style={{ color: 'var(--color-secondary)' }} />
                         <span className="font-medium" style={{ color: 'var(--text-color)' }}>
                           {new Date(delivery.deliveryDate).toLocaleDateString()}
                         </span>
@@ -216,7 +216,7 @@ const ScheduleDetailsModal = ({ isOpen, onClose, schedule, isRTL, textAlign, t }
                       </span>
                     </div>
                     {delivery.tracking?.trackingNumber && (
-                      <div className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      <div className="mt-2 text-sm" style={{ color: 'var(--color-secondary)' }}>
                         {t("procurement.tracking") || "Tracking"}: {delivery.tracking.trackingNumber}
                       </div>
                     )}
@@ -232,7 +232,7 @@ const ScheduleDetailsModal = ({ isOpen, onClose, schedule, isRTL, textAlign, t }
                   </div>
                 ))
               ) : (
-                <p className="text-center py-4" style={{ color: 'var(--text-secondary)' }}>
+                <p className="text-center py-4" style={{ color: 'var(--color-secondary)' }}>
                   {t("procurement.no_deliveries_scheduled") || "No deliveries scheduled"}
                 </p>
               )}
@@ -246,14 +246,14 @@ const ScheduleDetailsModal = ({ isOpen, onClose, schedule, isRTL, textAlign, t }
 
 const getStatusColor = (status) => {
   const colors = {
-    Scheduled: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+    Scheduled: "bg-[var(--bg-secondary)] text-[var(--text-color)]",
     "In Progress": "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
     "Partially Delivered": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
     Delivered: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
     Delayed: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
     Cancelled: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
   };
-  return colors[status] || "bg-gray-100 text-gray-800";
+  return colors[status] || "bg-[var(--bg-secondary)] text-[var(--text-color)]";
 };
 
 const SupplySchedulesList = () => {
@@ -543,26 +543,31 @@ const SupplySchedulesList = () => {
   }
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--bg-color)' }} dir={direction}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }} dir={direction}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-7xl mx-auto"
       >
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div className={textAlign}>
-            <h1 className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
-              {t("procurement.supply_schedules") || "Supply Schedules"}
-            </h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
-              {t("procurement.supply_schedules_description") || "Manage and track supply schedules"}
-            </p>
+        <div className="flex justify-between items-center mb-8">
+          <div className={`flex items-center gap-4 ${textAlign}`}>
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
+              <Truck size={28} color="white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
+                {t("procurement.supply_schedules") || "Supply Schedules"}
+              </h1>
+              <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
+                {t("procurement.supply_schedules_description") || "Manage and track supply schedules"}
+              </p>
+            </div>
           </div>
           <button
             onClick={() => navigate("/dashboard/procurement/supply-schedules/add")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white hover:opacity-90 transition ${isRTL ? 'flex-row-reverse' : ''}`}
-            style={{ backgroundColor: 'var(--color-primary)' }}
+            className={`flex items-center justify-center gap-2 px-6 h-11 rounded-lg font-medium hover:opacity-90 transition ${isRTL ? 'flex-row-reverse' : ''}`}
+            style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
           >
             <Plus size={20} />
             {t("procurement.add_schedule") || "Add Schedule"}
@@ -575,12 +580,12 @@ const SupplySchedulesList = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-4 rounded-lg border"
-              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)' }}
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--surface-color)' }}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
                     {t("procurement.active") || "Active"}
                   </p>
                   <p className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
@@ -597,12 +602,12 @@ const SupplySchedulesList = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="p-4 rounded-lg border"
-              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)' }}
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--surface-color)' }}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
                     {t("procurement.upcoming_7_days") || "Upcoming (7 days)"}
                   </p>
                   <p className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
@@ -619,12 +624,12 @@ const SupplySchedulesList = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="p-4 rounded-lg border"
-              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)' }}
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--surface-color)' }}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
                     {t("procurement.delayed") || "Delayed"}
                   </p>
                   <p className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
@@ -641,12 +646,12 @@ const SupplySchedulesList = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="p-4 rounded-lg border"
-              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)' }}
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--surface-color)' }}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
                     {t("procurement.completion") || "Completion"}
                   </p>
                   <p className="text-2xl font-bold" style={{ color: 'var(--text-color)' }}>
@@ -662,17 +667,17 @@ const SupplySchedulesList = () => {
         )}
 
         {/* Filters and Search */}
-        <div className="rounded-2xl shadow-md border overflow-hidden mb-6" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+        <div className="rounded-2xl shadow-lg border overflow-hidden mb-6" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
               <div className="lg:col-span-2 relative">
-                <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2`} size={20} style={{ color: 'var(--text-secondary)' }} />
+                <Search className="absolute start-3 top-1/2 -translate-y-1/2" size={20} style={{ color: 'var(--color-secondary)' }} />
               <input
                 type="text"
                 placeholder={t("procurement.search_schedules") || "Search schedules..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                  className={`w-full ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 rounded-lg border`}
+                  className="w-full h-11 ps-10 pe-4 rounded-xl border"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
@@ -682,7 +687,7 @@ const SupplySchedulesList = () => {
                   setFilterStatus(e.target.value);
                   setPage(1);
                 }}
-              className="px-4 py-2 rounded-lg border"
+              className="h-11 px-4 rounded-xl border"
               style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
             >
               <option value="all">{t("procurement.all_statuses") || "All Statuses"}</option>
@@ -699,7 +704,7 @@ const SupplySchedulesList = () => {
                   setFilterSupplier(e.target.value);
                   setPage(1);
                 }}
-                className="px-4 py-2 rounded-lg border"
+                className="h-11 px-4 rounded-xl border"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               >
                 <option value="all">{t("procurement.all_suppliers") || "All Suppliers"}</option>
@@ -717,7 +722,7 @@ const SupplySchedulesList = () => {
                     setFilterStartDate(e.target.value);
                     setPage(1);
                   }}
-                  className="flex-1 px-4 py-2 rounded-lg border"
+                  className="flex-1 h-11 px-4 rounded-xl border"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                   placeholder={t("procurement.from_date") || "From Date"}
                 />
@@ -728,7 +733,7 @@ const SupplySchedulesList = () => {
                     setFilterEndDate(e.target.value);
                     setPage(1);
                   }}
-                  className="flex-1 px-4 py-2 rounded-lg border"
+                  className="flex-1 h-11 px-4 rounded-xl border"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                   placeholder={t("procurement.to_date") || "To Date"}
                 />
@@ -738,23 +743,29 @@ const SupplySchedulesList = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setViewMode("table")}
-                  className={`p-2 rounded-lg transition ${viewMode === "table" ? 'bg-blue-100' : ''}`}
-                  style={{ color: viewMode === "table" ? 'var(--color-primary)' : 'var(--text-secondary)' }}
+                  className="p-2 rounded-lg transition"
+                  style={{
+                    color: viewMode === "table" ? 'var(--color-primary)' : 'var(--color-secondary)',
+                    backgroundColor: viewMode === "table" ? 'var(--bg-secondary)' : 'transparent'
+                  }}
                   title={t("procurement.table_view") || "Table View"}
                 >
                   <List size={20} />
                 </button>
                 <button
                   onClick={() => setViewMode("card")}
-                  className={`p-2 rounded-lg transition ${viewMode === "card" ? 'bg-blue-100' : ''}`}
-                  style={{ color: viewMode === "card" ? 'var(--color-primary)' : 'var(--text-secondary)' }}
+                  className="p-2 rounded-lg transition"
+                  style={{
+                    color: viewMode === "card" ? 'var(--color-primary)' : 'var(--color-secondary)',
+                    backgroundColor: viewMode === "card" ? 'var(--bg-secondary)' : 'transparent'
+                  }}
                   title={t("procurement.card_view") || "Card View"}
                 >
                   <Grid size={20} />
                 </button>
                 <button
                   onClick={exportToExcel}
-                  className="p-2 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                  className="p-2 rounded-lg border hover:bg-[var(--bg-secondary)] transition"
                   style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
                   title={t("procurement.export_to_excel") || "Export to Excel"}
                 >
@@ -762,7 +773,7 @@ const SupplySchedulesList = () => {
                 </button>
                 <button
                   onClick={exportToPDF}
-                  className="p-2 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                  className="p-2 rounded-lg border hover:bg-[var(--bg-secondary)] transition"
                   style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
                   title={t("procurement.export_to_pdf") || "Export to PDF"}
                 >
@@ -777,7 +788,7 @@ const SupplySchedulesList = () => {
                     setSortBy(field);
                     setSortOrder(order);
                   }}
-                  className="px-4 py-2 rounded-lg border text-sm"
+                  className="h-11 px-4 rounded-xl border text-sm"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 >
                   <option value="startDate-desc">{t("procurement.start_date_newest") || "Start Date (Newest)"}</option>
@@ -792,12 +803,12 @@ const SupplySchedulesList = () => {
 
         {/* Table View */}
         {viewMode === "table" && (
-          <div className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+          <div className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           {filteredSchedules.length === 0 ? (
             <div className="px-6 pb-6">
               <div className="text-center py-12 border-2 border-dashed rounded-lg" style={{ borderColor: 'var(--border-color)' }}>
-                <Calendar size={64} className="mx-auto mb-4" style={{ color: 'var(--text-secondary)' }} />
-                <p style={{ color: 'var(--text-secondary)' }}>
+                <Calendar size={64} className="mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
+                <p style={{ color: 'var(--color-secondary)' }}>
                     {searchTerm 
                       ? (isRTL ? "לא נמצאו תוצאות" : "No results found")
                       : (isRTL ? "אין לוחות זמנים" : "No schedules found")}
@@ -849,7 +860,7 @@ const SupplySchedulesList = () => {
                         return (
                     <motion.tr
                       key={schedule._id}
-                      className="border-b hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                      className="border-b hover:bg-[var(--bg-secondary)] transition"
                       style={{ borderColor: 'var(--border-color)' }}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -873,7 +884,7 @@ const SupplySchedulesList = () => {
                                   <ExternalLink size={12} />
                                 </button>
                               ) : (
-                                <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>-</span>
+                                <span className="text-sm" style={{ color: 'var(--color-secondary)' }}>-</span>
                               )}
                             </td>
                             <td className={`p-3 text-sm ${textAlign}`} style={{ color: 'var(--text-color)' }}>
@@ -883,7 +894,7 @@ const SupplySchedulesList = () => {
                       </td>
                             <td className="p-3">
                               <div className="flex items-center gap-2">
-                                <div className="w-16 bg-gray-200 rounded-full h-2">
+                                <div className="w-16 bg-[var(--border-color)] rounded-full h-2">
                                   <div
                                     className="bg-green-500 h-2 rounded-full transition-all"
                                     style={{ width: `${progress}%` }}
@@ -904,7 +915,7 @@ const SupplySchedulesList = () => {
                                 </span>
                               )}
                               {upcoming.count7 === 0 && upcoming.count14 === 0 && (
-                                <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>-</span>
+                                <span className="text-xs" style={{ color: 'var(--color-secondary)' }}>-</span>
                               )}
                       </td>
                             <td className={`p-3 text-sm ${textAlign}`} style={{ color: 'var(--text-color)' }}>
@@ -914,7 +925,7 @@ const SupplySchedulesList = () => {
                                   {totalAmount.toLocaleString()} {schedule.procurementId?.currency || "ILS"}
                         </span>
                               ) : (
-                                <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>-</span>
+                                <span className="text-xs" style={{ color: 'var(--color-secondary)' }}>-</span>
                               )}
                       </td>
                             <td className={`p-3 ${textAlign}`}>
@@ -936,7 +947,7 @@ const SupplySchedulesList = () => {
                               <div className={`flex gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                 <button
                                   onClick={() => handleViewDetails(schedule)}
-                                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                                  className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                                   style={{ color: 'var(--color-primary)' }}
                                   title={t("procurement.view_details") || "View Details"}
                                 >
@@ -944,7 +955,7 @@ const SupplySchedulesList = () => {
                                 </button>
                                 <button
                                   onClick={() => navigate(`/dashboard/procurement/supply-schedules/${schedule._id}`)}
-                                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                                  className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                                   style={{ color: 'var(--color-primary)' }}
                                   title={t("procurement.edit") || "Edit"}
                                 >
@@ -952,7 +963,7 @@ const SupplySchedulesList = () => {
                                 </button>
                                 <button
                                   onClick={() => duplicateMutation.mutate(schedule._id)}
-                                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                                  className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                                   style={{ color: 'var(--text-color)' }}
                                   title={t("procurement.duplicate") || "Duplicate"}
                                 >
@@ -960,7 +971,7 @@ const SupplySchedulesList = () => {
                                 </button>
                                 <button
                                   onClick={() => sendAlert(schedule)}
-                                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                                  className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                                   style={{ color: 'var(--text-color)' }}
                                   title={t("procurement.send_alert") || "Send Alert"}
                                 >
@@ -968,7 +979,7 @@ const SupplySchedulesList = () => {
                                 </button>
                                 <button
                                   onClick={() => handleDelete(schedule)}
-                                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                                  className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                                   title={t("procurement.delete") || "Delete"}
                                 >
                                   <Trash2 size={18} className="text-red-500" />
@@ -985,7 +996,7 @@ const SupplySchedulesList = () => {
                 {/* Pagination */}
                 {pagination.pages > 1 && (
                   <div className={`flex items-center justify-between p-4 border-t ${isRTL ? 'flex-row-reverse' : ''}`} style={{ borderColor: 'var(--border-color)' }}>
-                    <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    <div className="text-sm" style={{ color: 'var(--color-secondary)' }}>
                       {t("procurement.showing_results", {
                         start: (pagination.page - 1) * pagination.limit + 1,
                         end: Math.min(pagination.page * pagination.limit, pagination.total),
@@ -996,7 +1007,7 @@ const SupplySchedulesList = () => {
                       <button
                         onClick={() => setPage(p => Math.max(1, p - 1))}
                         disabled={pagination.page === 1}
-                        className="p-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                        className="p-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[var(--bg-secondary)] transition"
                         style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
                       >
                         <ChevronLeft size={20} />
@@ -1007,7 +1018,7 @@ const SupplySchedulesList = () => {
                       <button
                         onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
                         disabled={pagination.page === pagination.pages}
-                        className="p-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                        className="p-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[var(--bg-secondary)] transition"
                         style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
                       >
                         <ChevronRight size={20} />
@@ -1026,8 +1037,8 @@ const SupplySchedulesList = () => {
             {filteredSchedules.length === 0 ? (
               <div className="col-span-full">
                 <div className="text-center py-12 border-2 border-dashed rounded-lg" style={{ borderColor: 'var(--border-color)' }}>
-                  <Calendar size={64} className="mx-auto mb-4" style={{ color: 'var(--text-secondary)' }} />
-                  <p style={{ color: 'var(--text-secondary)' }}>
+                  <Calendar size={64} className="mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
+                  <p style={{ color: 'var(--color-secondary)' }}>
                     {searchTerm 
                       ? (isRTL ? "לא נמצאו תוצאות" : "No results found")
                       : (isRTL ? "אין לוחות זמנים" : "No schedules found")}
@@ -1045,8 +1056,8 @@ const SupplySchedulesList = () => {
                     key={schedule._id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-4 rounded-lg border hover:shadow-lg transition"
-                    style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)' }}
+                    className="rounded-2xl p-6 shadow-lg border hover:shadow-xl transition"
+                    style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--surface-color)' }}
                   >
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="font-mono font-semibold" style={{ color: 'var(--text-color)' }}>
@@ -1059,12 +1070,12 @@ const SupplySchedulesList = () => {
                     
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center gap-2 text-sm">
-                        <Truck size={16} style={{ color: 'var(--text-secondary)' }} />
+                        <Truck size={16} style={{ color: 'var(--color-secondary)' }} />
                         <span style={{ color: 'var(--text-color)' }}>{schedule.supplierName}</span>
                       </div>
                       {schedule.procurementId && (
                         <div className="flex items-center gap-2 text-sm">
-                          <Package size={16} style={{ color: 'var(--text-secondary)' }} />
+                          <Package size={16} style={{ color: 'var(--color-secondary)' }} />
                           <button
                             onClick={() => navigate(`/dashboard/procurement/by/${schedule.procurementId.PurchaseOrder}`)}
                             className="text-blue-500 hover:underline"
@@ -1074,7 +1085,7 @@ const SupplySchedulesList = () => {
                         </div>
                       )}
                       <div className="flex items-center gap-2 text-sm">
-                        <Calendar size={16} style={{ color: 'var(--text-secondary)' }} />
+                        <Calendar size={16} style={{ color: 'var(--color-secondary)' }} />
                         <span style={{ color: 'var(--text-color)' }}>
                           {schedule.startDate ? new Date(schedule.startDate).toLocaleDateString() : "-"}
                         </span>
@@ -1083,14 +1094,14 @@ const SupplySchedulesList = () => {
 
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                        <span className="text-xs" style={{ color: 'var(--color-secondary)' }}>
                           {t("procurement.progress") || "Progress"}
                         </span>
                         <span className="text-xs font-medium" style={{ color: 'var(--text-color)' }}>
                           {progress}%
                         </span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-[var(--border-color)] rounded-full h-2">
                         <div
                           className="bg-green-500 h-2 rounded-full transition-all"
                           style={{ width: `${progress}%` }}
@@ -1101,7 +1112,7 @@ const SupplySchedulesList = () => {
                     <div className={`flex gap-2 ${isRTL ? 'flex-row-reverse' : ''} mb-4`}>
                       <button
                         onClick={() => handleViewDetails(schedule)}
-                        className="flex-1 px-3 py-2 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition text-sm"
+                        className="px-4 h-11 rounded-lg border hover:bg-[var(--bg-secondary)] transition text-sm"
                         style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
                       >
                         <Eye size={16} className="inline mr-1" />
@@ -1109,7 +1120,7 @@ const SupplySchedulesList = () => {
                       </button>
                       <button
                         onClick={() => navigate(`/dashboard/procurement/supply-schedules/${schedule._id}`)}
-                        className="flex-1 px-3 py-2 rounded-lg text-white hover:opacity-90 transition text-sm"
+                        className="px-4 h-11 rounded-lg text-white hover:opacity-90 transition text-sm"
                         style={{ backgroundColor: 'var(--color-primary)' }}
                       >
                         <Edit size={16} className="inline mr-1" />

@@ -113,7 +113,7 @@ const ProjectGanttChart = () => {
       <div className="min-h-screen flex justify-center items-center" style={{ backgroundColor: "var(--bg-color)" }}>
         <div className="text-center">
           <RefreshCw className="size-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">{t("projects.loading")}</p>
+          <p className="text-[var(--color-secondary)]">{t("projects.loading")}</p>
         </div>
       </div>
     );
@@ -124,8 +124,8 @@ const ProjectGanttChart = () => {
       <div className="min-h-screen flex justify-center items-center" style={{ backgroundColor: "var(--bg-color)" }}>
         <div className="text-center">
           <AlertCircle className="size-8 mx-auto mb-4 text-red-600" />
-          <p className="text-gray-600">{t("projects.error_loading")}</p>
-          <p className="text-gray-500 text-sm mt-2">{error?.message || ""}</p>
+          <p className="text-[var(--color-secondary)]">{t("projects.error_loading")}</p>
+          <p className="text-[var(--color-secondary)] text-sm mt-2">{error?.message || ""}</p>
         </div>
       </div>
     );
@@ -142,7 +142,7 @@ const ProjectGanttChart = () => {
           transition={{ duration: 0.6 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-indigo-500 to-purple-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Calendar size={28} color="white" />
             </div>
             <div className="flex-1">
@@ -156,7 +156,7 @@ const ProjectGanttChart = () => {
           </div>
 
           {/* Controls */}
-          <div className="rounded-2xl shadow-lg p-6 mb-6 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+          <div className="rounded-2xl shadow-lg p-6 mb-6 border" style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}>
             <div className="flex flex-wrap items-center justify-between gap-4">
               {/* Project Filter */}
               <div className="flex-1 min-w-[200px]">
@@ -272,7 +272,7 @@ const ProjectGanttChart = () => {
         </motion.div>
 
         {/* Gantt Chart */}
-        <div className="rounded-2xl shadow-lg overflow-hidden border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+        <div className="rounded-2xl shadow-lg overflow-hidden border" style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}>
           {filteredProjects.length === 0 ? (
             <div className="p-12 text-center">
               <Calendar className="size-12 mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />

@@ -267,7 +267,7 @@ const PayrollAutomation = () => {
         animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-purple-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Settings size={28} color="white" />
             </div>
             <div>
@@ -314,7 +314,7 @@ const PayrollAutomation = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="rounded-2xl shadow-lg border p-6 sm:p-8"
-            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
           >
             {loadingSettings ? (
               <div className="text-center py-16">
@@ -367,7 +367,7 @@ const PayrollAutomation = () => {
                       onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
                       className="sr-only peer"
                     />
-                    <div className="w-14 h-7 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600 bg-gray-300"></div>
+                    <div className="w-14 h-7 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--surface-color)] after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-[var(--surface-color)] after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600 bg-[var(--border-color)]"></div>
                   </label>
                 </div>
 
@@ -485,7 +485,7 @@ const PayrollAutomation = () => {
                         onChange={(e) => setFormData({ ...formData, autoApprove: e.target.checked })}
                         className="sr-only peer"
                       />
-                      <div className="w-14 h-7 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600 bg-gray-300"></div>
+                      <div className="w-14 h-7 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--surface-color)] after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-[var(--surface-color)] after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600 bg-[var(--border-color)]"></div>
                     </label>
                   </div>
                   <div className="flex items-center justify-between p-4 rounded-xl border" style={{ borderColor: "var(--border-color)" }}>
@@ -504,7 +504,7 @@ const PayrollAutomation = () => {
                         onChange={(e) => setFormData({ ...formData, autoSendPayslips: e.target.checked })}
                         className="sr-only peer"
                       />
-                      <div className="w-14 h-7 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600 bg-gray-300"></div>
+                      <div className="w-14 h-7 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[var(--surface-color)] after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-[var(--surface-color)] after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600 bg-[var(--border-color)]"></div>
                     </label>
                   </div>
                 </div>
@@ -618,7 +618,7 @@ const PayrollAutomation = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="rounded-2xl shadow-lg border p-6 sm:p-8"
-            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
           >
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold" style={{ color: "var(--text-color)" }}>
@@ -753,7 +753,7 @@ const PayrollAutomation = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="rounded-2xl shadow-lg border p-6 sm:p-8"
-            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
           >
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold" style={{ color: "var(--text-color)" }}>
@@ -865,7 +865,7 @@ const PayrollAutomation = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="rounded-2xl shadow-lg border p-6 sm:p-8"
-            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
           >
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold" style={{ color: "var(--text-color)" }}>

@@ -368,7 +368,7 @@ const LeadsManagement = () => {
   };
 
   const pipelineStages = [
-    { id: "New", label: t("leads.stage_new") || "New", color: "bg-gray-500" },
+    { id: "New", label: t("leads.stage_new") || "New", color: "bg-[var(--color-secondary)]" },
     {
       id: "Contacted",
       label: t("leads.stage_contacted") || "Contacted",
@@ -478,7 +478,7 @@ const LeadsManagement = () => {
         >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-purple-600">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
                 <Target size={28} color="white" />
               </div>
               <div>
@@ -492,7 +492,7 @@ const LeadsManagement = () => {
             </div>
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all shadow-lg"
+              className="flex items-center gap-2 px-6 h-11 rounded-xl font-semibold transition-all shadow-lg" style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}
             >
               <Plus size={20} />
               {t("leads.add_lead") || "Add Lead"}
@@ -680,7 +680,7 @@ const LeadsManagement = () => {
             </p>
             <button
               onClick={() => setShowAddModal(true)}
-              className="px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all shadow-lg"
+              className="px-6 h-11 rounded-xl font-semibold transition-all shadow-lg" style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}
             >
               <Plus size={20} className="inline mr-2" />
               {t("leads.add_lead") || "Add Lead"}
@@ -735,7 +735,7 @@ const LeadsManagement = () => {
                         }}
                         className="bg-bg rounded-xl p-4 shadow-md border border-border-color cursor-pointer hover:shadow-lg transition-all"
                         style={{
-                          backgroundColor: "var(--bg-color)",
+                          backgroundColor: "var(--surface-color)",
                           borderColor: "var(--border-color)",
                         }}
                       >
@@ -850,7 +850,7 @@ const LeadsManagement = () => {
                         <span
                           className="px-3 py-1 rounded-lg text-sm font-medium"
                           style={{
-                            backgroundColor: pipelineStages.find((s) => s.id === lead.status)?.color || "bg-gray-500",
+                            backgroundColor: pipelineStages.find((s) => s.id === lead.status)?.color || "bg-[var(--color-secondary)]",
                             color: "white",
                           }}
                         >
@@ -896,7 +896,7 @@ const LeadsManagement = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div
             className="bg-bg rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
-            style={{ backgroundColor: "var(--bg-color)" }}
+            style={{ backgroundColor: "var(--surface-color)" }}
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -1537,7 +1537,7 @@ const LeadsManagement = () => {
                   <button
                     type="submit"
                     disabled={createLeadMutation.isPending}
-                    className="flex-1 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full sm:w-auto px-6 h-11 rounded-xl font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2" style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}
                   >
                     {createLeadMutation.isPending ? (
                       <>
@@ -1563,7 +1563,7 @@ const LeadsManagement = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div
             className="bg-bg rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-            style={{ backgroundColor: "var(--bg-color)" }}
+            style={{ backgroundColor: "var(--surface-color)" }}
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -1750,7 +1750,7 @@ const LeadsManagement = () => {
                     // Navigate to activities page with lead filter
                     navigate(`/dashboard/activities?leadId=${selectedLead._id}&relatedToType=Lead`);
                   }}
-                  className="flex-1 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 transition-all"
+                  className="w-full sm:w-auto px-6 h-11 rounded-xl font-semibold transition-all" style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}
                 >
                   {t("leads.view_activities") || "View Activities"}
                 </button>
@@ -1779,7 +1779,8 @@ const LeadsManagement = () => {
                       createOrderMutation.mutate(selectedLead._id);
                     }}
                     disabled={createOrderMutation.isPending}
-                    className="flex-1 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full sm:w-auto px-6 h-11 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    style={{ backgroundColor: "var(--color-accent)", color: "var(--button-text)" }}
                   >
                     {createOrderMutation.isPending ? (
                       <>
@@ -1800,7 +1801,7 @@ const LeadsManagement = () => {
                     onClick={() => {
                       navigate(`/dashboard/orders/${selectedLead.createdOrderId}`);
                     }}
-                    className="flex-1 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 transition-all flex items-center justify-center gap-2"
+                    className="w-full sm:w-auto px-6 h-11 rounded-xl font-semibold transition-all flex items-center justify-center gap-2" style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}
                   >
                     <ShoppingCart size={20} />
                     {t("leads.view_order") || "View Order"}
@@ -1817,7 +1818,7 @@ const LeadsManagement = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div
             className="bg-bg rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-            style={{ backgroundColor: "var(--bg-color)" }}
+            style={{ backgroundColor: "var(--surface-color)" }}
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -2356,7 +2357,7 @@ const LeadsManagement = () => {
                   <button
                     type="submit"
                     disabled={updateLeadMutation.isLoading}
-                    className="flex-1 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 transition-all disabled:opacity-50"
+                    className="w-full sm:w-auto px-6 h-11 rounded-xl font-semibold transition-all disabled:opacity-50" style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}
                   >
                     {updateLeadMutation.isLoading ? (
                       <span className="flex items-center justify-center gap-2">

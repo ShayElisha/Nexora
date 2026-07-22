@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 
 const statusStyles = {
-  operational: "text-green-600 bg-green-50 border-green-200",
+  operational: "text-green-600 bg-green-50 border-[var(--border-color)]",
   maintenance: "text-amber-600 bg-amber-50 border-amber-200",
   offline: "text-red-600 bg-red-50 border-red-200",
 };
@@ -304,7 +304,7 @@ const WarehouseManagement = () => {
   const StatusBadge = ({ status }) => (
     <span
       className={`px-3 py-1 rounded-full text-xs font-semibold border ${
-        statusStyles[status] || "bg-gray-100 text-gray-600 border-gray-200"
+        statusStyles[status] || "bg-[var(--bg-secondary)] text-[var(--color-secondary)] border-[var(--border-color)]"
       }`}
     >
       {status === "operational"
@@ -563,18 +563,19 @@ const WarehouseManagement = () => {
           initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 sm:p-8"
+          className="rounded-2xl p-6 shadow-lg border sm:p-8"
+          style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
         >
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div className="flex gap-4 items-center">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg">
-                <Warehouse className="text-white" size={32} />
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
+                <Warehouse className="text-white" size={28} />
               </div>
               <div>
-                <h1 className="text-3xl sm:text-4xl font-bold" style={{ color: "var(--text-color)" }}>
+                <h1 className="text-4xl font-bold" style={{ color: "var(--text-color)" }}>
                   {t("warehouse.management_title", { defaultValue: "Warehouse Management" })}
                 </h1>
-                <p className="text-gray-500 text-base sm:text-lg">
+                <p className="text-lg" style={{ color: "var(--color-secondary)" }}>
                   {t("warehouse.subtitle", {
                     defaultValue: "Monitor utilization, environment and workflows across every facility",
                   })}
@@ -583,7 +584,8 @@ const WarehouseManagement = () => {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <button
-                className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl font-semibold border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 transition-all"
+                className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition-all"
+                style={{ backgroundColor: "var(--border-color)", color: "var(--text-color)" }}
                 onClick={() => queryClient.invalidateQueries({ queryKey: ["warehouses"] })}
                 disabled={isFetching}
               >
@@ -593,8 +595,8 @@ const WarehouseManagement = () => {
                   : t("common.refresh", { defaultValue: "Refresh" })}
               </button>
               <button
-                className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl font-semibold text-white transition-all hover:scale-105"
-                style={{ background: "var(--color-primary)" }}
+                className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition-all hover:opacity-90"
+                style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}
                 onClick={openCreateModal}
               >
                 <Plus size={18} />
@@ -636,28 +638,30 @@ const WarehouseManagement = () => {
           />
         </div>
 
-        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6 space-y-4">
+        <div className="rounded-2xl p-6 shadow-lg border space-y-4" style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}>
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex items-center gap-3 text-gray-600">
+            <div className="flex items-center gap-3" style={{ color: "var(--color-secondary)" }}>
               <Filter size={20} />
               <span className="font-semibold">
                 {t("warehouse.filters", { defaultValue: "Smart Filters" })}
               </span>
             </div>
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4 w-full">
-              <div className="relative flex-1">
-                <Search className="absolute top-3 left-3 text-gray-400" size={18} />
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 w-full">
+              <div className="relative col-span-2 md:col-span-1">
+                <Search className="absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" size={18} style={{ color: "var(--text-secondary)" }} />
                 <input
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full h-11 ps-10 pe-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                  style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                   placeholder={t("warehouse.search_placeholder", {
                     defaultValue: "Search ID, name or region...",
                   })}
                 />
               </div>
               <select
-                className="px-4 py-2.5 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
@@ -675,7 +679,8 @@ const WarehouseManagement = () => {
                 </option>
               </select>
               <select
-                className="px-4 py-2.5 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                 value={regionFilter}
                 onChange={(e) => setRegionFilter(e.target.value)}
               >
@@ -687,7 +692,8 @@ const WarehouseManagement = () => {
                 ))}
               </select>
               <select
-                className="px-4 py-2.5 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                 value={automationFilter}
                 onChange={(e) => setAutomationFilter(e.target.value)}
               >
@@ -699,7 +705,8 @@ const WarehouseManagement = () => {
                 <option value="low">{automationLabels.low}</option>
               </select>
               <select
-                className="px-4 py-2.5 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                 value={sortOption}
                 onChange={(e) => setSortOption(e.target.value)}
               >
@@ -733,20 +740,21 @@ const WarehouseManagement = () => {
           />
         </div>
 
-        <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6">
+        <div className="rounded-2xl p-6 shadow-lg border" style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}>
           <div className="flex items-center justify-between mb-4">
     <div>
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold" style={{ color: "var(--text-color)" }}>
                 {t("warehouse.overview", { defaultValue: "Operational Overview" })}
               </h2>
-              <p className="text-gray-500 text-sm">
+              <p className="text-sm" style={{ color: "var(--color-secondary)" }}>
                 {t("warehouse.table_subtitle", {
                   defaultValue: "Live conditions, throughput and alert feed",
                 })}
               </p>
             </div>
             <button
-              className="px-4 py-2 rounded-2xl border border-gray-200 text-sm font-medium text-gray-600 hover:border-gray-300 flex items-center gap-2 disabled:opacity-50"
+              className="px-4 py-2 rounded-lg border text-sm font-medium flex items-center gap-2 disabled:opacity-50 hover:opacity-80"
+              style={{ borderColor: "var(--border-color)", color: "var(--text-color)" }}
               onClick={handleExportCsv}
               disabled={!normalizedWarehouses.length}
             >
@@ -758,7 +766,7 @@ const WarehouseManagement = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="text-xs uppercase tracking-wide text-gray-400">
+                <tr className="text-xs uppercase tracking-wide" style={{ color: "var(--color-secondary)" }}>
                   <th className="pb-3">{t("warehouse.name", { defaultValue: "Warehouse" })}</th>
                   <th className="pb-3">{t("warehouse.region", { defaultValue: "Region" })}</th>
                   <th className="pb-3">{t("warehouse.utilization", { defaultValue: "Utilization" })}</th>
@@ -769,16 +777,16 @@ const WarehouseManagement = () => {
                   <th className="pb-3" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y" style={{ borderColor: "var(--border-color)" }}>
                 {filteredWarehouses.map((wh) => (
-                  <tr key={wh.id} className="text-sm text-gray-700">
+                  <tr key={wh.id} className="text-sm" style={{ color: "var(--text-color)" }}>
                     <td className="py-4">
                       <p className="font-semibold">{wh.name}</p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs" style={{ color: "var(--color-secondary)" }}>
                         {t("warehouse.last_audit", { defaultValue: "Audit" })}: {wh.lastAudit}
                       </p>
                     </td>
-                    <td className="py-4 flex items-center gap-2 text-gray-600">
+                    <td className="py-4 flex items-center gap-2" style={{ color: "var(--color-secondary)" }}>
                       <MapPin size={14} />
                       {wh.region}
                     </td>
@@ -790,15 +798,15 @@ const WarehouseManagement = () => {
                     </td>
                     <td className="py-4">
                       <p className="font-semibold">{wh.capacity.toLocaleString()} m³</p>
-                      <p className="text-xs text-gray-400">{automationLabels[wh.automation]}</p>
+                      <p className="text-xs" style={{ color: "var(--color-secondary)" }}>{automationLabels[wh.automation]}</p>
                     </td>
                     <td className="py-4">
                       <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1 text-gray-600">
+                        <span className="flex items-center gap-1" style={{ color: "var(--color-secondary)" }}>
                           <ThermometerSun size={14} />
                           {wh.temperature}°C
                         </span>
-                        <span className="flex items-center gap-1 text-gray-600">
+                        <span className="flex items-center gap-1" style={{ color: "var(--color-secondary)" }}>
                           <Droplets size={14} />
                           {wh.humidity}%
                         </span>
@@ -806,10 +814,10 @@ const WarehouseManagement = () => {
                     </td>
                     <td className="py-4">
                       <div className="flex flex-col">
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs" style={{ color: "var(--color-secondary)" }}>
                           {t("warehouse.inbound", { defaultValue: "Inbound" })}: <strong>{wh.inboundToday}</strong>
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs" style={{ color: "var(--color-secondary)" }}>
                           {t("warehouse.outbound", { defaultValue: "Outbound" })}: <strong>{wh.outboundToday}</strong>
                         </span>
                       </div>
@@ -841,7 +849,7 @@ const WarehouseManagement = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <button
-                            className="px-3 py-1 rounded-full border border-blue-200 text-blue-700 text-xs font-medium hover:bg-blue-50 flex items-center gap-1"
+                            className="px-3 py-1 rounded-full border border-[var(--border-color)] text-blue-700 text-xs font-medium hover:bg-blue-50 flex items-center gap-1"
                             onClick={() => navigate(`/dashboard/inventory/warehouse/${wh.id}`)}
                             title={t("warehouse.view_inventory", { defaultValue: "View Inventory" })}
                           >
@@ -849,7 +857,8 @@ const WarehouseManagement = () => {
                             {t("warehouse.view_inventory", { defaultValue: "View" })}
                           </button>
                           <button
-                            className="p-2 rounded-full border border-gray-200 hover:border-gray-300"
+                            className="p-2 rounded-full border hover:opacity-80"
+                            style={{ borderColor: "var(--border-color)", color: "var(--text-color)" }}
                             onClick={() => openEditModal(wh)}
                           >
                             <Edit size={16} />
@@ -869,7 +878,7 @@ const WarehouseManagement = () => {
               </tbody>
             </table>
             {!filteredWarehouses.length && (
-              <div className="text-center py-10 text-gray-400 text-sm">
+              <div className="text-center py-16 text-sm" style={{ color: "var(--color-secondary)" }}>
                 {isFetching
                   ? t("warehouse.loading", { defaultValue: "Loading warehouses..." })
                   : isError
@@ -885,23 +894,24 @@ const WarehouseManagement = () => {
 
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" onClick={closeModal} />
-          <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+          <div className="absolute inset-0 bg-black bg-opacity-60" onClick={closeModal} />
+          <div className="relative rounded-2xl shadow-2xl w-full max-w-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "var(--surface-color)" }}>
             <button
               type="button"
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+              className="absolute top-4 end-4 hover:opacity-70"
+              style={{ color: "var(--color-secondary)" }}
               onClick={closeModal}
               aria-label={t("warehouse.cancel", { defaultValue: "Cancel" })}
             >
               <X size={20} />
             </button>
             <div className="mb-6">
-              <h3 className="text-2xl font-semibold text-gray-900">
+              <h3 className="text-2xl font-semibold" style={{ color: "var(--text-color)" }}>
                 {modalMode === "create"
                   ? t("warehouse.custom_form_title", { defaultValue: "Create warehouse" })
                   : t("warehouse.edit_title", { defaultValue: "Edit warehouse" })}
               </h3>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm" style={{ color: "var(--color-secondary)" }}>
                 {t("warehouse.custom_form_description", {
                   defaultValue: "Define live data that will be stored on the server.",
                 })}
@@ -909,22 +919,24 @@ const WarehouseManagement = () => {
             </div>
             <form className="grid gap-4" onSubmit={handleSubmit}>
               <div className="grid gap-2">
-                <label className="text-sm font-medium text-gray-700">
+                <label className="block text-sm font-semibold" style={{ color: "var(--text-color)" }}>
                   {t("warehouse.fields.name", { defaultValue: "Warehouse name" })}
                 </label>
                 <input
-                  className="w-full rounded-2xl border border-gray-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                  style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                   value={formData.name}
                   onChange={(e) => handleFormChange("name", e.target.value)}
                   required
                 />
               </div>
               <div className="grid gap-2">
-                <label className="text-sm font-medium text-gray-700">
+                <label className="block text-sm font-semibold" style={{ color: "var(--text-color)" }}>
                   {t("warehouse.fields.region", { defaultValue: "Region" })}
                 </label>
                 <input
-                  className="w-full rounded-2xl border border-gray-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                  style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                   value={formData.region}
                   onChange={(e) => handleFormChange("region", e.target.value)}
                   required
@@ -932,22 +944,24 @@ const WarehouseManagement = () => {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="grid gap-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-semibold" style={{ color: "var(--text-color)" }}>
                     {t("warehouse.fields.street", { defaultValue: "Street" })}
                   </label>
                   <input
-                    className="w-full rounded-2xl border border-gray-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                  style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                     value={formData.address?.street}
                     onChange={(e) => handleAddressChange("street", e.target.value)}
                     required
                   />
                 </div>
                 <div className="grid gap-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-semibold" style={{ color: "var(--text-color)" }}>
                     {t("warehouse.fields.city", { defaultValue: "City" })}
                   </label>
                   <input
-                    className="w-full rounded-2xl border border-gray-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                  style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                     value={formData.address?.city}
                     onChange={(e) => handleAddressChange("city", e.target.value)}
                     required
@@ -956,21 +970,23 @@ const WarehouseManagement = () => {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="grid gap-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-semibold" style={{ color: "var(--text-color)" }}>
                     {t("warehouse.fields.state", { defaultValue: "State/Region" })}
                   </label>
                   <input
-                    className="w-full rounded-2xl border border-gray-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                  style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                     value={formData.address?.state}
                     onChange={(e) => handleAddressChange("state", e.target.value)}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-semibold" style={{ color: "var(--text-color)" }}>
                     {t("warehouse.fields.zip", { defaultValue: "ZIP / Postal Code" })}
                   </label>
                   <input
-                    className="w-full rounded-2xl border border-gray-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                  style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                     value={formData.address?.zipCode}
                     onChange={(e) => handleAddressChange("zipCode", e.target.value)}
                   />
@@ -978,44 +994,48 @@ const WarehouseManagement = () => {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="grid gap-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-semibold" style={{ color: "var(--text-color)" }}>
                     {t("warehouse.fields.country", { defaultValue: "Country" })}
                   </label>
                   <input
-                    className="w-full rounded-2xl border border-gray-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                  style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                     value={formData.address?.country}
                     onChange={(e) => handleAddressChange("country", e.target.value)}
                     required
                   />
                 </div>
                 <div className="grid gap-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-semibold" style={{ color: "var(--text-color)" }}>
                     {t("warehouse.fields.contactName", { defaultValue: "Contact name" })}
                   </label>
                   <input
-                    className="w-full rounded-2xl border border-gray-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                  style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                     value={formData.address?.contactName}
                     onChange={(e) => handleAddressChange("contactName", e.target.value)}
                   />
                 </div>
               </div>
               <div className="grid gap-2">
-                <label className="text-sm font-medium text-gray-700">
+                <label className="block text-sm font-semibold" style={{ color: "var(--text-color)" }}>
                   {t("warehouse.fields.contactPhone", { defaultValue: "Contact phone" })}
                 </label>
                 <input
-                  className="w-full rounded-2xl border border-gray-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                  style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                   value={formData.address?.contactPhone}
                   onChange={(e) => handleAddressChange("contactPhone", e.target.value)}
                 />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="grid gap-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-semibold" style={{ color: "var(--text-color)" }}>
                     {t("warehouse.fields.status", { defaultValue: "Status" })}
                   </label>
                   <select
-                    className="w-full rounded-2xl border border-gray-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                  style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                     value={formData.status}
                     onChange={(e) => handleFormChange("status", e.target.value)}
                   >
@@ -1025,11 +1045,12 @@ const WarehouseManagement = () => {
                   </select>
                 </div>
                 <div className="grid gap-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-semibold" style={{ color: "var(--text-color)" }}>
                     {t("warehouse.fields.automation", { defaultValue: "Automation" })}
                   </label>
                   <select
-                    className="w-full rounded-2xl border border-gray-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                  style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                     value={formData.automation}
                     onChange={(e) => handleFormChange("automation", e.target.value)}
                   >
@@ -1082,28 +1103,30 @@ const WarehouseManagement = () => {
                 />
               </div>
               <div className="grid gap-2">
-                <label className="text-sm font-medium text-gray-700">
+                <label className="block text-sm font-semibold" style={{ color: "var(--text-color)" }}>
                   {t("warehouse.fields.lastAudit", { defaultValue: "Last audit" })}
                 </label>
                 <input
                   type="date"
-                  className="w-full rounded-2xl border border-gray-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                  style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                   value={formData.lastAudit}
                   onChange={(e) => handleFormChange("lastAudit", e.target.value)}
                 />
               </div>
-              <div className="flex items-center justify-end gap-3 pt-4">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4">
                 <button
                   type="button"
-                  className="px-5 py-2.5 rounded-2xl border border-gray-200 text-gray-600 hover:border-gray-300"
+                  className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium hover:opacity-90"
+                  style={{ backgroundColor: "var(--border-color)", color: "var(--text-color)" }}
                   onClick={closeModal}
                 >
                   {t("warehouse.cancel", { defaultValue: "Cancel" })}
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-2xl text-white font-semibold"
-                  style={{ background: "var(--color-primary)" }}
+                  className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium hover:opacity-90"
+                  style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}
                   disabled={createWarehouse.isPending || updateWarehouse.isPending}
                 >
                   {modalMode === "create"
@@ -1120,7 +1143,7 @@ const WarehouseManagement = () => {
 };
 
 const ProgressBar = ({ value }) => (
-  <div className="w-full h-2 bg-gray-100 rounded-full">
+  <div className="w-full h-2 rounded-full" style={{ backgroundColor: "var(--bg-secondary)" }}>
     <div
       className="h-2 rounded-full transition-all"
       style={{
@@ -1132,15 +1155,15 @@ const ProgressBar = ({ value }) => (
 );
 
 const SummaryCard = ({ title, value, subtitle, icon, iconWrapper, progress }) => (
-  <div className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100">
+  <div className="rounded-2xl p-6 shadow-lg border" style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}>
     <div className="flex items-center justify-between">
       <div>
-        <p className="text-sm text-gray-500">{title}</p>
-        <p className="text-3xl font-bold text-gray-900">{value}</p>
-        {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
+        <p className="text-sm" style={{ color: "var(--color-secondary)" }}>{title}</p>
+        <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>{value}</p>
+        {subtitle && <p className="text-xs mt-1" style={{ color: "var(--color-secondary)" }}>{subtitle}</p>}
         {typeof progress === "number" && (
           <div className="mt-3">
-            <div className="w-full h-2 bg-gray-100 rounded-full">
+            <div className="w-full h-2 rounded-full" style={{ backgroundColor: "var(--bg-secondary)" }}>
               <div
                 className="h-2 rounded-full"
                 style={{
@@ -1159,12 +1182,13 @@ const SummaryCard = ({ title, value, subtitle, icon, iconWrapper, progress }) =>
 
 const NumberInput = ({ label, value, onChange, min, max }) => (
   <div className="grid gap-2">
-    <label className="text-sm font-medium text-gray-700">{label}</label>
+    <label className="block text-sm font-semibold" style={{ color: "var(--text-color)" }}>{label}</label>
     <input
       type="number"
       min={min}
       max={max}
-      className="w-full rounded-2xl border border-gray-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+      className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:ring-[var(--color-primary)] outline-none"
+                  style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
       value={value}
       onChange={(e) => onChange(e.target.value)}
     />
@@ -1172,33 +1196,33 @@ const NumberInput = ({ label, value, onChange, min, max }) => (
 );
 
 const RegionOverviewCard = ({ data, totalCapacity, t }) => (
-  <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6">
+  <div className="rounded-2xl p-6 shadow-lg border" style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}>
     <div className="flex items-center justify-between gap-4">
       <div>
-        <p className="text-xs uppercase text-gray-400 font-semibold">
+        <p className="text-xs uppercase font-semibold" style={{ color: "var(--color-secondary)" }}>
           {t("warehouse.region_overview", { defaultValue: "Regional capacity overview" })}
         </p>
-        <h3 className="text-2xl font-semibold text-gray-900">
+        <h3 className="text-2xl font-semibold" style={{ color: "var(--text-color)" }}>
           {t("warehouse.region_capacity_label", { defaultValue: "Capacity" })}
         </h3>
       </div>
-      <div className="text-right">
-        <p className="text-xs text-gray-500">
+      <div className="text-end">
+        <p className="text-xs" style={{ color: "var(--color-secondary)" }}>
           {t("warehouse.capacity", { defaultValue: "Total Capacity" })}
         </p>
-        <p className="text-2xl font-bold text-gray-900">{totalCapacity.toLocaleString()} m³</p>
+        <p className="text-2xl font-bold" style={{ color: "var(--text-color)" }}>{totalCapacity.toLocaleString()} m³</p>
       </div>
     </div>
     {data.length ? (
       <ul className="mt-6 space-y-4">
         {data.map((region) => (
           <li key={region.region} className="space-y-2">
-            <div className="flex items-center justify-between text-sm font-semibold text-gray-900">
+            <div className="flex items-center justify-between text-sm font-semibold" style={{ color: "var(--text-color)" }}>
               <span>{region.region}</span>
               <span>{region.capacity.toLocaleString()} m³</span>
             </div>
             <ProgressBar value={region.avgUtilization} />
-            <div className="flex items-center justify-between text-xs text-gray-500">
+            <div className="flex items-center justify-between text-xs" style={{ color: "var(--color-secondary)" }}>
               <span>
                 {t("warehouse.region_utilization_label", { defaultValue: "Avg utilization" })}:{" "}
                 {Math.round(region.avgUtilization)}%
@@ -1217,24 +1241,24 @@ const RegionOverviewCard = ({ data, totalCapacity, t }) => (
 );
 
 const InsightsPanel = ({ topUtilized, environmentRisks, t }) => (
-  <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-6">
-    <h3 className="text-xl font-semibold text-gray-900 mb-4">
+  <div className="rounded-2xl p-6 shadow-lg border" style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}>
+    <h3 className="text-xl font-semibold mb-4" style={{ color: "var(--text-color)" }}>
       {t("warehouse.insights_title", { defaultValue: "Operational insights" })}
     </h3>
     <div className="space-y-6">
       <div>
         <div className="flex items-center justify-between mb-2">
-          <h4 className="text-sm font-semibold text-gray-900">
+          <h4 className="text-sm font-semibold" style={{ color: "var(--text-color)" }}>
             {t("warehouse.top_performers", { defaultValue: "Top utilized" })}
           </h4>
         </div>
         {topUtilized.length ? (
           <ul className="space-y-3">
             {topUtilized.map((warehouse) => (
-              <li key={`top-${warehouse.id}`} className="flex items-center justify-between text-sm text-gray-700">
+              <li key={`top-${warehouse.id}`} className="flex items-center justify-between text-sm" style={{ color: "var(--text-color)" }}>
                 <div>
-                  <p className="font-semibold text-gray-900">{warehouse.name}</p>
-                  <p className="text-xs text-gray-500">{warehouse.region}</p>
+                  <p className="font-semibold" style={{ color: "var(--text-color)" }}>{warehouse.name}</p>
+                  <p className="text-xs" style={{ color: "var(--color-secondary)" }}>{warehouse.region}</p>
                 </div>
                 <span className="text-sm font-semibold text-emerald-600">{warehouse.utilization}%</span>
               </li>
@@ -1246,24 +1270,24 @@ const InsightsPanel = ({ topUtilized, environmentRisks, t }) => (
       </div>
       <div>
         <div className="flex items-center justify-between mb-2">
-          <h4 className="text-sm font-semibold text-gray-900">
+          <h4 className="text-sm font-semibold" style={{ color: "var(--text-color)" }}>
             {t("warehouse.at_risk", { defaultValue: "Environmental risks" })}
           </h4>
         </div>
         {environmentRisks.length ? (
           <ul className="space-y-3">
             {environmentRisks.map((warehouse) => (
-              <li key={`risk-${warehouse.id}`} className="text-sm text-gray-700">
+              <li key={`risk-${warehouse.id}`} className="text-sm" style={{ color: "var(--text-color)" }}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-semibold text-gray-900">{warehouse.name}</p>
-                    <p className="text-xs text-gray-500">{warehouse.region}</p>
+                    <p className="font-semibold" style={{ color: "var(--text-color)" }}>{warehouse.name}</p>
+                    <p className="text-xs" style={{ color: "var(--color-secondary)" }}>{warehouse.region}</p>
                   </div>
                   <span className="text-xs font-semibold text-amber-600">
                     {t("warehouse.status_" + warehouse.status, { defaultValue: warehouse.status })}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">{warehouse.reasons.join(" · ")}</p>
+                <p className="text-xs mt-1" style={{ color: "var(--color-secondary)" }}>{warehouse.reasons.join(" · ")}</p>
               </li>
             ))}
           </ul>
@@ -1276,7 +1300,7 @@ const InsightsPanel = ({ topUtilized, environmentRisks, t }) => (
 );
 
 const EmptyState = ({ message }) => (
-  <div className="py-6 text-center text-sm text-gray-400 border border-dashed border-gray-200 rounded-2xl">
+  <div className="py-6 text-center text-sm border border-dashed rounded-2xl" style={{ color: "var(--color-secondary)", borderColor: "var(--border-color)" }}>
     {message}
   </div>
 );

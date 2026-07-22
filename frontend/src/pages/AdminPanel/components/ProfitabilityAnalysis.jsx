@@ -152,7 +152,7 @@ const ProfitabilityAnalysis = () => {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               viewMode === "product"
                 ? "bg-accent text-button-text shadow-md"
-                : "bg-gray-100 text-secondary hover:bg-gray-200"
+                : "bg-[var(--bg-secondary)] text-secondary hover:bg-[var(--border-color)]"
             }`}
           >
             לפי מוצר
@@ -162,7 +162,7 @@ const ProfitabilityAnalysis = () => {
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               viewMode === "customer"
                 ? "bg-primary text-button-text shadow-md"
-                : "bg-gray-100 text-secondary hover:bg-gray-200"
+                : "bg-[var(--bg-secondary)] text-secondary hover:bg-[var(--border-color)]"
             }`}
           >
             לפי לקוח
@@ -178,14 +178,14 @@ const ProfitabilityAnalysis = () => {
           </div>
 
           {/* Top Products Table */}
-          <div className="bg-gray-50 rounded-xl p-4 border border-[var(--border-color)]">
+          <div className="bg-[var(--bg-secondary)] rounded-xl p-4 border border-[var(--border-color)]">
             <h4 className="text-base font-semibold mb-4">
               TOP 10 מוצרים מרווחיים
             </h4>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-gray-200 text-secondary">
+                  <tr className="bg-[var(--border-color)] text-secondary">
                     <th className="px-4 py-2 text-right">#</th>
                     <th className="px-4 py-2 text-right">מוצר</th>
                     <th className="px-4 py-2 text-right">הכנסות</th>
@@ -198,9 +198,9 @@ const ProfitabilityAnalysis = () => {
                   {data.byProduct.slice(0, 10).map((product, index) => (
                     <tr
                       key={index}
-                      className="border-b border-[var(--border-color)] hover:bg-gray-100"
+                      className="border-b border-[var(--border-color)] hover:bg-[var(--bg-secondary)]"
                     >
-                      <td className="px-4 py-3 font-semibold text-gray-600">
+                      <td className="px-4 py-3 font-semibold text-[var(--color-secondary)]">
                         {index + 1}
                       </td>
                       <td className="px-4 py-3 font-medium">
@@ -241,14 +241,14 @@ const ProfitabilityAnalysis = () => {
           </div>
 
           {/* Top Customers Table */}
-          <div className="bg-gray-50 rounded-xl p-4 border border-[var(--border-color)]">
+          <div className="bg-[var(--bg-secondary)] rounded-xl p-4 border border-[var(--border-color)]">
             <h4 className="text-base font-semibold mb-4">
               TOP 10 לקוחות מרווחיים
             </h4>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-gray-200 text-secondary">
+                  <tr className="bg-[var(--border-color)] text-secondary">
                     <th className="px-4 py-2 text-right">#</th>
                     <th className="px-4 py-2 text-right">לקוח</th>
                     <th className="px-4 py-2 text-right">הכנסות כוללות</th>
@@ -261,9 +261,9 @@ const ProfitabilityAnalysis = () => {
                   {data.byCustomer.slice(0, 10).map((customer, index) => (
                     <tr
                       key={index}
-                      className="border-b border-[var(--border-color)] hover:bg-gray-100"
+                      className="border-b border-[var(--border-color)] hover:bg-[var(--bg-secondary)]"
                     >
-                      <td className="px-4 py-3 font-semibold text-gray-600">
+                      <td className="px-4 py-3 font-semibold text-[var(--color-secondary)]">
                         {index + 1}
                       </td>
                       <td className="px-4 py-3 font-medium">
@@ -284,7 +284,7 @@ const ProfitabilityAnalysis = () => {
                           currency: "ILS",
                         }).format(customer.avgOrderValue)}
                       </td>
-                      <td className="px-4 py-3 text-gray-600">
+                      <td className="px-4 py-3 text-[var(--color-secondary)]">
                         {new Date(customer.lastOrderDate).toLocaleDateString(
                           "he-IL"
                         )}

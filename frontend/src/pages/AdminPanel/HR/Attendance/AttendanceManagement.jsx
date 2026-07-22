@@ -430,14 +430,22 @@ const AttendanceManagement = () => {
     <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }}>
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>
-                {t("hr.attendance.title") || "Attendance Management"}
-              </h1>
-              <p className="mt-1" style={{ color: "var(--color-secondary)" }}>
-                {t("hr.attendance.subtitle") || "Track and manage employee shifts with pay rates"}
-              </p>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div
+                className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+                style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
+              >
+                <Clock size={28} color="white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold" style={{ color: "var(--text-color)" }}>
+                  {t("hr.attendance.title") || "Attendance Management"}
+                </h1>
+                <p className="mt-1 text-lg" style={{ color: "var(--color-secondary)" }}>
+                  {t("hr.attendance.subtitle") || "Track and manage employee shifts with pay rates"}
+                </p>
+              </div>
             </div>
             {activeShiftId && (
               <motion.div
@@ -464,7 +472,7 @@ const AttendanceManagement = () => {
             animate={{ opacity: 1, y: 0 }}
             className="rounded-xl shadow-lg p-4"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
               border: "1px solid",
             }}
@@ -483,7 +491,7 @@ const AttendanceManagement = () => {
             animate={{ opacity: 1, y: 0 }}
             className="rounded-xl shadow-lg p-4"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
               border: "1px solid",
             }}
@@ -502,7 +510,7 @@ const AttendanceManagement = () => {
             animate={{ opacity: 1, y: 0 }}
             className="rounded-xl shadow-lg p-4"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
               border: "1px solid",
             }}
@@ -530,7 +538,7 @@ const AttendanceManagement = () => {
             animate={{ opacity: 1, y: 0 }}
             className="rounded-xl shadow-lg p-4"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
               border: "1px solid",
             }}
@@ -552,7 +560,7 @@ const AttendanceManagement = () => {
             animate={{ opacity: 1, y: 0 }}
             className="rounded-xl shadow-lg p-4"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
               border: "1px solid",
             }}
@@ -571,7 +579,7 @@ const AttendanceManagement = () => {
             animate={{ opacity: 1, y: 0 }}
             className="rounded-xl shadow-lg p-4"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
               border: "1px solid",
             }}
@@ -590,7 +598,7 @@ const AttendanceManagement = () => {
             animate={{ opacity: 1, y: 0 }}
             className="rounded-xl shadow-lg p-4"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
               border: "1px solid",
             }}
@@ -606,7 +614,7 @@ const AttendanceManagement = () => {
         </div>
 
         {/* Filters */}
-        <div className="rounded-xl shadow-lg p-6 mb-6" style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)", border: "1px solid" }}>
+        <div className="rounded-xl shadow-lg p-6 mb-6" style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)", border: "1px solid" }}>
           <div className="flex flex-wrap gap-4 items-center">
             <SearchField
               className="flex-1 min-w-[200px]"
@@ -622,7 +630,7 @@ const AttendanceManagement = () => {
             <select
               value={selectedPayRate}
               onChange={(e) => setSelectedPayRate(e.target.value)}
-              className="px-4 py-2 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+              className="h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
               style={{
                 borderColor: "var(--border-color)",
                 backgroundColor: "var(--bg-color)",
@@ -640,7 +648,7 @@ const AttendanceManagement = () => {
               type="date"
               value={dateRange.start}
               onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-              className="px-4 py-2 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+              className="h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
               style={{
                 borderColor: "var(--border-color)",
                 backgroundColor: "var(--bg-color)",
@@ -651,7 +659,7 @@ const AttendanceManagement = () => {
               type="date"
               value={dateRange.end}
               onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-              className="px-4 py-2 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+              className="h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
               style={{
                 borderColor: "var(--border-color)",
                 backgroundColor: "var(--bg-color)",
@@ -691,7 +699,7 @@ const AttendanceManagement = () => {
         </div>
 
         {/* Shifts Table */}
-        <div className="rounded-xl shadow-lg overflow-hidden" style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)", border: "1px solid" }}>
+        <div className="rounded-xl shadow-lg overflow-hidden" style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)", border: "1px solid" }}>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead style={{ backgroundColor: "var(--footer-bg)" }}>
@@ -819,7 +827,7 @@ const AttendanceManagement = () => {
                       {isExpanded && shift.shiftBreakdown && shift.shiftBreakdown.length > 0 && (
                         <tr>
                           <td colSpan="10" className="px-4 py-4" style={{ backgroundColor: "var(--footer-bg)" }}>
-                            <div className="rounded-lg p-4" style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)", border: "1px solid" }}>
+                            <div className="rounded-lg p-4" style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)", border: "1px solid" }}>
                               <h4 className="font-semibold mb-3 flex items-center gap-2" style={{ color: "var(--text-color)" }}>
                                 <Percent className="w-4 h-4" />
                                 {t("hr.attendance.rate_breakdown") || "Rate Breakdown"}

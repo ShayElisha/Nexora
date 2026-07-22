@@ -31,7 +31,7 @@ const getStatusColor = (status) => {
     case "cancelled":
       return "bg-red-100 text-red-700";
     default:
-      return "bg-gray-100 text-gray-700";
+      return "bg-[var(--bg-secondary)] text-[var(--text-color)]";
   }
 };
 
@@ -42,9 +42,9 @@ const getPriorityColor = (priority) => {
     case "medium":
       return "text-orange-500 font-semibold";
     case "low":
-      return "text-gray-500";
+      return "text-[var(--color-secondary)]";
     default:
-      return "text-gray-400";
+      return "text-[var(--color-secondary)]";
   }
 };
 
@@ -203,7 +203,7 @@ const TasksList = () => {
             className={`px-3 py-1 rounded-full mx-1 transition-all ${
               currentPage === i
                 ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-blue-100"
+                : "bg-[var(--border-color)] text-[var(--text-color)] hover:bg-blue-100"
             }`}
           >
             {i}
@@ -222,7 +222,7 @@ const TasksList = () => {
             className={`px-3 py-1 rounded-full mx-1 transition-all ${
               currentPage === 1
                 ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-blue-100"
+                : "bg-[var(--border-color)] text-[var(--text-color)] hover:bg-blue-100"
             }`}
           >
             1
@@ -245,7 +245,7 @@ const TasksList = () => {
             className={`px-3 py-1 rounded-full mx-1 transition-all ${
               currentPage === i
                 ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-blue-100"
+                : "bg-[var(--border-color)] text-[var(--text-color)] hover:bg-blue-100"
             }`}
           >
             {i}
@@ -268,7 +268,7 @@ const TasksList = () => {
             className={`px-3 py-1 rounded-full mx-1 transition-all ${
               currentPage === totalPages
                 ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-blue-100"
+                : "bg-[var(--border-color)] text-[var(--text-color)] hover:bg-blue-100"
             }`}
           >
             {totalPages}
@@ -330,7 +330,7 @@ const TasksList = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-indigo-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <ListChecks size={28} color="white" />
             </div>
             <div>
@@ -347,7 +347,7 @@ const TasksList = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -367,7 +367,7 @@ const TasksList = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -387,7 +387,7 @@ const TasksList = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -407,7 +407,7 @@ const TasksList = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -513,7 +513,7 @@ const TasksList = () => {
         ) : (
           <motion.div
             className="rounded-2xl shadow-lg border overflow-hidden"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
@@ -647,7 +647,7 @@ const TasksList = () => {
               disabled={currentPage === 1}
               className={`px-3 py-1 rounded-full transition-all ${
                 currentPage === 1
-                  ? "bg-gray-300 cursor-not-allowed text-gray-500"
+                  ? "bg-[var(--border-color)] cursor-not-allowed text-[var(--color-secondary)]"
                   : "bg-blue-600 text-white hover:bg-blue-700"
               }`}
             >
@@ -659,7 +659,7 @@ const TasksList = () => {
               disabled={currentPage === totalPages}
               className={`px-3 py-1 rounded-full transition-all ${
                 currentPage === totalPages
-                  ? "bg-gray-300 cursor-not-allowed text-gray-500"
+                  ? "bg-[var(--border-color)] cursor-not-allowed text-[var(--color-secondary)]"
                   : "bg-blue-600 text-white hover:bg-blue-700"
               }`}
             >
@@ -816,7 +816,7 @@ const EditTaskModal = ({ task, onClose, onUpdate }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
       <motion.div
         className="bg-bg rounded-2xl shadow-2xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto mx-4"
-        style={{ backgroundColor: 'var(--bg-color)' }}
+        style={{ backgroundColor: "var(--surface-color)" }}
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
       >

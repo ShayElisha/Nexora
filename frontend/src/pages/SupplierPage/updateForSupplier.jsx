@@ -110,12 +110,13 @@ const UpdateForSupplier = () => {
   const companyName = oldProcurement?.companyId?.CompanyName || "Acme Co.";
 
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-gray-50 rounded-md shadow-md font-sans">
+    <div className="min-h-screen p-4 sm:p-6" style={{ backgroundColor: "var(--bg-color)" }}>
+    <div className="max-w-5xl mx-auto p-6 rounded-md shadow-md font-sans border" style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}>
       {/* כותרת ושאלה */}
-      <h1 className="text-2xl font-bold text-gray-800 mb-2">
+      <h1 className="text-2xl font-bold text-[var(--text-color)] mb-2">
         Hello {supplierName},
       </h1>
-      <p className="text-gray-700 mb-6 text-lg">
+      <p className="text-[var(--text-color)] mb-6 text-lg">
         Would you like to confirm the purchase certificate update for{" "}
         <span className="font-semibold">{companyName}</span>?
       </p>
@@ -128,44 +129,44 @@ const UpdateForSupplier = () => {
 
       {/* אם אין לנו עדיין את שתי הרשומות להשוואה */}
       {!oldProcurement || !newProcurement ? (
-        <div className="bg-white rounded p-4 shadow-sm text-gray-700">
+        <div className="bg-[var(--surface-color)] rounded p-4 shadow-sm text-[var(--text-color)]">
           <p>Could not find procurement data to compare.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* עמודה ראשונה: נתוני הרכש המקורי */}
-          <div className="bg-white rounded-md shadow p-4 border border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">
+          <div className="bg-[var(--surface-color)] rounded-md shadow p-4 border border-[var(--border-color)]">
+            <h2 className="text-lg font-semibold text-[var(--text-color)] border-b pb-2 mb-4">
               Original Procurement Data
             </h2>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
-                <thead className="bg-gray-100">
+                <thead className="bg-[var(--bg-secondary)]">
                   <tr>
-                    <th className="border-b p-2 font-medium text-gray-700">
+                    <th className="border-b p-2 font-medium text-[var(--text-color)]">
                       Product
                     </th>
-                    <th className="border-b p-2 font-medium text-gray-700">
+                    <th className="border-b p-2 font-medium text-[var(--text-color)]">
                       SKU
                     </th>
-                    <th className="border-b p-2 font-medium text-gray-700">
+                    <th className="border-b p-2 font-medium text-[var(--text-color)]">
                       Category
                     </th>
-                    <th className="border-b p-2 font-medium text-gray-700">
+                    <th className="border-b p-2 font-medium text-[var(--text-color)]">
                       Price
                     </th>
-                    <th className="border-b p-2 font-medium text-gray-700">
+                    <th className="border-b p-2 font-medium text-[var(--text-color)]">
                       Qty
                     </th>
-                    <th className="border-b p-2 font-medium text-gray-700">
+                    <th className="border-b p-2 font-medium text-[var(--text-color)]">
                       Total
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {oldProcurement.products?.map((product, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
+                    <tr key={index} className="hover:bg-[var(--bg-secondary)]">
                       <td className="p-2 border-b">{product.productName}</td>
                       <td className="p-2 border-b">{product.SKU}</td>
                       <td className="p-2 border-b">{product.category}</td>
@@ -183,41 +184,41 @@ const UpdateForSupplier = () => {
             </div>
 
             <div className="mt-4 text-right">
-              <span className="font-semibold text-gray-800 mr-2">
+              <span className="font-semibold text-[var(--text-color)] mr-2">
                 Total Cost:
               </span>
-              <span className="font-bold text-gray-900">
+              <span className="font-bold text-[var(--text-color)]">
                 {oldProcurement.totalCost} {oldProcurement.currency || "USD"}
               </span>
             </div>
           </div>
 
           {/* עמודה שנייה: נתוני הרכש המעודכן (מ-PendingUpdate) */}
-          <div className="bg-white rounded-md shadow p-4 border border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-800 border-b pb-2 mb-4">
+          <div className="bg-[var(--surface-color)] rounded-md shadow p-4 border border-[var(--border-color)]">
+            <h2 className="text-lg font-semibold text-[var(--text-color)] border-b pb-2 mb-4">
               Updated Procurement Data
             </h2>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
-                <thead className="bg-gray-100">
+                <thead className="bg-[var(--bg-secondary)]">
                   <tr>
-                    <th className="border-b p-2 font-medium text-gray-700">
+                    <th className="border-b p-2 font-medium text-[var(--text-color)]">
                       Product
                     </th>
-                    <th className="border-b p-2 font-medium text-gray-700">
+                    <th className="border-b p-2 font-medium text-[var(--text-color)]">
                       SKU
                     </th>
-                    <th className="border-b p-2 font-medium text-gray-700">
+                    <th className="border-b p-2 font-medium text-[var(--text-color)]">
                       Category
                     </th>
-                    <th className="border-b p-2 font-medium text-gray-700">
+                    <th className="border-b p-2 font-medium text-[var(--text-color)]">
                       Price
                     </th>
-                    <th className="border-b p-2 font-medium text-gray-700">
+                    <th className="border-b p-2 font-medium text-[var(--text-color)]">
                       Qty
                     </th>
-                    <th className="border-b p-2 font-medium text-gray-700">
+                    <th className="border-b p-2 font-medium text-[var(--text-color)]">
                       Total
                     </th>
                   </tr>
@@ -225,7 +226,7 @@ const UpdateForSupplier = () => {
                 <tbody>
                   {newProcurement.updatedData?.products?.map(
                     (product, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
+                      <tr key={index} className="hover:bg-[var(--bg-secondary)]">
                         <td className="p-2 border-b">{product.productName}</td>
                         <td className="p-2 border-b">{product.SKU}</td>
                         <td className="p-2 border-b">{product.category}</td>
@@ -246,10 +247,10 @@ const UpdateForSupplier = () => {
             </div>
 
             <div className="mt-4 text-right">
-              <span className="font-semibold text-gray-800 mr-2">
+              <span className="font-semibold text-[var(--text-color)] mr-2">
                 Total Cost:
               </span>
-              <span className="font-bold text-gray-900">
+              <span className="font-bold text-[var(--text-color)]">
                 {newProcurement.updatedData?.totalCost}{" "}
                 {newProcurement.updatedData?.currency || "USD"}
               </span>
@@ -287,6 +288,7 @@ const UpdateForSupplier = () => {
           {rejectUpdateLoading ? "Rejecting..." : "Reject"}
         </button>
       </div>
+    </div>
     </div>
   );
 };

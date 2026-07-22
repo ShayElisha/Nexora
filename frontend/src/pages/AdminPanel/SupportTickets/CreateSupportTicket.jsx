@@ -29,7 +29,7 @@ const CreateSupportTicket = () => {
   ];
 
   const priorities = [
-    { value: "Low", label: t("supportTickets.low"), color: "text-gray-500" },
+    { value: "Low", label: t("supportTickets.low"), color: "text-[var(--color-secondary)]" },
     { value: "Medium", label: t("supportTickets.medium"), color: "text-yellow-600" },
     { value: "High", label: t("supportTickets.high"), color: "text-orange-600" },
     { value: "Urgent", label: t("supportTickets.urgent"), color: "text-red-600" },
@@ -63,7 +63,7 @@ const CreateSupportTicket = () => {
 
   return (
     <div
-      className="min-h-screen p-6"
+      className="min-h-screen p-4 sm:p-6 lg:p-8"
       style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
     >
       <div className="max-w-3xl mx-auto">
@@ -73,20 +73,28 @@ const CreateSupportTicket = () => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => navigate("/dashboard/support-tickets")}
-            className="p-2 rounded-lg border"
+            className="p-2 h-11 w-11 flex items-center justify-center rounded-lg border"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
             }}
           >
             <ArrowLeft size={20} />
           </motion.button>
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shrink-0"
+            style={{
+              background:
+                "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
+            }}
+          >
+            <Ticket size={28} className="text-white" />
+          </div>
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-3">
-              <Ticket size={32} style={{ color: "var(--color-primary)" }} />
+            <h1 className="text-4xl font-bold" style={{ color: "var(--text-color)" }}>
               {t("supportTickets.createTicket")}
             </h1>
-            <p className="text-gray-500 mt-1" style={{ color: "var(--color-secondary)" }}>
+            <p className="text-lg mt-1" style={{ color: "var(--color-secondary)" }}>
               {t("supportTickets.createSubtitle")}
             </p>
           </div>
@@ -97,7 +105,11 @@ const CreateSupportTicket = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           onSubmit={handleSubmit}
-          className="space-y-6"
+          className="space-y-6 rounded-2xl p-6 shadow-lg border"
+          style={{
+            backgroundColor: "var(--surface-color)",
+            borderColor: "var(--border-color)",
+          }}
         >
           {/* Title */}
           <div>
@@ -112,7 +124,7 @@ const CreateSupportTicket = () => {
               }
               placeholder={t("supportTickets.titlePlaceholder")}
               required
-              className="w-full px-4 py-3 rounded-lg border"
+              className="w-full h-11 px-4 rounded-xl border"
               style={{
                 backgroundColor: "var(--bg-color)",
                 borderColor: "var(--border-color)",
@@ -136,7 +148,7 @@ const CreateSupportTicket = () => {
                   onClick={() =>
                     setFormData({ ...formData, category: cat.value })
                   }
-                  className={`p-4 rounded-lg border text-center transition-all ${
+                  className={`p-4 rounded-xl border text-center transition-all ${
                     formData.category === cat.value
                       ? "border-blue-500 bg-blue-50"
                       : ""
@@ -174,7 +186,7 @@ const CreateSupportTicket = () => {
                   onClick={() =>
                     setFormData({ ...formData, priority: pri.value })
                   }
-                  className={`flex-1 px-4 py-3 rounded-lg border font-semibold transition-all ${
+                  className={`flex-1 px-4 h-11 rounded-lg border font-medium transition-all ${
                     formData.priority === pri.value
                       ? "border-blue-500 bg-blue-50"
                       : ""
@@ -209,7 +221,7 @@ const CreateSupportTicket = () => {
               placeholder={t("supportTickets.descriptionPlaceholder")}
               required
               rows={8}
-              className="w-full px-4 py-3 rounded-lg border resize-none"
+              className="w-full px-4 py-3 rounded-xl border resize-none"
               style={{
                 backgroundColor: "var(--bg-color)",
                 borderColor: "var(--border-color)",
@@ -219,15 +231,15 @@ const CreateSupportTicket = () => {
           </div>
 
           {/* Submit Button */}
-          <div className="flex gap-4">
+          <div className="flex flex-col-reverse sm:flex-row gap-3">
             <motion.button
               type="button"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => navigate("/dashboard/support-tickets")}
-              className="flex-1 px-6 py-3 rounded-lg border font-semibold"
+              className="flex-1 px-6 h-11 rounded-lg border font-medium"
               style={{
-                backgroundColor: "var(--bg-color)",
+                backgroundColor: "var(--bg-secondary)",
                 borderColor: "var(--border-color)",
                 color: "var(--text-color)",
               }}
@@ -239,8 +251,11 @@ const CreateSupportTicket = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               disabled={createMutation.isLoading}
-              className="flex-1 px-6 py-3 rounded-lg font-semibold text-white flex items-center justify-center gap-2"
-              style={{ backgroundColor: "var(--color-primary)" }}
+              className="flex-1 px-6 h-11 rounded-lg font-medium flex items-center justify-center gap-2"
+              style={{
+                backgroundColor: "var(--color-primary)",
+                color: "var(--button-text)",
+              }}
             >
               {createMutation.isLoading ? (
                 <>

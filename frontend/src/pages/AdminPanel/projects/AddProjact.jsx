@@ -173,7 +173,7 @@ const AddProject = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-purple-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))' }}>
               <Plus size={28} color="white" />
             </div>
             <div>
@@ -187,7 +187,7 @@ const AddProject = () => {
           </div>
 
           {/* Progress Bar */}
-          <div className="rounded-xl p-4 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+          <div className="rounded-2xl p-6 shadow-lg border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
             <div className="flex items-center justify-between mb-2">
               <span className="font-bold" style={{ color: 'var(--text-color)' }}>
                 {t("project.form_progress")}
@@ -211,21 +211,21 @@ const AddProject = () => {
         {/* Form */}
         <motion.div
           className="rounded-2xl shadow-lg border p-6 lg:p-8"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
           <form onSubmit={formik.handleSubmit} className="space-y-6">
             {/* Project Name */}
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                 <Briefcase className="inline mr-2" size={16} />
-                {t("project.name")} *
+                {t("project.name")}<span className="text-red-500 ms-1">*</span>
               </label>
               <input
                 type="text"
                 name="name"
-                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -239,7 +239,7 @@ const AddProject = () => {
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                 <FileText className="inline mr-2" size={16} />
                 {t("project.description")}
               </label>
@@ -258,14 +258,14 @@ const AddProject = () => {
             {/* Dates */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <Calendar className="inline mr-2" size={16} />
-                  {t("project.start_date")} *
+                  {t("project.start_date")}<span className="text-red-500 ms-1">*</span>
                 </label>
                 <input
                   type="date"
                   name="startDate"
-                  className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -278,14 +278,14 @@ const AddProject = () => {
                 )}
               </div>
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <Calendar className="inline mr-2" size={16} />
-                  {t("project.end_date")} *
+                  {t("project.end_date")}<span className="text-red-500 ms-1">*</span>
                 </label>
                 <input
                   type="date"
                   name="endDate"
-                  className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -302,13 +302,13 @@ const AddProject = () => {
             {/* Priority & Budget */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <Target className="inline mr-2" size={16} />
                   {t("project.priority")}
                 </label>
                 <select
                   name="priority"
-                  className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -320,14 +320,14 @@ const AddProject = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <DollarSign className="inline mr-2" size={16} />
                   {t("project.budget")}
                 </label>
                 <input
                   type="number"
                   name="budget"
-                  className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -341,14 +341,14 @@ const AddProject = () => {
             {/* Tags & Progress */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <Tag className="inline mr-2" size={16} />
                   {t("project.tags")}
                 </label>
                 <input
                   type="text"
                   name="tags"
-                  className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -360,7 +360,7 @@ const AddProject = () => {
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <TrendingUp className="inline mr-2" size={16} />
                   {t("project.progress")} ({formik.values.progress}%)
                 </label>
@@ -380,14 +380,14 @@ const AddProject = () => {
 
             {/* Department */}
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                 <Building2 className="inline mr-2" size={16} />
-                {t("project.department")} *
+                {t("project.department")}<span className="text-red-500 ms-1">*</span>
               </label>
               <div className="flex items-center gap-2">
                 <select
                   name="departmentId"
-                  className="flex-1 p-3 rounded-xl border focus:outline-none focus:ring-2"
+                  className="flex-1 h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -415,16 +415,16 @@ const AddProject = () => {
             {/* Project Manager */}
             {formik.values.departmentId && (
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <User className="inline mr-2" size={16} />
-                  {t("project.project_manager")} *
+                  {t("project.project_manager")}<span className="text-red-500 ms-1">*</span>
                 </label>
                 <select
                   name="projectManager"
                   value={formik.values.projectManager}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 >
                   <option value="">
@@ -453,7 +453,7 @@ const AddProject = () => {
             {/* Team Members */}
             {formik.values.departmentId ? (
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <Users className="inline mr-2" size={16} />
                   {t("project.team_members")}
                 </label>
@@ -520,34 +520,36 @@ const AddProject = () => {
             )}
 
             {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="animate-spin" size={24} />
-                  {t("project.creating")}
-                </>
-              ) : (
-                <>
-                  <CheckCircle size={24} />
-                  {t("project.submit")}
-                </>
-              )}
-            </button>
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="animate-spin" size={20} />
+                    {t("project.creating")}
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle size={20} />
+                    {t("project.submit")}
+                  </>
+                )}
+              </button>
+            </div>
           </form>
         </motion.div>
       </div>
 
       {/* Department Modal */}
       {showDepartmentModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}>
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 p-4">
           <motion.div
             className="rounded-2xl p-6 w-full max-w-md shadow-2xl relative"
-            style={{ backgroundColor: 'var(--bg-color)' }}
+            style={{ backgroundColor: 'var(--surface-color)' }}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}

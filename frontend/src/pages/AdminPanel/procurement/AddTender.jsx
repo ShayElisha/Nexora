@@ -104,7 +104,7 @@ const AddTender = () => {
   };
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--bg-color)' }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -115,7 +115,7 @@ const AddTender = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate("/dashboard/procurement/tenders")}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
               style={{ color: 'var(--text-color)' }}
             >
               <ArrowLeft size={24} />
@@ -124,7 +124,7 @@ const AddTender = () => {
               <h1 className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
                 {isEdit ? t("procurement.edit_tender") || "Edit Tender" : t("procurement.add_tender") || "Add Tender"}
               </h1>
-              <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-secondary)' }}>
                 {t("procurement.fill_tender_details") || "Fill in the details below to create a tender"}
               </p>
             </div>
@@ -132,7 +132,7 @@ const AddTender = () => {
         </div>
 
         {/* Form Card */}
-        <form onSubmit={handleSubmit} className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+        <form onSubmit={handleSubmit} className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           <div className="p-6 space-y-6">
             {/* Basic Information Section */}
             <div>
@@ -149,7 +149,7 @@ const AddTender = () => {
                     required
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -184,7 +184,7 @@ const AddTender = () => {
                     required
                     value={formData.publishDate}
                     onChange={(e) => setFormData({ ...formData, publishDate: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -202,7 +202,7 @@ const AddTender = () => {
                     required
                     value={formData.submissionDeadline}
                     onChange={(e) => setFormData({ ...formData, submissionDeadline: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -221,7 +221,7 @@ const AddTender = () => {
                     min="0"
                     value={formData.estimatedBudget}
                     onChange={(e) => setFormData({ ...formData, estimatedBudget: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -237,7 +237,7 @@ const AddTender = () => {
                   <select
                     value={formData.currency}
                     onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -257,7 +257,7 @@ const AddTender = () => {
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -285,7 +285,7 @@ const AddTender = () => {
                 <button
                   type="button"
                   onClick={addRequirement}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-white hover:opacity-90 transition"
+                  className="flex items-center gap-2 px-4 h-11 rounded-lg text-white hover:opacity-90 transition"
                   style={{ backgroundColor: 'var(--color-primary)' }}
                 >
                   <Plus size={18} />
@@ -294,7 +294,7 @@ const AddTender = () => {
               </div>
               {formData.requirements.length === 0 ? (
                 <div className="text-center py-8 border-2 border-dashed rounded-lg" style={{ borderColor: 'var(--border-color)' }}>
-                  <p style={{ color: 'var(--text-secondary)' }}>
+                  <p style={{ color: 'var(--color-secondary)' }}>
                     {t("procurement.no_requirements") || "No requirements added yet. Click 'Add Requirement' to get started."}
                   </p>
                 </div>
@@ -311,7 +311,7 @@ const AddTender = () => {
                         type="text"
                         value={req}
                         onChange={(e) => updateRequirement(index, e.target.value)}
-                        className="flex-1 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                        className="flex-1 px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                         style={{ 
                           borderColor: 'var(--border-color)', 
                           backgroundColor: 'var(--bg-color)', 
@@ -323,7 +323,7 @@ const AddTender = () => {
                       <button
                         type="button"
                         onClick={() => removeRequirement(index)}
-                        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                        className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                       >
                         <Trash2 size={18} className="text-red-500" />
                       </button>
@@ -361,7 +361,7 @@ const AddTender = () => {
               <button
                 type="submit"
                 disabled={mutation.isLoading}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg text-white hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 h-11 rounded-lg text-white hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: 'var(--color-primary)' }}
               >
                 {mutation.isLoading ? (
@@ -379,7 +379,7 @@ const AddTender = () => {
               <button
                 type="button"
                 onClick={() => navigate("/dashboard/procurement/tenders")}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                className="flex items-center gap-2 px-6 h-11 rounded-lg border hover:bg-[var(--bg-secondary)] transition"
                 style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
               >
                 <X size={20} />

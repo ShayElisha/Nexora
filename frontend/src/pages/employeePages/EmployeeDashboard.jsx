@@ -458,7 +458,7 @@ const EmployeeDashboard = () => {
           {/* Left Column - Profile */}
           <div className="lg:col-span-1">
             {employeeLoading ? (
-              <div className="flex items-center justify-center p-12 bg-white rounded-xl shadow-sm">
+              <div className="flex items-center justify-center p-12 rounded-xl shadow-sm" style={{ backgroundColor: 'var(--surface-color)' }}>
                 <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--color-primary)' }} />
               </div>
             ) : employeeError ? (
@@ -466,7 +466,7 @@ const EmployeeDashboard = () => {
                 <p className="text-rose-600 text-sm">{employeeError}</p>
               </div>
             ) : (
-              <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200/50">
+              <div className="rounded-xl shadow-sm p-6 border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-lg font-bold" style={{ color: 'var(--text-color)' }}>
                     {t("employeeDashboard.myProfile")}
@@ -474,7 +474,7 @@ const EmployeeDashboard = () => {
                   {!isEditingProfile && (
                     <button
                       onClick={handleEditProfile}
-                      className="p-2 rounded-lg hover:bg-gray-100 transition-all"
+                      className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition-all"
                       title={t("employeeDashboard.editProfile")}
                     >
                       <Edit className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
@@ -490,12 +490,13 @@ const EmployeeDashboard = () => {
                         <img
                           src={employee.profileImage}
                           alt="Profile"
-                          className="w-24 h-24 rounded-full object-cover border-4 border-gray-100 shadow-sm"
+                          className="w-24 h-24 rounded-full object-cover border-4 shadow-sm"
+                          style={{ borderColor: 'var(--border-color)' }}
                         />
                       ) : (
                         <div
-                          className="w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold border-4 border-gray-100 shadow-sm"
-                          style={{ backgroundColor: 'var(--color-primary)' }}
+                          className="w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold border-4 shadow-sm"
+                          style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--border-color)' }}
                         >
                           {employee.name?.[0]?.toUpperCase() || "U"}
                         </div>
@@ -512,7 +513,7 @@ const EmployeeDashboard = () => {
                         { icon: IdCard, label: t("employeeDashboard.employeeId"), value: employee.employeeId || t("employeeDashboard.notSpecified") },
                         { icon: Building2, label: t("employeeDashboard.department"), value: employee.department?.name || employee.department || t("employeeDashboard.notSpecified") },
                       ].map((item, idx) => (
-                        <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50/50">
+                        <div key={idx} className="flex items-start gap-3 p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                           <item.icon className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-medium mb-0.5" style={{ color: 'var(--color-secondary)' }}>
@@ -527,7 +528,7 @@ const EmployeeDashboard = () => {
 
                       {/* Address */}
                       {employee.address && (
-                        <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50/50">
+                        <div className="flex items-start gap-3 p-3 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                           <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: 'var(--color-primary)' }} />
                           <div className="flex-1">
                             <p className="text-xs font-medium mb-0.5" style={{ color: 'var(--color-secondary)' }}>
@@ -550,7 +551,7 @@ const EmployeeDashboard = () => {
                             {employee.projects.map((proj, index) => (
                               <span
                                 key={index}
-                                className="px-3 py-1 rounded-full text-xs font-semibold bg-primary text-white"
+                                className="px-3 py-1 rounded-full text-xs font-semibold bg-primary text-button-text"
                               >
                                 {proj.projectId?.name || t("employeeDashboard.unknownProject")}
                               </span>
@@ -570,20 +571,21 @@ const EmployeeDashboard = () => {
                           <img
                             src={editedEmployee.profileImagePreview}
                             alt="Preview"
-                            className="w-24 h-24 rounded-full object-cover border-4 border-gray-100 shadow-sm"
+                            className="w-24 h-24 rounded-full object-cover border-4 shadow-sm"
+                            style={{ borderColor: 'var(--border-color)' }}
                           />
                         ) : (
                           <div
-                            className="w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold border-4 border-gray-100"
-                            style={{ backgroundColor: 'var(--color-primary)' }}
+                            className="w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold border-4"
+                            style={{ backgroundColor: 'var(--color-primary)', borderColor: 'var(--border-color)' }}
                           >
                             {employee.name?.[0]?.toUpperCase() || "U"}
                           </div>
                         )}
                         <label
                           htmlFor="profileImage"
-                          className="absolute bottom-0 right-0 p-2 rounded-full cursor-pointer shadow-md hover:scale-110 transition-all bg-white border-2"
-                          style={{ borderColor: 'var(--color-primary)' }}
+                          className="absolute bottom-0 right-0 p-2 rounded-full cursor-pointer shadow-md hover:scale-110 transition-all border-2"
+                          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--color-primary)' }}
                         >
                           <Camera className="w-4 h-4" style={{ color: 'var(--color-primary)' }} />
                         </label>
@@ -619,8 +621,9 @@ const EmployeeDashboard = () => {
                             name={field.name}
                             value={field.value || ""}
                             onChange={handleProfileChange}
-                            className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm transition-all duration-200 focus:border-[var(--border-color)] focus:ring-2 focus:ring-blue-100"
+                            className="w-full h-11 px-4 rounded-xl border text-sm transition-all duration-200 focus:ring-2 focus:ring-[var(--color-primary)]"
                             style={{
+                              borderColor: 'var(--border-color)',
                               backgroundColor: 'var(--bg-color)',
                               color: 'var(--text-color)',
                             }}
@@ -648,7 +651,8 @@ const EmployeeDashboard = () => {
                               value={editedEmployee[field.name] || ""}
                               onChange={handleProfileChange}
                               placeholder={field.label}
-                              className="w-full px-3 py-2 pe-10 rounded-lg border border-[var(--border-color)] text-sm focus:border-[var(--border-color)] focus:ring-2 focus:ring-primary transition-all"
+                              className="w-full h-11 px-4 pe-10 rounded-xl border border-[var(--border-color)] text-sm focus:ring-2 focus:ring-primary transition-all"
+                              style={{ backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                             />
                             <button
                               type="button"
@@ -658,7 +662,8 @@ const EmployeeDashboard = () => {
                                   [field.key]: !prev[field.key],
                                 }))
                               }
-                              className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary"
+                              className="absolute end-3 top-1/2 -translate-y-1/2 hover:text-primary"
+                              style={{ color: 'var(--color-secondary)' }}
                             >
                               {showPasswords[field.key] ? (
                                 <EyeOff className="w-4 h-4" />
@@ -672,17 +677,19 @@ const EmployeeDashboard = () => {
                     </div>
 
                     {/* Action Buttons - Compact */}
-                    <div className="flex gap-2 pt-2">
+                    <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2">
                       <button
                         onClick={() => setIsEditingProfile(false)}
-                        className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
+                        className="w-full sm:w-auto px-6 h-11 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2"
+                        style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
                       >
                         <X className="w-4 h-4" />
                         {t("employeeDashboard.cancel")}
                       </button>
                       <button
                         onClick={handleSaveProfile}
-                        className="flex-1 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-button-text rounded-lg text-sm font-semibold hover:shadow-md transition-all flex items-center justify-center gap-2"
+                        className="w-full sm:w-auto px-6 h-11 rounded-lg text-sm font-medium hover:shadow-md transition-all flex items-center justify-center gap-2"
+                        style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
                       >
                         <Save className="w-4 h-4" />
                         {t("employeeDashboard.save")}
@@ -698,7 +705,7 @@ const EmployeeDashboard = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Charts - Side by Side */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-200/50">
+              <div className="rounded-xl shadow-sm p-5 border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
                 <h3 className="text-sm font-bold mb-4" style={{ color: 'var(--text-color)' }}>
                   {t("employeeDashboard.taskDistribution")}
                 </h3>
@@ -722,7 +729,7 @@ const EmployeeDashboard = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-200/50">
+              <div className="rounded-xl shadow-sm p-5 border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
                 <h3 className="text-sm font-bold mb-4" style={{ color: 'var(--text-color)' }}>
                   {t("employeeDashboard.priorityBreakdown")}
                 </h3>
@@ -751,7 +758,7 @@ const EmployeeDashboard = () => {
         {/* Tasks Sections - Refined */}
         <div className="space-y-6">
           {/* Standalone Tasks */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200/50">
+          <div className="rounded-xl shadow-sm p-6 border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
             <h2 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
               <Target className="w-5 h-5" style={{ color: 'var(--color-primary)' }} />
               {t("employeeDashboard.standaloneТasks")}
@@ -769,7 +776,8 @@ const EmployeeDashboard = () => {
                 {filterActiveTasksForRole(tasksNoProjectAssignedToUser).map((task) => (
                   <div
                     key={task.id || task._id}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-all duration-200"
+                    className="border rounded-lg p-4 hover:shadow-sm transition-all duration-200"
+                    style={{ borderColor: 'var(--border-color)' }}
                   >
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-sm font-semibold" style={{ color: 'var(--text-color)' }}>
@@ -777,7 +785,7 @@ const EmployeeDashboard = () => {
                       </h3>
                       <button
                         onClick={() => handleToggleTask(task.id || task._id)}
-                        className="p-1 rounded hover:bg-gray-100 transition-all"
+                        className="p-1 rounded hover:bg-[var(--bg-secondary)] transition-all"
                       >
                         {expandedTaskId === (task.id || task._id) ? (
                           <ChevronUp className="w-4 h-4" style={{ color: 'var(--color-secondary)' }} />
@@ -795,14 +803,14 @@ const EmployeeDashboard = () => {
                         {task.priority}
                       </span>
                       {task.dueDate && (
-                        <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-color)' }}>
                           {new Date(task.dueDate).toLocaleDateString()}
                         </span>
                       )}
                     </div>
 
                     {expandedTaskId === (task.id || task._id) && (
-                      <div className="mt-3 pt-3 border-t border-gray-200">
+                      <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--border-color)' }}>
                         <p className="text-xs mb-3" style={{ color: 'var(--text-color)' }}>
                           {task.description || t("employeeDashboard.noDescription")}
                         </p>
@@ -812,8 +820,8 @@ const EmployeeDashboard = () => {
                             onChange={(e) =>
                               handleStatusChange(task.id || task._id, e.target.value)
                             }
-                            className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium"
-                            style={{ color: 'var(--text-color)' }}
+                            className="w-full h-11 px-4 rounded-xl border text-sm font-medium"
+                            style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                           >
                             <option value="pending">Pending</option>
                             <option value="in progress">In Progress</option>
@@ -830,7 +838,7 @@ const EmployeeDashboard = () => {
           </div>
 
           {/* Project Tasks */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200/50">
+          <div className="rounded-xl shadow-sm p-6 border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
             <h2 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
               <Award className="w-5 h-5" style={{ color: 'var(--color-primary)' }} />
               {t("employeeDashboard.projectTasks")}
@@ -848,7 +856,8 @@ const EmployeeDashboard = () => {
                 {filterActiveTasksForRole(projectTasksForUser).map((task) => (
                   <div
                     key={task.id || task._id}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-all duration-200"
+                    className="border rounded-lg p-4 hover:shadow-sm transition-all duration-200"
+                    style={{ borderColor: 'var(--border-color)' }}
                   >
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-sm font-semibold" style={{ color: 'var(--text-color)' }}>
@@ -856,7 +865,7 @@ const EmployeeDashboard = () => {
                       </h3>
                       <button
                         onClick={() => handleToggleTask(task.id || task._id)}
-                        className="p-1 rounded hover:bg-gray-100 transition-all"
+                        className="p-1 rounded hover:bg-[var(--bg-secondary)] transition-all"
                       >
                         {expandedTaskId === (task.id || task._id) ? (
                           <ChevronUp className="w-4 h-4" style={{ color: 'var(--color-secondary)' }} />
@@ -874,19 +883,19 @@ const EmployeeDashboard = () => {
                         {task.priority}
                       </span>
                       {task.projectId && (
-                        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-primary text-white">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-primary text-button-text">
                           {task.projectId.name || t("employeeDashboard.unknownProject")}
                         </span>
                       )}
                       {task.dueDate && (
-                        <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-color)' }}>
                           {new Date(task.dueDate).toLocaleDateString()}
                         </span>
                       )}
                     </div>
 
                     {expandedTaskId === (task.id || task._id) && (
-                      <div className="mt-3 pt-3 border-t border-gray-200">
+                      <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--border-color)' }}>
                         <p className="text-xs mb-3" style={{ color: 'var(--text-color)' }}>
                           {task.description || t("employeeDashboard.noDescription")}
                         </p>
@@ -896,8 +905,8 @@ const EmployeeDashboard = () => {
                             onChange={(e) =>
                               handleStatusChange(task.id || task._id, e.target.value)
                             }
-                            className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium"
-                            style={{ color: 'var(--text-color)' }}
+                            className="w-full h-11 px-4 rounded-xl border text-sm font-medium"
+                            style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                           >
                             <option value="pending">Pending</option>
                             <option value="in progress">In Progress</option>
@@ -915,7 +924,7 @@ const EmployeeDashboard = () => {
 
           {/* Archived Tasks - Compact Table */}
           {archivedTasks.length > 0 && (
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-200/50">
+            <div className="rounded-xl shadow-sm p-6 border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
               <h2 className="text-lg font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
                 <CheckCircle2 className="w-5 h-5" style={{ color: 'var(--color-primary)' }} />
                 {t("employeeDashboard.completedCancelledTasks")}
@@ -923,7 +932,7 @@ const EmployeeDashboard = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-gray-200">
+                    <tr className="border-b" style={{ borderColor: 'var(--border-color)' }}>
                       {[
                         t("employeeDashboard.title"),
                         t("employeeDashboard.status"),
@@ -944,7 +953,8 @@ const EmployeeDashboard = () => {
                     {archivedTasks.map((task) => (
                       <tr
                         key={task.id || task._id}
-                        className="border-b border-gray-100 hover:bg-gray-50/50 transition-colors"
+                        className="border-b hover:bg-[var(--bg-secondary)] transition-colors"
+                        style={{ borderColor: 'var(--border-color)' }}
                       >
                         <td className="px-3 py-3 font-medium" style={{ color: 'var(--text-color)' }}>
                           {task.title}

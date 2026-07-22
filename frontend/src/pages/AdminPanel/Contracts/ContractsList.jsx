@@ -71,7 +71,7 @@ const ContractsList = () => {
 
   const getStatusColor = (status) => {
     const colors = {
-      Draft: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+      Draft: "bg-[var(--bg-secondary)] text-[var(--text-color)]",
       Active: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
       Expired: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
       Terminated: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
@@ -91,7 +91,7 @@ const ContractsList = () => {
       case "Renewed":
         return <CheckCircle className="text-blue-600" size={16} />;
       default:
-        return <FileText className="text-gray-600" size={16} />;
+        return <FileText className="text-[var(--color-secondary)]" size={16} />;
     }
   };
 
@@ -139,7 +139,7 @@ const ContractsList = () => {
         <motion.div
           className="rounded-2xl shadow-lg border p-6 mb-6"
           style={{
-            backgroundColor: "var(--bg-color)",
+            backgroundColor: "var(--surface-color)",
             borderColor: "var(--border-color)",
           }}
           initial={{ opacity: 0, y: 20 }}
@@ -232,7 +232,7 @@ const ContractsList = () => {
                 key={contract._id}
                 className="rounded-2xl shadow-lg border overflow-hidden hover:shadow-xl transition-all duration-300"
                 style={{
-                  backgroundColor: "var(--bg-color)",
+                  backgroundColor: "var(--surface-color)",
                   borderColor: "var(--border-color)",
                 }}
                 initial={{ opacity: 0, y: 20 }}
@@ -263,7 +263,7 @@ const ContractsList = () => {
                     <div className="flex gap-2 ml-2">
                       <button
                         onClick={() => navigate(`/dashboard/contracts/${contract._id}`)}
-                        className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all"
+                        className="p-2 bg-[var(--surface-color)]/20 hover:bg-[var(--surface-color)]/30 rounded-lg transition-all"
                         title={t("common.edit") || "Edit"}
                       >
                         <Edit size={16} className="text-white" />
@@ -274,7 +274,7 @@ const ContractsList = () => {
                             deleteMutation.mutate(contract._id);
                           }
                         }}
-                        className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all"
+                        className="p-2 bg-[var(--surface-color)]/20 hover:bg-[var(--surface-color)]/30 rounded-lg transition-all"
                         title={t("common.delete") || "Delete"}
                       >
                         <Trash2 size={16} className="text-white" />

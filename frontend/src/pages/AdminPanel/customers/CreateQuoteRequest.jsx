@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../../../lib/axios.js";
 import { toast } from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { ShoppingCart } from "lucide-react";
 
 const CreateOrderRequest = () => {
   const { t } = useTranslation();
@@ -246,27 +247,66 @@ const CreateOrderRequest = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+    <div
+      className="min-h-screen p-4 sm:p-6 lg:p-8"
+      style={{ backgroundColor: "var(--bg-color)" }}
+    >
       {authLoading ? (
-        <p>{t("loading", "Loading...")}</p>
+        <div
+          className="text-center py-16"
+          style={{ color: "var(--color-secondary)" }}
+        >
+          <p>{t("loading", "Loading...")}</p>
+        </div>
       ) : (
-        <div className="w-full max-w-3xl bg-white p-8 rounded shadow-lg">
-          <h1 className="text-3xl font-bold text-center mb-8">
-            {t("order.create_internal_order", "Create Internal Order")}
-          </h1>
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center gap-4 mb-8">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{
+                background:
+                  "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
+              }}
+            >
+              <ShoppingCart size={28} className="text-white" />
+            </div>
+            <h1
+              className="text-4xl font-bold"
+              style={{ color: "var(--text-color)" }}
+            >
+              {t("order.create_internal_order", "Create Internal Order")}
+            </h1>
+          </div>
+          <div
+            className="rounded-2xl p-6 shadow-lg border"
+            style={{
+              backgroundColor: "var(--surface-color)",
+              borderColor: "var(--border-color)",
+            }}
+          >
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Customer selection */}
             <div className="mb-6">
-              <label className="block text-gray-700 font-medium mb-2">
+              <label
+                className="block text-sm font-semibold mb-2"
+                style={{ color: "var(--text-color)" }}
+              >
                 {t("order.select_customer", "Select Customer")}
               </label>
               {customersLoading ? (
-                <p>Loading customers...</p>
+                <p style={{ color: "var(--color-secondary)" }}>
+                  Loading customers...
+                </p>
               ) : (
                 <select
                   value={selectedCustomer}
                   onChange={(e) => setSelectedCustomer(e.target.value)}
-                  className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    backgroundColor: "var(--bg-color)",
+                    color: "var(--text-color)",
+                  }}
                 >
                   <option value="">
                     {t("order.choose_customer", "Choose a customer")}
@@ -308,7 +348,10 @@ const CreateOrderRequest = () => {
                     }}
                     className="w-4 h-4 rounded"
                   />
-                  <label className="block text-gray-700 font-medium">
+                  <label
+                    className="block text-sm font-semibold"
+                    style={{ color: "var(--text-color)" }}
+                  >
                     {t("order.use_price_list", { defaultValue: "Use Price List" })}
                   </label>
                 </div>
@@ -324,7 +367,12 @@ const CreateOrderRequest = () => {
                         }
                       });
                     }}
-                    className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
+                    style={{
+                      borderColor: "var(--border-color)",
+                      backgroundColor: "var(--bg-color)",
+                      color: "var(--text-color)",
+                    }}
                   >
                     <option value="">{t("order.auto_select_price_list", { defaultValue: "Auto-select (Recommended)" })}</option>
                     {priceLists.map((pl) => (
@@ -335,7 +383,10 @@ const CreateOrderRequest = () => {
                   </select>
                 )}
                 {selectedPriceList && usePriceList && (
-                  <p className="text-xs mt-1 text-gray-500">
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: "var(--color-secondary)" }}
+                  >
                     {t("order.price_list_active", { defaultValue: "Using" })}: {selectedPriceList.priceListName}
                   </p>
                 )}
@@ -344,11 +395,16 @@ const CreateOrderRequest = () => {
 
             {/* Order items */}
             <div className="mb-6">
-              <label className="block text-gray-700 font-medium mb-2">
+              <label
+                className="block text-sm font-semibold mb-2"
+                style={{ color: "var(--text-color)" }}
+              >
                 {t("order.order_items", "Order Items")}
               </label>
               {selectedCustomer && inventoryLoading && (
-                <p>Loading products...</p>
+                <p style={{ color: "var(--color-secondary)" }}>
+                  {t("inventory.loading_products", "Loading products...")}
+                </p>
               )}
               {orderItems.map((item, index) => {
                 // Find the selected product details and matching inventory item (if any)
@@ -377,7 +433,11 @@ const CreateOrderRequest = () => {
                 const itemTotalPrice = discountedUnitPrice * item.quantity;
 
                 return (
-                  <div key={index} className="mb-4 border-b pb-2">
+                  <div
+                    key={index}
+                    className="mb-4 border-b pb-2"
+                    style={{ borderColor: "var(--border-color)" }}
+                  >
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                       <div className="w-full sm:w-1/2">
                         <select
@@ -385,7 +445,12 @@ const CreateOrderRequest = () => {
                           onChange={(e) =>
                             handleItemChange(index, "product", e.target.value)
                           }
-                          className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
+                          style={{
+                            borderColor: "var(--border-color)",
+                            backgroundColor: "var(--bg-color)",
+                            color: "var(--text-color)",
+                          }}
                         >
                           <option value="">
                             {t("order.choose_product", "Choose a product")}
@@ -416,12 +481,20 @@ const CreateOrderRequest = () => {
                           }}
                           min="1"
                           max={availableStock}
-                          className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
+                          style={{
+                            borderColor: "var(--border-color)",
+                            backgroundColor: "var(--bg-color)",
+                            color: "var(--text-color)",
+                          }}
                           placeholder={t("order.quantity", "Quantity")}
                         />
                       </div>
                       <div className="w-full sm:w-1/4">
-                        <label className="block text-gray-700 font-medium mb-1">
+                        <label
+                          className="block text-sm font-semibold mb-1"
+                          style={{ color: "var(--text-color)" }}
+                        >
                           {t("order.discount", "Discount %")}
                         </label>
                         <input
@@ -433,13 +506,21 @@ const CreateOrderRequest = () => {
                           min="0"
                           max="100"
                           disabled={orderDiscount > 0}
-                          className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
+                          style={{
+                            borderColor: "var(--border-color)",
+                            backgroundColor: "var(--bg-color)",
+                            color: "var(--text-color)",
+                          }}
                           placeholder={t("order.discount", "Discount %")}
                         />
                       </div>
                     </div>
                     {/* Display available stock, unit price, discount and total price for this item */}
-                    <div className="mt-2 text-sm text-gray-600">
+                    <div
+                      className="mt-2 text-sm"
+                      style={{ color: "var(--color-secondary)" }}
+                    >
                       <p>
                         {t("order.available_stock", "Available Stock")}:{" "}
                         {availableStock}
@@ -458,7 +539,10 @@ const CreateOrderRequest = () => {
                           {item.discountPercent > 0 ? item.discountPercent.toFixed(2) : appliedDiscount}%
                         </span>
                         {item.discountPercent > 0 && (
-                          <span className="ml-1 text-xs text-gray-500">
+                          <span
+                            className="ml-1 text-xs"
+                            style={{ color: "var(--color-secondary)" }}
+                          >
                             (מרשימת מחירים)
                           </span>
                         )}
@@ -474,7 +558,8 @@ const CreateOrderRequest = () => {
               <button
                 type="button"
                 onClick={handleAddItem}
-                className="text-blue-600 underline"
+                className="underline"
+                style={{ color: "var(--color-primary)" }}
               >
                 {t("order.add_item", "Add another item")}
               </button>
@@ -482,7 +567,10 @@ const CreateOrderRequest = () => {
 
             {/* Global Order Discount */}
             <div className="mb-6">
-              <label className="block text-gray-700 font-medium mb-2">
+              <label
+                className="block text-sm font-semibold mb-2"
+                style={{ color: "var(--text-color)" }}
+              >
                 {t("order.global_discount", "Global Discount (%)")}
               </label>
               <input
@@ -500,14 +588,22 @@ const CreateOrderRequest = () => {
                 }}
                 min="0"
                 max="100"
-                className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: "var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
+                }}
                 placeholder={t("order.global_discount", "Global Discount (%)")}
               />
             </div>
 
             {/* Tax Rate */}
             <div className="mb-6">
-              <label className="block text-gray-700 font-medium mb-2">
+              <label
+                className="block text-sm font-semibold mb-2"
+                style={{ color: "var(--text-color)" }}
+              >
                 {t("order.tax_rate", "Tax Rate (%)")}
               </label>
               <input
@@ -517,20 +613,33 @@ const CreateOrderRequest = () => {
                 min="0"
                 max="100"
                 step="0.01"
-                className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: "var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
+                }}
                 placeholder={t("order.enter_tax_rate", "Enter tax rate (%)")}
               />
             </div>
 
             {/* Payment Terms */}
             <div className="mb-6">
-              <label className="block text-gray-700 font-medium mb-2">
+              <label
+                className="block text-sm font-semibold mb-2"
+                style={{ color: "var(--text-color)" }}
+              >
                 {t("order.payment_terms", "Payment Terms")}
               </label>
               <select
                 value={paymentTerms}
                 onChange={(e) => setPaymentTerms(e.target.value)}
-                className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: "var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
+                }}
               >
                 <option value="Immediate">{t("order.payment_immediate", "Immediate Payment")}</option>
                 <option value="Net 30">{t("order.payment_net_30", "Net 30 Days")}</option>
@@ -541,7 +650,13 @@ const CreateOrderRequest = () => {
             </div>
 
             {/* Display order summary */}
-            <div className="mb-6 p-4 bg-gray-50 rounded">
+            <div
+              className="mb-6 p-4 rounded-xl"
+              style={{
+                backgroundColor: "var(--bg-secondary)",
+                color: "var(--text-color)",
+              }}
+            >
               <div className="flex justify-between mb-2">
                 <span>{t("order.subtotal", "Subtotal")}:</span>
                 <span className="font-semibold">{orderSubtotal.toFixed(2)}</span>
@@ -552,7 +667,10 @@ const CreateOrderRequest = () => {
                   <span className="font-semibold">{taxAmount.toFixed(2)}</span>
                 </div>
               )}
-              <div className="flex justify-between pt-2 border-t border-gray-300">
+              <div
+                className="flex justify-between pt-2 border-t"
+                style={{ borderColor: "var(--border-color)" }}
+              >
                 <span className="font-bold text-xl">{t("order.total", "Total")}:</span>
                 <span className="font-bold text-xl">{orderTotal.toFixed(2)}</span>
               </div>
@@ -560,27 +678,43 @@ const CreateOrderRequest = () => {
 
             {/* Delivery Date */}
             <div className="mb-6">
-              <label className="block text-gray-700 font-medium mb-2">
+              <label
+                className="block text-sm font-semibold mb-2"
+                style={{ color: "var(--text-color)" }}
+              >
                 {t("order.delivery_date", "Delivery Date (optional)")}
               </label>
               <input
                 type="date"
                 value={deliveryDate}
                 onChange={(e) => setDeliveryDate(e.target.value)}
-                className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: "var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
+                }}
               />
             </div>
 
             {/* Order Notes */}
             <div className="mb-6">
-              <label className="block text-gray-700 font-medium mb-2">
+              <label
+                className="block text-sm font-semibold mb-2"
+                style={{ color: "var(--text-color)" }}
+              >
                 {t("order.notes", "Notes (optional)")}
               </label>
               <textarea
                 value={orderNotes}
                 onChange={(e) => setOrderNotes(e.target.value)}
                 rows="4"
-                className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                style={{
+                  borderColor: "var(--border-color)",
+                  backgroundColor: "var(--bg-color)",
+                  color: "var(--text-color)",
+                }}
                 placeholder={t(
                   "order.notes_placeholder",
                   "Enter additional details..."
@@ -588,16 +722,23 @@ const CreateOrderRequest = () => {
               ></textarea>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition duration-300"
-            >
-              {loading
-                ? t("order.submitting", "Submitting...")
-                : t("order.submit", "Submit Order")}
-            </button>
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition duration-300 disabled:opacity-60"
+                style={{
+                  backgroundColor: "var(--color-primary)",
+                  color: "var(--button-text)",
+                }}
+              >
+                {loading
+                  ? t("order.submitting", "Submitting...")
+                  : t("order.submit", "Submit Order")}
+              </button>
+            </div>
           </form>
+          </div>
         </div>
       )}
     </div>

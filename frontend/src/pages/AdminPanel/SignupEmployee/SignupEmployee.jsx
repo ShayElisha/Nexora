@@ -139,7 +139,7 @@ const SignupEmployee = () => {
           transition={{ duration: 0.6 }}
           className="backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden"
           style={{
-            backgroundColor: 'var(--bg-color)',
+            backgroundColor: "var(--surface-color)",
             border: '2px solid var(--border-color)'
           }}
         >
@@ -173,7 +173,7 @@ const SignupEmployee = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden"
           style={{
-            backgroundColor: 'var(--bg-color)',
+            backgroundColor: "var(--surface-color)",
             border: '2px solid var(--border-color)'
           }}
         >
@@ -243,7 +243,7 @@ const SignupEmployee = () => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden"
           style={{
-            backgroundColor: 'var(--bg-color)',
+            backgroundColor: "var(--surface-color)",
             border: '2px solid var(--border-color)'
           }}
         >
@@ -351,7 +351,7 @@ const SignupEmployee = () => {
                     onChange={(e) => setCountryCode(e.target.value)}
                     className="w-full sm:w-40 p-4 rounded-xl shadow-md transition-all duration-300 focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2"
                     style={{
-                      backgroundColor: 'var(--bg-color)',
+                      backgroundColor: "var(--surface-color)",
                       color: 'var(--text-color)',
                       border: '2px solid var(--border-color)'
                     }}

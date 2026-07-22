@@ -118,7 +118,7 @@ const CustomerSatisfaction = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4"
+              className="bg-[var(--surface-color)] bg-[var(--surface-color)] rounded-lg shadow-md p-4"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -137,7 +137,7 @@ const CustomerSatisfaction = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4"
+              className="bg-[var(--surface-color)] bg-[var(--surface-color)] rounded-lg shadow-md p-4"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -156,7 +156,7 @@ const CustomerSatisfaction = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4"
+              className="bg-[var(--surface-color)] bg-[var(--surface-color)] rounded-lg shadow-md p-4"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -175,7 +175,7 @@ const CustomerSatisfaction = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4"
+              className="bg-[var(--surface-color)] bg-[var(--surface-color)] rounded-lg shadow-md p-4"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -197,7 +197,7 @@ const CustomerSatisfaction = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6"
+            className="bg-[var(--surface-color)] bg-[var(--surface-color)] rounded-lg shadow-md p-6 mb-6"
           >
             <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-color)' }}>
               {t("crm.nps_distribution") || "NPS Distribution"}
@@ -235,7 +235,7 @@ const CustomerSatisfaction = () => {
         )}
 
         {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
+        <div className="bg-[var(--surface-color)] bg-[var(--surface-color)] rounded-lg shadow-md p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={20} style={{ color: 'var(--text-secondary)' }} />
@@ -269,7 +269,7 @@ const CustomerSatisfaction = () => {
               key={survey._id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
+              className="bg-[var(--surface-color)] bg-[var(--surface-color)] rounded-lg shadow-md p-6"
             >
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -287,7 +287,7 @@ const CustomerSatisfaction = () => {
                         <Star
                           key={i}
                           size={16}
-                          className={i < Math.round(survey.satisfactionScore / 2) ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}
+                          className={i < Math.round(survey.satisfactionScore / 2) ? "text-yellow-400 fill-yellow-400" : "text-[var(--border-color)]"}
                         />
                       ))}
                       <span className="ml-2 font-semibold" style={{ color: 'var(--text-color)' }}>
@@ -329,7 +329,7 @@ const CustomerSatisfaction = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4"
+              className="bg-[var(--surface-color)] bg-[var(--surface-color)] rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4"
             >
               <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-color)' }}>
                 {t("crm.create_survey") || "Create Survey"}

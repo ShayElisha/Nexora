@@ -18,17 +18,33 @@ const SubscriptionCard = ({ type, price, duration, features }) => {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105">
-      <h2 className="text-xl font-semibold text-gray-800">{type}</h2>
-      <p className="text-gray-600">
+    <div
+      className="p-6 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105 border"
+      style={{
+        backgroundColor: "var(--surface-color)",
+        borderColor: "var(--border-color)",
+      }}
+    >
+      <h2
+        className="text-xl font-semibold"
+        style={{ color: "var(--text-color)" }}
+      >
+        {type}
+      </h2>
+      <p style={{ color: "var(--color-secondary)" }}>
         <span className="text-3xl font-bold">{price}</span>
         <span className="text-sm">/{duration}</span>
       </p>
       <ul className="mt-4 space-y-2">
         {features.map((feature, index) => (
-          <li key={index} className="flex items-center text-gray-600">
+          <li
+            key={index}
+            className="flex items-center"
+            style={{ color: "var(--color-secondary)" }}
+          >
             <svg
-              className="w-5 h-5 text-indigo-600 mr-2"
+              className="w-5 h-5 mr-2"
+              style={{ color: "var(--color-primary)" }}
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -44,7 +60,11 @@ const SubscriptionCard = ({ type, price, duration, features }) => {
       </ul>
       <button
         onClick={() => handlePayment(duration, type)}
-        className="mt-6 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700"
+        className="mt-6 w-full py-2 rounded-lg text-sm font-semibold"
+        style={{
+          backgroundColor: "var(--color-primary)",
+          color: "var(--button-text)",
+        }}
       >
         Choose {type}
       </button>

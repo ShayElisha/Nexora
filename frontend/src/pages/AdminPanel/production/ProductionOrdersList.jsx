@@ -93,7 +93,7 @@ const ProductionOrdersList = () => {
       case "On Hold":
         return "bg-orange-100 text-orange-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-[var(--bg-secondary)] text-[var(--text-color)]";
     }
   };
 
@@ -108,7 +108,7 @@ const ProductionOrdersList = () => {
       case "low":
         return "bg-green-500 text-white";
       default:
-        return "bg-gray-500 text-white";
+        return "bg-[var(--color-secondary)] text-white";
     }
   };
 
@@ -160,7 +160,7 @@ const ProductionOrdersList = () => {
         >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-purple-600">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
                 <Factory size={28} color="white" />
               </div>
               <div>
@@ -174,7 +174,7 @@ const ProductionOrdersList = () => {
             </div>
             <button
               onClick={() => navigate("/dashboard/production/create")}
-              className="px-6 py-3 rounded-xl font-medium transition-all hover:opacity-90 flex items-center gap-2"
+              className="px-6 h-11 rounded-lg font-medium transition-all hover:opacity-90 flex items-center gap-2"
               style={{
                 backgroundColor: "var(--color-primary)",
                 color: "var(--button-text)",
@@ -189,7 +189,7 @@ const ProductionOrdersList = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -209,7 +209,7 @@ const ProductionOrdersList = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -229,7 +229,7 @@ const ProductionOrdersList = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -249,7 +249,7 @@ const ProductionOrdersList = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -269,7 +269,7 @@ const ProductionOrdersList = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -367,7 +367,7 @@ const ProductionOrdersList = () => {
                   className="p-6 rounded-xl border cursor-pointer transition-all hover:shadow-lg"
                   style={{
                     borderColor: "var(--border-color)",
-                    backgroundColor: "var(--bg-color)",
+                    backgroundColor: "var(--surface-color)",
                   }}
                   onClick={() => toggleOrder(order._id)}
                 >

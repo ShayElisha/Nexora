@@ -69,7 +69,7 @@ const SalesOpportunitiesList = () => {
 
   const getStageColor = (stage) => {
     const colors = {
-      Prospecting: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+      Prospecting: "bg-[var(--bg-secondary)] text-[var(--text-color)]",
       Qualification: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
       "Needs Analysis": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
       Proposal: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
@@ -81,7 +81,7 @@ const SalesOpportunitiesList = () => {
   };
 
   return (
-    <div className="p-6" style={{ backgroundColor: "var(--bg-color)", minHeight: "100vh" }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -89,26 +89,25 @@ const SalesOpportunitiesList = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div>
-            <h1
-              className="text-3xl font-bold mb-2"
-              style={{
-                color: "var(--text-color)",
-                background: "linear-gradient(135deg, var(--color-primary), var(--color-secondary))",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
+          <div className="flex items-center gap-4">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
             >
-            {t("sales.opportunities") || "Sales Opportunities"}
-          </h1>
-            <p className="text-sm" style={{ color: "var(--color-secondary)" }}>
-              {t("sales.manage_opportunities") || "Manage and track your sales opportunities"}
-            </p>
+              <TrendingUp size={28} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: "var(--text-color)" }}>
+                {t("sales.opportunities") || "Sales Opportunities"}
+              </h1>
+              <p className="text-lg" style={{ color: "var(--color-secondary)" }}>
+                {t("sales.manage_opportunities") || "Manage and track your sales opportunities"}
+              </p>
+            </div>
           </div>
           <motion.button
             onClick={() => navigate("/dashboard/sales/opportunities/add")}
-            className="flex items-center gap-2 px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            className="flex items-center gap-2 px-6 h-11 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
             style={{
               backgroundColor: "var(--button-bg)",
               color: "var(--button-text)",
@@ -125,7 +124,7 @@ const SalesOpportunitiesList = () => {
         <motion.div
           className="rounded-2xl shadow-lg border p-6 mb-6"
           style={{
-            backgroundColor: "var(--bg-color)",
+            backgroundColor: "var(--surface-color)",
             borderColor: "var(--border-color)",
           }}
           initial={{ opacity: 0, y: 20 }}
@@ -144,7 +143,7 @@ const SalesOpportunitiesList = () => {
                 placeholder={t("sales.search_opportunities") || "Search opportunities..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+                className="w-full h-11 ps-12 pe-4 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                 style={{
                   borderColor: "var(--border-color)",
                   backgroundColor: "var(--bg-color)",
@@ -156,7 +155,7 @@ const SalesOpportunitiesList = () => {
             <select
               value={filterStage}
               onChange={(e) => setFilterStage(e.target.value)}
-              className="px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+              className="h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all"
               style={{
                 borderColor: "var(--border-color)",
                 backgroundColor: "var(--bg-color)",
@@ -173,7 +172,7 @@ const SalesOpportunitiesList = () => {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
+              className="h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 transition-all"
               style={{
                 borderColor: "var(--border-color)",
                 backgroundColor: "var(--bg-color)",
@@ -217,7 +216,7 @@ const SalesOpportunitiesList = () => {
                 key={opp._id}
                 className="rounded-2xl shadow-lg border overflow-hidden hover:shadow-xl transition-all duration-300"
                 style={{
-                  backgroundColor: "var(--bg-color)",
+                  backgroundColor: "var(--surface-color)",
                   borderColor: "var(--border-color)",
                 }}
                 initial={{ opacity: 0, y: 20 }}
@@ -292,7 +291,7 @@ const SalesOpportunitiesList = () => {
                         {opp.probability || 0}%
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div className="w-full bg-[var(--bg-secondary)] rounded-full h-2">
                       <motion.div
                         className="h-2 rounded-full"
                         style={{ backgroundColor: "var(--color-primary)" }}

@@ -170,7 +170,7 @@ const RevenueVsExpenses = () => {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 period === p
                   ? "bg-primary text-button-text shadow-md"
-                  : "bg-gray-100 text-secondary hover:bg-gray-200"
+                  : "bg-[var(--bg-secondary)] text-secondary hover:bg-[var(--border-color)]"
               }`}
             >
               {p === "6months"

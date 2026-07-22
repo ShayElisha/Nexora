@@ -114,7 +114,7 @@ const AssetList = () => {
         >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-purple-600">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
                 <Package size={28} color="white" />
               </div>
               <div>
@@ -145,7 +145,7 @@ const AssetList = () => {
         {/* Filters */}
         <motion.div
           className="rounded-2xl shadow-lg border p-6 mb-6"
-          style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+          style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -266,7 +266,7 @@ const AssetList = () => {
         ) : assets.length === 0 ? (
           <motion.div
             className="text-center py-16 rounded-2xl shadow-lg border"
-            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
@@ -285,7 +285,7 @@ const AssetList = () => {
                   animate={{ opacity: 1, y: 0 }}
                   className="rounded-2xl shadow-lg border p-6 transition-all hover:scale-105"
                   style={{
-                    backgroundColor: "var(--bg-color)",
+                    backgroundColor: "var(--surface-color)",
                     borderColor: "var(--border-color)",
                   }}
                 >

@@ -73,7 +73,7 @@ const LeaveRequestsList = () => {
       pending: "bg-yellow-100 text-yellow-800",
       approved: "bg-green-100 text-green-800",
       rejected: "bg-red-100 text-red-800",
-      cancelled: "bg-gray-100 text-gray-800",
+      cancelled: "bg-[var(--bg-secondary)] text-[var(--text-color)]",
     };
     return colors[status] || colors.pending;
   };
@@ -86,7 +86,7 @@ const LeaveRequestsList = () => {
       maternity: "bg-pink-100 text-pink-800",
       paternity: "bg-indigo-100 text-indigo-800",
     };
-    return colors[type] || "bg-gray-100 text-gray-800";
+    return colors[type] || "bg-[var(--bg-secondary)] text-[var(--text-color)]";
   };
 
   if (isLoading) {
@@ -113,9 +113,9 @@ const LeaveRequestsList = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/dashboard/hr/leave/requests/new")}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all shadow-lg"
+            className="flex items-center gap-2 px-4 h-11 rounded-lg font-medium transition-all shadow-lg"
             style={{
-              background: "linear-gradient(to right, var(--color-primary), var(--color-secondary))",
+              background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
               color: "var(--button-text)",
             }}
           >
@@ -124,7 +124,7 @@ const LeaveRequestsList = () => {
           </motion.button>
         </div>
 
-        <div className="rounded-2xl shadow-xl p-6" style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)", border: "1px solid" }}>
+        <div className="rounded-2xl shadow-xl p-6" style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)", border: "1px solid" }}>
         <div className="flex gap-4 mb-6">
           <SearchField
             className="flex-1"
@@ -140,7 +140,7 @@ const LeaveRequestsList = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+            className="h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
             style={{
               borderColor: "var(--border-color)",
               backgroundColor: "var(--bg-color)",
@@ -155,7 +155,7 @@ const LeaveRequestsList = () => {
           <select
             value={leaveTypeFilter}
             onChange={(e) => setLeaveTypeFilter(e.target.value)}
-            className="px-4 py-2 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+            className="h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
             style={{
               borderColor: "var(--border-color)",
               backgroundColor: "var(--bg-color)",
@@ -181,7 +181,7 @@ const LeaveRequestsList = () => {
               style={{
                 borderColor: "var(--border-color)",
                 border: "1px solid",
-                backgroundColor: "var(--bg-color)",
+                backgroundColor: "var(--surface-color)",
               }}
             >
               <div className="flex justify-between items-start mb-4">

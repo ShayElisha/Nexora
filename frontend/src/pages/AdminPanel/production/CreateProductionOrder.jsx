@@ -125,7 +125,7 @@ const CreateProductionOrder = () => {
             >
               <ArrowLeft size={20} style={{ color: "var(--text-color)" }} />
             </button>
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-purple-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Factory size={28} color="white" />
             </div>
             <div>
@@ -146,7 +146,7 @@ const CreateProductionOrder = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <div className="p-6 rounded-xl border" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)" }}>
+          <div className="p-6 rounded-2xl shadow-lg border" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--surface-color)" }}>
             <h2 className="text-xl font-semibold mb-4" style={{ color: "var(--text-color)" }}>
               פרטי הזמנת ייצור
             </h2>
@@ -161,7 +161,7 @@ const CreateProductionOrder = () => {
                 <select
                   value={formData.productId}
                   onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg border"
+                  className="w-full h-11 px-4 rounded-xl border"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -198,7 +198,7 @@ const CreateProductionOrder = () => {
                   min="1"
                   value={formData.quantity}
                   onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 1 })}
-                  className="w-full px-4 py-2 rounded-lg border"
+                  className="w-full h-11 px-4 rounded-xl border"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -227,7 +227,7 @@ const CreateProductionOrder = () => {
                     value={formData.dueDate}
                     onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
                     onClick={(e) => e.currentTarget.showPicker?.()}
-                    className="w-full px-4 py-2 ps-10 rounded-lg border cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden"
+                    className="w-full h-11 px-4 ps-10 rounded-xl border cursor-pointer [&::-webkit-calendar-picker-indicator]:hidden"
                     style={{
                       borderColor: "var(--border-color)",
                       backgroundColor: "var(--bg-color)",
@@ -246,7 +246,7 @@ const CreateProductionOrder = () => {
                 <select
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg border"
+                  className="w-full h-11 px-4 rounded-xl border"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -268,7 +268,7 @@ const CreateProductionOrder = () => {
                 <select
                   value={formData.departmentId}
                   onChange={(e) => setFormData({ ...formData, departmentId: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg border"
+                  className="w-full h-11 px-4 rounded-xl border"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -293,7 +293,7 @@ const CreateProductionOrder = () => {
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   rows={4}
-                  className="w-full px-4 py-2 rounded-lg border"
+                  className="w-full px-4 py-2 rounded-xl border resize-none"
                   style={{
                     borderColor: "var(--border-color)",
                     backgroundColor: "var(--bg-color)",
@@ -306,7 +306,7 @@ const CreateProductionOrder = () => {
 
           {/* BOM Preview */}
           {bomData && (
-            <div className="p-6 rounded-xl border" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)" }}>
+            <div className="p-6 rounded-2xl shadow-lg border" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--surface-color)" }}>
               <h2 className="text-xl font-semibold mb-4" style={{ color: "var(--text-color)" }}>
                 רשימת רכיבים (BOM)
               </h2>

@@ -51,14 +51,18 @@ const ResourceCapacityPlanning = () => {
   });
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-6" style={{ backgroundColor: 'var(--bg-color)' }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
+      <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center gap-4">
+        <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))' }}>
+          <Users size={28} color="white" />
+        </div>
         <div>
-          <h1 className="text-3xl font-bold text-left" style={{ color: 'var(--text-color)' }}>
+          <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
             {t("projects.resource_capacity")}
           </h1>
-          <p className="mt-1 text-left" style={{ color: 'var(--color-secondary)' }}>
+          <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
             {t("projects.resource_capacity_description")}
           </p>
         </div>
@@ -69,8 +73,8 @@ const ResourceCapacityPlanning = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-lg shadow p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          className="rounded-2xl p-6 shadow-lg border"
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -89,8 +93,8 @@ const ResourceCapacityPlanning = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="rounded-lg shadow p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          className="rounded-2xl p-6 shadow-lg border"
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -109,8 +113,8 @@ const ResourceCapacityPlanning = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="rounded-lg shadow p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          className="rounded-2xl p-6 shadow-lg border"
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -127,15 +131,15 @@ const ResourceCapacityPlanning = () => {
       </div>
 
       {/* Search */}
-      <div className="rounded-lg shadow p-4 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+      <div className="rounded-2xl p-6 shadow-lg border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
         <div className="relative">
-          <Search className={`absolute top-1/2 transform -translate-y-1/2 w-5 h-5 ${isRTL ? 'right-3' : 'left-3'}`} style={{ color: 'var(--color-secondary)' }} />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
           <input
             type="text"
             placeholder={t("projects.search_employees")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className={`w-full py-2 border rounded-lg focus:ring-2 ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'}`}
+            className="w-full h-11 ps-10 pe-4 border rounded-xl focus:ring-2"
             style={{ 
               borderColor: 'var(--border-color)', 
               backgroundColor: 'var(--bg-color)', 
@@ -147,10 +151,10 @@ const ResourceCapacityPlanning = () => {
       </div>
 
       {/* Employee Capacity Table */}
-      <div className="rounded-lg shadow overflow-hidden border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+      <div className="rounded-2xl border overflow-hidden shadow-lg" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
         <div className="overflow-x-auto">
           <table className="w-full" dir={isRTL ? "rtl" : "ltr"}>
-            <thead style={{ backgroundColor: 'var(--footer-bg)' }}>
+            <thead style={{ backgroundColor: 'var(--bg-secondary)' }}>
               <tr>
                 <th className={`px-6 py-3 text-xs font-medium uppercase ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                   {t("projects.employee")}
@@ -175,7 +179,7 @@ const ResourceCapacityPlanning = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+            <tbody className="divide-y" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
               {filteredEmployees.map((emp) => (
                 <tr
                   key={emp.employee._id}
@@ -243,6 +247,7 @@ const ResourceCapacityPlanning = () => {
             </tbody>
           </table>
         </div>
+      </div>
       </div>
     </div>
   );

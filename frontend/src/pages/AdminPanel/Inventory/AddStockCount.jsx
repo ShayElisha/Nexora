@@ -144,7 +144,7 @@ const AddStockCount = () => {
   };
 
   return (
-    <div className="p-6" style={{ backgroundColor: "var(--bg-color)", minHeight: "100vh" }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }}>
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold mb-6" style={{ color: "var(--text-color)" }}>
           {isEdit
@@ -152,7 +152,7 @@ const AddStockCount = () => {
             : t("inventory.add_stock_count") || "Add Stock Count"}
         </h1>
 
-        <form onSubmit={handleSubmit} className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+        <form onSubmit={handleSubmit} className="rounded-2xl shadow-lg border overflow-hidden" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           <div className="p-6 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -161,7 +161,7 @@ const AddStockCount = () => {
                 required
                 value={formData.warehouseId}
                 onChange={(e) => setFormData({ ...formData, warehouseId: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               >
                 <option value="">Select Warehouse</option>
@@ -178,7 +178,7 @@ const AddStockCount = () => {
                 required
                 value={formData.countType}
                 onChange={(e) => setFormData({ ...formData, countType: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               >
                 <option value="Full">Full</option>
@@ -195,7 +195,7 @@ const AddStockCount = () => {
                 required
                 value={formData.countDate}
                 onChange={(e) => setFormData({ ...formData, countDate: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
@@ -205,7 +205,7 @@ const AddStockCount = () => {
                 type="date"
                 value={formData.scheduledDate}
                 onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
@@ -277,7 +277,7 @@ const AddStockCount = () => {
                   <button
                     type="button"
                     onClick={() => removeItem(index)}
-                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                    className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                   >
                     <Trash2 size={18} className="text-red-500" />
                   </button>
@@ -291,7 +291,7 @@ const AddStockCount = () => {
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full px-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 rows={3}
               />
@@ -301,8 +301,8 @@ const AddStockCount = () => {
               <button
                 type="submit"
                 disabled={mutation.isLoading}
-                className="flex items-center gap-2 px-6 py-2 rounded-lg text-white hover:opacity-90 disabled:opacity-50 transition"
-                style={{ backgroundColor: 'var(--color-primary)' }}
+                className="flex items-center gap-2 px-6 h-11 rounded-lg font-medium hover:opacity-90 disabled:opacity-50 transition"
+                style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
               >
                 <Save size={20} />
                 {mutation.isLoading ? "Saving..." : t("inventory.save") || "Save"}
@@ -310,7 +310,8 @@ const AddStockCount = () => {
               <button
                 type="button"
                 onClick={() => navigate("/dashboard/inventory/stock-counts")}
-                className="flex items-center gap-2 px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
+                className="flex items-center gap-2 px-6 h-11 rounded-lg font-medium border hover:bg-[var(--bg-secondary)] transition"
+                style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)', backgroundColor: 'var(--surface-color)' }}
               >
                 <X size={20} />
                 {t("inventory.cancel") || "Cancel"}

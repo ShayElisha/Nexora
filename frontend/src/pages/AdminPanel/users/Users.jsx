@@ -57,7 +57,7 @@ const EmployeeCard = ({ user, onEdit, onDelete, onStatusChange }) => {
   return (
     <motion.div
       className="rounded-2xl shadow-lg border overflow-hidden"
-      style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+      style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ scale: 1.02, translateY: -5 }}
@@ -102,7 +102,7 @@ const EmployeeCard = ({ user, onEdit, onDelete, onStatusChange }) => {
               user.status === "active"
                 ? "bg-green-100 text-green-700"
                 : user.status === "inactive"
-                ? "bg-gray-100 text-gray-700"
+                ? "bg-[var(--bg-secondary)] text-[var(--text-color)]"
                 : user.status === "suspended"
                 ? "bg-yellow-100 text-yellow-700"
                 : "bg-red-100 text-red-700"
@@ -182,7 +182,7 @@ const EmployeeCard = ({ user, onEdit, onDelete, onStatusChange }) => {
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               {/* Personal Details */}
-              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--border-color)' }}>
+              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                 <h4 className="font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
                   <User size={18} style={{ color: 'var(--color-primary)' }} />
                   {t("users.personal_details")}
@@ -204,7 +204,7 @@ const EmployeeCard = ({ user, onEdit, onDelete, onStatusChange }) => {
         </div>
 
               {/* Payment Details */}
-              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--border-color)' }}>
+              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                 <h4 className="font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
                   <CreditCard size={18} style={{ color: 'var(--color-primary)' }} />
                   {t("users.payment_details")}
@@ -232,7 +232,7 @@ const EmployeeCard = ({ user, onEdit, onDelete, onStatusChange }) => {
         </div>
 
               {/* Vacation & Sick */}
-              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--border-color)' }}>
+              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                 <h4 className="font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
                   <Calendar size={18} style={{ color: 'var(--color-primary)' }} />
                   {t("users.vacation_sick")}
@@ -248,7 +248,7 @@ const EmployeeCard = ({ user, onEdit, onDelete, onStatusChange }) => {
         </div>
 
               {/* Projects */}
-              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--border-color)' }}>
+              <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                 <h4 className="font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
                   <Building2 size={18} style={{ color: 'var(--color-primary)' }} />
                   {t("users.projects")}
@@ -270,14 +270,14 @@ const EmployeeCard = ({ user, onEdit, onDelete, onStatusChange }) => {
         </div>
 
             {/* Status Change */}
-            <div className="mt-4 p-4 rounded-xl" style={{ backgroundColor: 'var(--border-color)' }}>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+            <div className="mt-4 p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                 {t("users.change_status")}:
           </label>
           <select
                 value={user.status || "active"}
                 onChange={(e) => onStatusChange(user._id, e.target.value)}
-                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                 style={{
                   borderColor: 'var(--border-color)',
                   backgroundColor: 'var(--bg-color)',
@@ -616,7 +616,10 @@ const Users = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-indigo-600">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
+            >
               <UsersIcon size={28} color="white" />
                                 </div>
             <div>
@@ -632,8 +635,8 @@ const Users = () => {
           {/* Statistics Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <motion.div
-              className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -652,8 +655,8 @@ const Users = () => {
             </motion.div>
 
             <motion.div
-              className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -672,13 +675,13 @@ const Users = () => {
             </motion.div>
 
             <motion.div
-              className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-gray-100">
-                  <UserX size={24} className="text-gray-600" />
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-[var(--bg-secondary)]">
+                  <UserX size={24} className="text-[var(--color-secondary)]" />
                 </div>
                 <div>
                   <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
@@ -692,8 +695,8 @@ const Users = () => {
             </motion.div>
 
             <motion.div
-              className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -717,7 +720,7 @@ const Users = () => {
             <div className="relative">
               <Search
                 size={20}
-                className="absolute left-3 top-1/2 -translate-y-1/2"
+                className="absolute start-3 top-1/2 -translate-y-1/2"
                 style={{ color: 'var(--color-secondary)' }}
               />
               <input
@@ -725,7 +728,7 @@ const Users = () => {
                 placeholder={t("users.search_placeholder")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2"
+                className="w-full h-11 ps-10 pe-4 rounded-xl border focus:outline-none focus:ring-2"
                 style={{
                   borderColor: 'var(--border-color)',
                   backgroundColor: 'var(--bg-color)',
@@ -737,7 +740,7 @@ const Users = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-3 rounded-xl border focus:outline-none focus:ring-2"
+              className="h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
               style={{
                 borderColor: 'var(--border-color)',
                 backgroundColor: 'var(--bg-color)',
@@ -754,7 +757,7 @@ const Users = () => {
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="px-4 py-3 rounded-xl border focus:outline-none focus:ring-2"
+              className="h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
               style={{
                 borderColor: 'var(--border-color)',
                 backgroundColor: 'var(--bg-color)',
@@ -839,7 +842,7 @@ const Users = () => {
           >
             <motion.div
               className="rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               onClick={(e) => e.stopPropagation()}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -861,7 +864,7 @@ const Users = () => {
               <form onSubmit={handleEditSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("users.name")}
                     </label>
                     <input
@@ -869,7 +872,7 @@ const Users = () => {
                       name="name"
                       value={editUser.name}
                       onChange={handleEditChange}
-                      className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                      className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                       style={{
                         borderColor: 'var(--border-color)',
                         backgroundColor: 'var(--bg-color)',
@@ -879,7 +882,7 @@ const Users = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("users.last_name")}
                     </label>
                     <input
@@ -887,7 +890,7 @@ const Users = () => {
                       name="lastName"
                       value={editUser.lastName}
                       onChange={handleEditChange}
-                      className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                      className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                       style={{
                         borderColor: 'var(--border-color)',
                         backgroundColor: 'var(--bg-color)',
@@ -897,7 +900,7 @@ const Users = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("users.email")}
                     </label>
                     <input
@@ -905,7 +908,7 @@ const Users = () => {
                       name="email"
                       value={editUser.email}
                       onChange={handleEditChange}
-                      className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                      className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                       style={{
                         borderColor: 'var(--border-color)',
                         backgroundColor: 'var(--bg-color)',
@@ -915,7 +918,7 @@ const Users = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("users.phone")}
                     </label>
                     <input
@@ -923,7 +926,7 @@ const Users = () => {
                       name="phone"
                       value={editUser.phone}
                       onChange={handleEditChange}
-                      className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                      className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                       style={{
                         borderColor: 'var(--border-color)',
                         backgroundColor: 'var(--bg-color)',
@@ -932,7 +935,7 @@ const Users = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("users.role")} (מערכת ישנה)
                     </label>
                     <input
@@ -940,7 +943,7 @@ const Users = () => {
                       name="role"
                       value={editUser.role}
                       onChange={handleEditChange}
-                      className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                      className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                       style={{
                         borderColor: 'var(--border-color)',
                         backgroundColor: 'var(--bg-color)',
@@ -950,14 +953,14 @@ const Users = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("users.role_assignment") || "הקצאת תפקיד (מערכת חדשה)"}
                     </label>
                     <select
                       name="roleId"
                       value={editUser.roleId || ""}
                       onChange={handleEditChange}
-                      className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                      className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                       style={{
                         borderColor: 'var(--border-color)',
                         backgroundColor: 'var(--bg-color)',
@@ -981,14 +984,14 @@ const Users = () => {
                     </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("users.department")}
                     </label>
                     <select
                       name="department"
                       value={editUser.department}
                       onChange={handleEditChange}
-                      className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                      className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                       style={{
                         borderColor: 'var(--border-color)',
                         backgroundColor: 'var(--bg-color)',
@@ -1008,14 +1011,14 @@ const Users = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("users.payment_type")}
                     </label>
                     <select
                       name="paymentType"
                       value={editUser.paymentType}
                       onChange={handleEditChange}
-                      className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                      className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                       style={{
                         borderColor: 'var(--border-color)',
                         backgroundColor: 'var(--bg-color)',
@@ -1029,7 +1032,7 @@ const Users = () => {
                   </div>
                   {editUser.paymentType === "Hourly" && (
                     <div>
-                      <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                      <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                         {t("users.hourly_salary")}
                       </label>
                       <input
@@ -1037,7 +1040,7 @@ const Users = () => {
                         name="hourlySalary"
                         value={editUser.hourlySalary}
                         onChange={handleEditChange}
-                        className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                        className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                         style={{
                           borderColor: 'var(--border-color)',
                           backgroundColor: 'var(--bg-color)',
@@ -1049,7 +1052,7 @@ const Users = () => {
                   {editUser.paymentType === "Global" && (
                     <>
                       <div>
-                        <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                        <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                           {t("users.global_salary")}
                         </label>
                         <input
@@ -1057,7 +1060,7 @@ const Users = () => {
                           name="globalSalary"
                           value={editUser.globalSalary}
                           onChange={handleEditChange}
-                          className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                          className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                           style={{
                             borderColor: 'var(--border-color)',
                             backgroundColor: 'var(--bg-color)',
@@ -1066,7 +1069,7 @@ const Users = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                        <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                           {t("users.expected_hours")}
                         </label>
                         <input
@@ -1074,7 +1077,7 @@ const Users = () => {
                           name="expectedHours"
                           value={editUser.expectedHours}
                           onChange={handleEditChange}
-                          className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                          className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                           style={{
                             borderColor: 'var(--border-color)',
                             backgroundColor: 'var(--bg-color)',

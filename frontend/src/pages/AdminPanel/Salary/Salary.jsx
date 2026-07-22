@@ -1054,7 +1054,7 @@ const Salary = () => {
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-pink-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <DollarSign size={28} color="white" />
             </div>
             <div>
@@ -1068,7 +1068,7 @@ const Salary = () => {
             </div>
             <button
               onClick={() => setShowEmailModal(true)}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all hover:scale-105 shadow-lg"
+              className="flex items-center gap-2 px-6 h-11 rounded-lg font-semibold transition-all hover:scale-105 shadow-lg"
               style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
             >
               <Mail size={20} />
@@ -1092,7 +1092,7 @@ const Salary = () => {
               animate="visible"
               transition={{ delay: index * 0.1 }}
               className="rounded-2xl shadow-lg p-6 border hover:shadow-xl transition-all"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               whileHover={{ y: -5 }}
             >
               <div className="flex items-center justify-between mb-4">
@@ -1113,7 +1113,7 @@ const Salary = () => {
         {/* Tax Calculator */}
         <motion.div
           className="mb-8 rounded-2xl shadow-lg p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
           variants={cardVariant}
           initial="hidden"
           animate="visible"
@@ -1203,7 +1203,7 @@ const Salary = () => {
       ) : salaries.length === 0 ? (
           <motion.div
             className="text-center py-16 rounded-2xl shadow-lg"
-            style={{ backgroundColor: 'var(--bg-color)' }}
+            style={{ backgroundColor: "var(--surface-color)" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
@@ -1222,14 +1222,14 @@ const Salary = () => {
                 animate="visible"
                 transition={{ delay: index * 0.05 }}
                 className="rounded-2xl shadow-lg overflow-hidden border hover:shadow-xl transition-all"
-                style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               >
                 <div className="p-6 cursor-pointer" onClick={() => toggleRow(salary._id)}>
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
                     {/* Employee Info */}
                     <div className="lg:col-span-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
                           <Users size={24} color="white" />
                         </div>
                         <div>
@@ -1399,7 +1399,7 @@ const Salary = () => {
           >
             <motion.div
               className="rounded-2xl shadow-2xl p-6 max-w-md w-full border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               onClick={(e) => e.stopPropagation()}
@@ -1484,7 +1484,7 @@ const Salary = () => {
           >
             <motion.div
               className="rounded-2xl shadow-2xl p-6 max-w-4xl w-full border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               onClick={(e) => e.stopPropagation()}
@@ -1534,7 +1534,7 @@ const Salary = () => {
                           toast.error("שגיאה בהורדת התלוש");
                         });
                     }}
-                  className="px-6 py-3 rounded-xl font-bold transition-all hover:scale-105 flex items-center gap-2"
+                  className="px-6 h-11 rounded-lg font-bold transition-all hover:scale-105 flex items-center gap-2"
                   style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
                 >
                   <Download size={20} />

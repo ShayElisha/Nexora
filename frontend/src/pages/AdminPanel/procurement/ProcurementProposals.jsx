@@ -211,7 +211,7 @@ const ProcurementProposals = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-cyan-500 to-blue-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <ShoppingCart size={28} color="white" />
             </div>
             <div>
@@ -240,7 +240,7 @@ const ProcurementProposals = () => {
               animate="visible"
               transition={{ delay: index * 0.1 }}
               className="rounded-2xl shadow-lg p-6 border hover:shadow-xl transition-all"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               whileHover={{ y: -5 }}
             >
               <div className="flex items-center justify-between mb-4">
@@ -261,7 +261,7 @@ const ProcurementProposals = () => {
         {/* Search & Filter */}
         <motion.div
           className="mb-8 rounded-2xl shadow-lg p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
@@ -311,7 +311,7 @@ const ProcurementProposals = () => {
         ) : filteredProposals.length === 0 ? (
           <motion.div
             className="text-center py-16 rounded-2xl shadow-lg"
-            style={{ backgroundColor: 'var(--bg-color)' }}
+            style={{ backgroundColor: "var(--surface-color)" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
@@ -330,14 +330,14 @@ const ProcurementProposals = () => {
                 animate="visible"
                 transition={{ delay: index * 0.05 }}
                 className="rounded-2xl shadow-lg overflow-hidden border hover:shadow-xl transition-all"
-                style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               >
                 <div className="p-6">
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
                     {/* Supplier Info */}
                     <div className="lg:col-span-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-cyan-500 to-blue-500">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
                           <Building2 size={24} color="white" />
                         </div>
                         <div>

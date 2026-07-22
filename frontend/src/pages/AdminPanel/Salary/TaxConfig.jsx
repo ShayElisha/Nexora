@@ -201,7 +201,7 @@ const TaxConfig = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-orange-500 to-red-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Settings size={28} color="white" />
             </div>
             <div>
@@ -218,7 +218,7 @@ const TaxConfig = () => {
         {/* Form */}
         <motion.div
           className="mb-8 rounded-2xl shadow-lg p-6 lg:p-8 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
           variants={cardVariant}
           initial="hidden"
           animate="visible"
@@ -292,7 +292,7 @@ const TaxConfig = () => {
                 <button
                   type="button"
                   onClick={addTaxBracket}
-                  className="px-4 py-2 rounded-xl font-medium transition-all hover:scale-105 flex items-center gap-2"
+                  className="px-4 h-11 rounded-lg font-medium transition-all hover:scale-105 flex items-center gap-2"
                   style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
                 >
                   <Plus size={18} />
@@ -352,7 +352,7 @@ const TaxConfig = () => {
                 <button
                   type="button"
                   onClick={addOtherTax}
-                  className="px-4 py-2 rounded-xl font-medium transition-all hover:scale-105 flex items-center gap-2"
+                  className="px-4 h-11 rounded-lg font-medium transition-all hover:scale-105 flex items-center gap-2"
                   style={{ backgroundColor: 'var(--color-accent)', color: 'var(--button-text)' }}
                 >
                   <Plus size={18} />
@@ -452,7 +452,7 @@ const TaxConfig = () => {
         {/* Existing Configs */}
         <motion.div
           className="rounded-2xl shadow-lg p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
           variants={cardVariant}
           initial="hidden"
           animate="visible"
@@ -487,7 +487,7 @@ const TaxConfig = () => {
                   animate="visible"
                   transition={{ delay: index * 0.05 }}
                   className="rounded-xl shadow-md overflow-hidden border hover:shadow-lg transition-all"
-                  style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                  style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
                 >
                   <div
                     className="p-6 cursor-pointer"
@@ -495,7 +495,7 @@ const TaxConfig = () => {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-orange-500 to-red-500">
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
                           <Globe size={24} color="white" />
                         </div>
                         <div>

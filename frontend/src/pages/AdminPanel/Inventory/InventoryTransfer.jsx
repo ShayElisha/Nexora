@@ -145,11 +145,11 @@ const InventoryTransfer = () => {
           <div className="flex items-center gap-4 mb-6">
             <button
               onClick={() => navigate(-1)}
-              className="p-2 rounded-lg hover:bg-gray-100 transition"
+              className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-indigo-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <ArrowRight size={28} color="white" />
             </div>
             <div className="flex-1">
@@ -170,18 +170,20 @@ const InventoryTransfer = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-lg p-6"
+          className="rounded-2xl shadow-lg border p-6"
+          style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
         >
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Source Warehouse */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-color)" }}>
                 {t("inventory.from_warehouse", { defaultValue: "From Warehouse" })}
               </label>
               <select
                 value={formData.fromWarehouseId}
                 onChange={(e) => setFormData({ ...formData, fromWarehouseId: e.target.value })}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-800"
+                className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-primary transition-all duration-200"
+                style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                 required
               >
                 <option value="">
@@ -205,13 +207,14 @@ const InventoryTransfer = () => {
 
             {/* Destination Warehouse */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-color)" }}>
                 {t("inventory.to_warehouse", { defaultValue: "To Warehouse" })}
               </label>
               <select
                 value={formData.toWarehouseId}
                 onChange={(e) => setFormData({ ...formData, toWarehouseId: e.target.value, toLocationId: "" })}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-800"
+                className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-primary transition-all duration-200"
+                style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                 required
               >
                 <option value="">
@@ -237,10 +240,10 @@ const InventoryTransfer = () => {
 
             {/* Quantity */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-color)" }}>
                 {t("inventory.quantity", { defaultValue: "Quantity" })}
                 {maxQuantity > 0 && (
-                  <span className="text-gray-500 ml-2">
+                  <span className="ml-2" style={{ color: "var(--color-secondary)" }}>
                     ({t("inventory.max_available", { defaultValue: "Max available" })}: {maxQuantity})
                   </span>
                 )}
@@ -251,7 +254,8 @@ const InventoryTransfer = () => {
                 onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
                 min="1"
                 max={maxQuantity}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-800"
+                className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-primary transition-all duration-200"
+                style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                 required
               />
               {maxQuantity > 0 && Number(formData.quantity) > maxQuantity && (
@@ -270,13 +274,14 @@ const InventoryTransfer = () => {
             {/* Location (optional) */}
             {formData.toWarehouseId && locations.length > 0 && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-color)" }}>
                   {t("inventory.location", { defaultValue: "Location" })} ({t("common.optional", { defaultValue: "Optional" })})
                 </label>
                 <select
                   value={formData.toLocationId}
                   onChange={(e) => setFormData({ ...formData, toLocationId: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-800"
+                  className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-primary transition-all duration-200"
+                  style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                 >
                   <option value="">
                     {t("inventory.no_location", { defaultValue: "No specific location" })}
@@ -292,14 +297,15 @@ const InventoryTransfer = () => {
 
             {/* Notes */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: "var(--text-color)" }}>
                 {t("inventory.notes", { defaultValue: "Notes" })} ({t("common.optional", { defaultValue: "Optional" })})
               </label>
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-800"
+                className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary transition-all duration-200 resize-none"
+                style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                 placeholder={t("inventory.transfer_notes_placeholder", {
                   defaultValue: "Add any notes about this transfer...",
                 })}
@@ -307,18 +313,20 @@ const InventoryTransfer = () => {
             </div>
 
             {/* Submit Button */}
-            <div className="flex gap-4 pt-4">
+            <div className="flex flex-wrap gap-3 pt-4">
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl font-medium text-gray-700 hover:bg-gray-50 transition"
+                className="px-6 h-11 rounded-lg font-medium border hover:bg-[var(--bg-secondary)] transition"
+                style={{ borderColor: "var(--border-color)", color: "var(--text-color)", backgroundColor: "var(--surface-color)" }}
               >
                 {t("common.cancel", { defaultValue: "Cancel" })}
               </button>
               <button
                 type="submit"
                 disabled={transferMutation.isPending}
-                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="px-6 h-11 rounded-lg font-medium transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:opacity-90"
+                style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}
               >
                 {transferMutation.isPending ? (
                   <>

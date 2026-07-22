@@ -29,7 +29,7 @@ const AttachedFilesModal = ({ files, onClose }) => {
       <div className="bg-bg rounded-2xl shadow-2xl w-full max-w-md p-6 mx-4 transform transition-all duration-300 animate-slide-in relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-text hover:text-gray-800 text-xl transition-all duration-200 transform hover:scale-110"
+          className="absolute top-4 right-4 text-text hover:text-[var(--text-color)] text-xl transition-all duration-200 transform hover:scale-110"
         >
           ×
         </button>
@@ -48,7 +48,7 @@ const AttachedFilesModal = ({ files, onClose }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`text-primary hover:underline font-medium ${
-                    !file.fileUrl ? "pointer-events-none text-gray-400" : ""
+                    !file.fileUrl ? "pointer-events-none text-[var(--color-secondary)]" : ""
                   }`}
                 >
                   {file.fileName || file.name || `File ${index + 1}`}
@@ -375,7 +375,7 @@ const EditInventoryModal = ({ item, onClose }) => {
       <div className="bg-bg rounded-2xl shadow-2xl w-full max-w-3xl p-6 max-h-[85vh] overflow-y-auto mx-4 transform transition-all duration-300 animate-slide-in relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-text hover:text-gray-800 text-xl transition-all duration-200 transform hover:scale-110"
+          className="absolute top-4 right-4 text-text hover:text-[var(--text-color)] text-xl transition-all duration-200 transform hover:scale-110"
         >
           ×
         </button>
@@ -596,7 +596,7 @@ const EditInventoryModal = ({ item, onClose }) => {
                     type="button"
                     onClick={handleFileAdd}
                     disabled={!newAttachedFile}
-                    className="px-3 py-1 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="px-3 py-1 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {t("buttons.add_file")}
                   </button>
@@ -798,7 +798,7 @@ const EditInventoryModal = ({ item, onClose }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-500 text-white rounded-full shadow-md hover:bg-gray-600 transition-all duration-200 transform hover:scale-105"
+              className="px-4 py-2 rounded-full shadow-md transition-all duration-200 transform hover:scale-105" style={{ backgroundColor: "var(--border-color)", color: "var(--text-color)" }}
             >
               {t("buttons.cancel")}
             </button>
@@ -1576,7 +1576,7 @@ const ProductList = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-purple-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Package size={28} color="white" />
             </div>
             <div>
@@ -1594,7 +1594,7 @@ const ProductList = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
           <motion.div
             className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
-            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -1612,7 +1612,7 @@ const ProductList = () => {
 
           <motion.div
             className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
-            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -1630,7 +1630,7 @@ const ProductList = () => {
 
           <motion.div
             className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
-            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
@@ -1648,7 +1648,7 @@ const ProductList = () => {
 
           <motion.div
             className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
-            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
@@ -1666,7 +1666,7 @@ const ProductList = () => {
 
           <motion.div
             className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
-            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
@@ -1686,7 +1686,7 @@ const ProductList = () => {
         {/* Main Content Card */}
         <motion.div
           className="rounded-2xl shadow-lg border p-6 sm:p-8 mb-6"
-          style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+          style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}

@@ -148,7 +148,7 @@ const CreateInvoice = () => {
 
   return (
     <div
-      className="min-h-screen p-6"
+      className="min-h-screen p-4 sm:p-6 lg:p-8"
       style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
     >
       <div className="max-w-5xl mx-auto">
@@ -160,18 +160,34 @@ const CreateInvoice = () => {
             onClick={() => navigate("/dashboard/invoices")}
             className="p-2 rounded-lg border"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
             }}
           >
             <ArrowLeft size={20} />
           </motion.button>
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+            style={{
+              background:
+                "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
+            }}
+          >
+            <FileText size={28} className="text-white" />
+          </div>
           <div>
-            <h1 className="text-3xl font-bold flex items-center gap-3">
-              <FileText size={32} style={{ color: "var(--color-primary)" }} />
+            <h1
+              className="text-4xl font-bold"
+              style={{ color: "var(--text-color)" }}
+            >
               {t("invoices.createInvoice")}
             </h1>
-            <p className="text-gray-500 mt-1">{t("invoices.createSubtitle")}</p>
+            <p
+              className="text-lg mt-1"
+              style={{ color: "var(--color-secondary)" }}
+            >
+              {t("invoices.createSubtitle")}
+            </p>
           </div>
         </div>
 
@@ -184,15 +200,20 @@ const CreateInvoice = () => {
         >
           {/* Basic Information */}
           <div
-            className="p-6 rounded-lg border"
-            style={{ borderColor: "var(--border-color)" }}
+            className="rounded-2xl p-6 shadow-lg border"
+            style={{
+              backgroundColor: "var(--surface-color)",
+              borderColor: "var(--border-color)",
+            }}
           >
             <h2 className="text-xl font-semibold mb-4">
               {t("invoices.basicInformation")}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className="block text-sm font-semibold mb-2"
+                        style={{ color: "var(--text-color)" }}
+                      >
                   {t("invoices.customer")} {t("invoices.optional")}
                 </label>
                 <select
@@ -200,7 +221,7 @@ const CreateInvoice = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, customerId: e.target.value })
                   }
-                  className="w-full px-4 py-2 rounded-lg border"
+                  className="w-full h-11 px-4 rounded-xl border"
                   style={{
                     backgroundColor: "var(--bg-color)",
                     borderColor: "var(--border-color)",
@@ -216,7 +237,9 @@ const CreateInvoice = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className="block text-sm font-semibold mb-2"
+                        style={{ color: "var(--text-color)" }}
+                      >
                   {t("invoices.issueDate")}
                 </label>
                 <input
@@ -225,7 +248,7 @@ const CreateInvoice = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, issueDate: e.target.value })
                   }
-                  className="w-full px-4 py-2 rounded-lg border"
+                  className="w-full h-11 px-4 rounded-xl border"
                   style={{
                     backgroundColor: "var(--bg-color)",
                     borderColor: "var(--border-color)",
@@ -235,7 +258,9 @@ const CreateInvoice = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className="block text-sm font-semibold mb-2"
+                        style={{ color: "var(--text-color)" }}
+                      >
                   {t("invoices.dueDate")}
                 </label>
                 <input
@@ -244,7 +269,7 @@ const CreateInvoice = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, dueDate: e.target.value })
                   }
-                  className="w-full px-4 py-2 rounded-lg border"
+                  className="w-full h-11 px-4 rounded-xl border"
                   style={{
                     backgroundColor: "var(--bg-color)",
                     borderColor: "var(--border-color)",
@@ -254,7 +279,9 @@ const CreateInvoice = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className="block text-sm font-semibold mb-2"
+                        style={{ color: "var(--text-color)" }}
+                      >
                   {t("invoices.paymentTerms")}
                 </label>
                 <input
@@ -263,7 +290,7 @@ const CreateInvoice = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, paymentTerms: e.target.value })
                   }
-                  className="w-full px-4 py-2 rounded-lg border"
+                  className="w-full h-11 px-4 rounded-xl border"
                   style={{
                     backgroundColor: "var(--bg-color)",
                     borderColor: "var(--border-color)",
@@ -277,8 +304,11 @@ const CreateInvoice = () => {
 
           {/* Items */}
           <div
-            className="p-6 rounded-lg border"
-            style={{ borderColor: "var(--border-color)" }}
+            className="rounded-2xl p-6 shadow-lg border"
+            style={{
+              backgroundColor: "var(--surface-color)",
+              borderColor: "var(--border-color)",
+            }}
           >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">{t("invoices.items")}</h2>
@@ -287,8 +317,11 @@ const CreateInvoice = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={addItem}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-white"
-                style={{ backgroundColor: "var(--color-primary)" }}
+                className="flex items-center gap-2 px-4 h-11 rounded-lg font-medium"
+                style={{
+                  backgroundColor: "var(--color-primary)",
+                  color: "var(--button-text)",
+                }}
               >
                 <Plus size={20} />
                 {t("invoices.addItem")}
@@ -304,8 +337,11 @@ const CreateInvoice = () => {
                 >
                   <div className="grid grid-cols-12 gap-4 items-end">
                     <div className="col-span-12 md:col-span-4">
-                      <label className="block text-sm font-medium mb-2">
-                        {t("invoices.description")} *
+                      <label className="block text-sm font-semibold mb-2"
+                        style={{ color: "var(--text-color)" }}
+                      >
+                        {t("invoices.description")}
+                        <span className="text-red-500 ms-1">*</span>
                       </label>
                       <input
                         type="text"
@@ -313,7 +349,7 @@ const CreateInvoice = () => {
                         onChange={(e) =>
                           updateItem(index, "description", e.target.value)
                         }
-                        className="w-full px-4 py-2 rounded-lg border"
+                        className="w-full h-11 px-4 rounded-xl border"
                         style={{
                           backgroundColor: "var(--bg-color)",
                           borderColor: "var(--border-color)",
@@ -323,8 +359,11 @@ const CreateInvoice = () => {
                       />
                     </div>
                     <div className="col-span-6 md:col-span-2">
-                      <label className="block text-sm font-medium mb-2">
-                        {t("invoices.quantity")} *
+                      <label className="block text-sm font-semibold mb-2"
+                        style={{ color: "var(--text-color)" }}
+                      >
+                        {t("invoices.quantity")}
+                        <span className="text-red-500 ms-1">*</span>
                       </label>
                       <input
                         type="number"
@@ -338,7 +377,7 @@ const CreateInvoice = () => {
                             parseFloat(e.target.value) || 0
                           )
                         }
-                        className="w-full px-4 py-2 rounded-lg border"
+                        className="w-full h-11 px-4 rounded-xl border"
                         style={{
                           backgroundColor: "var(--bg-color)",
                           borderColor: "var(--border-color)",
@@ -348,8 +387,11 @@ const CreateInvoice = () => {
                       />
                     </div>
                     <div className="col-span-6 md:col-span-2">
-                      <label className="block text-sm font-medium mb-2">
-                        {t("invoices.unitPrice")} *
+                      <label className="block text-sm font-semibold mb-2"
+                        style={{ color: "var(--text-color)" }}
+                      >
+                        {t("invoices.unitPrice")}
+                        <span className="text-red-500 ms-1">*</span>
                       </label>
                       <input
                         type="number"
@@ -363,7 +405,7 @@ const CreateInvoice = () => {
                             parseFloat(e.target.value) || 0
                           )
                         }
-                        className="w-full px-4 py-2 rounded-lg border"
+                        className="w-full h-11 px-4 rounded-xl border"
                         style={{
                           backgroundColor: "var(--bg-color)",
                           borderColor: "var(--border-color)",
@@ -373,7 +415,9 @@ const CreateInvoice = () => {
                       />
                     </div>
                     <div className="col-span-6 md:col-span-2">
-                      <label className="block text-sm font-medium mb-2">
+                      <label className="block text-sm font-semibold mb-2"
+                        style={{ color: "var(--text-color)" }}
+                      >
                         {t("invoices.discount")} (%)
                       </label>
                       <input
@@ -388,7 +432,7 @@ const CreateInvoice = () => {
                             parseFloat(e.target.value) || 0
                           )
                         }
-                        className="w-full px-4 py-2 rounded-lg border"
+                        className="w-full h-11 px-4 rounded-xl border"
                         style={{
                           backgroundColor: "var(--bg-color)",
                           borderColor: "var(--border-color)",
@@ -397,10 +441,19 @@ const CreateInvoice = () => {
                       />
                     </div>
                     <div className="col-span-6 md:col-span-1">
-                      <label className="block text-sm font-medium mb-2">
+                      <label className="block text-sm font-semibold mb-2"
+                        style={{ color: "var(--text-color)" }}
+                      >
                         {t("invoices.total")}
                       </label>
-                      <div className="px-4 py-2 rounded-lg border bg-gray-50">
+                      <div
+                        className="h-11 px-4 rounded-xl border flex items-center"
+                        style={{
+                          backgroundColor: "var(--bg-secondary)",
+                          borderColor: "var(--border-color)",
+                          color: "var(--text-color)",
+                        }}
+                      >
                         {item.total.toFixed(2)}
                       </div>
                     </div>
@@ -423,15 +476,20 @@ const CreateInvoice = () => {
 
           {/* Discount and Tax */}
           <div
-            className="p-6 rounded-lg border"
-            style={{ borderColor: "var(--border-color)" }}
+            className="rounded-2xl p-6 shadow-lg border"
+            style={{
+              backgroundColor: "var(--surface-color)",
+              borderColor: "var(--border-color)",
+            }}
           >
             <h2 className="text-xl font-semibold mb-4">
               {t("invoices.discountAndTax")}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className="block text-sm font-semibold mb-2"
+                        style={{ color: "var(--text-color)" }}
+                      >
                   {t("invoices.globalDiscount")}
                 </label>
                 <select
@@ -445,7 +503,7 @@ const CreateInvoice = () => {
                       },
                     })
                   }
-                  className="w-full px-4 py-2 rounded-lg border mb-2"
+                  className="w-full h-11 px-4 rounded-xl border mb-2"
                   style={{
                     backgroundColor: "var(--bg-color)",
                     borderColor: "var(--border-color)",
@@ -469,7 +527,7 @@ const CreateInvoice = () => {
                       },
                     })
                   }
-                  className="w-full px-4 py-2 rounded-lg border"
+                  className="w-full h-11 px-4 rounded-xl border"
                   style={{
                     backgroundColor: "var(--bg-color)",
                     borderColor: "var(--border-color)",
@@ -478,7 +536,9 @@ const CreateInvoice = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">
+                <label className="block text-sm font-semibold mb-2"
+                        style={{ color: "var(--text-color)" }}
+                      >
                   {t("invoices.taxRate")} (%)
                 </label>
                 <input
@@ -493,7 +553,7 @@ const CreateInvoice = () => {
                       taxRate: parseFloat(e.target.value) || 0,
                     })
                   }
-                  className="w-full px-4 py-2 rounded-lg border"
+                  className="w-full h-11 px-4 rounded-xl border"
                   style={{
                     backgroundColor: "var(--bg-color)",
                     borderColor: "var(--border-color)",
@@ -506,8 +566,11 @@ const CreateInvoice = () => {
 
           {/* Totals Summary */}
           <div
-            className="p-6 rounded-lg border bg-gray-50"
-            style={{ borderColor: "var(--border-color)" }}
+            className="rounded-2xl p-6 shadow-lg border"
+            style={{
+              backgroundColor: "var(--surface-color)",
+              borderColor: "var(--border-color)",
+            }}
           >
             <div className="flex items-center gap-2 mb-4">
               <Calculator size={20} />
@@ -538,7 +601,10 @@ const CreateInvoice = () => {
                   </span>
                 </div>
               )}
-              <div className="flex justify-between text-lg font-bold pt-2 border-t">
+              <div
+                className="flex justify-between text-lg font-bold pt-2 border-t"
+                style={{ borderColor: "var(--border-color)" }}
+              >
                 <span>{t("invoices.total")}:</span>
                 <span>${totals.totalAmount.toFixed(2)}</span>
               </div>
@@ -547,10 +613,15 @@ const CreateInvoice = () => {
 
           {/* Notes */}
           <div
-            className="p-6 rounded-lg border"
-            style={{ borderColor: "var(--border-color)" }}
+            className="rounded-2xl p-6 shadow-lg border"
+            style={{
+              backgroundColor: "var(--surface-color)",
+              borderColor: "var(--border-color)",
+            }}
           >
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-sm font-semibold mb-2"
+                        style={{ color: "var(--text-color)" }}
+                      >
               {t("invoices.notes")} {t("invoices.optional")}
             </label>
             <textarea
@@ -559,7 +630,7 @@ const CreateInvoice = () => {
                 setFormData({ ...formData, notes: e.target.value })
               }
               rows={4}
-              className="w-full px-4 py-2 rounded-lg border resize-none"
+              className="w-full p-3 rounded-xl border resize-none"
               style={{
                 backgroundColor: "var(--bg-color)",
                 borderColor: "var(--border-color)",
@@ -569,16 +640,15 @@ const CreateInvoice = () => {
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end gap-4">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
             <motion.button
               type="button"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate("/dashboard/invoices")}
-              className="px-6 py-3 rounded-lg border font-semibold"
+              className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium"
               style={{
-                backgroundColor: "var(--bg-color)",
-                borderColor: "var(--border-color)",
+                backgroundColor: "var(--border-color)",
                 color: "var(--text-color)",
               }}
             >
@@ -589,8 +659,11 @@ const CreateInvoice = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               disabled={createMutation.isLoading}
-              className="px-6 py-3 rounded-lg font-semibold text-white flex items-center gap-2"
-              style={{ backgroundColor: "var(--color-primary)" }}
+              className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium flex items-center justify-center gap-2"
+              style={{
+                backgroundColor: "var(--color-primary)",
+                color: "var(--button-text)",
+              }}
             >
               {createMutation.isLoading ? (
                 <>

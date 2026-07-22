@@ -151,7 +151,7 @@ const AddAccount = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-purple-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Building2 size={28} color="white" />
             </div>
             <div>
@@ -168,7 +168,7 @@ const AddAccount = () => {
         <motion.form
           onSubmit={handleSubmit}
           className="rounded-2xl shadow-lg border p-6 sm:p-8"
-          style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+          style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}

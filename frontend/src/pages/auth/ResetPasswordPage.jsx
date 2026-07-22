@@ -14,7 +14,7 @@ const Card = ({ children }) => (
     <div
       className="backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden"
       style={{
-        backgroundColor: "var(--bg-color)",
+        backgroundColor: "var(--surface-color)",
         border: "1px solid var(--border-color)",
       }}
     >

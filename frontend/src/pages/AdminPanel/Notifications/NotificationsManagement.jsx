@@ -29,8 +29,8 @@ const priorityConfig = {
   },
   low: {
     label: "נמוך",
-    border: "border-gray-300",
-    badge: "bg-gray-100 text-gray-600",
+    border: "border-[var(--border-color)]",
+    badge: "bg-[var(--bg-secondary)] text-[var(--color-secondary)]",
   },
 };
 
@@ -159,51 +159,54 @@ const NotificationsManagement = () => {
   }, [notifications]);
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="p-3 rounded-full bg-[var(--color-primary)] text-white">
-          <FaBell className="w-5 h-5" />
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-6" style={{ backgroundColor: "var(--bg-color)" }}>
+      <div className="flex items-center gap-4">
+        <div
+          className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg text-white"
+          style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
+        >
+          <FaBell className="w-6 h-6" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text-color)]">
+          <h1 className="text-4xl font-bold" style={{ color: "var(--text-color)" }}>
             ניהול התראות
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-lg" style={{ color: "var(--color-secondary)" }}>
             צפייה, סינון וביצוע פעולות על כל ההתראות במערכת
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="rounded-xl border border-gray-200 p-4 bg-white shadow-sm">
-          <p className="text-sm text-gray-500">סה"כ התראות</p>
+        <div className="rounded-2xl border border-[var(--border-color)] p-6 bg-[var(--surface-color)] shadow-lg">
+          <p className="text-sm text-[var(--color-secondary)]">סה"כ התראות</p>
           <p className="text-2xl font-bold text-[var(--color-primary)]">
             {stats.total}
           </p>
         </div>
-        <div className="rounded-xl border border-gray-200 p-4 bg-white shadow-sm">
-          <p className="text-sm text-gray-500">התראות שלא נקראו</p>
+        <div className="rounded-2xl border border-[var(--border-color)] p-6 bg-[var(--surface-color)] shadow-lg">
+          <p className="text-sm text-[var(--color-secondary)]">התראות שלא נקראו</p>
           <p className="text-2xl font-bold text-red-500">{stats.unread}</p>
         </div>
-        <div className="rounded-xl border border-gray-200 p-4 bg-white shadow-sm">
-          <p className="text-sm text-gray-500">התראות קריטיות</p>
+        <div className="rounded-2xl border border-[var(--border-color)] p-6 bg-[var(--surface-color)] shadow-lg">
+          <p className="text-sm text-[var(--color-secondary)]">התראות קריטיות</p>
           <p className="text-2xl font-bold text-orange-500">{stats.critical}</p>
         </div>
-        <div className="rounded-xl border border-gray-200 p-4 bg-white shadow-sm">
-          <p className="text-sm text-gray-500">התראות פיננסיות</p>
+        <div className="rounded-2xl border border-[var(--border-color)] p-6 bg-[var(--surface-color)] shadow-lg">
+          <p className="text-sm text-[var(--color-secondary)]">התראות פיננסיות</p>
           <p className="text-2xl font-bold text-emerald-500">{stats.finance}</p>
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-4 items-center bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
-        <div className="flex items-center gap-2 text-gray-600">
+      <div className="flex flex-wrap gap-4 items-center bg-[var(--surface-color)] border border-[var(--border-color)] rounded-2xl p-4 shadow-sm">
+        <div className="flex items-center gap-2 text-[var(--color-secondary)]">
           <FaFilter />
           <span className="font-medium">סינון</span>
         </div>
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="border rounded-full px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+          className="h-11 border rounded-xl px-4 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]" style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)", color: "var(--text-color)" }}
         >
           {categories.map((category) => (
             <option key={category} value={category}>
@@ -226,7 +229,7 @@ const NotificationsManagement = () => {
           placeholder="חיפוש לפי כותרת או תוכן..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="flex-1 min-w-[220px] border rounded-full px-4 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+          className="flex-1 min-w-[220px] h-11 border rounded-xl px-4 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]" style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)", color: "var(--text-color)" }}
         />
         <button
           onClick={() => {
@@ -235,34 +238,34 @@ const NotificationsManagement = () => {
             setSearchTerm("");
             refetch();
           }}
-          className="px-4 py-1.5 text-sm rounded-full border border-gray-300 hover:border-[var(--color-primary)] transition-colors"
+          className="px-4 h-11 text-sm rounded-lg border border-[var(--border-color)] hover:border-[var(--color-primary)] transition-colors font-medium"
         >
           איפוס
         </button>
         <button
           onClick={() => markAllAsReadMutation.mutate()}
           disabled={notifications.length === 0}
-          className="ml-auto flex items-center gap-2 px-4 py-1.5 rounded-full text-sm bg-[var(--color-primary)] text-white hover:bg-[var(--color-secondary)] transition disabled:bg-gray-200 disabled:text-gray-400"
+          className="ml-auto flex items-center gap-2 px-4 h-11 rounded-lg text-sm font-medium bg-[var(--color-primary)] text-[var(--button-text)] hover:opacity-90 transition disabled:bg-[var(--border-color)] disabled:text-[var(--color-secondary)]"
         >
           <FaCheckCircle />
           סמן הכל כנקרא
         </button>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm">
+      <div className="bg-[var(--surface-color)] border border-[var(--border-color)] rounded-2xl shadow-lg">
         {isLoading ? (
-          <div className="p-8 text-center text-gray-500">טוען התראות...</div>
+          <div className="p-8 text-center text-[var(--color-secondary)]">טוען התראות...</div>
         ) : isError ? (
           <div className="p-8 text-center text-red-500">
             אירעה שגיאה בטעינת ההתראות
           </div>
         ) : filteredNotifications.length === 0 ? (
-          <div className="p-12 text-center text-gray-500 flex flex-col items-center gap-3">
-            <FaInbox className="w-10 h-10 text-gray-300" />
+          <div className="p-12 text-center text-[var(--color-secondary)] flex flex-col items-center gap-3">
+            <FaInbox className="w-10 h-10 text-[var(--color-secondary)]" />
             <p>אין התראות התואמות את הסינון הנוכחי</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-[var(--border-color)]">
             {filteredNotifications.map((notification) => {
               const priorityStyle =
                 priorityConfig[notification.priority] || priorityConfig.medium;
@@ -271,15 +274,15 @@ const NotificationsManagement = () => {
                 <div
                   key={notification._id}
                   className={`flex flex-col md:flex-row md:items-center gap-3 p-5 transition ${
-                    notification.isRead ? "bg-white" : "bg-yellow-50"
+                    notification.isRead ? "bg-[var(--surface-color)]" : "bg-yellow-50"
                   } border-l-4 ${priorityStyle.border}`}
                 >
                   <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 mb-1">
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--color-secondary)] mb-1">
                       <span className="font-medium">
                         {formatDate(notification.createdAt)}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                      <span className="px-2 py-0.5 rounded-full bg-[var(--bg-secondary)] text-[var(--color-secondary)]">
                         {categoryLabels[notification.category] ||
                           notification.category ||
                           "כללי"}
@@ -298,7 +301,7 @@ const NotificationsManagement = () => {
                     <h3 className="text-lg font-semibold text-[var(--text-color)]">
                       {notification.title}
                     </h3>
-                    <p className="text-gray-600 text-sm whitespace-pre-line">
+                    <p className="text-[var(--color-secondary)] text-sm whitespace-pre-line">
                       {notification.content}
                     </p>
                     {notification.actionUrl && (

@@ -42,11 +42,11 @@ const EmployeeDetails = () => {
   const getStatusColor = (status) => {
     const colors = {
       active: "bg-green-100 text-green-800",
-      inactive: "bg-gray-100 text-gray-800",
+      inactive: "bg-[var(--bg-secondary)] text-[var(--text-color)]",
       suspended: "bg-yellow-100 text-yellow-800",
       deleted: "bg-red-100 text-red-800",
     };
-    return colors[status] || "bg-gray-100 text-gray-800";
+    return colors[status] || "bg-[var(--bg-secondary)] text-[var(--text-color)]";
   };
 
   const getRoleColor = (role) => {
@@ -55,7 +55,7 @@ const EmployeeDetails = () => {
       Manager: "bg-blue-100 text-blue-800",
       Employee: "bg-green-100 text-green-800",
     };
-    return colors[role] || "bg-gray-100 text-gray-800";
+    return colors[role] || "bg-[var(--bg-secondary)] text-[var(--text-color)]";
   };
 
   if (isLoading) {
@@ -83,8 +83,8 @@ const EmployeeDetails = () => {
           </p>
           <button
             onClick={() => navigate("/dashboard/employees/directory")}
-            className="mt-4 px-4 py-2 rounded-lg text-white hover:opacity-90 transition"
-            style={{ backgroundColor: 'var(--color-primary)' }}
+            className="mt-4 px-6 h-11 rounded-lg font-medium hover:opacity-90 transition"
+            style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
           >
             {t("employees.back_to_directory") || "Back to Directory"}
           </button>
@@ -94,35 +94,41 @@ const EmployeeDetails = () => {
   }
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--bg-color)' }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-6xl mx-auto"
+        className="max-w-7xl mx-auto"
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate("/dashboard/employees/directory")}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
               style={{ color: 'var(--text-color)' }}
             >
               <ArrowLeft size={24} />
             </button>
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
+            >
+              <User size={28} className="text-white" />
+            </div>
             <div>
-              <h1 className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
+              <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
                 {t("employees.details.title") || "Employee Details"}
               </h1>
-              <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
                 {t("employees.details.description") || "View complete employee information"}
               </p>
             </div>
           </div>
           <button
             onClick={() => navigate(`/dashboard/employees/${id}`, { state: { edit: true } })}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-white hover:opacity-90 transition"
-            style={{ backgroundColor: 'var(--color-primary)' }}
+            className="flex items-center gap-2 w-full sm:w-auto px-6 h-11 rounded-lg font-medium justify-center hover:opacity-90 transition"
+            style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
           >
             <Edit size={20} />
             {t("employees.edit") || "Edit"}
@@ -135,8 +141,8 @@ const EmployeeDetails = () => {
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="rounded-2xl shadow-md border overflow-hidden"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl shadow-lg border overflow-hidden"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             >
               <div className="p-6">
                 {/* Profile Image */}
@@ -149,8 +155,8 @@ const EmployeeDetails = () => {
                       style={{ borderColor: 'var(--color-primary)' }}
                     />
                   ) : (
-                    <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center border-4"
-                      style={{ borderColor: 'var(--color-primary)' }}>
+                    <div className="w-32 h-32 rounded-full flex items-center justify-center border-4"
+                      style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--color-primary)' }}>
                       <User size={64} style={{ color: 'var(--text-secondary)' }} />
                     </div>
                   )}
@@ -217,8 +223,8 @@ const EmployeeDetails = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-2xl shadow-md border overflow-hidden"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl shadow-lg border overflow-hidden"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             >
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-color)' }}>
@@ -269,8 +275,8 @@ const EmployeeDetails = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="rounded-2xl shadow-md border overflow-hidden"
-                style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                className="rounded-2xl shadow-lg border overflow-hidden"
+                style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               >
                 <div className="p-6">
                   <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-color)' }}>
@@ -311,8 +317,8 @@ const EmployeeDetails = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="rounded-2xl shadow-md border overflow-hidden"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl shadow-lg border overflow-hidden"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             >
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-color)' }}>
@@ -363,8 +369,8 @@ const EmployeeDetails = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="rounded-2xl shadow-md border overflow-hidden"
-                style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                className="rounded-2xl shadow-lg border overflow-hidden"
+                style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               >
                 <div className="p-6">
                   <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-color)' }}>
@@ -419,8 +425,8 @@ const EmployeeDetails = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="rounded-2xl shadow-md border overflow-hidden"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl shadow-lg border overflow-hidden"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             >
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-color)' }}>
@@ -459,8 +465,8 @@ const EmployeeDetails = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="rounded-2xl shadow-md border overflow-hidden"
-                style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                className="rounded-2xl shadow-lg border overflow-hidden"
+                style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               >
                 <div className="p-6">
                   <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--text-color)' }}>

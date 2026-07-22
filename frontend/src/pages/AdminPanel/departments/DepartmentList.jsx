@@ -116,13 +116,12 @@ const EditDepartmentModal = ({ department, isOpen, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center z-50 p-4"
-      style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}
+      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 p-4"
       onClick={onClose}
     >
       <motion.div
         className="rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl border"
-        style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+        style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
         onClick={(e) => e.stopPropagation()}
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -143,8 +142,8 @@ const EditDepartmentModal = ({ department, isOpen, onClose }) => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
-              <Building2 className="inline mr-2" size={16} />
+            <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
+              <Building2 className="inline me-2" size={16} />
               {t("departments.name")}
             </label>
             <input
@@ -152,7 +151,7 @@ const EditDepartmentModal = ({ department, isOpen, onClose }) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+              className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
               style={{
                 borderColor: 'var(--border-color)',
                 backgroundColor: 'var(--bg-color)',
@@ -163,7 +162,7 @@ const EditDepartmentModal = ({ department, isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+            <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
               {t("departments.description")}
             </label>
             <textarea
@@ -181,15 +180,15 @@ const EditDepartmentModal = ({ department, isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
-              <User className="inline mr-2" size={16} />
+            <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
+              <User className="inline me-2" size={16} />
               {t("departments.manager")}
             </label>
             <select
               name="departmentManager"
               value={formData.departmentManager}
               onChange={handleChange}
-              className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+              className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
               style={{
                 borderColor: 'var(--border-color)',
                 backgroundColor: 'var(--bg-color)',
@@ -208,8 +207,8 @@ const EditDepartmentModal = ({ department, isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
-              <Users className="inline mr-2" size={16} />
+            <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
+              <Users className="inline me-2" size={16} />
               {t("departments.team_members")}
             </label>
             <select
@@ -232,18 +231,18 @@ const EditDepartmentModal = ({ department, isOpen, onClose }) => {
             </select>
           </div>
 
-          <div className="flex justify-end gap-4 mt-6">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-6">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 rounded-xl font-bold transition-all hover:scale-105"
+              className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition-all hover:scale-105"
               style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
             >
               {t("departments.cancel")}
             </button>
             <button
               type="submit"
-              className="px-6 py-3 rounded-xl font-bold shadow-lg transition-all hover:scale-105"
+              className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium shadow-lg transition-all hover:scale-105"
               style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
             >
               {t("departments.save")}
@@ -378,7 +377,10 @@ const DepartmentList = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-cyan-500 to-blue-600">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
+            >
               <Building2 size={28} color="white" />
             </div>
             <div>
@@ -394,8 +396,8 @@ const DepartmentList = () => {
           {/* Statistics Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <motion.div
-              className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -414,8 +416,8 @@ const DepartmentList = () => {
             </motion.div>
 
             <motion.div
-              className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -434,8 +436,8 @@ const DepartmentList = () => {
             </motion.div>
 
             <motion.div
-              className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -454,8 +456,8 @@ const DepartmentList = () => {
             </motion.div>
 
             <motion.div
-              className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -478,7 +480,7 @@ const DepartmentList = () => {
           <div className="relative">
             <Search
               size={20}
-              className="absolute left-3 top-1/2 -translate-y-1/2"
+              className="absolute start-3 top-1/2 -translate-y-1/2"
               style={{ color: 'var(--color-secondary)' }}
             />
           <input
@@ -486,7 +488,7 @@ const DepartmentList = () => {
             placeholder={t("departments.search_placeholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2"
+              className="w-full h-11 ps-10 pe-4 rounded-xl border focus:outline-none focus:ring-2"
               style={{
                 borderColor: 'var(--border-color)',
                 backgroundColor: 'var(--bg-color)',
@@ -499,7 +501,7 @@ const DepartmentList = () => {
         {/* Table */}
         <motion.div
           className="rounded-2xl shadow-lg border overflow-hidden"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -549,7 +551,7 @@ const DepartmentList = () => {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.03 }}
-                          whileHover={{ backgroundColor: 'var(--border-color)' }}
+                          whileHover={{ backgroundColor: 'var(--bg-secondary)' }}
                         onClick={() => handleRowClick(dept)}
                       >
                           <td className="px-4 py-4">
@@ -616,12 +618,12 @@ const DepartmentList = () => {
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: "auto" }}
                               exit={{ opacity: 0, height: 0 }}
-                              style={{ backgroundColor: 'var(--border-color)' }}
+                              style={{ backgroundColor: 'var(--bg-secondary)' }}
                             >
                               <td colSpan="5" className="px-6 py-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   {/* Team Members */}
-                                  <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-color)' }}>
+                                  <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--surface-color)' }}>
                                     <h4 className="font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
                                       <Users size={18} style={{ color: 'var(--color-primary)' }} />
                                       {t("departments.team_members")}:
@@ -644,7 +646,7 @@ const DepartmentList = () => {
                                   </div>
 
                                   {/* Projects */}
-                                  <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--bg-color)' }}>
+                                  <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--surface-color)' }}>
                                     <h4 className="font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--text-color)' }}>
                                       <Briefcase size={18} style={{ color: 'var(--color-primary)' }} />
                                   {t("departments.projects")}:

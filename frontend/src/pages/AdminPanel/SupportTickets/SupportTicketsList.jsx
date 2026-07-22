@@ -28,9 +28,9 @@ const getStatusColor = (status) => {
     case "Resolved":
       return "bg-green-100 text-green-700 border-green-300";
     case "Closed":
-      return "bg-gray-100 text-gray-700 border-gray-300";
+      return "bg-[var(--bg-secondary)] text-[var(--text-color)] border-[var(--border-color)]";
     default:
-      return "bg-gray-100 text-gray-700 border-gray-300";
+      return "bg-[var(--bg-secondary)] text-[var(--text-color)] border-[var(--border-color)]";
   }
 };
 
@@ -43,9 +43,9 @@ const getPriorityColor = (priority) => {
     case "Medium":
       return "text-yellow-600";
     case "Low":
-      return "text-gray-500";
+      return "text-[var(--color-secondary)]";
     default:
-      return "text-gray-400";
+      return "text-[var(--color-secondary)]";
   }
 };
 
@@ -176,27 +176,46 @@ const SupportTicketsList = () => {
 
   return (
     <div
-      className="min-h-screen p-6"
+      className="min-h-screen p-4 sm:p-6 lg:p-8"
       style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
     >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-3">
-              <Ticket size={32} style={{ color: "var(--color-primary)" }} />
-              {t("supportTickets.title")}
-            </h1>
-            <p className="text-gray-500 mt-1">
-              {t("supportTickets.subtitle")}
-            </p>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{
+                background:
+                  "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
+              }}
+            >
+              <Ticket size={28} className="text-white" />
+            </div>
+            <div>
+              <h1
+                className="text-4xl font-bold"
+                style={{ color: "var(--text-color)" }}
+              >
+                {t("supportTickets.title")}
+              </h1>
+              <p
+                className="text-lg mt-1"
+                style={{ color: "var(--color-secondary)" }}
+              >
+                {t("supportTickets.subtitle")}
+              </p>
+            </div>
           </div>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/dashboard/support-tickets/create")}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-white"
-            style={{ backgroundColor: "var(--color-primary)" }}
+            className="flex items-center gap-2 px-6 h-11 rounded-lg font-medium"
+            style={{
+              backgroundColor: "var(--color-primary)",
+              color: "var(--button-text)",
+            }}
           >
             <Plus size={20} />
             {t("supportTickets.createTicket")}
@@ -208,20 +227,20 @@ const SupportTicketsList = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-4 rounded-lg border"
+            className="rounded-2xl p-6 shadow-lg border"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
             }}
           >
-            <p className="text-sm text-gray-500">{t("supportTickets.total")}</p>
+            <p className="text-sm" style={{ color: "var(--color-secondary)" }}>{t("supportTickets.total")}</p>
             <p className="text-2xl font-bold">{stats.total}</p>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="p-4 rounded-lg border border-yellow-300 bg-yellow-50"
+            className="rounded-2xl p-6 shadow-lg border border-yellow-300 bg-yellow-50"
           >
             <p className="text-sm text-yellow-700">{t("supportTickets.open")}</p>
             <p className="text-2xl font-bold text-yellow-700">{stats.open}</p>
@@ -230,7 +249,7 @@ const SupportTicketsList = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="p-4 rounded-lg border border-blue-300 bg-blue-50"
+            className="rounded-2xl p-6 shadow-lg border border-blue-300 bg-blue-50"
           >
             <p className="text-sm text-blue-700">{t("supportTickets.inProgress")}</p>
             <p className="text-2xl font-bold text-blue-700">
@@ -241,7 +260,7 @@ const SupportTicketsList = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="p-4 rounded-lg border border-green-300 bg-green-50"
+            className="rounded-2xl p-6 shadow-lg border border-green-300 bg-green-50"
           >
             <p className="text-sm text-green-700">{t("supportTickets.resolved")}</p>
             <p className="text-2xl font-bold text-green-700">
@@ -252,48 +271,52 @@ const SupportTicketsList = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="p-4 rounded-lg border border-gray-300 bg-gray-50"
+            className="rounded-2xl p-6 shadow-lg border border-[var(--border-color)] bg-[var(--bg-secondary)]"
           >
-            <p className="text-sm text-gray-700">{t("supportTickets.closed")}</p>
-            <p className="text-2xl font-bold text-gray-700">{stats.closed}</p>
+            <p className="text-sm text-[var(--text-color)]">{t("supportTickets.closed")}</p>
+            <p className="text-2xl font-bold text-[var(--text-color)]">{stats.closed}</p>
           </motion.div>
         </div>
 
         {/* Filters */}
-        <div className="mb-6 p-4 rounded-lg border" style={{ borderColor: "var(--border-color)" }}>
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex items-center gap-2">
-              <Filter size={20} />
-              <span className="font-semibold">{t("supportTickets.filters")}:</span>
-            </div>
-            
+        <div
+          className="mb-6 rounded-2xl p-6 shadow-lg border"
+          style={{
+            backgroundColor: "var(--surface-color)",
+            borderColor: "var(--border-color)",
+          }}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <Filter size={20} />
+            <span className="font-semibold">{t("supportTickets.filters")}:</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Search */}
-            <div className="flex-1 min-w-[200px]">
-              <div className="relative">
-                <Search
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  size={20}
-                />
-                <input
-                  type="text"
-                  placeholder={t("supportTickets.searchPlaceholder")}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-lg border"
-                  style={{
-                    backgroundColor: "var(--bg-color)",
-                    borderColor: "var(--border-color)",
-                    color: "var(--text-color)",
-                  }}
-                />
-              </div>
+            <div className="relative">
+              <Search
+                className="absolute start-3 top-1/2 -translate-y-1/2"
+                style={{ color: "var(--color-secondary)" }}
+                size={20}
+              />
+              <input
+                type="text"
+                placeholder={t("supportTickets.searchPlaceholder")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full h-11 ps-10 pe-4 rounded-xl border"
+                style={{
+                  backgroundColor: "var(--bg-color)",
+                  borderColor: "var(--border-color)",
+                  color: "var(--text-color)",
+                }}
+              />
             </div>
 
             {/* Status Filter */}
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-2 rounded-lg border"
+              className="w-full h-11 px-4 rounded-xl border"
               style={{
                 backgroundColor: "var(--bg-color)",
                 borderColor: "var(--border-color)",
@@ -311,7 +334,7 @@ const SupportTicketsList = () => {
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="px-4 py-2 rounded-lg border"
+              className="w-full h-11 px-4 rounded-xl border"
               style={{
                 backgroundColor: "var(--bg-color)",
                 borderColor: "var(--border-color)",
@@ -331,7 +354,7 @@ const SupportTicketsList = () => {
             <select
               value={filterPriority}
               onChange={(e) => setFilterPriority(e.target.value)}
-              className="px-4 py-2 rounded-lg border"
+              className="w-full h-11 px-4 rounded-xl border"
               style={{
                 backgroundColor: "var(--bg-color)",
                 borderColor: "var(--border-color)",
@@ -349,9 +372,9 @@ const SupportTicketsList = () => {
 
         {/* Tickets List */}
         {filteredTickets.length === 0 ? (
-          <div className="text-center py-12">
-            <Ticket size={64} className="mx-auto mb-4 text-gray-400" />
-            <p className="text-gray-500 text-lg">{t("supportTickets.noTickets")}</p>
+          <div className="text-center py-16">
+            <Ticket size={64} className="mx-auto mb-4" style={{ color: "var(--color-secondary)" }} />
+            <p className="text-lg" style={{ color: "var(--color-secondary)" }}>{t("supportTickets.noTickets")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
@@ -362,9 +385,9 @@ const SupportTicketsList = () => {
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ scale: 1.02 }}
                 onClick={() => navigate(`/dashboard/support-tickets/${ticket._id}`)}
-                className="p-4 rounded-lg border cursor-pointer transition-all"
+                className="rounded-2xl p-6 shadow-lg border cursor-pointer transition-all"
                 style={{
-                  backgroundColor: "var(--bg-color)",
+                  backgroundColor: "var(--surface-color)",
                   borderColor: "var(--border-color)",
                 }}
               >
@@ -390,10 +413,10 @@ const SupportTicketsList = () => {
                         {t(`supportTickets.priority.${ticket.priority.toLowerCase()}`)}
                       </span>
                     </div>
-                    <p className="text-gray-500 text-sm mb-2 line-clamp-2">
+                    <p className="text-sm mb-2 line-clamp-2" style={{ color: "var(--color-secondary)" }}>
                       {ticket.description}
                     </p>
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <div className="flex items-center gap-4 text-sm" style={{ color: "var(--color-secondary)" }}>
                       <span>
                         {t("supportTickets.createdBy")}: {ticket.createdBy?.name || t("supportTickets.unknown")}
                       </span>
@@ -420,9 +443,9 @@ const SupportTicketsList = () => {
             <button
               onClick={() => paginate(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-4 py-2 rounded border disabled:opacity-50"
+              className="px-4 h-11 rounded-lg border disabled:opacity-50 font-medium"
               style={{
-                backgroundColor: "var(--bg-color)",
+                backgroundColor: "var(--surface-color)",
                 borderColor: "var(--border-color)",
                 color: "var(--text-color)",
               }}
@@ -434,19 +457,22 @@ const SupportTicketsList = () => {
                 <button
                   key={page}
                   onClick={() => paginate(page)}
-                  className={`px-4 py-2 rounded ${
+                  className={`px-4 h-11 rounded-lg font-medium ${
                     currentPage === page
-                      ? "bg-blue-600 text-white"
+                      ? ""
                       : "border"
                   }`}
                   style={
-                    currentPage !== page
+                    currentPage === page
                       ? {
-                          backgroundColor: "var(--bg-color)",
+                          backgroundColor: "var(--color-primary)",
+                          color: "var(--button-text)",
+                        }
+                      : {
+                          backgroundColor: "var(--surface-color)",
                           borderColor: "var(--border-color)",
                           color: "var(--text-color)",
                         }
-                      : {}
                   }
                 >
                   {page}
@@ -456,9 +482,9 @@ const SupportTicketsList = () => {
             <button
               onClick={() => paginate(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 rounded border disabled:opacity-50"
+              className="px-4 h-11 rounded-lg border disabled:opacity-50 font-medium"
               style={{
-                backgroundColor: "var(--bg-color)",
+                backgroundColor: "var(--surface-color)",
                 borderColor: "var(--border-color)",
                 color: "var(--text-color)",
               }}

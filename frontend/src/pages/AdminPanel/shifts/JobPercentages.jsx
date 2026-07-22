@@ -244,7 +244,7 @@ const JobPercentages = () => {
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
-              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-indigo-600"
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
             >
               <Percent size={28} color="white" />
             </div>
@@ -263,7 +263,7 @@ const JobPercentages = () => {
         <motion.div
           className="mb-8 rounded-2xl shadow-lg p-6 lg:p-8 border"
           style={{ 
-            backgroundColor: 'var(--bg-color)',
+            backgroundColor: "var(--surface-color)",
             borderColor: 'var(--border-color)'
           }}
           initial={{ opacity: 0, y: 20 }}
@@ -486,7 +486,7 @@ const JobPercentages = () => {
               name="isActive"
               checked={formData.isActive}
               onChange={handleChange}
-                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-[var(--border-color)] rounded"
               />
               <label className="text-sm font-medium" style={{ color: 'var(--text-color)' }}>
                 {formData.isActive ? (
@@ -495,7 +495,7 @@ const JobPercentages = () => {
                     {t("jobPercentages.active")}
                   </span>
                 ) : (
-                  <span className="flex items-center gap-2 text-gray-500">
+                  <span className="flex items-center gap-2 text-[var(--color-secondary)]">
                     <XCircle size={18} />
                     {t("jobPercentages.inactive")}
                   </span>
@@ -538,7 +538,7 @@ const JobPercentages = () => {
                 setEditingPayRateId(null);
                 toast(t("jobPercentages.cancelled"));
               }}
-                  className="px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 hover:scale-105"
+                  className="px-6 h-11 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 hover:scale-105"
                   style={{
                     backgroundColor: 'var(--color-accent)',
                     color: 'var(--button-text)'
@@ -575,7 +575,7 @@ const JobPercentages = () => {
         ) : payRates.length === 0 ? (
             <motion.div
               className="text-center py-16 rounded-2xl shadow-lg"
-              style={{ backgroundColor: 'var(--bg-color)' }}
+              style={{ backgroundColor: "var(--surface-color)" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
@@ -616,7 +616,7 @@ const JobPercentages = () => {
                     {/* Header with Actions */}
                     <div className="flex items-center justify-between mb-4">
                       <div 
-                        className="px-4 py-2 rounded-xl font-bold text-white shadow-lg"
+                        className="px-4 h-11 rounded-lg font-bold text-white shadow-lg"
                         style={{ backgroundColor: getRateColor(rate.rateType) }}
                       >
                         {t(`jobPercentages.rateTypes.${rate.rateType}`)}
@@ -738,7 +738,7 @@ const JobPercentages = () => {
                     {/* Status Badge */}
                     <div className="mt-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 w-fit ${
-                        rate.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                        rate.isActive ? 'bg-green-100 text-green-700' : 'bg-[var(--bg-secondary)] text-[var(--color-secondary)]'
                       }`}>
                         {rate.isActive ? (
                           <>

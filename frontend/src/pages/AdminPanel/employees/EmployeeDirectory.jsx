@@ -67,11 +67,11 @@ const EmployeeDirectory = () => {
   const getStatusColor = (status) => {
     const colors = {
       active: "bg-green-100 text-green-800",
-      inactive: "bg-gray-100 text-gray-800",
+      inactive: "bg-[var(--bg-secondary)] text-[var(--text-color)]",
       suspended: "bg-yellow-100 text-yellow-800",
       deleted: "bg-red-100 text-red-800",
     };
-    return colors[status] || "bg-gray-100 text-gray-800";
+    return colors[status] || "bg-[var(--bg-secondary)] text-[var(--text-color)]";
   };
 
   const getRoleColor = (role) => {
@@ -80,7 +80,7 @@ const EmployeeDirectory = () => {
       Manager: "bg-blue-100 text-blue-800",
       Employee: "bg-green-100 text-green-800",
     };
-    return colors[role] || "bg-gray-100 text-gray-800";
+    return colors[role] || "bg-[var(--bg-secondary)] text-[var(--text-color)]";
   };
 
   if (isLoading) {
@@ -112,26 +112,34 @@ const EmployeeDirectory = () => {
   }
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--bg-color)' }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-7xl mx-auto"
       >
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
-              {t("employees.directory.title") || "Employee Directory"}
-        </h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
-              {t("employees.directory.description") || "Browse and manage all employees in your organization"}
-            </p>
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
+            >
+              <Users size={28} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
+                {t("employees.directory.title") || "Employee Directory"}
+              </h1>
+              <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
+                {t("employees.directory.description") || "Browse and manage all employees in your organization"}
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setViewMode(viewMode === "cards" ? "table" : "cards")}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+              className="flex items-center gap-2 px-6 h-11 rounded-lg font-medium border hover:bg-[var(--bg-secondary)] transition"
               style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
             >
               {viewMode === "cards" ? "Table View" : "Card View"}
@@ -140,63 +148,61 @@ const EmployeeDirectory = () => {
         </div>
 
         {/* Filters */}
-        <div className="rounded-2xl shadow-md border overflow-hidden mb-6" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
-          <div className="p-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              {/* Search */}
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={20} style={{ color: 'var(--text-secondary)' }} />
-                <input
-                  type="text"
-                  placeholder={t("employees.directory.search_placeholder") || "Search by name, email, ID..."}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-lg border"
-                  style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
-                />
-              </div>
-
-              {/* Department Filter */}
-              <select
-                value={filterDepartment}
-                onChange={(e) => setFilterDepartment(e.target.value)}
-                className="px-4 py-2 rounded-lg border"
+        <div className="rounded-2xl p-6 shadow-lg border mb-6" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {/* Search */}
+            <div className="col-span-2 relative">
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2" size={20} style={{ color: 'var(--text-secondary)' }} />
+              <input
+                type="text"
+                placeholder={t("employees.directory.search_placeholder") || "Search by name, email, ID..."}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full h-11 ps-10 pe-4 rounded-xl border"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
-              >
-                <option value="all">{t("employees.directory.all_departments") || "All Departments"}</option>
-                {departments.map((dept) => (
-                  <option key={dept._id} value={dept._id}>
-                    {dept.name}
-                  </option>
-                ))}
-              </select>
-
-              {/* Role Filter */}
-              <select
-                value={filterRole}
-                onChange={(e) => setFilterRole(e.target.value)}
-                className="px-4 py-2 rounded-lg border"
-                style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
-              >
-                <option value="all">{t("employees.directory.all_roles") || "All Roles"}</option>
-                <option value="Admin">Admin</option>
-                <option value="Manager">Manager</option>
-                <option value="Employee">Employee</option>
-              </select>
-
-              {/* Status Filter */}
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-2 rounded-lg border"
-                style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
-              >
-                <option value="all">{t("employees.directory.all_statuses") || "All Statuses"}</option>
-                <option value="active">{t("employees.active") || "Active"}</option>
-                <option value="inactive">{t("employees.inactive") || "Inactive"}</option>
-                <option value="suspended">{t("employees.suspended") || "Suspended"}</option>
-              </select>
+              />
             </div>
+
+            {/* Department Filter */}
+            <select
+              value={filterDepartment}
+              onChange={(e) => setFilterDepartment(e.target.value)}
+              className="h-11 px-4 rounded-xl border"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+            >
+              <option value="all">{t("employees.directory.all_departments") || "All Departments"}</option>
+              {departments.map((dept) => (
+                <option key={dept._id} value={dept._id}>
+                  {dept.name}
+                </option>
+              ))}
+            </select>
+
+            {/* Role Filter */}
+            <select
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value)}
+              className="h-11 px-4 rounded-xl border"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+            >
+              <option value="all">{t("employees.directory.all_roles") || "All Roles"}</option>
+              <option value="Admin">Admin</option>
+              <option value="Manager">Manager</option>
+              <option value="Employee">Employee</option>
+            </select>
+
+            {/* Status Filter */}
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="h-11 px-4 rounded-xl border"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+            >
+              <option value="all">{t("employees.directory.all_statuses") || "All Statuses"}</option>
+              <option value="active">{t("employees.active") || "Active"}</option>
+              <option value="inactive">{t("employees.inactive") || "Inactive"}</option>
+              <option value="suspended">{t("employees.suspended") || "Suspended"}</option>
+            </select>
           </div>
         </div>
 
@@ -210,10 +216,10 @@ const EmployeeDirectory = () => {
 
         {/* Employee List */}
         {filteredEmployees.length === 0 ? (
-          <div className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
-            <div className="p-12 text-center">
-              <Users size={64} className="mx-auto mb-4" style={{ color: 'var(--text-secondary)' }} />
-              <p style={{ color: 'var(--text-secondary)' }}>
+          <div className="rounded-2xl shadow-lg border overflow-hidden" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
+            <div className="text-center py-16">
+              <Users size={64} className="mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
+              <p style={{ color: 'var(--color-secondary)' }}>
                 {t("employees.directory.no_employees") || "No employees found"}
               </p>
             </div>
@@ -225,14 +231,14 @@ const EmployeeDirectory = () => {
                 key={employee._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl shadow-md border overflow-hidden hover:shadow-lg transition"
-                style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                className="rounded-2xl shadow-lg border overflow-hidden hover:shadow-xl transition"
+                style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               >
                 <div className="p-6">
                   {/* Employee Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                         {employee.profileImage ? (
                           <img
                             src={employee.profileImage}
@@ -308,7 +314,7 @@ const EmployeeDirectory = () => {
                   <div className="flex gap-2 pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
                     <button
                       onClick={() => navigate(`/dashboard/employees/${employee._id}/details`)}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg border hover:bg-[var(--bg-secondary)] transition"
                       style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
                     >
                       <Eye size={16} />
@@ -316,8 +322,8 @@ const EmployeeDirectory = () => {
                     </button>
                     <button
                       onClick={() => navigate(`/dashboard/employees/${employee._id}`, { state: { edit: true } })}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-white hover:opacity-90 transition"
-                      style={{ backgroundColor: 'var(--color-primary)' }}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg hover:opacity-90 transition"
+                      style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
                     >
                       <Edit size={16} />
                       {t("employees.edit") || "Edit"}
@@ -328,10 +334,10 @@ const EmployeeDirectory = () => {
             ))}
           </div>
         ) : (
-          <div className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+          <div className="rounded-2xl shadow-lg border overflow-hidden" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead>
+                <thead style={{ backgroundColor: 'var(--bg-secondary)' }}>
                   <tr className="border-b" style={{ borderColor: 'var(--border-color)' }}>
                     <th className="text-left p-4 font-semibold" style={{ color: 'var(--text-color)' }}>
                       {t("employees.name") || "Name"}
@@ -360,14 +366,14 @@ const EmployeeDirectory = () => {
                   {filteredEmployees.map((employee) => (
                     <motion.tr
                       key={employee._id}
-                      className="border-b hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                      className="border-b hover:bg-[var(--bg-secondary)] transition"
                       style={{ borderColor: 'var(--border-color)' }}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                     >
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                             {employee.profileImage ? (
                               <img
                                 src={employee.profileImage}
@@ -415,7 +421,7 @@ const EmployeeDirectory = () => {
                         <div className="flex gap-2">
                           <button
                             onClick={() => navigate(`/dashboard/employees/${employee._id}/details`)}
-                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                            className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                             style={{ color: 'var(--color-primary)' }}
                             title={t("employees.view") || "View"}
                           >
@@ -423,7 +429,7 @@ const EmployeeDirectory = () => {
                           </button>
                           <button
                             onClick={() => navigate(`/dashboard/employees/${employee._id}`, { state: { edit: true } })}
-                            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                            className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                             style={{ color: 'var(--color-primary)' }}
                             title={t("employees.edit") || "Edit"}
                           >

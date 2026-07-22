@@ -59,20 +59,26 @@ const ProjectTemplates = () => {
   }
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-6" style={{ backgroundColor: 'var(--bg-color)' }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
+      <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
-            {t("projects.templates")}
-          </h1>
-          <p className="mt-1" style={{ color: 'var(--color-secondary)' }}>
-            {t("projects.templates_description")}
-          </p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))' }}>
+            <FileText size={28} color="white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
+              {t("projects.templates")}
+            </h1>
+            <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
+              {t("projects.templates_description")}
+            </p>
+          </div>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg transition"
+          className="flex items-center justify-center gap-2 w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition"
           style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
         >
           <Plus className="w-5 h-5" />
@@ -81,17 +87,17 @@ const ProjectTemplates = () => {
       </div>
 
       {/* Filters */}
-      <div className="rounded-lg shadow p-4 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
+      <div className="rounded-2xl p-6 shadow-lg border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-2">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
               <input
                 type="text"
                 placeholder={t("projects.search_templates")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2"
+                className="w-full h-11 ps-10 pe-4 border rounded-xl focus:ring-2"
                 style={{ 
                   borderColor: 'var(--border-color)', 
                   backgroundColor: 'var(--bg-color)', 
@@ -104,7 +110,7 @@ const ProjectTemplates = () => {
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
-            className="px-4 py-2 border rounded-lg focus:ring-2"
+            className="h-11 px-4 border rounded-xl focus:ring-2"
             style={{ 
               borderColor: 'var(--border-color)', 
               backgroundColor: 'var(--bg-color)', 
@@ -130,8 +136,8 @@ const ProjectTemplates = () => {
             key={template._id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-lg shadow p-6 hover:shadow-lg transition border"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition border"
+            style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
@@ -188,7 +194,7 @@ const ProjectTemplates = () => {
                 style={{ 
                   borderColor: 'var(--border-color)', 
                   color: 'var(--text-color)',
-                  backgroundColor: 'var(--bg-color)'
+                  backgroundColor: 'var(--surface-color)'
                 }}
                 onClick={() => {
                   // TODO: Implement edit template
@@ -202,7 +208,7 @@ const ProjectTemplates = () => {
                 style={{ 
                   borderColor: '#ef4444', 
                   color: '#ef4444',
-                  backgroundColor: 'var(--bg-color)'
+                  backgroundColor: 'var(--surface-color)'
                 }}
                 onClick={() => {
                   if (window.confirm(t("projects.confirm_delete_template"))) {
@@ -218,13 +224,14 @@ const ProjectTemplates = () => {
       </div>
 
       {filteredTemplates.length === 0 && (
-        <div className="text-center py-12">
+        <div className="text-center py-16">
           <FileText className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
           <p style={{ color: 'var(--color-secondary)' }}>
             {t("projects.no_templates")}
           </p>
         </div>
       )}
+      </div>
     </div>
   );
 };

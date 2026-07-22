@@ -85,7 +85,7 @@ const TrackingDetails = () => {
     "Out for Delivery": "bg-orange-100 text-orange-800",
     Delivered: "bg-green-100 text-green-800",
     Exception: "bg-red-100 text-red-800",
-    Returned: "bg-gray-100 text-gray-800",
+    Returned: "bg-[var(--bg-secondary)] text-[var(--text-color)]",
   };
 
   const handleUpdateStatus = (e) => {
@@ -115,7 +115,7 @@ const TrackingDetails = () => {
   }
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: "var(--bg-color)" }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }}>
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -185,7 +185,7 @@ const TrackingDetails = () => {
                   </p>
                   <span
                     className={`inline-block px-3 py-1 rounded text-sm font-medium ${
-                      statusColors[tracking.shippingStatus] || "bg-gray-100 text-gray-800"
+                      statusColors[tracking.shippingStatus] || "bg-[var(--bg-secondary)] text-[var(--text-color)]"
                     }`}
                   >
                     {statusLabels[tracking.shippingStatus] || tracking.shippingStatus}

@@ -408,13 +408,13 @@ const ProductSelector = ({
             animate={{ opacity: 1, y: 0 }}
           >
             <div className="relative">
-              <Search className="absolute left-3 top-3 text-gray-400" size={18} />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2" size={18} style={{ color: 'var(--color-secondary)' }} />
               <input
                 type="text"
                 placeholder={t("procurement.search_products")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className="w-full h-11 ps-10 pe-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 style={{
                   borderColor: 'var(--border-color)',
                   backgroundColor: 'var(--bg-color)',
@@ -471,7 +471,7 @@ const ProductSelector = ({
             className={`p-4 rounded-xl border flex items-center gap-3 ${
               isLowStock
                 ? 'bg-yellow-50 border-yellow-200'
-                : 'bg-green-50 border-green-200'
+                : 'bg-green-50 border-[var(--border-color)]'
             }`}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -501,13 +501,13 @@ const ProductSelector = ({
         {showProductInfo && productData.productId && (
           <motion.div
             className="rounded-xl border p-6"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-blue-500 to-cyan-600">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
                 <Package size={20} color="white" />
               </div>
               <h3 className="text-lg font-bold" style={{ color: 'var(--text-color)' }}>
@@ -530,7 +530,7 @@ const ProductSelector = ({
                   className="w-full p-3 border rounded-xl opacity-70"
                   style={{
                     borderColor: 'var(--border-color)',
-                    backgroundColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-secondary)',
                     color: 'var(--text-color)'
                   }}
           />
@@ -550,7 +550,7 @@ const ProductSelector = ({
                   className="w-full p-3 border rounded-xl opacity-70"
                   style={{
                     borderColor: 'var(--border-color)',
-                    backgroundColor: 'var(--border-color)',
+                    backgroundColor: 'var(--bg-secondary)',
                     color: 'var(--text-color)'
                   }}
           />
@@ -568,14 +568,14 @@ const ProductSelector = ({
             value={productData.unitPrice}
             readOnly
             placeholder={t("procurement.unit_price_placeholder")}
-                    className="w-full p-3 border rounded-xl opacity-70 pr-12"
+                    className="w-full p-3 border rounded-xl opacity-70 pe-12"
                     style={{
                       borderColor: 'var(--border-color)',
-                      backgroundColor: 'var(--border-color)',
+                      backgroundColor: 'var(--bg-secondary)',
                       color: 'var(--text-color)'
                     }}
                   />
-                  <span className="absolute right-3 top-3.5 font-bold text-sm" style={{ color: 'var(--color-primary)' }}>
+                  <span className="absolute end-3 top-1/2 -translate-y-1/2 font-bold text-sm" style={{ color: 'var(--color-primary)' }}>
                     {formData.currency}
                   </span>
                 </div>
@@ -636,7 +636,7 @@ const ProductSelector = ({
             {/* Total Price */}
             <motion.div
               className="mt-4 p-4 rounded-xl"
-              style={{ backgroundColor: 'var(--border-color)' }}
+              style={{ backgroundColor: 'var(--bg-secondary)' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}

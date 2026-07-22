@@ -117,7 +117,7 @@ const HistorySignature = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-indigo-500 to-purple-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Shield size={28} color="white" />
             </div>
             <div>
@@ -134,7 +134,7 @@ const HistorySignature = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -154,7 +154,7 @@ const HistorySignature = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -174,7 +174,7 @@ const HistorySignature = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -197,7 +197,7 @@ const HistorySignature = () => {
         {/* Table */}
         <motion.div
           className="rounded-2xl shadow-lg border overflow-hidden"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -309,7 +309,7 @@ const HistorySignature = () => {
                                   }
                                 />
                               ) : (
-                                <div className="w-10 h-10 flex items-center justify-center bg-gray-200 text-gray-500 text-xs rounded">
+                                <div className="w-10 h-10 flex items-center justify-center bg-[var(--border-color)] text-[var(--color-secondary)] text-xs rounded">
                                   N/A
                                 </div>
                               )}
@@ -383,7 +383,7 @@ const HistorySignature = () => {
             >
               <motion.div
                 className="rounded-2xl p-6 max-w-4xl w-full shadow-2xl border relative"
-                style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
                 onClick={(e) => e.stopPropagation()}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}

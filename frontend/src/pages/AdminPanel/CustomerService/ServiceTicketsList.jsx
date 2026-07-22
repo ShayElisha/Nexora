@@ -65,14 +65,14 @@ const ServiceTicketsList = () => {
       "In Progress": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
       "Waiting for Customer": "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
       Resolved: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-      Closed: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+      Closed: "bg-[var(--bg-secondary)] text-[var(--text-color)]",
     };
     return colors[status] || colors.Open;
   };
 
   const getPriorityColor = (priority) => {
     const colors = {
-      Low: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+      Low: "bg-[var(--bg-secondary)] text-[var(--text-color)]",
       Medium: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
       High: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
       Urgent: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
@@ -89,7 +89,7 @@ const ServiceTicketsList = () => {
       case "Resolved":
         return <CheckCircle className="text-green-600" size={16} />;
       case "Closed":
-        return <XCircle className="text-gray-600" size={16} />;
+        return <XCircle className="text-[var(--color-secondary)]" size={16} />;
       default:
         return <AlertCircle className="text-orange-600" size={16} />;
     }
@@ -139,7 +139,7 @@ const ServiceTicketsList = () => {
         <motion.div
           className="rounded-2xl shadow-lg border p-6 mb-6"
           style={{
-            backgroundColor: "var(--bg-color)",
+            backgroundColor: "var(--surface-color)",
             borderColor: "var(--border-color)",
           }}
           initial={{ opacity: 0, y: 20 }}
@@ -231,7 +231,7 @@ const ServiceTicketsList = () => {
                 key={ticket._id}
                 className="rounded-2xl shadow-lg border overflow-hidden hover:shadow-xl transition-all duration-300"
                 style={{
-                  backgroundColor: "var(--bg-color)",
+                  backgroundColor: "var(--surface-color)",
                   borderColor: "var(--border-color)",
                 }}
                 initial={{ opacity: 0, y: 20 }}
@@ -262,7 +262,7 @@ const ServiceTicketsList = () => {
                     <div className="flex gap-2 ml-2">
                       <button
                         onClick={() => navigate(`/dashboard/customer-service/tickets/${ticket._id}`)}
-                        className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all"
+                        className="p-2 bg-[var(--surface-color)]/20 hover:bg-[var(--surface-color)]/30 rounded-lg transition-all"
                         title={t("common.edit") || "Edit"}
                       >
                         <Edit size={16} className="text-white" />
@@ -273,7 +273,7 @@ const ServiceTicketsList = () => {
                             deleteMutation.mutate(ticket._id);
                           }
                         }}
-                        className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all"
+                        className="p-2 bg-[var(--surface-color)]/20 hover:bg-[var(--surface-color)]/30 rounded-lg transition-all"
                         title={t("common.delete") || "Delete"}
                       >
                         <Trash2 size={16} className="text-white" />

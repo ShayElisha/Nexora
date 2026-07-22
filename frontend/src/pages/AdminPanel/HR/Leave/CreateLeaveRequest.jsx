@@ -75,7 +75,7 @@ const CreateLeaveRequest = () => {
             <div
               className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
               style={{
-                background: "linear-gradient(to right, var(--color-primary), var(--color-secondary))",
+                background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
               }}
             >
               <Calendar className="w-7 h-7" style={{ color: "var(--button-text)" }} />
@@ -84,7 +84,7 @@ const CreateLeaveRequest = () => {
               <h1 className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>
                 {t("hr.leave.create_request") || "Create Leave Request"}
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-[var(--color-secondary)] mt-1">
                 {t("hr.leave.submit_leave_request") || "Submit a new leave request"}
               </p>
             </div>
@@ -96,7 +96,7 @@ const CreateLeaveRequest = () => {
           onSubmit={handleSubmit}
           className="rounded-2xl shadow-xl p-6 sm:p-8"
           style={{
-            backgroundColor: "var(--bg-color)",
+            backgroundColor: "var(--surface-color)",
             borderColor: "var(--border-color)",
             border: "1px solid",
           }}
@@ -111,7 +111,7 @@ const CreateLeaveRequest = () => {
             <select
               value={formData.leaveType}
               onChange={(e) => setFormData({ ...formData, leaveType: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+              className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
               style={{
                 borderColor: "var(--border-color)",
                 backgroundColor: "var(--bg-color)",
@@ -174,7 +174,7 @@ const CreateLeaveRequest = () => {
               value={formData.reason}
               onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
               rows={4}
-              className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:outline-none transition-all"
+              className="w-full h-11 px-4 rounded-xl border focus:ring-2 focus:outline-none transition-all"
               style={{
                 borderColor: "var(--border-color)",
                 backgroundColor: "var(--bg-color)",

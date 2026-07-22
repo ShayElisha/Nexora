@@ -95,8 +95,8 @@ const SignaturesModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-bg p-8 rounded-lg shadow-xl w-3/4 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
+      <div className="p-8 rounded-2xl shadow-2xl w-3/4 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: "var(--surface-color)" }}>
         <h2 className="text-2xl font-bold text-primary mb-6 text-center">
           {t("signature_modal.title")}
         </h2>
@@ -105,7 +105,7 @@ const SignaturesModal = ({
         <div className="flex justify-center mb-6">
           <button
             onClick={() => setIsCreatingNewList(true)}
-            className="bg-button-bg hover:bg-button-bg text-button-text py-2 px-4 rounded mr-4"
+            className="bg-button-bg hover:bg-button-bg text-button-text px-6 h-11 rounded-lg font-medium"
           >
             {t("signature_modal.create_new_list")}
           </button>
@@ -123,7 +123,7 @@ const SignaturesModal = ({
                 value={newRequirement}
                 onChange={(e) => setNewRequirement(e.target.value)}
                 placeholder="Enter list name"
-                className="w-full p-3 rounded bg-bg text-text placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-accent"
+                className="w-full h-11 px-4 rounded-xl border border-border-color bg-bg text-text focus:outline-none focus:ring-2 focus:ring-accent"
               />
 
               {/* Employee selection for adding signers */}
@@ -149,7 +149,7 @@ const SignaturesModal = ({
                       ]);
                     }
                   }}
-                  className="bg-bg text-text p-2 rounded"
+                  className="w-full h-11 px-4 rounded-xl border border-border-color bg-bg text-text focus:outline-none focus:ring-2 focus:ring-accent"
                 >
                   <option value="">
                     {t("signature_modal.select_employee")}
@@ -196,7 +196,7 @@ const SignaturesModal = ({
 
             <button
               onClick={handleSaveSignatureList}
-              className="bg-button-bg hover:bg-button-bg text-button-text font-bold py-3 px-6 rounded-lg mt-6 shadow-lg transform transition-transform duration-300 hover:scale-105"
+              className="bg-button-bg hover:bg-button-bg text-button-text font-medium px-6 h-11 rounded-lg mt-6 shadow-lg transform transition-transform duration-300 hover:scale-105"
             >
               {t("signature_modal.save_list")}
             </button>
@@ -208,9 +208,9 @@ const SignaturesModal = ({
             {t("signature_modal.existing_lists_title")}
           </h3>
           {signatureListsList && signatureListsList.length > 0 ? (
-            <table className="w-full border-collapse rounded-lg overflow-hidden shadow-md">
+            <table className="w-full border-collapse rounded-2xl overflow-hidden shadow-md border border-border-color">
               <thead>
-                <tr className="bg-gradient-to-r from-border-color to-border-color text-text">
+                <tr className="text-text" style={{ backgroundColor: "var(--bg-secondary)" }}>
                   <th className="p-4">{t("signature_modal.list_name")}</th>
                   <th className="p-4">{t("signature_modal.signers")}</th>
                   <th className="p-4 text-center">
@@ -222,7 +222,7 @@ const SignaturesModal = ({
                 {signatureListsList.map((list, index) => (
                   <tr
                     key={index}
-                    className="bg-bg hover:bg-border-color text-text transition-colors duration-200"
+                    className="border-b border-border-color hover:bg-bg text-text transition-colors duration-200"
                   >
                     <td className="p-4">{list.requirement || list.name}</td>
                     <td className="p-4">
@@ -231,7 +231,7 @@ const SignaturesModal = ({
                           return (
                             <span
                               key={signer?.employeeId || i}
-                              className="inline-block bg-bg text-primary text-xs px-2 py-1 rounded-lg mr-2"
+                              className="inline-block bg-bg text-primary text-xs px-2 py-1 rounded-lg me-2"
                             >
                               {signer?.name || t("signature_modal.no_name")} (
                               {signer?.role || ""})
@@ -272,7 +272,8 @@ const SignaturesModal = ({
         <div className="flex justify-end mt-6">
           <button
             onClick={onClose}
-            className="bg-gradient-to-r from-border-color to-border-color hover:from-gray-600 hover:to-gray-800 text-button-text py-2 px-6 rounded-full shadow-lg transform transition-transform duration-300 hover:scale-105"
+            className="px-6 h-11 rounded-lg font-medium shadow-lg transform transition-transform duration-300 hover:scale-105"
+            style={{ backgroundColor: "var(--border-color)", color: "var(--text-color)" }}
           >
             {t("signature_modal.close")}
           </button>

@@ -213,8 +213,8 @@ const SupplierList = () => {
             onClick={() => paginate(1)}
             className={`min-w-[40px] px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
               currentPage === 1
-                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md scale-105"
-                : "bg-white text-gray-700 hover:bg-gray-100 shadow-sm"
+                ? "shadow-md scale-105 bg-[var(--color-primary)] text-[var(--button-text)]"
+                : "bg-[var(--surface-color)] text-[var(--text-color)] hover:bg-[var(--bg-secondary)] shadow-sm"
             }`}
           >
             1
@@ -255,7 +255,7 @@ const SupplierList = () => {
       if (endPage < totalPages) {
         if (endPage < totalPages - 1) {
           pageNumbers.push(
-            <span key="end-dots" className="px-2 text-gray-400 font-bold">
+            <span key="end-dots" className="px-2 text-[var(--color-secondary)] font-bold">
               ...
             </span>
           );
@@ -266,8 +266,8 @@ const SupplierList = () => {
             onClick={() => paginate(totalPages)}
             className={`min-w-[40px] px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
               currentPage === totalPages
-                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md scale-105"
-                : "bg-white text-gray-700 hover:bg-gray-100 shadow-sm"
+                ? "shadow-md scale-105 bg-[var(--color-primary)] text-[var(--button-text)]"
+                : "bg-[var(--surface-color)] text-[var(--text-color)] hover:bg-[var(--bg-secondary)] shadow-sm"
             }`}
           >
             {totalPages}
@@ -315,7 +315,7 @@ const SupplierList = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-indigo-500 to-purple-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Truck size={28} color="white" />
             </div>
             <div>
@@ -352,7 +352,7 @@ const SupplierList = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <motion.div
             className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
-            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -370,7 +370,7 @@ const SupplierList = () => {
 
           <motion.div
             className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
-            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -388,7 +388,7 @@ const SupplierList = () => {
 
           <motion.div
             className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
-            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
@@ -406,7 +406,7 @@ const SupplierList = () => {
 
           <motion.div
             className="rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
-            style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
@@ -430,7 +430,7 @@ const SupplierList = () => {
                     key={supplier._id}
                     className="relative rounded-2xl p-6 shadow-lg border transition-all hover:scale-105"
                     style={{
-                      backgroundColor: "var(--bg-color)",
+                      backgroundColor: "var(--surface-color)",
                       borderColor: "var(--border-color)",
                     }}
                     initial={{ opacity: 0, y: 20 }}
@@ -499,7 +499,7 @@ const SupplierList = () => {
                                 className={
                                   star <= displayRating
                                     ? "text-yellow-500 fill-yellow-500"
-                                    : "text-gray-300"
+                                    : "text-[var(--border-color)]"
                                 }
                               />
                             );
@@ -529,7 +529,7 @@ const SupplierList = () => {
                             onChange={() => handleToggle(supplier._id, supplier.IsActive)}
                             className="sr-only peer"
                           />
-                          <div className="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
+                          <div className="w-14 h-7 bg-[var(--border-color)] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-[var(--surface-color)] after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-[var(--surface-color)] after:border-[var(--border-color)] after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
                         </label>
                       </div>
 
@@ -577,8 +577,8 @@ const SupplierList = () => {
                     disabled={currentPage === totalPages}
                     className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                       currentPage === totalPages
-                        ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                        : "bg-white text-gray-700 hover:bg-indigo-600 hover:text-white shadow-md hover:shadow-lg transform hover:scale-105"
+                        ? "bg-[var(--border-color)] text-[var(--color-secondary)] cursor-not-allowed"
+                        : "bg-[var(--surface-color)] text-[var(--text-color)] hover:bg-indigo-600 hover:text-white shadow-md hover:shadow-lg transform hover:scale-105"
                     }`}
                   >
                     {direction === "rtl" ? "←" : "→"}
@@ -587,11 +587,11 @@ const SupplierList = () => {
               )}
             </>
           ) : (
-            <div className="bg-white rounded-2xl p-12 shadow-lg text-center">
-              <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                <Truck className="text-gray-400" size={40} />
+            <div className="bg-[var(--surface-color)] rounded-2xl p-12 shadow-lg text-center">
+              <div className="w-20 h-20 mx-auto mb-4 bg-[var(--bg-secondary)] rounded-full flex items-center justify-center">
+                <Truck className="text-[var(--color-secondary)]" size={40} />
               </div>
-              <p className="text-gray-600 text-lg font-medium">{t("supplier.no_suppliers")}</p>
+              <p className="text-[var(--color-secondary)] text-lg font-medium">{t("supplier.no_suppliers")}</p>
             </div>
           )}
 
@@ -693,7 +693,7 @@ const SupplierList = () => {
                   <div className="flex justify-end mt-6 space-x-2">
                     <button
                       onClick={() => setIsModalOpen(false)}
-                      className="px-4 py-2 bg-gray-500 text-white rounded-full shadow-md hover:bg-gray-600 transition-all duration-200 transform hover:scale-105"
+                      className="px-4 py-2 rounded-full shadow-md transition-all duration-200 transform hover:scale-105" style={{ backgroundColor: "var(--border-color)", color: "var(--text-color)" }}
                     >
                       {t("supplier.cancel")}
                     </button>
@@ -721,7 +721,7 @@ const SupplierList = () => {
                   <div className="flex justify-end mt-6 space-x-2">
                     <button
                       onClick={() => setIsModalOpen(false)}
-                      className="px-4 py-2 bg-gray-500 text-white rounded-full shadow-md hover:bg-gray-600 transition-all duration-200 transform hover:scale-105"
+                      className="px-4 py-2 rounded-full shadow-md transition-all duration-200 transform hover:scale-105" style={{ backgroundColor: "var(--border-color)", color: "var(--text-color)" }}
                     >
                       {t("supplier.cancel")}
                     </button>
@@ -744,8 +744,8 @@ const SupplierList = () => {
             dir={direction}
             className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 animate-fadeIn"
           >
-            <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md border-2 border-gray-200">
-              <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">
+            <div className="bg-[var(--surface-color)] rounded-2xl shadow-2xl p-6 w-full max-w-md border-2 border-[var(--border-color)]">
+              <h2 className="text-xl font-bold text-[var(--text-color)] mb-4 text-center">
                 {t("supplier.attachments")} - {attachmentsSupplier.SupplierName}
               </h2>
               <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -753,7 +753,7 @@ const SupplierList = () => {
                   attachmentsSupplier.attachments.map((file, index) => (
                     <div
                       key={index}
-                      className="bg-gray-50 p-3 rounded-lg border border-gray-200 hover:bg-gray-100 transition-all duration-200"
+                      className="bg-[var(--bg-secondary)] p-3 rounded-lg border border-[var(--border-color)] hover:bg-[var(--bg-secondary)] transition-all duration-200"
                     >
                       <a
                         href={file.fileUrl || "#"}
@@ -767,14 +767,14 @@ const SupplierList = () => {
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 text-center py-6">
+                  <p className="text-[var(--color-secondary)] text-center py-6">
                     {t("supplier.no_attachments")}
                   </p>
                 )}
               </div>
               <button
                 onClick={() => setIsAttachmentsModalOpen(false)}
-                className="mt-6 w-full bg-gray-200 text-gray-800 font-semibold py-3 px-4 rounded-xl hover:bg-gray-300 transition-all duration-200"
+                className="mt-6 w-full sm:w-auto px-6 h-11 bg-[var(--border-color)] text-[var(--text-color)] font-semibold rounded-xl hover:opacity-80 transition-all duration-200"
               >
                 סגור
               </button>

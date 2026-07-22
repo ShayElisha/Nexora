@@ -23,14 +23,14 @@ const PaymentAndShipping = ({
       </h2>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-text mb-2">
+          <label className="block text-sm font-semibold mb-2 text-text">
             {t("procurement.payment_method")}:
           </label>
           <select
             name="PaymentMethod"
             value={formData.PaymentMethod}
             onChange={handleFormChange}
-            className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full h-11 px-4 rounded-xl bg-bg text-text border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="">{t("procurement.select_payment_method")}</option>
             <option value="Cash">{t("procurement.cash")}</option>
@@ -41,14 +41,14 @@ const PaymentAndShipping = ({
           </select>
         </div>
         <div>
-          <label className="block text-text mb-2">
+          <label className="block text-sm font-semibold mb-2 text-text">
             {t("procurement.payment_terms")}:
           </label>
           <select
             name="PaymentTerms"
             value={formData.PaymentTerms}
             onChange={handleFormChange}
-            className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full h-11 px-4 rounded-xl bg-bg text-text border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="">{t("procurement.select_payment_terms")}</option>
             <option value="Due on receipt">
@@ -60,14 +60,14 @@ const PaymentAndShipping = ({
           </select>
         </div>
         <div>
-          <label className="block text-text mb-2">
+          <label className="block text-sm font-semibold mb-2 text-text">
             {t("procurement.shipping_method")}:
           </label>
           <select
             name="ShippingMethod"
             value={formData.ShippingMethod}
             onChange={handleFormChange}
-            className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full h-11 px-4 rounded-xl bg-bg text-text border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="">{t("procurement.select_shipping_method")}</option>
             <option value="Air Freight">{t("procurement.air_freight")}</option>
@@ -78,7 +78,7 @@ const PaymentAndShipping = ({
           </select>
         </div>
         <div>
-          <label className="block text-text mb-2">
+          <label className="block text-sm font-semibold mb-2 text-text">
             {t("procurement.shipping_cost")}:
           </label>
           <input
@@ -86,13 +86,13 @@ const PaymentAndShipping = ({
             name="shippingCost"
             value={formData.shippingCost}
             onChange={handleFormChange}
-            className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full h-11 px-4 rounded-xl bg-bg text-text border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         <div className="mb-4">
           <label
             htmlFor="currency"
-            className="block text-text font-medium mb-2"
+            className="block text-sm font-semibold mb-2 text-text"
           >
             {t("procurement.currency")}:
           </label>
@@ -107,7 +107,7 @@ const PaymentAndShipping = ({
               }
               handleCurrencyChange(e);
             }}
-            className="w-full p-2 rounded bg-bg text-text border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full h-11 px-4 rounded-xl bg-bg text-text border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="">{t("procurement.select_currency")}</option>
             {currency.map((cur) => (
@@ -163,7 +163,7 @@ const PaymentAndShipping = ({
         <div>
           {addressMode === "warehouse" ? (
             <div className="space-y-3">
-              <label className="block text-text mb-1">
+              <label className="block text-sm font-semibold mb-2 text-text">
                 {t("procurement.select_warehouse_address", {
                   defaultValue: "Select warehouse",
                 })} <span className="text-red-500">*</span>
@@ -173,7 +173,7 @@ const PaymentAndShipping = ({
                   <select
                     value={selectedWarehouseId || ""}
                     onChange={(e) => onSelectWarehouse(e.target.value)}
-                    className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full h-11 px-4 rounded-xl bg-bg text-text border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
                     required
                   >
                     <option value="">
@@ -189,7 +189,7 @@ const PaymentAndShipping = ({
                     ))}
                   </select>
                   {selectedWarehouse?.address && (
-                    <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 text-sm text-text">
+                    <div className="p-4 rounded-xl border border-border-color text-sm text-text" style={{ backgroundColor: "var(--bg-secondary)" }}>
                       <p className="font-medium">{selectedWarehouse.name}</p>
                       <p>
                         {[
@@ -204,7 +204,7 @@ const PaymentAndShipping = ({
                       </p>
                       {(selectedWarehouse.address.contactName ||
                         selectedWarehouse.address.contactPhone) && (
-                        <p className="mt-1 text-gray-600">
+                        <p className="mt-1 text-secondary">
                           {selectedWarehouse.address.contactName && (
                             <>
                               {t("procurement.contact_name", {
@@ -229,7 +229,7 @@ const PaymentAndShipping = ({
                   )}
                 </>
               ) : (
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-secondary">
                   {t("procurement.no_warehouses_available", {
                     defaultValue: "No warehouses available yet. Please create one first.",
                   })}
@@ -241,7 +241,7 @@ const PaymentAndShipping = ({
               {/* בחירת מחסן גם בכתובת ידנית - חובה */}
               {warehouses.length > 0 && (
                 <div className="space-y-2">
-                  <label className="block text-text mb-1">
+                  <label className="block text-sm font-semibold mb-2 text-text">
                     {t("procurement.select_warehouse", {
                       defaultValue: "Select warehouse",
                     })} <span className="text-red-500">*</span>
@@ -249,7 +249,7 @@ const PaymentAndShipping = ({
                   <select
                     value={selectedWarehouseId || ""}
                     onChange={(e) => onSelectWarehouse(e.target.value)}
-                    className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full h-11 px-4 rounded-xl bg-bg text-text border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
                     required
                   >
                     <option value="">
@@ -268,42 +268,42 @@ const PaymentAndShipping = ({
               )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-text mb-2">
-                    {t("procurement.street", { defaultValue: "Street" })} *
+                  <label className="block text-sm font-semibold mb-2 text-text">
+                    {t("procurement.street", { defaultValue: "Street" })}<span className="text-red-500 ms-1">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.shippingAddress?.street || ""}
                     onChange={(e) => handleShippingAddressChange("street", e.target.value)}
-                    className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full h-11 px-4 rounded-xl bg-bg text-text border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
                     required={addressMode === "manual"}
                   />
                 </div>
                 <div>
-                  <label className="block text-text mb-2">
-                    {t("procurement.city", { defaultValue: "City" })} *
+                  <label className="block text-sm font-semibold mb-2 text-text">
+                    {t("procurement.city", { defaultValue: "City" })}<span className="text-red-500 ms-1">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.shippingAddress?.city || ""}
                     onChange={(e) => handleShippingAddressChange("city", e.target.value)}
-                    className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full h-11 px-4 rounded-xl bg-bg text-text border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
                     required={addressMode === "manual"}
                   />
                 </div>
                 <div>
-                  <label className="block text-text mb-2">
+                  <label className="block text-sm font-semibold mb-2 text-text">
                     {t("procurement.state", { defaultValue: "State/Region" })}
                   </label>
                   <input
                     type="text"
                     value={formData.shippingAddress?.state || ""}
                     onChange={(e) => handleShippingAddressChange("state", e.target.value)}
-                    className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full h-11 px-4 rounded-xl bg-bg text-text border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-text mb-2">
+                  <label className="block text-sm font-semibold mb-2 text-text">
                     {t("procurement.zip_code", {
                       defaultValue: "ZIP / Postal Code",
                     })}
@@ -312,23 +312,23 @@ const PaymentAndShipping = ({
                     type="text"
                     value={formData.shippingAddress?.zipCode || ""}
                     onChange={(e) => handleShippingAddressChange("zipCode", e.target.value)}
-                    className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full h-11 px-4 rounded-xl bg-bg text-text border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-text mb-2">
+                  <label className="block text-sm font-semibold mb-2 text-text">
                     {t("procurement.country", { defaultValue: "Country" })}
                   </label>
                   <input
                     type="text"
                     value={formData.shippingAddress?.country || ""}
                     onChange={(e) => handleShippingAddressChange("country", e.target.value)}
-                    className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full h-11 px-4 rounded-xl bg-bg text-text border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
                     required={addressMode === "manual"}
                   />
                 </div>
                 <div>
-                  <label className="block text-text mb-2">
+                  <label className="block text-sm font-semibold mb-2 text-text">
                     {t("procurement.contact_name", {
                       defaultValue: "Contact Name",
                     })}
@@ -339,11 +339,11 @@ const PaymentAndShipping = ({
                     onChange={(e) =>
                       handleShippingAddressChange("contactName", e.target.value)
                     }
-                    className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full h-11 px-4 rounded-xl bg-bg text-text border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-text mb-2">
+                  <label className="block text-sm font-semibold mb-2 text-text">
                     {t("procurement.contact_phone", {
                       defaultValue: "Contact Phone",
                     })}
@@ -354,7 +354,7 @@ const PaymentAndShipping = ({
                     onChange={(e) =>
                       handleShippingAddressChange("contactPhone", e.target.value)
                     }
-                    className="w-full p-2 rounded bg-bg border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full h-11 px-4 rounded-xl bg-bg text-text border border-border-color focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </div>

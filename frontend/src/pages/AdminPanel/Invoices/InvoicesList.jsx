@@ -24,7 +24,7 @@ import {
 const getStatusColor = (status) => {
   switch (status) {
     case "Draft":
-      return "bg-gray-100 text-gray-700 border-gray-300";
+      return "bg-[var(--bg-secondary)] text-[var(--text-color)] border-[var(--border-color)]";
     case "Sent":
       return "bg-blue-100 text-blue-700 border-blue-300";
     case "Paid":
@@ -32,9 +32,9 @@ const getStatusColor = (status) => {
     case "Overdue":
       return "bg-red-100 text-red-700 border-red-300";
     case "Cancelled":
-      return "bg-gray-100 text-gray-700 border-gray-300";
+      return "bg-[var(--bg-secondary)] text-[var(--text-color)] border-[var(--border-color)]";
     default:
-      return "bg-gray-100 text-gray-700 border-gray-300";
+      return "bg-[var(--bg-secondary)] text-[var(--text-color)] border-[var(--border-color)]";
   }
 };
 
@@ -177,25 +177,46 @@ const InvoicesList = () => {
 
   return (
     <div
-      className="min-h-screen p-6"
+      className="min-h-screen p-4 sm:p-6 lg:p-8"
       style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
     >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-3">
-              <FileText size={32} style={{ color: "var(--color-primary)" }} />
-              {t("invoices.title")}
-            </h1>
-            <p className="text-gray-500 mt-1">{t("invoices.subtitle")}</p>
+          <div className="flex items-center gap-4">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{
+                background:
+                  "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
+              }}
+            >
+              <FileText size={28} className="text-white" />
+            </div>
+            <div>
+              <h1
+                className="text-4xl font-bold"
+                style={{ color: "var(--text-color)" }}
+              >
+                {t("invoices.title")}
+              </h1>
+              <p
+                className="text-lg mt-1"
+                style={{ color: "var(--color-secondary)" }}
+              >
+                {t("invoices.subtitle")}
+              </p>
+            </div>
           </div>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/dashboard/invoices/create")}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-white"
-            style={{ backgroundColor: "var(--color-primary)" }}
+            className="flex items-center gap-2 px-6 h-11 rounded-lg font-medium"
+            style={{
+              backgroundColor: "var(--color-primary)",
+              color: "var(--button-text)",
+            }}
           >
             <Plus size={20} />
             {t("invoices.createInvoice")}
@@ -208,23 +229,28 @@ const InvoicesList = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-4 rounded-lg border"
+              className="rounded-2xl p-6 shadow-lg border"
               style={{
-                backgroundColor: "var(--bg-color)",
+                backgroundColor: "var(--surface-color)",
                 borderColor: "var(--border-color)",
               }}
             >
-              <p className="text-sm text-gray-500">{t("invoices.total")}</p>
+              <p
+                className="text-sm"
+                style={{ color: "var(--color-secondary)" }}
+              >
+                {t("invoices.total")}
+              </p>
               <p className="text-2xl font-bold">{stats.total || 0}</p>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="p-4 rounded-lg border border-gray-300 bg-gray-50"
+              className="rounded-2xl p-6 shadow-lg border border-[var(--border-color)] bg-[var(--bg-secondary)]"
             >
-              <p className="text-sm text-gray-700">{t("invoices.draft")}</p>
-              <p className="text-2xl font-bold text-gray-700">
+              <p className="text-sm text-[var(--text-color)]">{t("invoices.draft")}</p>
+              <p className="text-2xl font-bold text-[var(--text-color)]">
                 {stats.draft || 0}
               </p>
             </motion.div>
@@ -232,7 +258,7 @@ const InvoicesList = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="p-4 rounded-lg border border-blue-300 bg-blue-50"
+              className="rounded-2xl p-6 shadow-lg border border-blue-300 bg-blue-50"
             >
               <p className="text-sm text-blue-700">{t("invoices.sent")}</p>
               <p className="text-2xl font-bold text-blue-700">
@@ -243,7 +269,7 @@ const InvoicesList = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="p-4 rounded-lg border border-green-300 bg-green-50"
+              className="rounded-2xl p-6 shadow-lg border border-green-300 bg-green-50"
             >
               <p className="text-sm text-green-700">{t("invoices.paid")}</p>
               <p className="text-2xl font-bold text-green-700">
@@ -254,7 +280,7 @@ const InvoicesList = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="p-4 rounded-lg border border-red-300 bg-red-50"
+              className="rounded-2xl p-6 shadow-lg border border-red-300 bg-red-50"
             >
               <p className="text-sm text-red-700">{t("invoices.overdue")}</p>
               <p className="text-2xl font-bold text-red-700">
@@ -266,35 +292,36 @@ const InvoicesList = () => {
 
         {/* Filters */}
         <div
-          className="mb-6 p-4 rounded-lg border"
-          style={{ borderColor: "var(--border-color)" }}
+          className="mb-6 rounded-2xl p-6 shadow-lg border"
+          style={{
+            backgroundColor: "var(--surface-color)",
+            borderColor: "var(--border-color)",
+          }}
         >
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex items-center gap-2">
-              <Filter size={20} />
-              <span className="font-semibold">{t("invoices.filters")}:</span>
-            </div>
-
+          <div className="flex items-center gap-2 mb-4">
+            <Filter size={20} />
+            <span className="font-semibold">{t("invoices.filters")}:</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Search */}
-            <div className="flex-1 min-w-[200px]">
-              <div className="relative">
-                <Search
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  size={20}
-                />
-                <input
-                  type="text"
-                  placeholder={t("invoices.searchPlaceholder")}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-lg border"
-                  style={{
-                    backgroundColor: "var(--bg-color)",
-                    borderColor: "var(--border-color)",
-                    color: "var(--text-color)",
-                  }}
-                />
-              </div>
+            <div className="relative">
+              <Search
+                className="absolute start-3 top-1/2 -translate-y-1/2"
+                style={{ color: "var(--color-secondary)" }}
+                size={20}
+              />
+              <input
+                type="text"
+                placeholder={t("invoices.searchPlaceholder")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full h-11 ps-10 pe-4 rounded-xl border"
+                style={{
+                  backgroundColor: "var(--bg-color)",
+                  borderColor: "var(--border-color)",
+                  color: "var(--text-color)",
+                }}
+              />
             </div>
 
             {/* Status Filter */}
@@ -304,7 +331,7 @@ const InvoicesList = () => {
                 setFilterStatus(e.target.value);
                 setCurrentPage(1);
               }}
-              className="px-4 py-2 rounded-lg border"
+              className="w-full h-11 px-4 rounded-xl border"
               style={{
                 backgroundColor: "var(--bg-color)",
                 borderColor: "var(--border-color)",
@@ -323,9 +350,16 @@ const InvoicesList = () => {
 
         {/* Invoices List */}
         {filteredInvoices.length === 0 ? (
-          <div className="text-center py-12">
-            <FileText size={64} className="mx-auto mb-4 text-gray-400" />
-            <p className="text-gray-500 text-lg">
+          <div className="text-center py-16">
+            <FileText
+              size={64}
+              className="mx-auto mb-4"
+              style={{ color: "var(--color-secondary)" }}
+            />
+            <p
+              className="text-lg"
+              style={{ color: "var(--color-secondary)" }}
+            >
               {t("invoices.noInvoicesFound")}
             </p>
           </div>
@@ -337,9 +371,9 @@ const InvoicesList = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ scale: 1.02 }}
-                className="p-4 rounded-lg border cursor-pointer transition-all"
+                className="rounded-2xl p-6 shadow-lg border cursor-pointer transition-all"
                 style={{
-                  backgroundColor: "var(--bg-color)",
+                  backgroundColor: "var(--surface-color)",
                   borderColor: "var(--border-color)",
                 }}
               >
@@ -361,7 +395,10 @@ const InvoicesList = () => {
                         {t(`invoices.status.${invoice.status.toLowerCase()}`)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-2">
+                    <div
+                      className="flex items-center gap-4 text-sm mb-2"
+                      style={{ color: "var(--color-secondary)" }}
+                    >
                       <span>
                         {t("invoices.customer")}:{" "}
                         {invoice.customerId?.name || t("invoices.noCustomer")}
@@ -388,7 +425,7 @@ const InvoicesList = () => {
                       )}
                     </div>
                   </div>
-                  <div className="flex gap-2 ml-4">
+                  <div className="flex gap-2 ms-4">
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
@@ -468,9 +505,9 @@ const InvoicesList = () => {
             <button
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-4 py-2 rounded border disabled:opacity-50"
+              className="px-4 py-2 rounded-lg border disabled:opacity-50"
               style={{
-                backgroundColor: "var(--bg-color)",
+                backgroundColor: "var(--surface-color)",
                 borderColor: "var(--border-color)",
                 color: "var(--text-color)",
               }}
@@ -482,19 +519,20 @@ const InvoicesList = () => {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`px-4 py-2 rounded ${
-                    currentPage === page
-                      ? "bg-blue-600 text-white"
-                      : "border"
+                  className={`px-4 py-2 rounded-lg ${
+                    currentPage === page ? "" : "border"
                   }`}
                   style={
                     currentPage !== page
                       ? {
-                          backgroundColor: "var(--bg-color)",
+                          backgroundColor: "var(--surface-color)",
                           borderColor: "var(--border-color)",
                           color: "var(--text-color)",
                         }
-                      : {}
+                      : {
+                          backgroundColor: "var(--color-primary)",
+                          color: "var(--button-text)",
+                        }
                   }
                 >
                   {page}
@@ -504,9 +542,9 @@ const InvoicesList = () => {
             <button
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={currentPage === pagination.pages}
-              className="px-4 py-2 rounded border disabled:opacity-50"
+              className="px-4 py-2 rounded-lg border disabled:opacity-50"
               style={{
-                backgroundColor: "var(--bg-color)",
+                backgroundColor: "var(--surface-color)",
                 borderColor: "var(--border-color)",
                 color: "var(--text-color)",
               }}

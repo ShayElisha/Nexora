@@ -458,7 +458,7 @@ const MissingComponentsManagement = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-red-500 to-orange-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <AlertTriangle size={28} color="white" />
             </div>
             <div>
@@ -475,7 +475,7 @@ const MissingComponentsManagement = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -495,7 +495,7 @@ const MissingComponentsManagement = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -515,7 +515,7 @@ const MissingComponentsManagement = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -594,7 +594,7 @@ const MissingComponentsManagement = () => {
                   className="p-6 rounded-xl border cursor-pointer transition-all hover:shadow-lg"
                   style={{
                     borderColor: "var(--border-color)",
-                    backgroundColor: "var(--bg-color)",
+                    backgroundColor: "var(--surface-color)",
                   }}
                   onClick={() => toggleComponent(component.componentId)}
                 >
@@ -779,7 +779,7 @@ const MissingComponentsManagement = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto my-8"
+              className="bg-[var(--surface-color)] rounded-xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto my-8"
               style={{ backgroundColor: "var(--bg-color)" }}
             >
               <div className="flex items-center justify-between mb-6">
@@ -788,7 +788,7 @@ const MissingComponentsManagement = () => {
                 </h2>
                 <button
                   onClick={() => setShowProcurementModal(false)}
-                  className="p-2 rounded-lg hover:bg-gray-100"
+                  className="p-2 rounded-lg hover:bg-[var(--bg-secondary)]"
                 >
                   <X size={20} style={{ color: "var(--text-color)" }} />
                 </button>

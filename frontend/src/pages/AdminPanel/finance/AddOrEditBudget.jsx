@@ -52,7 +52,7 @@ const AddDepartmentModal = ({ isOpen, onClose, onSuccess }) => {
       <div className="absolute inset-0 bg-black bg-opacity-60" />
       <motion.div
         className="relative rounded-2xl p-6 w-full max-w-md z-10 shadow-2xl border"
-        style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+        style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
         initial={{ scale: 0.9, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         onClick={(e) => e.stopPropagation()}
@@ -62,7 +62,7 @@ const AddDepartmentModal = ({ isOpen, onClose, onSuccess }) => {
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+            <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
               {t("finance.budget.department_name")}
             </label>
             <input
@@ -71,12 +71,12 @@ const AddDepartmentModal = ({ isOpen, onClose, onSuccess }) => {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
-              className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
               style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
             />
           </div>
           <div>
-            <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+            <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
               {t("finance.budget.description")}
             </label>
             <textarea
@@ -84,15 +84,15 @@ const AddDepartmentModal = ({ isOpen, onClose, onSuccess }) => {
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows="3"
-              className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
               style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
             />
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 rounded-xl font-bold transition-all hover:scale-105"
+              className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition-all hover:scale-105"
               style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
             >
               {t("finance.budget.cancel")}
@@ -100,7 +100,7 @@ const AddDepartmentModal = ({ isOpen, onClose, onSuccess }) => {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-6 py-3 rounded-xl font-bold transition-all hover:scale-105 disabled:opacity-50"
+              className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition-all hover:scale-105 disabled:opacity-50"
               style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
             >
               {loading ? t("finance.budget.creating") : t("finance.budget.create_department")}
@@ -241,7 +241,7 @@ const AddBudget = () => {
       <div className="max-w-4xl mx-auto">
         <motion.div className="mb-8" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-pink-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Plus size={28} color="white" />
             </div>
             <div>
@@ -257,7 +257,7 @@ const AddBudget = () => {
 
         <motion.div
           className="rounded-2xl shadow-lg p-6 lg:p-8 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
           variants={cardVariant}
           initial="hidden"
           animate="visible"
@@ -267,7 +267,7 @@ const AddBudget = () => {
             {/* Department Selection */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-bold" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold" style={{ color: 'var(--text-color)' }}>
                   <Building className="inline mr-2" size={18} />
                   {t("finance.budget.department_project_name")}
                 </label>
@@ -283,7 +283,7 @@ const AddBudget = () => {
               <select
                 value={formData.departmentId}
                 onChange={handleDepartmentSelect}
-                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 required
               >
@@ -299,7 +299,7 @@ const AddBudget = () => {
             {/* Amount & Currency */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <DollarSign className="inline mr-2" size={18} />
                   {t("finance.budget.budget_amount")}
                 </label>
@@ -309,19 +309,19 @@ const AddBudget = () => {
                   value={formData.amount}
                   onChange={handleChange}
                   required
-                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   {t("finance.budget.currency")}
                 </label>
                 <select
                   name="currency"
                   value={formData.currency}
                   onChange={handleChange}
-                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 >
                   {currency.map((c) => (
@@ -336,7 +336,7 @@ const AddBudget = () => {
             {/* Dates */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <Calendar className="inline mr-2" size={18} />
                   {t("finance.budget.start_date")}
                 </label>
@@ -346,12 +346,12 @@ const AddBudget = () => {
                   value={formData.startDate}
                   onChange={handleChange}
                   required
-                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                   <Calendar className="inline mr-2" size={18} />
                   {t("finance.budget.end_date")}
                 </label>
@@ -361,7 +361,7 @@ const AddBudget = () => {
                   value={formData.endDate}
                   onChange={handleChange}
                   required
-                  className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full h-11 px-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 />
               </div>
@@ -369,7 +369,7 @@ const AddBudget = () => {
 
             {/* Notes */}
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                 <FileText className="inline mr-2" size={18} />
                 {t("finance.budget.notes")}
               </label>
@@ -378,7 +378,7 @@ const AddBudget = () => {
                 value={formData.notes}
                 onChange={handleChange}
                 rows="4"
-                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 placeholder={t("finance.budget.notes_placeholder")}
               />
@@ -387,7 +387,7 @@ const AddBudget = () => {
             {/* Signers */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-bold" style={{ color: 'var(--text-color)' }}>
+                <label className="block text-sm font-semibold" style={{ color: 'var(--text-color)' }}>
                   <Users className="inline mr-2" size={18} />
                   {t("finance.budget.select_signers")}
                 </label>
@@ -404,7 +404,7 @@ const AddBudget = () => {
               {selectedSignatureList && (
                 <motion.div
                   className="p-4 rounded-xl border"
-                  style={{ backgroundColor: 'var(--border-color)', borderColor: 'var(--border-color)' }}
+                  style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                 >
@@ -426,14 +426,16 @@ const AddBudget = () => {
             </div>
 
             {/* Submit */}
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
             <button
               type="submit"
-              className="w-full py-4 px-6 rounded-xl font-bold text-lg shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-3"
+              className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-2"
               style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
             >
-              <Save size={24} />
+              <Save size={20} />
               {t("finance.budget.create_budget")}
             </button>
+            </div>
           </form>
         </motion.div>
 

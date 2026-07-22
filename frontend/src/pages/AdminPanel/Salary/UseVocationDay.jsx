@@ -84,7 +84,7 @@ const UseVacationDay = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-indigo-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <CalendarCheck size={28} color="white" />
             </div>
             <div>
@@ -100,13 +100,13 @@ const UseVacationDay = () => {
 
         <motion.div
           className="rounded-2xl shadow-lg p-6 lg:p-8 border mb-8"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
           <div className="flex items-center gap-4 p-6 rounded-xl mb-6" style={{ backgroundColor: 'var(--border-color)' }}>
-            <div className="w-16 h-16 rounded-xl flex items-center justify-center bg-gradient-to-br from-green-500 to-emerald-600">
+            <div className="w-16 h-16 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Award size={32} color="white" />
             </div>
             <div>

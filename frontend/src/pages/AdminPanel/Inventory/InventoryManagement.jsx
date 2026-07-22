@@ -209,7 +209,7 @@ const InventoryManagement = () => {
       case "ok":
         return "text-green-600 bg-green-50";
       default:
-        return "text-gray-600 bg-gray-50";
+        return "text-[var(--color-secondary)] bg-[var(--bg-secondary)]";
     }
   };
 
@@ -237,7 +237,7 @@ const InventoryManagement = () => {
           transition={{ duration: 0.6 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-indigo-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Package size={28} color="white" />
             </div>
             <div className="flex-1">
@@ -278,7 +278,7 @@ const InventoryManagement = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border-blue-500 transform hover:-translate-y-1"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: 'var(--surface-color)' }}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -300,7 +300,7 @@ const InventoryManagement = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border-green-500 transform hover:-translate-y-1"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: 'var(--surface-color)' }}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -322,7 +322,7 @@ const InventoryManagement = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border-orange-500 transform hover:-translate-y-1"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: 'var(--surface-color)' }}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -344,7 +344,7 @@ const InventoryManagement = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
               className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border-red-500 transform hover:-translate-y-1"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: 'var(--surface-color)' }}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -367,7 +367,7 @@ const InventoryManagement = () => {
         {alertsData && (alertsData.lowStock?.length > 0 || alertsData.expiring?.length > 0) && (
           <div className="grid gap-4 md:grid-cols-2 mb-6">
             {alertsData.lowStock?.length > 0 && (
-              <div className="rounded-2xl border-l-4 border-orange-500 shadow-lg p-6" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+              <div className="rounded-2xl border-l-4 border-orange-500 shadow-lg p-6" style={{ backgroundColor: 'var(--surface-color)' }}>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="bg-orange-100 p-2 rounded-lg">
                     <AlertTriangle className="size-5 text-orange-600" />
@@ -379,7 +379,7 @@ const InventoryManagement = () => {
                 </div>
                 <div className="space-y-3 max-h-48 overflow-y-auto">
                   {alertsData.lowStock.slice(0, 5).map((alert) => (
-                    <div key={alert.inventoryId} className="bg-orange-50 p-3 rounded-lg border border-orange-200">
+                    <div key={alert.inventoryId} className="bg-orange-50 p-3 rounded-lg border border-[var(--border-color)]">
                       <p className="text-sm" style={{ color: 'var(--text-color)' }}>
                         <span className="font-semibold">{alert.productName}</span>
                         <span className="ml-2" style={{ color: 'var(--text-secondary)' }}>
@@ -394,7 +394,7 @@ const InventoryManagement = () => {
             )}
 
             {alertsData.expiring?.length > 0 && (
-              <div className="rounded-2xl border-l-4 border-yellow-500 shadow-lg p-6" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+              <div className="rounded-2xl border-l-4 border-yellow-500 shadow-lg p-6" style={{ backgroundColor: 'var(--surface-color)' }}>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="bg-yellow-100 p-2 rounded-lg">
                     <Clock className="size-5 text-yellow-600" />
@@ -423,7 +423,7 @@ const InventoryManagement = () => {
         )}
 
         {/* Filters and Search */}
-        <div className="rounded-2xl p-6 shadow-lg mb-6" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+        <div className="rounded-2xl p-6 shadow-lg border mb-6" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="relative col-span-2 md:col-span-1">
               <Search className="absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" size={18} style={{ color: 'var(--text-secondary)' }} />
@@ -432,16 +432,16 @@ const InventoryManagement = () => {
                 placeholder={t("inventory.search_placeholder", { defaultValue: "Search products..." })}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full h-11 ps-10 pe-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
-                style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+                className="w-full h-11 ps-10 pe-4 border rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] transition-all duration-200 shadow-sm"
+                style={{ borderColor: 'var(--border-color)', backgroundColor: "var(--surface-color)", color: 'var(--text-color)' }}
               />
             </div>
 
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="w-full h-11 px-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
-              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+              className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] transition-all duration-200 shadow-sm"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: "var(--surface-color)", color: 'var(--text-color)' }}
             >
               <option value="all">
                 {t("inventory.all_categories", { defaultValue: "All Categories" })}
@@ -456,8 +456,8 @@ const InventoryManagement = () => {
             <select
               value={filterStockStatus}
               onChange={(e) => setFilterStockStatus(e.target.value)}
-              className="w-full h-11 px-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
-              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+              className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] transition-all duration-200 shadow-sm"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: "var(--surface-color)", color: 'var(--text-color)' }}
             >
               <option value="all">
                 {t("inventory.all_status", { defaultValue: "All Status" })}
@@ -476,8 +476,8 @@ const InventoryManagement = () => {
             <select
               value={filterWarehouse}
               onChange={(e) => setFilterWarehouse(e.target.value)}
-              className="w-full h-11 px-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
-              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+              className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] transition-all duration-200 shadow-sm"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: "var(--surface-color)", color: 'var(--text-color)' }}
             >
               <option value="all">
                 {t("inventory.all_warehouses", { defaultValue: "All Warehouses" })}
@@ -492,8 +492,8 @@ const InventoryManagement = () => {
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
-              className="w-full h-11 px-4 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
-              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
+              className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] transition-all duration-200 shadow-sm"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: "var(--surface-color)", color: 'var(--text-color)' }}
             >
               <option value="">{t("inventory.sort_by", { defaultValue: "Sort By" })}</option>
               <option value="productName_asc">
@@ -513,10 +513,10 @@ const InventoryManagement = () => {
         </div>
 
         {/* Products Table */}
-        <div className="rounded-2xl shadow-lg overflow-hidden" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+        <div className="rounded-2xl shadow-lg border overflow-hidden" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           {loading ? (
             <div className="p-12 text-center">
-              <RefreshCw className="size-8 animate-spin mx-auto mb-4 text-blue-600" />
+              <RefreshCw className="size-8 animate-spin mx-auto mb-4" style={{ color: 'var(--color-primary)' }} />
               <p style={{ color: 'var(--text-secondary)' }}>
                 {t("inventory.loading", { defaultValue: "Loading inventory..." })}
               </p>
@@ -531,7 +531,7 @@ const InventoryManagement = () => {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className={isRTL ? 'bg-gradient-to-l from-gray-50 to-gray-100' : 'bg-gradient-to-r from-gray-50 to-gray-100'}>
+                <thead style={{ backgroundColor: 'var(--bg-secondary)' }}>
                   <tr>
                     <th className={`px-6 py-4 text-sm font-semibold ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: 'var(--text-color)' }}>
                       {t("inventory.product", { defaultValue: "Product" })}
@@ -559,7 +559,7 @@ const InventoryManagement = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y" style={{ borderColor: 'var(--border-color)' }}>
                   {filteredProducts.map((item) => {
                     const status = getStockStatus(item);
                     const inventory = item.inventory || {};
@@ -568,7 +568,7 @@ const InventoryManagement = () => {
                     return (
                       <React.Fragment key={item._id}>
                         <tr
-                          className="hover:bg-gray-50 dark:hover:bg-gray-700 transition cursor-pointer"
+                          className="hover:bg-[var(--bg-secondary)] transition cursor-pointer"
                           style={{ borderColor: 'var(--border-color)' }}
                           onClick={() => toggleRow(item._id)}
                         >
@@ -623,7 +623,8 @@ const InventoryManagement = () => {
                                   e.stopPropagation();
                                   handleEdit(item);
                                 }}
-                                className="p-2 rounded-lg hover:bg-blue-50 text-blue-600 transition"
+                                className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
+                                style={{ color: 'var(--color-primary)' }}
                                 title={t("common.edit", { defaultValue: "Edit" })}
                               >
                                 <Edit className="size-4" />
@@ -632,8 +633,8 @@ const InventoryManagement = () => {
                           </td>
                         </tr>
                         {isExpanded && (
-                          <tr>
-                            <td colSpan={8} className="px-6 py-4" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+                          <tr style={{ borderColor: 'var(--border-color)' }}>
+                            <td colSpan={8} className="px-6 py-4" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 text-sm">
                                 <div>
                                   <p className="mb-1" style={{ color: 'var(--text-secondary)' }}>
@@ -730,9 +731,9 @@ const EditInventoryModal = ({ item, onClose, onSave }) => {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 animate-slide-in relative"
-        style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+        style={{ backgroundColor: 'var(--surface-color)' }}
       >
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b" style={{ borderColor: 'var(--border-color)' }}>
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text-color)' }}>
               {t("inventory.edit_inventory", { defaultValue: "Edit Inventory" })}
@@ -763,7 +764,7 @@ const EditInventoryModal = ({ item, onClose, onSave }) => {
                 onChange={(e) =>
                   setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })
                 }
-                className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] transition-all duration-200"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 required
               />
@@ -780,7 +781,7 @@ const EditInventoryModal = ({ item, onClose, onSave }) => {
                 onChange={(e) =>
                   setFormData({ ...formData, minStockLevel: parseInt(e.target.value) || 0 })
                 }
-                className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] transition-all duration-200"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 required
               />
@@ -797,7 +798,7 @@ const EditInventoryModal = ({ item, onClose, onSave }) => {
                 onChange={(e) =>
                   setFormData({ ...formData, reorderQuantity: parseInt(e.target.value) || 0 })
                 }
-                className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] transition-all duration-200"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 required
               />
@@ -811,7 +812,7 @@ const EditInventoryModal = ({ item, onClose, onSave }) => {
                 type="text"
                 value={formData.shelfLocation}
                 onChange={(e) => setFormData({ ...formData, shelfLocation: e.target.value })}
-                className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] transition-all duration-200"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 placeholder={t("inventory.location_placeholder", { defaultValue: "e.g., A-12-B" })}
               />
@@ -825,7 +826,7 @@ const EditInventoryModal = ({ item, onClose, onSave }) => {
                 type="text"
                 value={formData.batchNumber}
                 onChange={(e) => setFormData({ ...formData, batchNumber: e.target.value })}
-                className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] transition-all duration-200"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
@@ -838,7 +839,7 @@ const EditInventoryModal = ({ item, onClose, onSave }) => {
                 type="date"
                 value={formData.expirationDate}
                 onChange={(e) => setFormData({ ...formData, expirationDate: e.target.value })}
-                className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] transition-all duration-200"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
@@ -851,23 +852,25 @@ const EditInventoryModal = ({ item, onClose, onSave }) => {
                 type="date"
                 value={formData.lastOrderDate}
                 onChange={(e) => setFormData({ ...formData, lastOrderDate: e.target.value })}
-                className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] transition-all duration-200"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-500 text-white rounded-full shadow-md hover:bg-gray-600 transition-all duration-200 transform hover:scale-105"
+              className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium shadow-md hover:opacity-90 transition-all duration-200"
+              style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
             >
               {t("common.cancel", { defaultValue: "Cancel" })}
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-button-bg text-button-text rounded-full shadow-md hover:bg-secondary transition-all duration-200 transform hover:scale-105"
+              className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium shadow-md hover:opacity-90 transition-all duration-200"
+              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
             >
               {t("common.save", { defaultValue: "Save" })}
             </button>

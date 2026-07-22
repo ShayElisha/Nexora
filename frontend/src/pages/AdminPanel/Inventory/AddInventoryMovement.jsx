@@ -126,7 +126,7 @@ const AddInventoryMovement = () => {
   };
 
   return (
-    <div className="p-6" style={{ backgroundColor: "var(--bg-color)", minHeight: "100vh" }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }}>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6" style={{ color: "var(--text-color)" }}>
           {isEdit
@@ -134,7 +134,7 @@ const AddInventoryMovement = () => {
             : t("inventory.add_movement") || "Add Inventory Movement"}
         </h1>
 
-        <form onSubmit={handleSubmit} className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+        <form onSubmit={handleSubmit} className="rounded-2xl shadow-lg border overflow-hidden" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           <div className="p-6 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -143,7 +143,7 @@ const AddInventoryMovement = () => {
                   required
                   value={formData.movementType}
                   onChange={(e) => setFormData({ ...formData, movementType: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 >
                 <option value="Internal">Internal</option>
@@ -161,7 +161,7 @@ const AddInventoryMovement = () => {
                   required
                   value={formData.movementDate}
                   onChange={(e) => setFormData({ ...formData, movementDate: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 />
               </div>
@@ -173,7 +173,7 @@ const AddInventoryMovement = () => {
                       required
                       value={formData.fromWarehouseId}
                       onChange={(e) => setFormData({ ...formData, fromWarehouseId: e.target.value })}
-                      className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                       style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                     >
                       <option value="">Select Warehouse</option>
@@ -190,7 +190,7 @@ const AddInventoryMovement = () => {
                       required
                       value={formData.toWarehouseId}
                       onChange={(e) => setFormData({ ...formData, toWarehouseId: e.target.value })}
-                      className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                       style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                     >
                       <option value="">Select Warehouse</option>
@@ -211,7 +211,7 @@ const AddInventoryMovement = () => {
                   type="text"
                   value={formData.reference}
                   onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 />
               </div>
@@ -267,7 +267,7 @@ const AddInventoryMovement = () => {
                   <button
                     type="button"
                     onClick={() => removeItem(index)}
-                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                    className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                   >
                     <Trash2 size={18} className="text-red-500" />
                   </button>
@@ -280,7 +280,7 @@ const AddInventoryMovement = () => {
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full px-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 rows={3}
               />
@@ -290,8 +290,8 @@ const AddInventoryMovement = () => {
               <button
                 type="submit"
                 disabled={mutation.isLoading}
-                className="flex items-center gap-2 px-6 py-2 rounded-lg text-white hover:opacity-90 disabled:opacity-50 transition"
-                style={{ backgroundColor: 'var(--color-primary)' }}
+                className="flex items-center gap-2 px-6 h-11 rounded-lg font-medium hover:opacity-90 disabled:opacity-50 transition"
+                style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
               >
                 <Save size={20} />
                 {mutation.isLoading ? "Saving..." : t("inventory.save") || "Save"}
@@ -299,7 +299,8 @@ const AddInventoryMovement = () => {
               <button
                 type="button"
                 onClick={() => navigate("/dashboard/inventory/movements")}
-                className="flex items-center gap-2 px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
+                className="flex items-center gap-2 px-6 h-11 rounded-lg font-medium border hover:bg-[var(--bg-secondary)] transition"
+                style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)', backgroundColor: 'var(--surface-color)' }}
               >
                 <X size={20} />
                 {t("inventory.cancel") || "Cancel"}

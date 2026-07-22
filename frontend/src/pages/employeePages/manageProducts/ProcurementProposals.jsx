@@ -226,7 +226,7 @@ const ProcurementProposals = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-pink-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <FileText size={28} color="white" />
             </div>
             <div>
@@ -244,7 +244,7 @@ const ProcurementProposals = () => {
           {/* Create New Proposal Form */}
           <motion.div
             className="lg:col-span-2 rounded-2xl shadow-lg border p-6 lg:p-8"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
           >
@@ -512,7 +512,7 @@ const ProcurementProposals = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
           >
-            <div className="rounded-2xl shadow-lg border p-6 sticky top-6" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+            <div className="rounded-2xl shadow-lg border p-6 sticky top-6" style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}>
               <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-color)' }}>
                 {t("procurement.existing_proposals")}
               </h2>
@@ -530,7 +530,7 @@ const ProcurementProposals = () => {
                     <motion.div
                       key={proposal._id}
                       className="p-4 border rounded-xl hover:shadow-md transition-all"
-                      style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                      style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
@@ -543,7 +543,7 @@ const ProcurementProposals = () => {
                           proposal.status === "approved" ? 'bg-green-100 text-green-700' :
                           proposal.status === "pending" ? 'bg-yellow-100 text-yellow-700' :
                           proposal.status === "rejected" ? 'bg-red-100 text-red-700' :
-                          'bg-gray-100 text-gray-700'
+                          'bg-[var(--bg-secondary)] text-[var(--text-color)]'
                         }`}>
                           {proposal.status === "approved" ? <CheckCircle size={12} className="inline mr-1" /> :
                            proposal.status === "pending" ? <Clock size={12} className="inline mr-1" /> :

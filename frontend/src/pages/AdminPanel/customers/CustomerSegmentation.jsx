@@ -108,26 +108,37 @@ const CustomerSegmentation = () => {
     : null;
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--bg-color)' }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-7xl mx-auto"
       >
         {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
-              {t("crm.customer_segmentation") || "Customer Segmentation"}
-            </h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
-              {t("crm.segmentation_description") || "Divide customers into categories for targeted campaigns"}
-            </p>
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{
+                background:
+                  "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
+              }}
+            >
+              <Users size={28} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
+                {t("crm.customer_segmentation") || "Customer Segmentation"}
+              </h1>
+              <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
+                {t("crm.segmentation_description") || "Divide customers into categories for targeted campaigns"}
+              </p>
+            </div>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-white hover:opacity-90 transition"
-            style={{ backgroundColor: 'var(--color-primary)' }}
+            className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium flex items-center justify-center gap-2 hover:opacity-90 transition"
+            style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
           >
             <Plus size={20} />
             {t("crm.create_segment") || "Create Segment"}
@@ -140,7 +151,8 @@ const CustomerSegmentation = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             >
               <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-color)' }}>
                 {t("crm.segment_distribution") || "Segment Distribution"}
@@ -151,7 +163,8 @@ const CustomerSegmentation = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             >
               <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-color)' }}>
                 {t("crm.segment_value") || "Segment Value"}
@@ -175,15 +188,18 @@ const CustomerSegmentation = () => {
         )}
 
         {/* Search */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
+        <div
+          className="rounded-2xl p-4 shadow-lg border mb-6"
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
+        >
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={20} style={{ color: 'var(--text-secondary)' }} />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2" size={20} style={{ color: 'var(--text-secondary)' }} />
             <input
               type="text"
               placeholder={t("crm.search_segments") || "Search segments..."}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-lg border"
+              className="w-full h-11 ps-10 pe-4 rounded-xl border"
               style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
             />
           </div>
@@ -196,7 +212,8 @@ const CustomerSegmentation = () => {
               key={segment._id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition"
+              className="rounded-2xl p-6 shadow-lg border hover:shadow-xl transition"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
@@ -219,7 +236,7 @@ const CustomerSegmentation = () => {
                       setSelectedSegment(segment);
                       setShowCreateModal(true);
                     }}
-                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="p-2 rounded-lg hover:bg-[var(--bg-secondary)]"
                   >
                     <Edit size={18} style={{ color: 'var(--color-primary)' }} />
                   </button>
@@ -230,7 +247,7 @@ const CustomerSegmentation = () => {
                         deleteMutation.mutate(segment._id);
                       }
                     }}
-                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="p-2 rounded-lg hover:bg-[var(--bg-secondary)]"
                   >
                     <Trash2 size={18} className="text-red-500" />
                   </button>
@@ -254,7 +271,7 @@ const CustomerSegmentation = () => {
                     className={`px-2 py-1 rounded text-xs ${
                       segment.isActive
                         ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
+                        : "bg-[var(--bg-secondary)] text-[var(--text-color)]"
                     }`}
                   >
                     {segment.isActive ? t("crm.active") || "Active" : t("crm.inactive") || "Inactive"}
@@ -266,9 +283,9 @@ const CustomerSegmentation = () => {
         </div>
 
         {filteredSegments.length === 0 && (
-          <div className="text-center py-12">
-            <Users size={64} className="mx-auto mb-4" style={{ color: 'var(--text-secondary)' }} />
-            <p style={{ color: 'var(--text-secondary)' }}>
+          <div className="text-center py-16">
+            <Users size={64} className="mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
+            <p style={{ color: 'var(--color-secondary)' }}>
               {t("crm.no_segments") || "No segments found. Create your first segment!"}
             </p>
           </div>
@@ -276,11 +293,12 @@ const CustomerSegmentation = () => {
 
         {/* Create/Edit Modal */}
         {showCreateModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+              className="rounded-2xl shadow-2xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+              style={{ backgroundColor: 'var(--surface-color)' }}
             >
               <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-color)' }}>
                 {selectedSegment
@@ -288,14 +306,14 @@ const CustomerSegmentation = () => {
                   : t("crm.create_segment") || "Create Segment"}
               </h2>
               {/* Form would go here - simplified for brevity */}
-              <div className="flex gap-4 mt-6">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-6">
                 <button
                   onClick={() => {
                     setShowCreateModal(false);
                     setSelectedSegment(null);
                   }}
-                  className="flex-1 px-4 py-2 rounded-lg border"
-                  style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
+                  className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium"
+                  style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
                 >
                   {t("crm.cancel") || "Cancel"}
                 </button>
@@ -306,8 +324,8 @@ const CustomerSegmentation = () => {
                     setSelectedSegment(null);
                     toast.success(t("crm.segment_saved") || "Segment saved");
                   }}
-                  className="flex-1 px-4 py-2 rounded-lg text-white"
-                  style={{ backgroundColor: 'var(--color-primary)' }}
+                  className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium"
+                  style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
                 >
                   {t("crm.save") || "Save"}
                 </button>

@@ -21,7 +21,7 @@ const Contact = () => {
           <div
             className="p-7 md:p-8 rounded-2xl border shadow-sm"
             style={{
-              backgroundColor: "var(--bg-color)",
+              backgroundColor: "var(--surface-color)",
               borderColor: "var(--border-color)",
             }}
           >

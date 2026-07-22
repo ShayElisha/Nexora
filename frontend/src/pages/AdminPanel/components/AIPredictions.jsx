@@ -81,7 +81,7 @@ const AIPredictions = () => {
             <h3 className="text-xl font-bold">
               תחזיות AI
             </h3>
-            <p className="text-xs text-gray-600 mt-0.5">
+            <p className="text-xs text-secondary mt-0.5">
               תחזיות מבוססות נתונים לחודש הבא
             </p>
           </div>
@@ -107,7 +107,7 @@ const AIPredictions = () => {
             ? "border-[var(--border-color)]"
             : trend.direction === "declining"
             ? "border-[var(--border-color)]"
-            : "bg-gray-50 border-[var(--border-color)]"
+            : "bg-[var(--bg-secondary)] border-[var(--border-color)]"
         }`}
       >
         <div className="flex items-center justify-between">
@@ -117,7 +117,7 @@ const AIPredictions = () => {
                 ? "bg-accent"
                 : trend.direction === "declining"
                 ? "bg-primary"
-                : "bg-gray-500"
+                : "bg-secondary"
             }`}>
               {trend.direction === "growing" ? (
                 <FaArrowUp className="w-5 h-5 text-button-text" />
@@ -143,7 +143,7 @@ const AIPredictions = () => {
                   ? "מגמה יורדת"
                   : "מגמה יציבה"}
               </h4>
-              <p className="text-sm text-gray-600">{trend.message}</p>
+              <p className="text-sm text-secondary">{trend.message}</p>
             </div>
           </div>
           <div
@@ -152,7 +152,7 @@ const AIPredictions = () => {
                 ? "text-accent"
                 : trend.direction === "declining"
                 ? "text-primary"
-                : "text-gray-600"
+                : "text-secondary"
             }`}
           >
             {trend.percentage > 0 ? "+" : ""}

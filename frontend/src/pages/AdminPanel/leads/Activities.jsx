@@ -226,7 +226,7 @@ const Activities = () => {
 
   const getActivityColor = (type) => {
     const activityType = activityTypes.find((t) => t.id === type);
-    return activityType?.color || "bg-gray-500";
+    return activityType?.color || "bg-[var(--color-secondary)]";
   };
 
   if (isLoading) {
@@ -282,7 +282,7 @@ const Activities = () => {
         >
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-purple-500 to-pink-600">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
                 <Activity size={28} color="white" />
               </div>
               <div>
@@ -296,7 +296,7 @@ const Activities = () => {
             </div>
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 transition-all shadow-lg"
+              className="flex items-center gap-2 px-6 h-11 rounded-xl font-semibold transition-all shadow-lg" style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}
             >
               <Plus size={20} />
               {t("activities.add_activity") || "Add Activity"}
@@ -527,7 +527,7 @@ const Activities = () => {
                 </p>
                 <button
                   onClick={() => setShowAddModal(true)}
-                  className="px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 transition-all shadow-lg"
+                  className="px-6 h-11 rounded-xl font-semibold transition-all shadow-lg" style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}
                 >
                   <Plus size={20} className="inline mr-2" />
                   {t("activities.add_activity") || "Add Activity"}
@@ -693,7 +693,7 @@ const Activities = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div
             className="bg-bg rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-            style={{ backgroundColor: "var(--bg-color)" }}
+            style={{ backgroundColor: "var(--surface-color)" }}
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
@@ -929,7 +929,7 @@ const Activities = () => {
                   <button
                     type="submit"
                     disabled={createMutation.isLoading}
-                    className="flex-1 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 transition-all disabled:opacity-50"
+                    className="w-full sm:w-auto px-6 h-11 rounded-xl font-semibold transition-all disabled:opacity-50" style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}
                   >
                     {createMutation.isLoading ? (
                       <span className="flex items-center justify-center gap-2">
@@ -952,7 +952,7 @@ const Activities = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div
             className="bg-bg rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-            style={{ backgroundColor: "var(--bg-color)" }}
+            style={{ backgroundColor: "var(--surface-color)" }}
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">

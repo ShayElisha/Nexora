@@ -116,27 +116,38 @@ const CustomerRetention = () => {
     : null;
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--bg-color)' }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         className="max-w-7xl mx-auto"
       >
         {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
-              {t("crm.customer_retention") || "Customer Retention"}
-            </h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
-              {t("crm.retention_description") || "Identify at-risk customers and take retention actions"}
-            </p>
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{
+                background:
+                  "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
+              }}
+            >
+              <TrendingDown size={28} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
+                {t("crm.customer_retention") || "Customer Retention"}
+              </h1>
+              <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
+                {t("crm.retention_description") || "Identify at-risk customers and take retention actions"}
+              </p>
+            </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <button
               onClick={() => calculateMutation.mutate()}
               disabled={calculateMutation.isLoading}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+              className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-[var(--bg-secondary)] border transition"
               style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
             >
               <RefreshCw size={20} className={calculateMutation.isLoading ? "animate-spin" : ""} />
@@ -144,8 +155,8 @@ const CustomerRetention = () => {
             </button>
             <button
               onClick={() => setShowActionModal(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-white hover:opacity-90 transition"
-              style={{ backgroundColor: 'var(--color-primary)' }}
+              className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium flex items-center justify-center gap-2 hover:opacity-90 transition"
+              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
             >
               <Plus size={20} />
               {t("crm.add_action") || "Add Action"}
@@ -159,7 +170,8 @@ const CustomerRetention = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4"
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -178,7 +190,8 @@ const CustomerRetention = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4"
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -197,7 +210,8 @@ const CustomerRetention = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4"
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -216,7 +230,8 @@ const CustomerRetention = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4"
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -238,7 +253,8 @@ const CustomerRetention = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6"
+            className="rounded-2xl p-6 shadow-lg border mb-6"
+            style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
           >
             <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-color)' }}>
               {t("crm.risk_distribution") || "Risk Distribution"}
@@ -248,23 +264,26 @@ const CustomerRetention = () => {
         )}
 
         {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
+        <div
+          className="rounded-2xl p-4 shadow-lg border mb-6"
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
+        >
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={20} style={{ color: 'var(--text-secondary)' }} />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2" size={20} style={{ color: 'var(--text-secondary)' }} />
               <input
                 type="text"
                 placeholder={t("crm.search_customers") || "Search customers..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border"
+                className="w-full h-11 ps-10 pe-4 rounded-xl border"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
             <select
               value={filterRisk}
               onChange={(e) => setFilterRisk(e.target.value)}
-              className="px-4 py-2 rounded-lg border"
+              className="h-11 px-4 rounded-xl border"
               style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
             >
               <option value="All">{t("crm.all_risks") || "All Risks"}</option>
@@ -283,7 +302,8 @@ const CustomerRetention = () => {
               key={item._id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
+              className="rounded-2xl p-6 shadow-lg border"
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex-1">
@@ -334,9 +354,9 @@ const CustomerRetention = () => {
                           className={`px-2 py-0.5 rounded text-xs ${
                             factor.severity === "High"
                               ? "bg-red-100 text-red-800"
-                              : factor.severity === "Medium"
+                              :                             factor.severity === "Medium"
                               ? "bg-yellow-100 text-yellow-800"
-                              : "bg-gray-100 text-gray-800"
+                              : "bg-[var(--bg-secondary)] text-[var(--text-color)]"
                           }`}
                         >
                           {factor.severity}
@@ -363,7 +383,7 @@ const CustomerRetention = () => {
                     setShowActionModal(true);
                   }}
                   className="px-3 py-1 rounded-lg text-sm hover:opacity-90 transition"
-                  style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}
+                  style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
                 >
                   {t("crm.take_action") || "Take Action"}
                 </button>
@@ -373,9 +393,9 @@ const CustomerRetention = () => {
         </div>
 
         {filteredData.length === 0 && (
-          <div className="text-center py-12">
-            <Users size={64} className="mx-auto mb-4" style={{ color: 'var(--text-secondary)' }} />
-            <p style={{ color: 'var(--text-secondary)' }}>
+          <div className="text-center py-16">
+            <Users size={64} className="mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
+            <p style={{ color: 'var(--color-secondary)' }}>
               {t("crm.no_retention_data") || "No retention data found. Calculate risk to get started!"}
             </p>
           </div>
@@ -383,24 +403,25 @@ const CustomerRetention = () => {
 
         {/* Action Modal */}
         {showActionModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4"
+              className="rounded-2xl shadow-2xl p-6 max-w-2xl w-full mx-4"
+              style={{ backgroundColor: 'var(--surface-color)' }}
             >
               <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-color)' }}>
                 {t("crm.add_retention_action") || "Add Retention Action"}
               </h2>
               {/* Form would go here */}
-              <div className="flex gap-4 mt-6">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-6">
                 <button
                   onClick={() => {
                     setShowActionModal(false);
                     setSelectedCustomer(null);
                   }}
-                  className="flex-1 px-4 py-2 rounded-lg border"
-                  style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
+                  className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium"
+                  style={{ backgroundColor: 'var(--border-color)', color: 'var(--text-color)' }}
                 >
                   {t("crm.cancel") || "Cancel"}
                 </button>
@@ -410,8 +431,8 @@ const CustomerRetention = () => {
                     setSelectedCustomer(null);
                     toast.success(t("crm.action_added") || "Action added");
                   }}
-                  className="flex-1 px-4 py-2 rounded-lg text-white"
-                  style={{ backgroundColor: 'var(--color-primary)' }}
+                  className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium"
+                  style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
                 >
                   {t("crm.save") || "Save"}
                 </button>

@@ -303,9 +303,9 @@ const ShiftsList = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-4">
-            <div 
+            <div
               className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
-              style={{ backgroundColor: 'var(--color-primary)' }}
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
             >
               <Briefcase size={28} style={{ color: 'var(--button-text)' }} />
             </div>
@@ -336,7 +336,7 @@ const ShiftsList = () => {
               transition={{ delay: index * 0.1 }}
               className="rounded-2xl shadow-lg p-6 border"
               style={{ 
-                backgroundColor: 'var(--bg-color)',
+                backgroundColor: "var(--surface-color)",
                 borderColor: 'var(--border-color)'
               }}
             >
@@ -362,7 +362,7 @@ const ShiftsList = () => {
         <motion.div
           className="mb-8 rounded-2xl shadow-lg p-6 border"
           style={{ 
-            backgroundColor: 'var(--bg-color)',
+            backgroundColor: "var(--surface-color)",
             borderColor: 'var(--border-color)'
           }}
           initial={{ opacity: 0, y: 20 }}
@@ -437,7 +437,7 @@ const ShiftsList = () => {
       ) : shifts.length === 0 ? (
           <motion.div
             className="text-center py-16 rounded-2xl shadow-lg"
-            style={{ backgroundColor: 'var(--bg-color)' }}
+            style={{ backgroundColor: "var(--surface-color)" }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
@@ -457,7 +457,7 @@ const ShiftsList = () => {
                 transition={{ delay: index * 0.05 }}
                 className="rounded-2xl shadow-lg overflow-hidden border"
                 style={{ 
-                  backgroundColor: 'var(--bg-color)',
+                  backgroundColor: "var(--surface-color)",
                   borderColor: 'var(--border-color)'
                 }}
               >

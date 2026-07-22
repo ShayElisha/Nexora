@@ -23,7 +23,7 @@ import {
 const getStatusColor = (status) => {
   switch (status) {
     case "Draft":
-      return "bg-gray-100 text-gray-700 border-gray-300";
+      return "bg-[var(--bg-secondary)] text-[var(--text-color)] border-[var(--border-color)]";
     case "Sent":
       return "bg-blue-100 text-blue-700 border-blue-300";
     case "Paid":
@@ -31,9 +31,9 @@ const getStatusColor = (status) => {
     case "Overdue":
       return "bg-red-100 text-red-700 border-red-300";
     case "Cancelled":
-      return "bg-gray-100 text-gray-700 border-gray-300";
+      return "bg-[var(--bg-secondary)] text-[var(--text-color)] border-[var(--border-color)]";
     default:
-      return "bg-gray-100 text-gray-700 border-gray-300";
+      return "bg-[var(--bg-secondary)] text-[var(--text-color)] border-[var(--border-color)]";
   }
 };
 
@@ -131,7 +131,7 @@ const InvoiceDetails = () => {
 
   return (
     <div
-      className="min-h-screen p-6"
+      className="min-h-screen p-4 sm:p-6 lg:p-8"
       style={{ backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
     >
       <div className="max-w-5xl mx-auto">
@@ -144,15 +144,26 @@ const InvoiceDetails = () => {
               onClick={() => navigate("/dashboard/invoices")}
               className="p-2 rounded-lg border"
               style={{
-                backgroundColor: "var(--bg-color)",
+                backgroundColor: "var(--surface-color)",
                 borderColor: "var(--border-color)",
               }}
             >
               <ArrowLeft size={20} />
             </motion.button>
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{
+                background:
+                  "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
+              }}
+            >
+              <FileText size={28} className="text-white" />
+            </div>
             <div>
-              <h1 className="text-3xl font-bold flex items-center gap-3">
-                <FileText size={32} style={{ color: "var(--color-primary)" }} />
+              <h1
+                className="text-4xl font-bold"
+                style={{ color: "var(--text-color)" }}
+              >
                 {invoice.invoiceNumber}
               </h1>
               <div className="flex items-center gap-3 mt-2">
@@ -164,7 +175,10 @@ const InvoiceDetails = () => {
                   {t(`invoices.status.${invoice.status.toLowerCase()}`)}
                 </span>
                 {invoice.paymentStatus && (
-                  <span className="text-sm text-gray-500">
+                  <span
+                    className="text-sm"
+                    style={{ color: "var(--color-secondary)" }}
+                  >
                     {t("invoices.paymentStatusLabel", { defaultValue: "סטטוס תשלום" })}:{" "}
                     {t(`invoices.paymentStatus.${invoice.paymentStatus.toLowerCase().replace(' ', '')}`)}
                   </span>
@@ -178,9 +192,9 @@ const InvoiceDetails = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate(`/dashboard/invoices/${id}/edit`)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border font-semibold"
+                className="flex items-center gap-2 px-4 h-11 rounded-lg border font-medium"
                 style={{
-                  backgroundColor: "var(--bg-color)",
+                  backgroundColor: "var(--surface-color)",
                   borderColor: "var(--border-color)",
                   color: "var(--text-color)",
                 }}
@@ -195,8 +209,11 @@ const InvoiceDetails = () => {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => markAsSentMutation.mutate()}
                 disabled={markAsSentMutation.isLoading}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-white"
-                style={{ backgroundColor: "var(--color-primary)" }}
+                className="flex items-center gap-2 px-4 h-11 rounded-lg font-medium"
+                style={{
+                  backgroundColor: "var(--color-primary)",
+                  color: "var(--button-text)",
+                }}
               >
                 {markAsSentMutation.isLoading ? (
                   <Loader2 className="animate-spin" size={20} />
@@ -210,9 +227,9 @@ const InvoiceDetails = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleDownloadPDF}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border font-semibold"
+              className="flex items-center gap-2 px-4 h-11 rounded-lg border font-medium"
               style={{
-                backgroundColor: "var(--bg-color)",
+                backgroundColor: "var(--surface-color)",
                 borderColor: "var(--border-color)",
                 color: "var(--text-color)",
               }}
@@ -226,7 +243,7 @@ const InvoiceDetails = () => {
                 whileTap={{ scale: 0.95 }}
                 onClick={handleDelete}
                 disabled={deleteMutation.isLoading}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-white bg-red-600"
+                className="flex items-center gap-2 px-4 h-11 rounded-lg font-medium text-white bg-red-600"
               >
                 {deleteMutation.isLoading ? (
                   <Loader2 className="animate-spin" size={20} />
@@ -243,8 +260,11 @@ const InvoiceDetails = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {/* Company Info */}
           <div
-            className="p-6 rounded-lg border"
-            style={{ borderColor: "var(--border-color)" }}
+            className="rounded-2xl p-6 shadow-lg border"
+            style={{
+              backgroundColor: "var(--surface-color)",
+              borderColor: "var(--border-color)",
+            }}
           >
             <h2 className="text-lg font-semibold mb-4">
               {t("invoices.from")}
@@ -277,8 +297,11 @@ const InvoiceDetails = () => {
 
           {/* Customer Info */}
           <div
-            className="p-6 rounded-lg border"
-            style={{ borderColor: "var(--border-color)" }}
+            className="rounded-2xl p-6 shadow-lg border"
+            style={{
+              backgroundColor: "var(--surface-color)",
+              borderColor: "var(--border-color)",
+            }}
           >
             <h2 className="text-lg font-semibold mb-4">{t("invoices.to")}</h2>
             {invoice.customerId ? (
@@ -291,30 +314,45 @@ const InvoiceDetails = () => {
                 )}
               </div>
             ) : (
-              <p className="text-gray-500">{t("invoices.noCustomer")}</p>
+              <p style={{ color: "var(--color-secondary)" }}>
+                {t("invoices.noCustomer")}
+              </p>
             )}
           </div>
         </div>
 
         {/* Invoice Dates */}
         <div
-          className="p-6 rounded-lg border mb-6"
-          style={{ borderColor: "var(--border-color)" }}
+          className="rounded-2xl p-6 shadow-lg border mb-6"
+          style={{
+            backgroundColor: "var(--surface-color)",
+            borderColor: "var(--border-color)",
+          }}
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-center gap-3">
-              <Calendar size={20} className="text-gray-500" />
+              <Calendar size={20} style={{ color: "var(--color-secondary)" }} />
               <div>
-                <p className="text-sm text-gray-500">{t("invoices.issueDate")}</p>
+                <p
+                  className="text-sm"
+                  style={{ color: "var(--color-secondary)" }}
+                >
+                  {t("invoices.issueDate")}
+                </p>
                 <p className="font-semibold">
                   {format(new Date(invoice.issueDate), "MMM d, yyyy")}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Calendar size={20} className="text-gray-500" />
+              <Calendar size={20} style={{ color: "var(--color-secondary)" }} />
               <div>
-                <p className="text-sm text-gray-500">{t("invoices.dueDate")}</p>
+                <p
+                  className="text-sm"
+                  style={{ color: "var(--color-secondary)" }}
+                >
+                  {t("invoices.dueDate")}
+                </p>
                 <p className="font-semibold">
                   {format(new Date(invoice.dueDate), "MMM d, yyyy")}
                 </p>
@@ -322,9 +360,15 @@ const InvoiceDetails = () => {
             </div>
             {invoice.paymentTerms && (
               <div className="flex items-center gap-3">
-                <CheckCircle size={20} className="text-gray-500" />
+                <CheckCircle
+                  size={20}
+                  style={{ color: "var(--color-secondary)" }}
+                />
                 <div>
-                  <p className="text-sm text-gray-500">
+                  <p
+                    className="text-sm"
+                    style={{ color: "var(--color-secondary)" }}
+                  >
                     {t("invoices.paymentTerms")}
                   </p>
                   <p className="font-semibold">{invoice.paymentTerms}</p>
@@ -336,14 +380,23 @@ const InvoiceDetails = () => {
 
         {/* Items Table */}
         <div
-          className="p-6 rounded-lg border mb-6"
-          style={{ borderColor: "var(--border-color)" }}
+          className="rounded-2xl p-6 shadow-lg border mb-6"
+          style={{
+            backgroundColor: "var(--surface-color)",
+            borderColor: "var(--border-color)",
+          }}
         >
           <h2 className="text-lg font-semibold mb-4">{t("invoices.items")}</h2>
-          <div className="overflow-x-auto">
+          <div
+            className="overflow-x-auto rounded-2xl border"
+            style={{ borderColor: "var(--border-color)" }}
+          >
             <table className="w-full">
-              <thead>
-                <tr className="border-b">
+              <thead style={{ backgroundColor: "var(--bg-secondary)" }}>
+                <tr
+                  className="border-b"
+                  style={{ borderColor: "var(--border-color)" }}
+                >
                   <th className="text-left py-3 px-4">{t("invoices.description")}</th>
                   <th className="text-right py-3 px-4">{t("invoices.quantity")}</th>
                   <th className="text-right py-3 px-4">{t("invoices.unitPrice")}</th>
@@ -353,7 +406,11 @@ const InvoiceDetails = () => {
               </thead>
               <tbody>
                 {invoice.items.map((item, index) => (
-                  <tr key={index} className="border-b">
+                  <tr
+                    key={index}
+                    className="border-b"
+                    style={{ borderColor: "var(--border-color)" }}
+                  >
                     <td className="py-3 px-4">{item.description}</td>
                     <td className="text-right py-3 px-4">{item.quantity}</td>
                     <td className="text-right py-3 px-4">
@@ -375,8 +432,11 @@ const InvoiceDetails = () => {
         {/* Totals */}
         <div className="flex justify-end mb-6">
           <div
-            className="p-6 rounded-lg border w-full md:w-96"
-            style={{ borderColor: "var(--border-color)" }}
+            className="rounded-2xl p-6 shadow-lg border w-full md:w-96"
+            style={{
+              backgroundColor: "var(--surface-color)",
+              borderColor: "var(--border-color)",
+            }}
           >
             <div className="space-y-3">
               <div className="flex justify-between">
@@ -403,7 +463,10 @@ const InvoiceDetails = () => {
                   </span>
                 </div>
               )}
-              <div className="flex justify-between text-lg font-bold pt-3 border-t">
+              <div
+                className="flex justify-between text-lg font-bold pt-3 border-t"
+                style={{ borderColor: "var(--border-color)" }}
+              >
                 <span>{t("invoices.total")}:</span>
                 <span>
                   {invoice.currency} {invoice.totalAmount.toFixed(2)}
@@ -411,7 +474,10 @@ const InvoiceDetails = () => {
               </div>
               {invoice.paidAmount > 0 && (
                 <>
-                  <div className="flex justify-between text-green-600 pt-3 border-t">
+                  <div
+                    className="flex justify-between text-green-600 pt-3 border-t"
+                    style={{ borderColor: "var(--border-color)" }}
+                  >
                     <span>{t("invoices.paid")}:</span>
                     <span className="font-semibold">
                       {invoice.currency} {invoice.paidAmount.toFixed(2)}
@@ -433,11 +499,19 @@ const InvoiceDetails = () => {
         {/* Notes */}
         {invoice.notes && (
           <div
-            className="p-6 rounded-lg border mb-6"
-            style={{ borderColor: "var(--border-color)" }}
+            className="rounded-2xl p-6 shadow-lg border mb-6"
+            style={{
+              backgroundColor: "var(--surface-color)",
+              borderColor: "var(--border-color)",
+            }}
           >
             <h2 className="text-lg font-semibold mb-2">{t("invoices.notes")}</h2>
-            <p className="text-gray-300 whitespace-pre-wrap">{invoice.notes}</p>
+            <p
+              className="whitespace-pre-wrap"
+              style={{ color: "var(--color-secondary)" }}
+            >
+              {invoice.notes}
+            </p>
           </div>
         )}
       </div>

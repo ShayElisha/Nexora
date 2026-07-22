@@ -229,8 +229,8 @@ const ProjectResourcesAllocation = () => {
     return (
       <div className="min-h-screen flex justify-center items-center" style={{ backgroundColor: "var(--bg-color)" }}>
         <div className="text-center">
-          <RefreshCw className="size-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">{t("projects.loading")}</p>
+          <RefreshCw className="size-8 animate-spin mx-auto mb-4" style={{ color: 'var(--color-primary)' }} />
+          <p style={{ color: 'var(--color-secondary)' }}>{t("projects.loading")}</p>
         </div>
       </div>
     );
@@ -241,8 +241,8 @@ const ProjectResourcesAllocation = () => {
       <div className="min-h-screen flex justify-center items-center" style={{ backgroundColor: "var(--bg-color)" }}>
         <div className="text-center">
           <AlertTriangle className="size-8 mx-auto mb-4 text-red-600" />
-          <p className="text-gray-600">{t("projects.error_loading")}</p>
-          <p className="text-gray-500 text-sm mt-2">{projectsErrorMsg?.message || ""}</p>
+          <p style={{ color: 'var(--color-secondary)' }}>{t("projects.error_loading")}</p>
+          <p className="text-sm mt-2" style={{ color: 'var(--color-secondary)' }}>{projectsErrorMsg?.message || ""}</p>
         </div>
       </div>
     );
@@ -259,7 +259,7 @@ const ProjectResourcesAllocation = () => {
           transition={{ duration: 0.6 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-green-500 to-teal-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))' }}>
               <Users size={28} color="white" />
             </div>
             <div className="flex-1">
@@ -274,7 +274,7 @@ const ProjectResourcesAllocation = () => {
           </div>
 
           {/* Controls */}
-          <div className="rounded-2xl shadow-lg p-6 mb-6 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+          <div className="rounded-2xl shadow-lg p-6 mb-6 border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
             <div className="flex flex-wrap items-center justify-between gap-4">
               {/* Project Filter */}
               <div className="flex-1 min-w-[200px]">
@@ -284,7 +284,7 @@ const ProjectResourcesAllocation = () => {
                 <select
                   value={selectedProject || ""}
                   onChange={(e) => setSelectedProject(e.target.value || null)}
-                  className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 transition-all duration-200"
+                  className="w-full h-11 px-4 border rounded-xl focus:ring-2 transition-all duration-200"
                   style={{ 
                     borderColor: 'var(--border-color)', 
                     backgroundColor: 'var(--bg-color)', 
@@ -309,7 +309,7 @@ const ProjectResourcesAllocation = () => {
                 <select
                   value={selectedDepartment}
                   onChange={(e) => setSelectedDepartment(e.target.value)}
-                  className="w-full px-4 py-2 border-2 rounded-xl focus:ring-2 transition-all duration-200"
+                  className="w-full h-11 px-4 border rounded-xl focus:ring-2 transition-all duration-200"
                   style={{ 
                     borderColor: 'var(--border-color)', 
                     backgroundColor: 'var(--bg-color)', 
@@ -377,7 +377,7 @@ const ProjectResourcesAllocation = () => {
             transition={{ delay: 0.1 }}
             className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border"
             style={{ 
-              backgroundColor: 'var(--bg-color)', 
+              backgroundColor: 'var(--surface-color)', 
               borderColor: 'var(--color-primary)',
               borderRightColor: 'var(--color-primary)'
             }}
@@ -401,7 +401,7 @@ const ProjectResourcesAllocation = () => {
             transition={{ delay: 0.2 }}
             className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border"
             style={{ 
-              backgroundColor: 'var(--bg-color)', 
+              backgroundColor: 'var(--surface-color)', 
               borderColor: 'var(--color-accent)',
               borderRightColor: 'var(--color-accent)'
             }}
@@ -427,7 +427,7 @@ const ProjectResourcesAllocation = () => {
             transition={{ delay: 0.3 }}
             className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4"
             style={{ 
-              backgroundColor: 'var(--bg-color)', 
+              backgroundColor: "var(--surface-color)", 
               borderRightColor: '#f59e0b',
               borderColor: '#f59e0b'
             }}
@@ -453,7 +453,7 @@ const ProjectResourcesAllocation = () => {
             transition={{ delay: 0.4 }}
             className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4"
             style={{ 
-              backgroundColor: 'var(--bg-color)', 
+              backgroundColor: "var(--surface-color)", 
               borderRightColor: '#a855f7',
               borderColor: '#a855f7'
             }}
@@ -483,7 +483,7 @@ const ProjectResourcesAllocation = () => {
 
         {/* Resource Allocation */}
         {resourceAllocation.length === 0 ? (
-          <div className="rounded-2xl shadow-lg p-12 text-center border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+          <div className="rounded-2xl shadow-lg p-12 text-center border" style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}>
             <Users className="size-12 mx-auto mb-4" style={{ color: 'var(--color-secondary)' }} />
             <p className="text-lg" style={{ color: 'var(--text-color)' }}>
               {t("projects.no_projects")}
@@ -502,7 +502,7 @@ const ProjectResourcesAllocation = () => {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all border"
-                style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2 rounded-lg" style={{ backgroundColor: 'rgba(var(--color-primary-rgb), 0.1)' || 'var(--border-color)' }}>
@@ -579,7 +579,7 @@ const ProjectResourcesAllocation = () => {
             )}
 
             {viewMode === "list" && (
-          <div className="rounded-2xl shadow-lg overflow-hidden border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+          <div className="rounded-2xl shadow-lg overflow-hidden border" style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead style={{ backgroundColor: 'var(--footer-bg)' }}>
@@ -654,7 +654,7 @@ const ProjectResourcesAllocation = () => {
             )}
 
             {viewMode === "chart" && (
-          <div className="rounded-2xl shadow-lg p-6 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+          <div className="rounded-2xl shadow-lg p-6 border" style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}>
             <h2 className="text-xl font-semibold mb-6" style={{ color: 'var(--text-color)' }}>
               {t("projects.department_allocation")}
             </h2>

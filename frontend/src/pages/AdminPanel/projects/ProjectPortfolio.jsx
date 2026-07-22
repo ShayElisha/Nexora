@@ -153,14 +153,18 @@ const ProjectPortfolio = () => {
   };
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-6" style={{ backgroundColor: 'var(--bg-color)' }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
+      <div className="max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center gap-4">
+        <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))' }}>
+          <Briefcase size={28} color="white" />
+        </div>
         <div>
-          <h1 className="text-3xl font-bold" style={{ color: 'var(--text-color)' }}>
+          <h1 className="text-4xl font-bold" style={{ color: 'var(--text-color)' }}>
             {t("projects.portfolio")}
           </h1>
-          <p className="mt-1" style={{ color: 'var(--color-secondary)' }}>
+          <p className="text-lg" style={{ color: 'var(--color-secondary)' }}>
             {t("projects.portfolio_description")}
           </p>
         </div>
@@ -171,8 +175,8 @@ const ProjectPortfolio = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-lg shadow p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          className="rounded-2xl p-6 shadow-lg border"
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -191,8 +195,8 @@ const ProjectPortfolio = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="rounded-lg shadow p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          className="rounded-2xl p-6 shadow-lg border"
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -211,8 +215,8 @@ const ProjectPortfolio = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="rounded-lg shadow p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          className="rounded-2xl p-6 shadow-lg border"
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -231,8 +235,8 @@ const ProjectPortfolio = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="rounded-lg shadow p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          className="rounded-2xl p-6 shadow-lg border"
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
         >
           <div className="flex items-center justify-between">
             <div>
@@ -250,7 +254,7 @@ const ProjectPortfolio = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="rounded-lg shadow p-6 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+        <div className="rounded-2xl p-6 shadow-lg border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-color)' }}>
             {t("projects.projects_by_status")}
           </h3>
@@ -259,7 +263,7 @@ const ProjectPortfolio = () => {
           </div>
         </div>
 
-        <div className="rounded-lg shadow p-6 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+        <div className="rounded-2xl p-6 shadow-lg border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-color)' }}>
             {t("projects.projects_by_priority")}
           </h3>
@@ -268,7 +272,7 @@ const ProjectPortfolio = () => {
           </div>
         </div>
 
-        <div className="rounded-lg shadow p-6 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+        <div className="rounded-2xl p-6 shadow-lg border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-color)' }}>
             {t("projects.projects_by_department")}
           </h3>
@@ -279,17 +283,17 @@ const ProjectPortfolio = () => {
       </div>
 
       {/* Filters and Search */}
-      <div className="rounded-lg shadow p-4 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
+      <div className="rounded-2xl p-6 shadow-lg border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="md:col-span-2">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
               <input
                 type="text"
                 placeholder={t("projects.search_projects")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2"
+                className="w-full h-11 ps-10 pe-4 border rounded-xl focus:ring-2"
                 style={{ 
                   borderColor: 'var(--border-color)', 
                   backgroundColor: 'var(--bg-color)', 
@@ -299,11 +303,10 @@ const ProjectPortfolio = () => {
               />
             </div>
           </div>
-          <div className="flex gap-4">
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-2 border rounded-lg focus:ring-2"
+              className="h-11 px-4 border rounded-xl focus:ring-2"
               style={{ 
                 borderColor: 'var(--border-color)', 
                 backgroundColor: 'var(--bg-color)', 
@@ -320,7 +323,7 @@ const ProjectPortfolio = () => {
             <select
               value={filterPriority}
               onChange={(e) => setFilterPriority(e.target.value)}
-              className="px-4 py-2 border rounded-lg focus:ring-2"
+              className="h-11 px-4 border rounded-xl focus:ring-2"
               style={{ 
                 borderColor: 'var(--border-color)', 
                 backgroundColor: 'var(--bg-color)', 
@@ -333,15 +336,14 @@ const ProjectPortfolio = () => {
               <option value="Medium">{t("projects.medium")}</option>
               <option value="Low">{t("projects.low")}</option>
             </select>
-          </div>
         </div>
       </div>
 
       {/* Projects Table */}
-      <div className="rounded-lg shadow overflow-hidden border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+      <div className="rounded-2xl border overflow-hidden shadow-lg" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead style={{ backgroundColor: 'var(--footer-bg)' }}>
+            <thead style={{ backgroundColor: 'var(--bg-secondary)' }}>
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-color)' }}>
                   {t("projects.name")}
@@ -363,7 +365,7 @@ const ProjectPortfolio = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+            <tbody className="divide-y" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
               {filteredProjects.map((project) => (
                 <tr key={project._id} style={{ borderColor: 'var(--border-color)' }} className="hover:opacity-80">
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -439,6 +441,7 @@ const ProjectPortfolio = () => {
             </tbody>
           </table>
         </div>
+      </div>
       </div>
     </div>
   );

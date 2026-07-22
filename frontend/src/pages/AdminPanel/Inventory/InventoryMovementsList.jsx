@@ -64,54 +64,59 @@ const InventoryMovementsList = () => {
       Adjustment: "bg-yellow-100 text-yellow-800",
       Return: "bg-red-100 text-red-800",
     };
-    return colors[type] || "bg-gray-100 text-gray-800";
+    return colors[type] || "bg-[var(--bg-secondary)] text-[var(--text-color)]";
   };
 
   return (
-    <div className="p-6" style={{ backgroundColor: "var(--bg-color)", minHeight: "100vh" }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }}>
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>
-                {t("inventory.movements") || "Inventory Movements"}
-              </h1>
-              <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
-                {t("inventory.movements_description") || "Track and manage inventory movements"}
-              </p>
+          <div className="flex justify-between items-center gap-4 mb-6">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
+                <ArrowRightLeft size={28} color="white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold" style={{ color: "var(--text-color)" }}>
+                  {t("inventory.movements") || "Inventory Movements"}
+                </h1>
+                <p className="text-lg" style={{ color: "var(--color-secondary)" }}>
+                  {t("inventory.movements_description") || "Track and manage inventory movements"}
+                </p>
+              </div>
             </div>
             <button
               onClick={() => navigate("/dashboard/inventory/movements/add")}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-white hover:opacity-90 transition"
-              style={{ backgroundColor: "var(--color-primary)" }}
+              className="flex items-center gap-2 px-6 h-11 rounded-lg font-medium hover:opacity-90 transition"
+              style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}
             >
               <Plus size={20} />
               {t("inventory.add_movement") || "Add Movement"}
             </button>
           </div>
 
-          <div className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}>
-            <div className="p-6">
-              <div className="flex flex-col md:flex-row gap-4 mb-4">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={20} style={{ color: "var(--text-secondary)" }} />
+          <div className="rounded-2xl p-6 shadow-lg border overflow-hidden" style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}>
+            <div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div className="relative col-span-2">
+                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" size={20} style={{ color: "var(--text-secondary)" }} />
                   <input
                     type="text"
                     placeholder={t("inventory.search_movements") || "Search movements..."}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 rounded-lg border"
+                    className="w-full h-11 ps-10 pe-4 rounded-xl border"
                     style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                   />
                 </div>
                 <select
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
-                  className="px-4 py-2 rounded-lg border"
+                  className="w-full h-11 px-4 rounded-xl border"
                   style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                 >
                   <option value="all">{t("inventory.all_types") || "All Types"}</option>
@@ -125,7 +130,7 @@ const InventoryMovementsList = () => {
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="px-4 py-2 rounded-lg border"
+                  className="w-full h-11 px-4 rounded-xl border"
                   style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                 >
                   <option value="all">{t("inventory.all_statuses") || "All Statuses"}</option>
@@ -136,12 +141,12 @@ const InventoryMovementsList = () => {
               </div>
 
               {isLoading ? (
-                <div className="text-center py-12">
+                <div className="text-center py-16">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: "var(--color-primary)" }}></div>
-                  <p className="mt-4" style={{ color: "var(--text-secondary)" }}>Loading...</p>
+                  <p className="mt-4" style={{ color: "var(--color-secondary)" }}>Loading...</p>
                 </div>
               ) : filteredMovements.length === 0 ? (
-                <div className="text-center py-12 border-2 border-dashed rounded-lg" style={{ borderColor: "var(--border-color)" }}>
+                <div className="text-center py-16 border-2 border-dashed rounded-lg" style={{ borderColor: "var(--border-color)" }}>
                   <Package size={64} className="mx-auto mb-4" style={{ color: "var(--text-secondary)" }} />
                   <p style={{ color: "var(--text-secondary)" }}>
                     {t("inventory.no_movements") || "No movements found"}
@@ -167,7 +172,7 @@ const InventoryMovementsList = () => {
                       {filteredMovements.map((movement) => (
                         <motion.tr
                           key={movement._id}
-                          className="border-b hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                          className="border-b hover:bg-[var(--bg-secondary)] transition"
                           style={{ borderColor: "var(--border-color)" }}
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
@@ -204,7 +209,7 @@ const InventoryMovementsList = () => {
                             <div className="flex gap-2">
                               <button
                                 onClick={() => navigate(`/dashboard/inventory/movements/${movement._id}`)}
-                                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                                className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                                 style={{ color: "var(--color-primary)" }}
                               >
                                 <Edit size={18} />
@@ -216,7 +221,7 @@ const InventoryMovementsList = () => {
                                     deleteMutation.mutate(movement._id);
                                   }
                                 }}
-                                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                                className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                               >
                                 <Trash2 size={18} className="text-red-500" />
                               </button>

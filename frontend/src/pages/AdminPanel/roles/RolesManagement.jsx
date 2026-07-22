@@ -228,7 +228,7 @@ const RoleFormModal = ({ role, isOpen, onClose, onSuccess }) => {
       >
         <motion.div
           className="rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden border"
-          style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+          style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
           initial={{ scale: 0.9, y: 20 }}
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 20 }}

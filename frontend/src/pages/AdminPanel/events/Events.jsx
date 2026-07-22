@@ -5,6 +5,7 @@ import axiosInstance from "../../../lib/axios";
 import toast from "react-hot-toast";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { CalendarDays } from "lucide-react";
 
 const Events = () => {
   const { t, i18n } = useTranslation();
@@ -310,10 +311,18 @@ const Events = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-bg flex flex-col">
-      <h1 className="text-4xl font-extrabold text-center py-6 text-primary">
-        {t("events.calendar")}
-      </h1>
+    <div className="min-h-screen w-full flex flex-col p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }}>
+      <div className="flex items-center justify-center gap-4 py-6 mb-2">
+        <div
+          className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+          style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
+        >
+          <CalendarDays size={28} className="text-white" />
+        </div>
+        <h1 className="text-4xl font-bold" style={{ color: "var(--text-color)" }}>
+          {t("events.calendar")}
+        </h1>
+      </div>
       {/* Calendar Container */}
       <div className="flex-grow w-full px-4 z-50">
         <Calendar
@@ -336,7 +345,7 @@ const Events = () => {
               {label}
             </div>
           )}
-          className="mx-auto w-full max-w-6xl bg-white shadow-xl rounded-lg p-6"
+          className="mx-auto w-full max-w-6xl bg-[var(--surface-color)] shadow-xl rounded-lg p-6"
         />
       </div>
 
@@ -345,7 +354,7 @@ const Events = () => {
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         contentLabel={t("events.modalLabel")}
-        className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-3xl mx-auto overflow-y-auto max-h-[90vh] transition-all"
+        className="bg-[var(--surface-color)] p-8 rounded-xl shadow-2xl w-full max-w-3xl mx-auto overflow-y-auto max-h-[90vh] transition-all"
         overlayClassName="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center"
         ariaHideApp={false}
       >
@@ -367,7 +376,7 @@ const Events = () => {
               name="title"
               value={formData.title}
               onChange={handleInputChange}
-              className="w-full border border-border-color rounded p-3 focus:ring-primary focus:outline-none transition-colors"
+              className="w-full h-11 border rounded-xl px-4 focus:ring-2 focus:outline-none transition-colors" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
               required
             />
           </div>
@@ -380,7 +389,7 @@ const Events = () => {
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              className="w-full border border-border-color rounded p-3 focus:ring-primary focus:outline-none transition-colors"
+              className="w-full h-11 border rounded-xl px-4 focus:ring-2 focus:outline-none transition-colors" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
               rows="3"
             />
           </div>
@@ -395,7 +404,7 @@ const Events = () => {
                 name="startDate"
                 value={formData.startDate}
                 onChange={handleInputChange}
-                className="w-full border border-border-color rounded p-3 focus:ring-primary focus:outline-none transition-colors"
+                className="w-full h-11 border rounded-xl px-4 focus:ring-2 focus:outline-none transition-colors" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                 required
               />
             </div>
@@ -408,7 +417,7 @@ const Events = () => {
                 name="endDate"
                 value={formData.endDate}
                 onChange={handleInputChange}
-                className="w-full border border-border-color rounded p-3 focus:ring-primary focus:outline-none transition-colors"
+                className="w-full h-11 border rounded-xl px-4 focus:ring-2 focus:outline-none transition-colors" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
               />
             </div>
           </div>
@@ -435,7 +444,7 @@ const Events = () => {
                   name="startTime"
                   value={formData.startTime}
                   onChange={handleInputChange}
-                  className="w-full border border-border-color rounded p-3 focus:ring-primary focus:outline-none transition-colors"
+                  className="w-full h-11 border rounded-xl px-4 focus:ring-2 focus:outline-none transition-colors" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                   required={!formData.allDay}
                 />
               </div>
@@ -448,7 +457,7 @@ const Events = () => {
                   name="endTime"
                   value={formData.endTime}
                   onChange={handleInputChange}
-                  className="w-full border border-border-color rounded p-3 focus:ring-primary focus:outline-none transition-colors"
+                  className="w-full h-11 border rounded-xl px-4 focus:ring-2 focus:outline-none transition-colors" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                   required={!formData.allDay}
                 />
               </div>
@@ -463,7 +472,7 @@ const Events = () => {
               name="participantType"
               value={formData.participantType}
               onChange={handleInputChange}
-              className="w-full border border-border-color rounded p-3 focus:ring-primary focus:outline-none transition-colors"
+              className="w-full h-11 border rounded-xl px-4 focus:ring-2 focus:outline-none transition-colors" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
             >
               <option value="external">
                 {t("events.participantType.external")}
@@ -504,7 +513,7 @@ const Events = () => {
                   placeholder={t("events.externalParticipant.phonePlaceholder")}
                   value={formData.externalParticipants[0].phone}
                   onChange={handleExternalParticipantChange}
-                  className="w-full border border-border-color rounded p-3 focus:ring-primary focus:outline-none transition-colors"
+                  className="w-full h-11 border rounded-xl px-4 focus:ring-2 focus:outline-none transition-colors" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
                 />
               </div>
             </div>
@@ -520,7 +529,7 @@ const Events = () => {
                 multiple
                 value={formData.participants}
                 onChange={handleMultiSelectChange}
-                className="w-full border border-border-color rounded p-3 focus:ring-primary focus:outline-none transition-colors"
+                className="w-full h-11 border rounded-xl px-4 focus:ring-2 focus:outline-none transition-colors" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
               >
                 {employeeOptions.map((emp) => (
                   <option key={emp._id} value={emp._id}>
@@ -566,7 +575,7 @@ const Events = () => {
               value={formData.recurrence}
               onChange={handleInputChange}
               placeholder={t("events.recurrencePlaceholder")}
-              className="w-full border border-border-color rounded p-3 focus:ring-primary focus:outline-none transition-colors"
+              className="w-full h-11 border rounded-xl px-4 focus:ring-2 focus:outline-none transition-colors" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
             />
           </div>
           <div>
@@ -578,7 +587,7 @@ const Events = () => {
               name="reminder"
               value={formData.reminder}
               onChange={handleInputChange}
-              className="w-full border border-border-color rounded p-3 focus:ring-primary focus:outline-none transition-colors"
+              className="w-full h-11 border rounded-xl px-4 focus:ring-2 focus:outline-none transition-colors" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
             />
           </div>
           <div>
@@ -600,7 +609,7 @@ const Events = () => {
                 placeholder={t("events.attachment.fileUrlPlaceholder")}
                 value={formData.attachments[0].fileUrl}
                 onChange={handleAttachmentChange}
-                className="w-full border border-border-color rounded p-3 focus:ring-primary focus:outline-none transition-colors"
+                className="w-full h-11 border rounded-xl px-4 focus:ring-2 focus:outline-none transition-colors" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
               />
             </div>
           </div>
@@ -612,21 +621,21 @@ const Events = () => {
               name="notes"
               value={formData.notes}
               onChange={handleInputChange}
-              className="w-full border border-border-color rounded p-3 focus:ring-primary focus:outline-none transition-colors"
+              className="w-full h-11 border rounded-xl px-4 focus:ring-2 focus:outline-none transition-colors" style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
               rows="3"
             />
           </div>
           <div className="flex space-x-6">
             <button
               type="submit"
-              className="bg-button-bg text-button-text px-6 py-3 rounded shadow-lg transform transition hover:scale-105"
+              className="px-6 h-11 rounded-lg font-medium shadow-lg transform transition hover:scale-105" style={{ backgroundColor: "var(--button-bg)", color: "var(--button-text)" }}
             >
               {isUpdateMode ? t("events.updateEvent") : t("events.createEvent")}
             </button>
             <button
               type="button"
               onClick={closeModal}
-              className="bg-red-600 text-white px-6 py-3 rounded shadow-lg transform transition hover:scale-105"
+              className="bg-red-600 text-white px-6 h-11 rounded-lg font-medium shadow-lg transform transition hover:scale-105"
             >
               {t("events.cancel")}
             </button>
@@ -640,7 +649,7 @@ const Events = () => {
           isOpen={detailModalIsOpen}
           onRequestClose={closeDetailModal}
           contentLabel={t("events.eventDetails")}
-          className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-4xl mx-auto overflow-y-auto max-h-[90vh] transition-all"
+          className="bg-[var(--surface-color)] p-8 rounded-xl shadow-2xl w-full max-w-4xl mx-auto overflow-y-auto max-h-[90vh] transition-all"
           overlayClassName="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center"
           ariaHideApp={false}
         >
@@ -715,19 +724,20 @@ const Events = () => {
           <div className="mt-8 flex justify-end space-x-6">
             <button
               onClick={handleUpdateEvent}
-              className="bg-green-600 text-white px-6 py-3 rounded shadow-lg transform transition hover:scale-105"
+              className="bg-green-600 text-white px-6 h-11 rounded-lg font-medium shadow-lg transform transition hover:scale-105"
             >
               {t("events.updateEvent")}
             </button>
             <button
               onClick={handleDeleteEvent}
-              className="bg-red-600 text-white px-6 py-3 rounded shadow-lg transform transition hover:scale-105"
+              className="bg-red-600 text-white px-6 h-11 rounded-lg font-medium shadow-lg transform transition hover:scale-105"
             >
               {t("events.deleteEvent")}
             </button>
             <button
               onClick={closeDetailModal}
-              className="bg-gray-600 text-white px-6 py-3 rounded shadow-lg transform transition hover:scale-105"
+              className="px-6 h-11 rounded-lg font-medium shadow-lg transform transition hover:scale-105"
+              style={{ backgroundColor: "var(--color-secondary)", color: "var(--button-text)" }}
             >
               {t("events.close")}
             </button>

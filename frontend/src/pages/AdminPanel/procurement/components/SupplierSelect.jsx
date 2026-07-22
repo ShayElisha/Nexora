@@ -46,7 +46,7 @@ const SupplierSelect = ({ supplierId, onChange }) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-8 rounded-xl border" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)' }}>
+      <div className="flex items-center justify-center p-8 rounded-xl border" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--surface-color)' }}>
         <Loader2 className="animate-spin mr-3" size={24} style={{ color: 'var(--color-primary)' }} />
         <p style={{ color: 'var(--text-color)' }}>{t("procurement.loading_suppliers")}</p>
       </div>
@@ -74,12 +74,12 @@ const SupplierSelect = ({ supplierId, onChange }) => {
           className="w-full p-4 border rounded-xl flex items-center justify-between transition-all hover:shadow-md"
           style={{
             borderColor: isOpen ? 'var(--color-primary)' : 'var(--border-color)',
-            backgroundColor: 'var(--bg-color)',
+            backgroundColor: "var(--surface-color)",
             color: 'var(--text-color)'
           }}
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-blue-500 to-cyan-600">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Building2 size={20} color="white" />
             </div>
             <div className="text-left">
@@ -104,7 +104,7 @@ const SupplierSelect = ({ supplierId, onChange }) => {
           {selectedSupplier && !isOpen && (
             <motion.div
               className="mt-3 p-4 rounded-xl border"
-              style={{ backgroundColor: 'var(--border-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
@@ -145,7 +145,7 @@ const SupplierSelect = ({ supplierId, onChange }) => {
         {isOpen && (
           <motion.div
             className="rounded-xl border shadow-xl overflow-hidden"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -153,13 +153,13 @@ const SupplierSelect = ({ supplierId, onChange }) => {
             {/* Search Bar */}
             <div className="p-4 border-b" style={{ borderColor: 'var(--border-color)' }}>
               <div className="relative">
-                <Search className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                <Search className="absolute start-3 top-1/2 -translate-y-1/2" size={18} style={{ color: 'var(--color-secondary)' }} />
                 <input
                   type="text"
                   placeholder={t("procurement.search_suppliers")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full h-11 ps-10 pe-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   style={{
                     borderColor: 'var(--border-color)',
                     backgroundColor: 'var(--bg-color)',
@@ -182,8 +182,8 @@ const SupplierSelect = ({ supplierId, onChange }) => {
                       className="w-full p-4 rounded-xl mb-2 text-left transition-all hover:shadow-md"
                       style={{
                         backgroundColor: selectedSupplier?._id === supplier._id 
-                          ? 'var(--border-color)' 
-                          : 'var(--bg-color)',
+                          ? 'var(--bg-secondary)' 
+                          : 'var(--surface-color)',
                         borderColor: 'var(--border-color)',
                       }}
                       initial={{ opacity: 0, x: -20 }}
@@ -193,7 +193,7 @@ const SupplierSelect = ({ supplierId, onChange }) => {
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-center gap-3 flex-1">
-                          <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-600 flex-shrink-0">
+                          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
                             <Building2 size={24} color="white" />
                           </div>
                           <div className="flex-1 min-w-0">
@@ -254,7 +254,7 @@ const SupplierSelect = ({ supplierId, onChange }) => {
             </div>
 
             {/* Footer */}
-            <div className="p-3 border-t flex items-center justify-between" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--border-color)' }}>
+            <div className="p-3 border-t flex items-center justify-between" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-secondary)' }}>
               <p className="text-sm" style={{ color: 'var(--color-secondary)' }}>
                 {filteredSuppliers.length} {t("procurement.suppliers_available")}
               </p>

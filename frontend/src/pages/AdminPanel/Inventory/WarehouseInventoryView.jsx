@@ -101,26 +101,27 @@ const WarehouseInventoryView = () => {
       case "ok":
         return "text-green-600 bg-green-50";
       default:
-        return "text-gray-600 bg-gray-50";
+        return "text-[var(--color-secondary)] bg-[var(--bg-secondary)]";
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <RefreshCw className="w-8 h-8 animate-spin text-blue-600" />
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "var(--bg-color)" }}>
+        <RefreshCw className="w-8 h-8 animate-spin" style={{ color: "var(--color-primary)" }} />
       </div>
     );
   }
 
   if (!warehouse) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "var(--bg-color)" }}>
         <div className="text-center">
-          <p className="text-gray-600 mb-4">Warehouse not found</p>
+          <p className="mb-4" style={{ color: "var(--color-secondary)" }}>Warehouse not found</p>
           <button
             onClick={() => navigate("/dashboard/warehouses")}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+            className="px-6 h-11 rounded-lg font-medium"
+            style={{ backgroundColor: "var(--color-primary)", color: "var(--button-text)" }}
           >
             Back to Warehouses
           </button>
@@ -142,11 +143,12 @@ const WarehouseInventoryView = () => {
           <div className="flex items-center gap-4 mb-6">
             <button
               onClick={() => navigate("/dashboard/warehouses")}
-              className="p-2 rounded-lg hover:bg-gray-100 transition"
+              className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
+              style={{ color: "var(--text-color)" }}
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-indigo-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Warehouse size={28} color="white" />
             </div>
             <div className="flex-1">
@@ -181,14 +183,15 @@ const WarehouseInventoryView = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border-blue-500"
+            className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border-blue-500"
+            style={{ backgroundColor: "var(--surface-color)" }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium mb-1">
+                <p className="text-sm font-medium mb-1" style={{ color: "var(--color-secondary)" }}>
                   {t("inventory.total_items", { defaultValue: "Total Items" })}
                 </p>
-                <p className="text-3xl font-bold text-gray-800">
+                <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>
                   {statistics.totalItems || 0}
                 </p>
               </div>
@@ -202,14 +205,15 @@ const WarehouseInventoryView = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border-green-500"
+            className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border-green-500"
+            style={{ backgroundColor: "var(--surface-color)" }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium mb-1">
+                <p className="text-sm font-medium mb-1" style={{ color: "var(--color-secondary)" }}>
                   {t("inventory.total_quantity", { defaultValue: "Total Quantity" })}
                 </p>
-                <p className="text-3xl font-bold text-gray-800">
+                <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>
                   {statistics.totalQuantity || 0}
                 </p>
               </div>
@@ -223,14 +227,15 @@ const WarehouseInventoryView = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border-purple-500"
+            className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border-purple-500"
+            style={{ backgroundColor: "var(--surface-color)" }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium mb-1">
+                <p className="text-sm font-medium mb-1" style={{ color: "var(--color-secondary)" }}>
                   {t("inventory.total_value", { defaultValue: "Total Value" })}
                 </p>
-                <p className="text-3xl font-bold text-gray-800">
+                <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>
                   ${(statistics.totalValue || 0).toLocaleString()}
                 </p>
               </div>
@@ -244,14 +249,15 @@ const WarehouseInventoryView = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border-orange-500"
+            className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border-r-4 border-orange-500"
+            style={{ backgroundColor: "var(--surface-color)" }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm font-medium mb-1">
+                <p className="text-sm font-medium mb-1" style={{ color: "var(--color-secondary)" }}>
                   {t("inventory.low_stock_items", { defaultValue: "Low Stock" })}
                 </p>
-                <p className="text-3xl font-bold text-gray-800">
+                <p className="text-3xl font-bold" style={{ color: "var(--text-color)" }}>
                   {statistics.lowStockItems || 0}
                 </p>
               </div>
@@ -263,23 +269,25 @@ const WarehouseInventoryView = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg mb-6">
+        <div className="rounded-2xl p-6 shadow-lg border mb-6" style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}>
           <div className="grid gap-4 md:grid-cols-3">
             <div className="relative">
-              <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none" size={20} style={{ color: "var(--text-secondary)" }} />
               <input
                 type="text"
                 placeholder={t("inventory.search_placeholder", { defaultValue: "Search products..." })}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pr-12 p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-800 placeholder-gray-400 shadow-sm"
+                className="w-full h-11 ps-10 pe-4 border rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] transition-all duration-200 shadow-sm"
+                style={{ borderColor: "var(--border-color)", backgroundColor: "var(--surface-color)", color: "var(--text-color)" }}
               />
             </div>
 
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-800 shadow-sm"
+              className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] transition-all duration-200 shadow-sm"
+              style={{ borderColor: "var(--border-color)", backgroundColor: "var(--surface-color)", color: "var(--text-color)" }}
             >
               <option value="all">
                 {t("inventory.all_categories", { defaultValue: "All Categories" })}
@@ -294,7 +302,8 @@ const WarehouseInventoryView = () => {
             <select
               value={filterStockStatus}
               onChange={(e) => setFilterStockStatus(e.target.value)}
-              className="px-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-800 shadow-sm"
+              className="w-full h-11 px-4 border rounded-xl focus:ring-2 focus:ring-[var(--color-primary)] transition-all duration-200 shadow-sm"
+              style={{ borderColor: "var(--border-color)", backgroundColor: "var(--surface-color)", color: "var(--text-color)" }}
             >
               <option value="all">
                 {t("inventory.all_status", { defaultValue: "All Status" })}
@@ -313,66 +322,66 @@ const WarehouseInventoryView = () => {
         </div>
 
         {/* Inventory Table */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="rounded-2xl shadow-lg border overflow-hidden" style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}>
           {filteredInventory.length === 0 ? (
-            <div className="p-12 text-center">
-              <Package className="size-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-600">
+            <div className="text-center py-16">
+              <Package className="size-12 mx-auto mb-4" style={{ color: "var(--color-secondary)" }} />
+              <p style={{ color: "var(--color-secondary)" }}>
                 {t("inventory.no_products", { defaultValue: "No products found" })}
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className={isRTL ? 'bg-gradient-to-l from-gray-50 to-gray-100' : 'bg-gradient-to-r from-gray-50 to-gray-100'}>
+                <thead style={{ backgroundColor: "var(--bg-secondary)" }}>
                   <tr>
-                    <th className={`px-6 py-4 text-sm font-semibold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <th className={`px-6 py-4 text-sm font-semibold ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: "var(--text-color)" }}>
                       {t("inventory.product", { defaultValue: "Product" })}
                     </th>
-                    <th className={`px-6 py-4 text-sm font-semibold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <th className={`px-6 py-4 text-sm font-semibold ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: "var(--text-color)" }}>
                       {t("inventory.category", { defaultValue: "Category" })}
                     </th>
-                    <th className={`px-6 py-4 text-sm font-semibold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <th className={`px-6 py-4 text-sm font-semibold ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: "var(--text-color)" }}>
                       {t("inventory.quantity", { defaultValue: "Quantity" })}
                     </th>
-                    <th className={`px-6 py-4 text-sm font-semibold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <th className={`px-6 py-4 text-sm font-semibold ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: "var(--text-color)" }}>
                       {t("inventory.min_stock", { defaultValue: "Min Stock" })}
                     </th>
-                    <th className={`px-6 py-4 text-sm font-semibold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <th className={`px-6 py-4 text-sm font-semibold ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: "var(--text-color)" }}>
                       {t("inventory.status_label", { defaultValue: "Status" })}
                     </th>
-                    <th className={`px-6 py-4 text-sm font-semibold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <th className={`px-6 py-4 text-sm font-semibold ${isRTL ? 'text-right' : 'text-left'}`} style={{ color: "var(--text-color)" }}>
                       {t("inventory.location", { defaultValue: "Location" })}
                     </th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-[var(--text-color)]">
                       {t("common.actions", { defaultValue: "Actions" })}
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y" style={{ borderColor: "var(--border-color)" }}>
                   {filteredInventory.map((item) => {
                     const status = getStockStatus(item);
                     const product = item.productId || {};
 
                     return (
-                      <tr key={item._id} className="hover:bg-gray-50 transition">
+                      <tr key={item._id} className="hover:bg-[var(--bg-secondary)] transition" style={{ borderColor: "var(--border-color)" }}>
                         <td className={`px-6 py-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                           <div>
-                            <p className="font-semibold text-gray-800">
+                            <p className="font-semibold text-[var(--text-color)]">
                               {product.productName || t("inventory.unknown_product", { defaultValue: "Unknown" })}
                             </p>
-                            <p className="text-sm text-gray-500">{product.SKU || "-"}</p>
+                            <p className="text-sm text-[var(--color-secondary)]">{product.SKU || "-"}</p>
                           </div>
                         </td>
-                        <td className={`px-6 py-4 text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
+                        <td className={`px-6 py-4 text-[var(--color-secondary)] ${isRTL ? 'text-right' : 'text-left'}`}>
                           {product.category || "-"}
                         </td>
                         <td className={`px-6 py-4 ${isRTL ? 'text-right' : 'text-left'}`}>
-                          <span className="font-semibold text-gray-800">
+                          <span className="font-semibold text-[var(--text-color)]">
                             {item.quantity ?? 0}
                           </span>
                         </td>
-                        <td className={`px-6 py-4 text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
+                        <td className={`px-6 py-4 text-[var(--color-secondary)] ${isRTL ? 'text-right' : 'text-left'}`}>
                           {item.minStockLevel ?? "-"}
                         </td>
                         <td className={`px-6 py-4 ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -384,7 +393,7 @@ const WarehouseInventoryView = () => {
                             {status === "ok" && t("inventory.in_stock", { defaultValue: "In Stock" })}
                           </span>
                         </td>
-                        <td className={`px-6 py-4 text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
+                        <td className={`px-6 py-4 text-[var(--color-secondary)] ${isRTL ? 'text-right' : 'text-left'}`}>
                           {item.locationId?.name || item.shelfLocation ? (
                             <div className={`flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
                               <MapPin className="size-4" />
@@ -405,7 +414,7 @@ const WarehouseInventoryView = () => {
                             </button>
                             <button
                               onClick={() => navigate(`/dashboard/inventory?productId=${item.productId?._id}`)}
-                              className="p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition"
+                              className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] text-[var(--color-secondary)] transition"
                               title={t("common.edit", { defaultValue: "Edit" })}
                             >
                               <Edit className="size-4" />

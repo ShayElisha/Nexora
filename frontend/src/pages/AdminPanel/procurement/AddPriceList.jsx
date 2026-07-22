@@ -255,7 +255,7 @@ const AddPriceList = () => {
   };
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--bg-color)' }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -266,7 +266,7 @@ const AddPriceList = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate("/dashboard/procurement/price-lists")}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
               style={{ color: 'var(--text-color)' }}
             >
               <ArrowLeft size={24} />
@@ -277,7 +277,7 @@ const AddPriceList = () => {
                   ? t("procurement.edit_price_list") || "Edit Price List"
                   : t("procurement.add_price_list") || "Add Price List"}
               </h1>
-              <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-secondary)' }}>
                 {t("procurement.fill_price_list_details") || "Fill in the details below to create a price list"}
               </p>
             </div>
@@ -285,7 +285,7 @@ const AddPriceList = () => {
         </div>
 
         {/* Form Card */}
-        <form onSubmit={handleSubmit} className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+        <form onSubmit={handleSubmit} className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           <div className="p-6 space-y-6">
             {/* Basic Information Section */}
             <div>
@@ -302,7 +302,7 @@ const AddPriceList = () => {
                     required
                     value={formData.priceListName}
                     onChange={(e) => setFormData({ ...formData, priceListName: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -320,7 +320,7 @@ const AddPriceList = () => {
                     required
                     value={formData.priceListNumber}
                     onChange={(e) => setFormData({ ...formData, priceListNumber: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -337,7 +337,7 @@ const AddPriceList = () => {
                     required
                     value={formData.priceListType}
                     onChange={(e) => setFormData({ ...formData, priceListType: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -359,7 +359,7 @@ const AddPriceList = () => {
                     <select
                       value={formData.supplierId}
                       onChange={(e) => setFormData({ ...formData, supplierId: e.target.value })}
-                      className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                      className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                       style={{ 
                         borderColor: 'var(--border-color)', 
                         backgroundColor: 'var(--bg-color)', 
@@ -384,7 +384,7 @@ const AddPriceList = () => {
                     <select
                       value={formData.customerId}
                       onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
-                      className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                      className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                       style={{ 
                         borderColor: 'var(--border-color)', 
                         backgroundColor: 'var(--bg-color)', 
@@ -408,7 +408,7 @@ const AddPriceList = () => {
                   <select
                     value={formData.currency}
                     onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -430,7 +430,7 @@ const AddPriceList = () => {
                     required
                     value={formData.startDate}
                     onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -447,7 +447,7 @@ const AddPriceList = () => {
                     type="date"
                     value={formData.endDate}
                     onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -463,7 +463,7 @@ const AddPriceList = () => {
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -488,7 +488,7 @@ const AddPriceList = () => {
                 <button
                   type="button"
                   onClick={addItem}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-white hover:opacity-90 transition"
+                  className="flex items-center gap-2 px-4 h-11 rounded-lg text-white hover:opacity-90 transition"
                   style={{ backgroundColor: 'var(--color-primary)' }}
                 >
                   <Plus size={18} />
@@ -497,7 +497,7 @@ const AddPriceList = () => {
               </div>
               {formData.items.length === 0 ? (
                 <div className="text-center py-8 border-2 border-dashed rounded-lg" style={{ borderColor: 'var(--border-color)' }}>
-                  <p style={{ color: 'var(--text-secondary)' }}>
+                  <p style={{ color: 'var(--color-secondary)' }}>
                     {t("procurement.no_items") || "No items added yet. Click 'Add Item' to get started."}
                   </p>
                 </div>
@@ -509,7 +509,7 @@ const AddPriceList = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="p-4 rounded-lg border"
-                      style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)' }}
+                      style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--surface-color)' }}
                     >
                       <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
@@ -521,7 +521,7 @@ const AddPriceList = () => {
                               required
                               value={item.productId}
                               onChange={(e) => updateItem(index, "productId", e.target.value)}
-                              className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                              className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                               style={{ 
                                 borderColor: 'var(--border-color)', 
                                 backgroundColor: 'var(--bg-color)', 
@@ -552,7 +552,7 @@ const AddPriceList = () => {
                                 updateItem(index, "basePrice", price);
                                 updateItem(index, "unitPrice", price); // Keep for UI compatibility
                               }}
-                              className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                              className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                               style={{ 
                                 borderColor: 'var(--border-color)', 
                                 backgroundColor: 'var(--bg-color)', 
@@ -565,7 +565,7 @@ const AddPriceList = () => {
                             <button
                               type="button"
                               onClick={() => removeItem(index)}
-                              className="w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                              className="w-full p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                             >
                               <Trash2 size={18} className="text-red-500 mx-auto" />
                             </button>
@@ -604,9 +604,9 @@ const AddPriceList = () => {
                           {item.quantityBreaks && item.quantityBreaks.length > 0 ? (
                             <div className="space-y-2">
                               {item.quantityBreaks.map((breakItem, breakIndex) => (
-                                <div key={breakIndex} className="grid grid-cols-1 md:grid-cols-4 gap-3 p-3 rounded-lg border" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)' }}>
+                                <div key={breakIndex} className="grid grid-cols-1 md:grid-cols-4 gap-3 p-3 rounded-lg border" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--surface-color)' }}>
                                   <div>
-                                    <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
+                                    <label className="block text-xs font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
                                       {t("procurement.min_quantity") || "Min Qty"} *
                                     </label>
                                     <input
@@ -619,7 +619,7 @@ const AddPriceList = () => {
                                         updatedItems[index].quantityBreaks[breakIndex].minQuantity = Number(e.target.value) || 1;
                                         setFormData({ ...formData, items: updatedItems });
                                       }}
-                                      className="w-full px-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 transition"
+                                      className="w-full px-3 h-11 text-sm rounded-lg border focus:outline-none focus:ring-2 transition"
                                       style={{ 
                                         borderColor: 'var(--border-color)', 
                                         backgroundColor: 'var(--bg-color)', 
@@ -629,7 +629,7 @@ const AddPriceList = () => {
                                     />
                                   </div>
                                   <div>
-                                    <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
+                                    <label className="block text-xs font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
                                       {t("procurement.max_quantity") || "Max Qty"} (אופציונלי)
                                     </label>
                                     <input
@@ -642,7 +642,7 @@ const AddPriceList = () => {
                                         setFormData({ ...formData, items: updatedItems });
                                       }}
                                       placeholder={t("procurement.unlimited") || "Unlimited"}
-                                      className="w-full px-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 transition"
+                                      className="w-full px-3 h-11 text-sm rounded-lg border focus:outline-none focus:ring-2 transition"
                                       style={{ 
                                         borderColor: 'var(--border-color)', 
                                         backgroundColor: 'var(--bg-color)', 
@@ -652,7 +652,7 @@ const AddPriceList = () => {
                                     />
                                   </div>
                                   <div>
-                                    <label className="block text-xs font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
+                                    <label className="block text-xs font-medium mb-1" style={{ color: 'var(--color-secondary)' }}>
                                       {t("procurement.price") || "Price"} *
                                     </label>
                                     <input
@@ -666,7 +666,7 @@ const AddPriceList = () => {
                                         updatedItems[index].quantityBreaks[breakIndex].price = Number(e.target.value) || 0;
                                         setFormData({ ...formData, items: updatedItems });
                                       }}
-                                      className="w-full px-3 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 transition"
+                                      className="w-full px-3 h-11 text-sm rounded-lg border focus:outline-none focus:ring-2 transition"
                                       style={{ 
                                         borderColor: 'var(--border-color)', 
                                         backgroundColor: 'var(--bg-color)', 
@@ -683,7 +683,7 @@ const AddPriceList = () => {
                                         updatedItems[index].quantityBreaks.splice(breakIndex, 1);
                                         setFormData({ ...formData, items: updatedItems });
                                       }}
-                                      className="w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                                      className="w-full p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
                                     >
                                       <Trash2 size={16} className="text-red-500 mx-auto" />
                                     </button>
@@ -692,7 +692,7 @@ const AddPriceList = () => {
                               ))}
                             </div>
                           ) : (
-                            <p className="text-sm text-center py-2" style={{ color: 'var(--text-secondary)' }}>
+                            <p className="text-sm text-center py-2" style={{ color: 'var(--color-secondary)' }}>
                               {t("procurement.no_quantity_breaks") || "No quantity breaks defined. Click 'Add Break' to add pricing tiers."}
                             </p>
                           )}
@@ -732,7 +732,7 @@ const AddPriceList = () => {
               <button
                 type="submit"
                 disabled={mutation.isLoading}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg text-white hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 h-11 rounded-lg text-white hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: 'var(--color-primary)' }}
               >
                 {mutation.isLoading ? (
@@ -750,7 +750,7 @@ const AddPriceList = () => {
               <button
                 type="button"
                 onClick={() => navigate("/dashboard/procurement/price-lists")}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                className="flex items-center gap-2 px-6 h-11 rounded-lg border hover:bg-[var(--bg-secondary)] transition"
                 style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
               >
                 <X size={20} />

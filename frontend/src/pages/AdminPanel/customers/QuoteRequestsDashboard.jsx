@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { ClipboardList } from "lucide-react";
 import axiosInstance from "../../../lib/axios.js";
 
 const QuoteRequestsDashboard = () => {
@@ -33,79 +34,134 @@ const QuoteRequestsDashboard = () => {
   };
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">כל פרטי ההזמנות</h2>
-      {orders.length === 0 && <p className="text-gray-600">אין הזמנות להצגה</p>}
-      {orders.map((order) => (
-        <div
-          key={order._id}
-          className="border border-gray-300 rounded-lg shadow-sm mb-4 transition-all hover:shadow-md"
-        >
-          {/* לחיצה על התיבה כולה תפעיל את הפונקציה */}
+    <div
+      className="min-h-screen p-4 sm:p-6 lg:p-8"
+      style={{ backgroundColor: "var(--bg-color)" }}
+    >
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
           <div
-            className="flex justify-between items-center p-4 cursor-pointer bg-gray-50"
-            onClick={() => toggleOrder(order._id)}
+            className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+            style={{
+              background:
+                "linear-gradient(135deg, var(--color-primary), var(--color-accent))",
+            }}
           >
-            <div>
-              <p className="text-lg font-medium">
-                <span className="font-bold">לקוח:</span>{" "}
-                {order.customer?.name || "לא זמין"}
-              </p>
-              <p className="text-gray-600">
-                <span className="font-bold">תאריך משלוח:</span>{" "}
-                {order.deliveryDate
-                  ? new Date(order.deliveryDate).toLocaleDateString("he-IL")
-                  : "לא צוין"}
-              </p>
-              <p className="text-gray-600">
-                <span className="font-bold">סה"כ הזמנה:</span>{" "}
-                {order.orderTotal}
-              </p>
-              {order.notes && (
-                <p className="text-gray-600">
-                  <span className="font-bold">הערות:</span> {order.notes}
-                </p>
-              )}
-            </div>
-            <div className="text-2xl">
-              {expandedOrders.includes(order._id) ? "▲" : "▼"}
-            </div>
+            <ClipboardList size={28} className="text-white" />
           </div>
-          {expandedOrders.includes(order._id) && (
-            <div className="bg-white p-4 border-t border-gray-200">
-              <h4 className="text-xl font-semibold mb-2">מוצרים והכמויות:</h4>
-              {order.items && order.items.length > 0 ? (
-                order.items.map((item, index) => (
-                  <div
-                    key={index}
-                    className="mb-3 pb-3 border-b border-gray-200"
-                  >
-                    <p className="text-lg">
-                      <span className="font-bold">מוצר:</span>{" "}
-                      {item.product?.productName || "לא זמין"}
-                    </p>
-                    <p className="text-gray-600">
-                      <span className="font-bold">כמות:</span> {item.quantity}
-                    </p>
-                    <p className="text-gray-600">
-                      <span className="font-bold">מחיר ליחידה:</span>{" "}
-                      {item.unitPrice}
-                    </p>
-                    <p className="text-gray-600">
-                      <span className="font-bold">הנחה:</span> {item.discount}%
-                    </p>
-                    <p className="text-gray-600">
-                      <span className="font-bold">סה"כ:</span> {item.totalPrice}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-600">אין פרטי מוצרים להזמנה זו.</p>
-              )}
-            </div>
-          )}
+          <h1
+            className="text-4xl font-bold"
+            style={{ color: "var(--text-color)" }}
+          >
+            כל פרטי ההזמנות
+          </h1>
         </div>
-      ))}
+        {orders.length === 0 && (
+          <p
+            className="text-center py-16"
+            style={{ color: "var(--color-secondary)" }}
+          >
+            אין הזמנות להצגה
+          </p>
+        )}
+        {orders.map((order) => (
+          <div
+            key={order._id}
+            className="rounded-2xl shadow-lg border mb-4 overflow-hidden transition-all hover:shadow-md"
+            style={{
+              backgroundColor: "var(--surface-color)",
+              borderColor: "var(--border-color)",
+            }}
+          >
+            {/* לחיצה על התיבה כולה תפעיל את הפונקציה */}
+            <div
+              className="flex justify-between items-center p-4 cursor-pointer"
+              style={{ backgroundColor: "var(--bg-secondary)" }}
+              onClick={() => toggleOrder(order._id)}
+            >
+              <div>
+                <p
+                  className="text-lg font-medium"
+                  style={{ color: "var(--text-color)" }}
+                >
+                  <span className="font-bold">לקוח:</span>{" "}
+                  {order.customer?.name || "לא זמין"}
+                </p>
+                <p style={{ color: "var(--color-secondary)" }}>
+                  <span className="font-bold">תאריך משלוח:</span>{" "}
+                  {order.deliveryDate
+                    ? new Date(order.deliveryDate).toLocaleDateString("he-IL")
+                    : "לא צוין"}
+                </p>
+                <p style={{ color: "var(--color-secondary)" }}>
+                  <span className="font-bold">סה"כ הזמנה:</span>{" "}
+                  {order.orderTotal}
+                </p>
+                {order.notes && (
+                  <p style={{ color: "var(--color-secondary)" }}>
+                    <span className="font-bold">הערות:</span> {order.notes}
+                  </p>
+                )}
+              </div>
+              <div className="text-2xl" style={{ color: "var(--text-color)" }}>
+                {expandedOrders.includes(order._id) ? "▲" : "▼"}
+              </div>
+            </div>
+            {expandedOrders.includes(order._id) && (
+              <div
+                className="p-4 border-t"
+                style={{
+                  backgroundColor: "var(--surface-color)",
+                  borderColor: "var(--border-color)",
+                }}
+              >
+                <h4
+                  className="text-xl font-semibold mb-2"
+                  style={{ color: "var(--text-color)" }}
+                >
+                  מוצרים והכמויות:
+                </h4>
+                {order.items && order.items.length > 0 ? (
+                  order.items.map((item, index) => (
+                    <div
+                      key={index}
+                      className="mb-3 pb-3 border-b"
+                      style={{ borderColor: "var(--border-color)" }}
+                    >
+                      <p
+                        className="text-lg"
+                        style={{ color: "var(--text-color)" }}
+                      >
+                        <span className="font-bold">מוצר:</span>{" "}
+                        {item.product?.productName || "לא זמין"}
+                      </p>
+                      <p style={{ color: "var(--color-secondary)" }}>
+                        <span className="font-bold">כמות:</span> {item.quantity}
+                      </p>
+                      <p style={{ color: "var(--color-secondary)" }}>
+                        <span className="font-bold">מחיר ליחידה:</span>{" "}
+                        {item.unitPrice}
+                      </p>
+                      <p style={{ color: "var(--color-secondary)" }}>
+                        <span className="font-bold">הנחה:</span> {item.discount}
+                        %
+                      </p>
+                      <p style={{ color: "var(--color-secondary)" }}>
+                        <span className="font-bold">סה"כ:</span>{" "}
+                        {item.totalPrice}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p style={{ color: "var(--color-secondary)" }}>
+                    אין פרטי מוצרים להזמנה זו.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

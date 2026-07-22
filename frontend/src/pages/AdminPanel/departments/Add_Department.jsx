@@ -108,7 +108,7 @@ const Add_Department = ({ onClose }) => {
 
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
           className="mb-8"
@@ -116,7 +116,10 @@ const Add_Department = ({ onClose }) => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-cyan-500 to-blue-600">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
+            >
               <Plus size={28} color="white" />
             </div>
             <div>
@@ -130,7 +133,7 @@ const Add_Department = ({ onClose }) => {
           </div>
 
           {/* Progress Bar */}
-          <div className="rounded-xl p-4 border" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+          <div className="rounded-2xl p-6 shadow-lg border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
             <div className="flex items-center justify-between mb-2">
               <span className="font-bold" style={{ color: 'var(--text-color)' }}>
                 {t("addDepartment.form_progress")}
@@ -166,16 +169,17 @@ const Add_Department = ({ onClose }) => {
         {/* Form */}
         <motion.div
           className="rounded-2xl shadow-lg border p-6 lg:p-8"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Department Name */}
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
-                <Building2 className="inline mr-2" size={16} />
-                {t("addDepartment.nameLabel")} *
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
+                <Building2 className="inline me-2" size={16} />
+                {t("addDepartment.nameLabel")}
+                <span className="text-red-500 ms-1">*</span>
               </label>
               <input
                 type="text"
@@ -183,7 +187,7 @@ const Add_Department = ({ onClose }) => {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                 style={{
                   borderColor: 'var(--border-color)',
                   backgroundColor: 'var(--bg-color)',
@@ -195,8 +199,8 @@ const Add_Department = ({ onClose }) => {
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
-                <FileText className="inline mr-2" size={16} />
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
+                <FileText className="inline me-2" size={16} />
                 {t("addDepartment.descriptionLabel")}
               </label>
               <textarea
@@ -216,16 +220,17 @@ const Add_Department = ({ onClose }) => {
 
             {/* Department Manager */}
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
-                <User className="inline mr-2" size={16} />
-                {t("addDepartment.managerLabel")} *
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
+                <User className="inline me-2" size={16} />
+                {t("addDepartment.managerLabel")}
+                <span className="text-red-500 ms-1">*</span>
               </label>
               <select
                 name="departmentManager"
                 value={formData.departmentManager}
                 onChange={handleChange}
                 required
-                className="w-full p-3 rounded-xl border focus:outline-none focus:ring-2"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2"
                 style={{
                   borderColor: 'var(--border-color)',
                   backgroundColor: 'var(--bg-color)',
@@ -248,8 +253,8 @@ const Add_Department = ({ onClose }) => {
 
             {/* Team Members */}
             <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
-                <Users className="inline mr-2" size={16} />
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
+                <Users className="inline me-2" size={16} />
                 {t("addDepartment.teamMembersLabel")}
               </label>
               <select
@@ -307,24 +312,26 @@ const Add_Department = ({ onClose }) => {
             </div>
 
             {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="animate-spin" size={24} />
-                  {t("addDepartment.creating")}
-                </>
-              ) : (
-                <>
-                  <CheckCircle size={24} />
-                  {t("addDepartment.submitButton")}
-                </>
-              )}
-            </button>
+            <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium shadow-lg transition-all hover:scale-105 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="animate-spin" size={20} />
+                    {t("addDepartment.creating")}
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle size={20} />
+                    {t("addDepartment.submitButton")}
+                  </>
+                )}
+              </button>
+            </div>
           </form>
         </motion.div>
       </div>

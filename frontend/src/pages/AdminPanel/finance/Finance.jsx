@@ -194,7 +194,8 @@ const Finance = () => {
         >
           <div className="flex items-center gap-4 mb-4">
             <div 
-              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-green-500 to-emerald-600"
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
             >
               <DollarSign size={28} color="white" />
             </div>
@@ -217,7 +218,7 @@ const Finance = () => {
               value: `${stats.totalIncome.toLocaleString()} ₪`, 
               icon: TrendingUp, 
               color: "#10b981",
-              gradient: "from-green-500 to-green-600"
+              gradient: "from-[var(--color-accent)] to-[var(--color-accent)]"
             },
             { 
               label: t("finance.totalExpense"), 
@@ -249,7 +250,7 @@ const Finance = () => {
               transition={{ delay: index * 0.1 }}
               className="rounded-2xl shadow-lg p-6 border hover:shadow-xl transition-all"
               style={{ 
-                backgroundColor: 'var(--bg-color)',
+                backgroundColor: 'var(--surface-color)',
                 borderColor: 'var(--border-color)'
               }}
               whileHover={{ y: -5 }}
@@ -275,7 +276,7 @@ const Finance = () => {
         <motion.div
           className="mb-8 rounded-2xl shadow-lg p-6 border"
           style={{ 
-            backgroundColor: 'var(--bg-color)',
+            backgroundColor: 'var(--surface-color)',
             borderColor: 'var(--border-color)'
           }}
           initial={{ opacity: 0, y: 20 }}
@@ -285,13 +286,13 @@ const Finance = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={20} style={{ color: 'var(--color-secondary)' }} />
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2" size={20} style={{ color: 'var(--color-secondary)' }} />
               <input
                 type="text"
                 placeholder={t("finance.search_placeholder")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className="w-full h-11 ps-10 pe-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                 style={{ 
                   borderColor: 'var(--border-color)',
                   backgroundColor: 'var(--bg-color)',
@@ -302,11 +303,11 @@ const Finance = () => {
 
             {/* Sort */}
             <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2" size={20} style={{ color: 'var(--color-secondary)' }} />
+              <Filter className="absolute start-3 top-1/2 -translate-y-1/2" size={20} style={{ color: 'var(--color-secondary)' }} />
               <select
                 value={sortOption}
                 onChange={(e) => setSortOption(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all appearance-none"
+                className="w-full h-11 ps-10 pe-4 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all appearance-none"
                 style={{ 
                   borderColor: 'var(--border-color)',
                   backgroundColor: 'var(--bg-color)',
@@ -327,7 +328,7 @@ const Finance = () => {
                 <button
                   key={status}
                   onClick={() => setFilterOption(status)}
-                  className={`flex-1 px-4 py-3 rounded-xl font-medium transition-all ${
+                  className={`flex-1 px-4 h-11 rounded-xl font-medium transition-all ${
                     filterOption === status 
                       ? 'shadow-lg scale-105' 
                       : 'hover:scale-105'
@@ -345,7 +346,7 @@ const Finance = () => {
 
           <button
             onClick={() => getFinanceData()}
-            className="mt-4 w-full md:w-auto px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 hover:scale-105 shadow-lg"
+            className="mt-4 w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 hover:scale-105 shadow-lg"
             style={{
               backgroundColor: 'var(--color-accent)',
               color: 'var(--button-text)'
@@ -367,7 +368,7 @@ const Finance = () => {
             />
           </div>
         ) : isError ? (
-          <div className="text-center py-16 rounded-2xl shadow-lg" style={{ backgroundColor: 'var(--bg-color)' }}>
+          <div className="text-center py-16 rounded-2xl shadow-lg border" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
             <XCircle size={64} className="mx-auto mb-4 text-red-500" />
             <p className="text-xl font-semibold text-red-500">
               {t("errors.loading_error")}: {error?.message}
@@ -385,7 +386,7 @@ const Finance = () => {
                   transition={{ delay: index * 0.05 }}
                   className="rounded-2xl shadow-lg overflow-hidden border hover:shadow-xl transition-all cursor-pointer"
                   style={{ 
-                    backgroundColor: 'var(--bg-color)',
+                    backgroundColor: 'var(--surface-color)',
                     borderColor: 'var(--border-color)'
                   }}
                   onClick={() => handleRowClick(doc._id)}
@@ -502,7 +503,7 @@ const Finance = () => {
                       exit={{ height: 0, opacity: 0 }}
                       className="border-t p-6"
                       style={{ 
-                        backgroundColor: 'var(--bg-color)',
+                        backgroundColor: 'var(--bg-secondary)',
                         borderColor: 'var(--border-color)',
                         opacity: 0.95
                       }}
@@ -549,8 +550,8 @@ const Finance = () => {
             {/* Empty State */}
             {filteredData.length === 0 && (
               <motion.div
-                className="text-center py-16 rounded-2xl shadow-lg"
-                style={{ backgroundColor: 'var(--bg-color)' }}
+                className="text-center py-16 rounded-2xl shadow-lg border"
+                style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
@@ -627,7 +628,7 @@ const Finance = () => {
           >
             <motion.div
               className="rounded-2xl shadow-2xl p-6 max-w-2xl w-full border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               onClick={(e) => e.stopPropagation()}
@@ -656,7 +657,7 @@ const Finance = () => {
                       rel="noopener noreferrer"
                       className="block p-4 rounded-xl border hover:shadow-lg transition-all"
                       style={{ 
-                        backgroundColor: 'var(--bg-color)',
+                        backgroundColor: "var(--surface-color)",
                         borderColor: 'var(--border-color)'
                       }}
                       initial={{ opacity: 0, x: -20 }}
@@ -685,14 +686,14 @@ const Finance = () => {
         {/* Edit Finance Record Modal */}
         {showEditModal && editingRecord && (
           <motion.div
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-bg rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-              style={{ backgroundColor: 'var(--bg-color)' }}
+              className="rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              style={{ backgroundColor: 'var(--surface-color)' }}
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -739,14 +740,14 @@ const Finance = () => {
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("finance.transaction_date")}
                     </label>
                     <input
                       type="date"
                       value={editingRecord.transactionDate ? new Date(editingRecord.transactionDate).toISOString().split('T')[0] : ""}
                       onChange={(e) => setEditingRecord({ ...editingRecord, transactionDate: e.target.value })}
-                      className="w-full p-3 border rounded-xl"
+                      className="w-full h-11 px-4 border rounded-xl"
                       style={{ 
                         borderColor: 'var(--border-color)',
                         backgroundColor: 'var(--bg-color)',
@@ -757,13 +758,13 @@ const Finance = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("finance.transaction_type")}
                     </label>
                     <select
                       value={editingRecord.transactionType}
                       onChange={(e) => setEditingRecord({ ...editingRecord, transactionType: e.target.value })}
-                      className="w-full p-3 border rounded-xl"
+                      className="w-full h-11 px-4 border rounded-xl"
                       style={{ 
                         borderColor: 'var(--border-color)',
                         backgroundColor: 'var(--bg-color)',
@@ -778,7 +779,7 @@ const Finance = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("finance.amount")}
                     </label>
                     <input
@@ -786,7 +787,7 @@ const Finance = () => {
                       value={editingRecord.transactionAmount}
                       onChange={(e) => setEditingRecord({ ...editingRecord, transactionAmount: Number(e.target.value) })}
                       step="0.01"
-                      className="w-full p-3 border rounded-xl"
+                      className="w-full h-11 px-4 border rounded-xl"
                       style={{ 
                         borderColor: 'var(--border-color)',
                         backgroundColor: 'var(--bg-color)',
@@ -797,14 +798,14 @@ const Finance = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("finance.Category")}
                     </label>
                     <input
                       type="text"
                       value={editingRecord.category}
                       onChange={(e) => setEditingRecord({ ...editingRecord, category: e.target.value })}
-                      className="w-full p-3 border rounded-xl"
+                      className="w-full h-11 px-4 border rounded-xl"
                       style={{ 
                         borderColor: 'var(--border-color)',
                         backgroundColor: 'var(--bg-color)',
@@ -815,13 +816,13 @@ const Finance = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("finance.Transaction_Status")}
                     </label>
                     <select
                       value={editingRecord.transactionStatus}
                       onChange={(e) => setEditingRecord({ ...editingRecord, transactionStatus: e.target.value })}
-                      className="w-full p-3 border rounded-xl"
+                      className="w-full h-11 px-4 border rounded-xl"
                       style={{ 
                         borderColor: 'var(--border-color)',
                         backgroundColor: 'var(--bg-color)',
@@ -836,13 +837,13 @@ const Finance = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                    <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                       {t("finance.payment_terms") || "Payment Terms"}
                     </label>
                     <select
                       value={editingRecord.paymentTerms || "Net 30"}
                       onChange={(e) => setEditingRecord({ ...editingRecord, paymentTerms: e.target.value })}
-                      className="w-full p-3 border rounded-xl"
+                      className="w-full h-11 px-4 border rounded-xl"
                       style={{ 
                         borderColor: 'var(--border-color)',
                         backgroundColor: 'var(--bg-color)',
@@ -859,7 +860,7 @@ const Finance = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-color)' }}>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-color)' }}>
                     {t("finance.Transaction_Description")}
                   </label>
                   <textarea
@@ -875,14 +876,14 @@ const Finance = () => {
                   />
                 </div>
 
-                <div className="flex gap-4 pt-4">
+                <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4">
                   <button
                     type="button"
                     onClick={() => {
                       setShowEditModal(false);
                       setEditingRecord(null);
                     }}
-                    className="flex-1 px-6 py-3 rounded-xl font-semibold transition-all"
+                    className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition-all"
                     style={{ 
                       backgroundColor: 'var(--border-color)',
                       color: 'var(--text-color)'
@@ -893,7 +894,7 @@ const Finance = () => {
                   <button
                     type="submit"
                     disabled={isUpdating}
-                    className="flex-1 px-6 py-3 rounded-xl font-semibold text-white transition-all disabled:opacity-50"
+                    className="w-full sm:w-auto px-6 h-11 rounded-lg font-medium transition-all disabled:opacity-50"
                     style={{ 
                       backgroundColor: 'var(--color-primary)',
                       color: 'var(--button-text)'

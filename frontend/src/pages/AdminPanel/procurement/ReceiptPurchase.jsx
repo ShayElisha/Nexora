@@ -187,7 +187,7 @@ const ReceiptPurchase = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-green-500 to-emerald-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <CheckCircle size={28} color="white" />
             </div>
             <div>
@@ -205,7 +205,7 @@ const ReceiptPurchase = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <motion.div
             className="rounded-2xl shadow-lg p-6 border"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -227,7 +227,7 @@ const ReceiptPurchase = () => {
 
           <motion.div
             className="rounded-2xl shadow-lg p-6 border"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -262,14 +262,14 @@ const ReceiptPurchase = () => {
         ) : filteredData && filteredData.length > 0 ? (
           <motion.div
             className="rounded-2xl shadow-lg border overflow-hidden"
-            style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+            style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
             <div className="overflow-x-auto">
               <table className="min-w-full">
-                <thead className="bg-gradient-to-r from-green-500 to-emerald-600">
+                <thead style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
                   <tr>
                     <th className="py-4 px-4 text-sm font-bold text-white text-left w-12"></th>
                     <th className="py-4 px-4 text-sm font-bold text-white text-left">
@@ -436,7 +436,7 @@ const ReceiptPurchase = () => {
             >
               <motion.div
                 className="rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border"
-                style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+                style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
                 initial={{ scale: 0.9, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.9, y: 20 }}
@@ -445,7 +445,7 @@ const ReceiptPurchase = () => {
                   {/* Modal Header */}
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-green-500 to-emerald-600">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
                         <Package size={24} color="white" />
                       </div>
                       <div>
@@ -533,7 +533,7 @@ const ReceiptPurchase = () => {
                     </h3>
                     <div className="rounded-xl border overflow-hidden" style={{ borderColor: 'var(--border-color)' }}>
                       <table className="min-w-full">
-                        <thead className="bg-gradient-to-r from-slate-100 to-slate-200">
+                        <thead style={{ backgroundColor: "var(--bg-secondary)" }}>
                           <tr>
                             <th className="py-3 px-4 text-sm font-semibold text-left" style={{ color: 'var(--text-color)' }}>
                         {t("receipts.product_name")}
@@ -604,7 +604,7 @@ const ReceiptPurchase = () => {
                         className="w-5 h-5 rounded border-2 text-green-600 focus:ring-green-500"
                   />
                       <div className="flex items-center gap-2 flex-1">
-                        <CheckCircle size={20} className={isGoodsChecked ? "text-green-600" : "text-gray-400"} />
+                        <CheckCircle size={20} className={isGoodsChecked ? "text-green-600" : "text-[var(--color-secondary)]"} />
                         <span className="font-medium" style={{ color: 'var(--text-color)' }}>
                   {t("receipts.goods_checked")}
                         </span>
@@ -650,7 +650,8 @@ const ReceiptPurchase = () => {
                             <Star
                               size={32}
                               fill={rating <= supplierRating ? "#FCD34D" : "none"}
-                              className={rating <= supplierRating ? "text-yellow-400" : "text-gray-300"}
+                              className={rating <= supplierRating ? "text-yellow-400" : ""}
+                              style={rating <= supplierRating ? undefined : { color: "var(--color-secondary)" }}
                             />
                           </motion.button>
                         ))}

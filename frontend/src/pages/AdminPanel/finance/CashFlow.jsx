@@ -56,10 +56,11 @@ const StatisticsCards = ({ data, loading }) => {
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="bg-bg rounded-xl p-6 shadow-lg border border-border-color animate-pulse"
+            className="rounded-2xl p-6 shadow-lg border border-border-color animate-pulse"
+            style={{ backgroundColor: "var(--surface-color)" }}
           >
-            <div className="h-4 bg-gray-300 rounded w-3/4 mb-4"></div>
-            <div className="h-8 bg-gray-300 rounded w-1/2"></div>
+            <div className="h-4 rounded w-3/4 mb-4" style={{ backgroundColor: "var(--bg-secondary)" }}></div>
+            <div className="h-8 rounded w-1/2" style={{ backgroundColor: "var(--bg-secondary)" }}></div>
           </div>
         ))}
       </div>
@@ -109,7 +110,8 @@ const StatisticsCards = ({ data, loading }) => {
         return (
           <div
             key={index}
-            className="bg-bg rounded-xl p-6 shadow-lg border border-border-color hover:shadow-xl transition-all duration-300"
+            className="rounded-2xl p-6 shadow-lg border border-border-color hover:shadow-xl transition-all duration-300"
+            style={{ backgroundColor: "var(--surface-color)" }}
           >
             <div className="flex items-center justify-between mb-4">
               <div className={`${card.bgColor} p-3 rounded-lg`}>
@@ -133,7 +135,7 @@ const CashFlowLineChart = ({ data, loading }) => {
 
   if (loading) {
     return (
-      <div className="bg-bg rounded-xl p-6 shadow-lg border border-border-color h-96 flex items-center justify-center">
+      <div className="rounded-2xl p-6 shadow-lg border border-border-color h-96 flex items-center justify-center" style={{ backgroundColor: "var(--surface-color)" }}>
         <div className="animate-pulse text-text/70">{t("finance.cashFlow.loading")}</div>
       </div>
     );
@@ -141,7 +143,7 @@ const CashFlowLineChart = ({ data, loading }) => {
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-bg rounded-xl p-6 shadow-lg border border-border-color h-96 flex items-center justify-center">
+      <div className="rounded-2xl p-6 shadow-lg border border-border-color h-96 flex items-center justify-center" style={{ backgroundColor: "var(--surface-color)" }}>
         <p className="text-text/70">{t("finance.cashFlow.no_data")}</p>
       </div>
     );
@@ -222,7 +224,7 @@ const CashFlowLineChart = ({ data, loading }) => {
   };
 
   return (
-    <div className="bg-bg rounded-xl p-6 shadow-lg border border-border-color">
+    <div className="rounded-2xl p-6 shadow-lg border border-border-color" style={{ backgroundColor: "var(--surface-color)" }}>
       <div className="h-96">
         <LineChart data={chartData} options={options} />
       </div>
@@ -236,7 +238,7 @@ const CumulativeCashFlowChart = ({ data, loading }) => {
 
   if (loading) {
     return (
-      <div className="bg-bg rounded-xl p-6 shadow-lg border border-border-color h-96 flex items-center justify-center">
+      <div className="rounded-2xl p-6 shadow-lg border border-border-color h-96 flex items-center justify-center" style={{ backgroundColor: "var(--surface-color)" }}>
         <div className="animate-pulse text-text/70">{t("finance.cashFlow.loading")}</div>
       </div>
     );
@@ -244,7 +246,7 @@ const CumulativeCashFlowChart = ({ data, loading }) => {
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-bg rounded-xl p-6 shadow-lg border border-border-color h-96 flex items-center justify-center">
+      <div className="rounded-2xl p-6 shadow-lg border border-border-color h-96 flex items-center justify-center" style={{ backgroundColor: "var(--surface-color)" }}>
         <p className="text-text/70">{t("finance.cashFlow.no_data")}</p>
       </div>
     );
@@ -308,7 +310,7 @@ const CumulativeCashFlowChart = ({ data, loading }) => {
   };
 
   return (
-    <div className="bg-bg rounded-xl p-6 shadow-lg border border-border-color">
+    <div className="rounded-2xl p-6 shadow-lg border border-border-color" style={{ backgroundColor: "var(--surface-color)" }}>
       <div className="h-96">
         <LineChart data={chartData} options={options} />
       </div>
@@ -322,7 +324,7 @@ const CategoryBreakdownChart = ({ data, loading }) => {
 
   if (loading) {
     return (
-      <div className="bg-bg rounded-xl p-6 shadow-lg border border-border-color h-96 flex items-center justify-center">
+      <div className="rounded-2xl p-6 shadow-lg border border-border-color h-96 flex items-center justify-center" style={{ backgroundColor: "var(--surface-color)" }}>
         <div className="animate-pulse text-text/70">{t("finance.cashFlow.loading")}</div>
       </div>
     );
@@ -330,7 +332,7 @@ const CategoryBreakdownChart = ({ data, loading }) => {
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-bg rounded-xl p-6 shadow-lg border border-border-color h-96 flex items-center justify-center">
+      <div className="rounded-2xl p-6 shadow-lg border border-border-color h-96 flex items-center justify-center" style={{ backgroundColor: "var(--surface-color)" }}>
         <p className="text-text/70">{t("finance.cashFlow.no_data")}</p>
       </div>
     );
@@ -402,7 +404,7 @@ const CategoryBreakdownChart = ({ data, loading }) => {
   };
 
   return (
-    <div className="bg-bg rounded-xl p-6 shadow-lg border border-border-color">
+    <div className="rounded-2xl p-6 shadow-lg border border-border-color" style={{ backgroundColor: "var(--surface-color)" }}>
       <div className="h-96">
         <BarChart data={chartData} options={options} />
       </div>
@@ -416,7 +418,7 @@ const ForecastChart = ({ data, loading }) => {
 
   if (loading) {
     return (
-      <div className="bg-bg rounded-xl p-6 shadow-lg border border-border-color h-96 flex items-center justify-center">
+      <div className="rounded-2xl p-6 shadow-lg border border-border-color h-96 flex items-center justify-center" style={{ backgroundColor: "var(--surface-color)" }}>
         <div className="animate-pulse text-text/70">{t("finance.cashFlow.loading")}</div>
       </div>
     );
@@ -424,7 +426,7 @@ const ForecastChart = ({ data, loading }) => {
 
   if (!data || !data.forecast || data.forecast.length === 0) {
     return (
-      <div className="bg-bg rounded-xl p-6 shadow-lg border border-border-color h-96 flex items-center justify-center">
+      <div className="rounded-2xl p-6 shadow-lg border border-border-color h-96 flex items-center justify-center" style={{ backgroundColor: "var(--surface-color)" }}>
         <p className="text-text/70">{t("finance.cashFlow.no_data")}</p>
       </div>
     );
@@ -508,7 +510,7 @@ const ForecastChart = ({ data, loading }) => {
   };
 
   return (
-    <div className="bg-bg rounded-xl p-6 shadow-lg border border-border-color">
+    <div className="rounded-2xl p-6 shadow-lg border border-border-color" style={{ backgroundColor: "var(--surface-color)" }}>
       <div className="h-96">
         <LineChart data={chartData} options={options} />
       </div>
@@ -638,14 +640,26 @@ const CashFlow = () => {
   }, [cashFlowData, t]);
 
   return (
-    <div className="min-h-screen bg-bg p-6" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }} dir={isRTL ? "rtl" : "ltr"}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-text mb-2">
-            {t("finance.cashFlow.title")}
-          </h1>
-          <p className="text-text/70">{t("finance.cashFlow.description")}</p>
+          <div className="flex items-center gap-4 mb-4">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
+            >
+              <Activity size={28} color="white" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold" style={{ color: "var(--text-color)" }}>
+                {t("finance.cashFlow.title")}
+              </h1>
+              <p className="text-lg" style={{ color: "var(--color-secondary)" }}>
+                {t("finance.cashFlow.description")}
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Alerts */}
@@ -723,7 +737,7 @@ const CashFlow = () => {
         <StatisticsCards data={cashFlowData} loading={cashFlowLoading} />
 
         {/* Filters */}
-        <div className="bg-bg rounded-xl shadow-lg border border-border-color p-6 mb-6">
+        <div className="rounded-2xl shadow-lg border border-border-color p-6 mb-6" style={{ backgroundColor: "var(--surface-color)" }}>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-text mb-2">
@@ -732,7 +746,7 @@ const CashFlow = () => {
               <select
                 value={period}
                 onChange={(e) => setPeriod(e.target.value)}
-                className="w-full px-4 py-2 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full h-11 px-4 border border-border-color rounded-xl bg-bg text-text focus:ring-2 focus:ring-primary focus:border-transparent"
               >
                 <option value="daily">{t("finance.cashFlow.daily")}</option>
                 <option value="weekly">{t("finance.cashFlow.weekly")}</option>
@@ -748,7 +762,7 @@ const CashFlow = () => {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full px-4 py-2 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full h-11 px-4 border border-border-color rounded-xl bg-bg text-text focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </div>
             <div>
@@ -759,7 +773,7 @@ const CashFlow = () => {
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full px-4 py-2 border border-border-color rounded-lg bg-bg text-text focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full h-11 px-4 border border-border-color rounded-xl bg-bg text-text focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </div>
             <div className="flex items-end">
@@ -768,7 +782,7 @@ const CashFlow = () => {
                   setStartDate(format(startOfMonth(subMonths(new Date(), 11)), "yyyy-MM-dd"));
                   setEndDate(format(endOfMonth(new Date()), "yyyy-MM-dd"));
                 }}
-                className="w-full px-4 py-2 bg-button-bg text-button-text rounded-lg hover:bg-primary transition-colors flex items-center justify-center gap-2"
+                className="w-full h-11 px-4 bg-button-bg text-button-text rounded-lg font-medium hover:bg-primary transition-colors flex items-center justify-center gap-2"
               >
                 <RefreshCw className="w-4 h-4" />
                 {t("finance.cashFlow.reset")}
@@ -778,8 +792,8 @@ const CashFlow = () => {
         </div>
 
         {/* Tabs */}
-        <div className="bg-bg rounded-xl shadow-lg border border-border-color p-4 mb-6">
-          <div className="flex gap-2">
+        <div className="rounded-2xl shadow-lg border border-border-color p-4 mb-6" style={{ backgroundColor: "var(--surface-color)" }}>
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setActiveTab("analysis")}
               className={`px-4 py-2 rounded-lg font-semibold transition-all ${
@@ -849,7 +863,7 @@ const CashFlow = () => {
 
         {/* Bank Accounts Table */}
         {activeTab === "analysis" && (
-          <div className="mt-6 bg-bg rounded-xl shadow-lg border border-border-color overflow-hidden">
+          <div className="mt-6 rounded-2xl shadow-lg border border-border-color overflow-hidden" style={{ backgroundColor: "var(--surface-color)" }}>
             <div className="p-6 border-b border-border-color">
               <h2 className="text-xl font-bold text-text">
                 {t("finance.cashFlow.by_bank_account")}

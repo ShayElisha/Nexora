@@ -119,7 +119,7 @@ const AddInventoryQuality = () => {
   };
 
   return (
-    <div className="p-6" style={{ backgroundColor: "var(--bg-color)", minHeight: "100vh" }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }}>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6" style={{ color: "var(--text-color)" }}>
           {isEdit
@@ -127,7 +127,7 @@ const AddInventoryQuality = () => {
             : t("inventory.add_quality_check") || "Add Quality Check"}
         </h1>
 
-        <form onSubmit={handleSubmit} className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+        <form onSubmit={handleSubmit} className="rounded-2xl shadow-lg border overflow-hidden" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           <div className="p-6 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -136,7 +136,7 @@ const AddInventoryQuality = () => {
                   required
                   value={formData.productId}
                   onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
-                  className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                   style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
                 >
                 <option value="">Select Product</option>
@@ -152,7 +152,7 @@ const AddInventoryQuality = () => {
               <select
                 value={formData.warehouseId}
                 onChange={(e) => setFormData({ ...formData, warehouseId: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               >
                 <option value="">Select Warehouse</option>
@@ -169,7 +169,7 @@ const AddInventoryQuality = () => {
                 required
                 value={formData.checkType}
                 onChange={(e) => setFormData({ ...formData, checkType: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               >
                 <option value="Incoming">Incoming</option>
@@ -187,7 +187,7 @@ const AddInventoryQuality = () => {
                 required
                 value={formData.checkDate}
                 onChange={(e) => setFormData({ ...formData, checkDate: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
@@ -197,7 +197,7 @@ const AddInventoryQuality = () => {
                 type="text"
                 value={formData.batchNumber}
                 onChange={(e) => setFormData({ ...formData, batchNumber: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
@@ -208,7 +208,7 @@ const AddInventoryQuality = () => {
                 required
                 value={formData.quantityChecked}
                 onChange={(e) => setFormData({ ...formData, quantityChecked: parseFloat(e.target.value) || 0 })}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
@@ -219,7 +219,7 @@ const AddInventoryQuality = () => {
                 required
                 value={formData.passed}
                 onChange={(e) => setFormData({ ...formData, passed: parseFloat(e.target.value) || 0 })}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
@@ -230,7 +230,7 @@ const AddInventoryQuality = () => {
                 required
                 value={formData.rejected}
                 onChange={(e) => setFormData({ ...formData, rejected: parseFloat(e.target.value) || 0 })}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               />
             </div>
@@ -240,7 +240,7 @@ const AddInventoryQuality = () => {
                 required
                 value={formData.overallResult}
                 onChange={(e) => setFormData({ ...formData, overallResult: e.target.value })}
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-11 px-4 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary"
                 style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               >
                 <option value="Pass">Pass</option>
@@ -251,11 +251,12 @@ const AddInventoryQuality = () => {
           </div>
 
           <div className="mb-4">
-            <label className="block mb-2">{t("inventory.notes") || "Notes"}</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-color)' }}>{t("inventory.notes") || "Notes"}</label>
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 rounded-xl border focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+              style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-color)', color: 'var(--text-color)' }}
               rows={3}
             />
           </div>
@@ -264,8 +265,8 @@ const AddInventoryQuality = () => {
               <button
                 type="submit"
                 disabled={mutation.isLoading}
-                className="flex items-center gap-2 px-6 py-2 rounded-lg text-white hover:opacity-90 disabled:opacity-50 transition"
-                style={{ backgroundColor: 'var(--color-primary)' }}
+                className="flex items-center gap-2 px-6 h-11 rounded-lg font-medium hover:opacity-90 disabled:opacity-50 transition"
+                style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
               >
                 <Save size={20} />
                 {mutation.isLoading ? "Saving..." : t("inventory.save") || "Save"}
@@ -273,7 +274,8 @@ const AddInventoryQuality = () => {
               <button
                 type="button"
                 onClick={() => navigate("/dashboard/inventory/quality")}
-                className="flex items-center gap-2 px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
+                className="flex items-center gap-2 px-6 h-11 rounded-lg font-medium border hover:bg-[var(--bg-secondary)] transition"
+                style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)', backgroundColor: 'var(--surface-color)' }}
               >
                 <X size={20} />
                 {t("inventory.cancel") || "Cancel"}

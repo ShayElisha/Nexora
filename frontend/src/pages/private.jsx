@@ -22,7 +22,7 @@ const PrivacyPolicy = () => {
           </p>
 
           {/* סעיף 1 */}
-          <div className="mb-8 bg-white p-6 rounded-lg shadow border border-border-color">
+          <div className="mb-8 bg-[var(--surface-color)] p-6 rounded-lg shadow border border-border-color">
             <h2 className="text-2xl font-semibold mb-4 border-b border-border-color pb-2">
               1. איסוף מידע
             </h2>
@@ -39,7 +39,7 @@ const PrivacyPolicy = () => {
           </div>
 
           {/* סעיף 2 */}
-          <div className="mb-8 bg-white p-6 rounded-lg shadow border border-border-color">
+          <div className="mb-8 bg-[var(--surface-color)] p-6 rounded-lg shadow border border-border-color">
             <h2 className="text-2xl font-semibold mb-4 border-b border-border-color pb-2">
               2. שימוש במידע
             </h2>
@@ -57,7 +57,7 @@ const PrivacyPolicy = () => {
           </div>
 
           {/* סעיף 3 */}
-          <div className="mb-8 bg-white p-6 rounded-lg shadow border border-border-color">
+          <div className="mb-8 bg-[var(--surface-color)] p-6 rounded-lg shadow border border-border-color">
             <h2 className="text-2xl font-semibold mb-4 border-b border-border-color pb-2">
               3. שמירת ואבטחת מידע
             </h2>
@@ -69,7 +69,7 @@ const PrivacyPolicy = () => {
           </div>
 
           {/* סעיף 4 */}
-          <div className="mb-8 bg-white p-6 rounded-lg shadow border border-border-color">
+          <div className="mb-8 bg-[var(--surface-color)] p-6 rounded-lg shadow border border-border-color">
             <h2 className="text-2xl font-semibold mb-4 border-b border-border-color pb-2">
               4. שיתוף מידע עם צדדים שלישיים
             </h2>
@@ -89,7 +89,7 @@ const PrivacyPolicy = () => {
           </div>
 
           {/* סעיף 5 */}
-          <div className="mb-8 bg-white p-6 rounded-lg shadow border border-border-color">
+          <div className="mb-8 bg-[var(--surface-color)] p-6 rounded-lg shadow border border-border-color">
             <h2 className="text-2xl font-semibold mb-4 border-b border-border-color pb-2">
               5. קבצי Cookie וטכנולוגיות דומות
             </h2>
@@ -102,7 +102,7 @@ const PrivacyPolicy = () => {
           </div>
 
           {/* סעיף 6 */}
-          <div className="mb-8 bg-white p-6 rounded-lg shadow border border-border-color">
+          <div className="mb-8 bg-[var(--surface-color)] p-6 rounded-lg shadow border border-border-color">
             <h2 className="text-2xl font-semibold mb-4 border-b border-border-color pb-2">
               6. קישורים לאתרים חיצוניים
             </h2>
@@ -114,7 +114,7 @@ const PrivacyPolicy = () => {
           </div>
 
           {/* סעיף 7 */}
-          <div className="mb-8 bg-white p-6 rounded-lg shadow border border-border-color">
+          <div className="mb-8 bg-[var(--surface-color)] p-6 rounded-lg shadow border border-border-color">
             <h2 className="text-2xl font-semibold mb-4 border-b border-border-color pb-2">
               7. עדכונים למדיניות הפרטיות
             </h2>
@@ -127,7 +127,7 @@ const PrivacyPolicy = () => {
           </div>
 
           {/* סעיף 8 */}
-          <div className="mb-8 bg-white p-6 rounded-lg shadow border border-border-color">
+          <div className="mb-8 bg-[var(--surface-color)] p-6 rounded-lg shadow border border-border-color">
             <h2 className="text-2xl font-semibold mb-4 border-b border-border-color pb-2">
               8. יצירת קשר
             </h2>

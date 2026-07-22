@@ -92,7 +92,7 @@ const AddSupplierContract = () => {
   };
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: 'var(--bg-color)' }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: 'var(--bg-color)' }}>
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -103,7 +103,7 @@ const AddSupplierContract = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate("/dashboard/procurement/supplier-contracts")}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+              className="p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition"
               style={{ color: 'var(--text-color)' }}
             >
               <ArrowLeft size={24} />
@@ -114,7 +114,7 @@ const AddSupplierContract = () => {
                   ? t("procurement.edit_supplier_contract") || "Edit Supplier Contract"
                   : t("procurement.add_supplier_contract") || "Add Supplier Contract"}
               </h1>
-              <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm mt-1" style={{ color: 'var(--color-secondary)' }}>
                 {t("procurement.fill_contract_details") || "Fill in the details below to create a supplier contract"}
               </p>
             </div>
@@ -122,7 +122,7 @@ const AddSupplierContract = () => {
         </div>
 
         {/* Form Card */}
-        <form onSubmit={handleSubmit} className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}>
+        <form onSubmit={handleSubmit} className="rounded-2xl shadow-md border overflow-hidden" style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}>
           <div className="p-6 space-y-6">
             {/* Basic Information Section */}
             <div>
@@ -140,7 +140,7 @@ const AddSupplierContract = () => {
                     required
                     value={formData.contractName}
                     onChange={(e) => setFormData({ ...formData, contractName: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -159,7 +159,7 @@ const AddSupplierContract = () => {
                     required
                     value={formData.contractNumber}
                     onChange={(e) => setFormData({ ...formData, contractNumber: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -176,7 +176,7 @@ const AddSupplierContract = () => {
                     required
                     value={formData.supplierId}
                     onChange={(e) => setFormData({ ...formData, supplierId: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -201,7 +201,7 @@ const AddSupplierContract = () => {
                     required
                     value={formData.startDate}
                     onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -218,7 +218,7 @@ const AddSupplierContract = () => {
                     type="date"
                     value={formData.endDate}
                     onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -237,7 +237,7 @@ const AddSupplierContract = () => {
                     min="0"
                     value={formData.contractValue}
                     onChange={(e) => setFormData({ ...formData, contractValue: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -253,7 +253,7 @@ const AddSupplierContract = () => {
                   <select
                     value={formData.currency}
                     onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -273,7 +273,7 @@ const AddSupplierContract = () => {
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 transition"
+                    className="w-full px-4 h-11 rounded-lg border focus:outline-none focus:ring-2 transition"
                     style={{ 
                       borderColor: 'var(--border-color)', 
                       backgroundColor: 'var(--bg-color)', 
@@ -376,7 +376,7 @@ const AddSupplierContract = () => {
               <button
                 type="submit"
                 disabled={mutation.isLoading}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg text-white hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 h-11 rounded-lg text-white hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: 'var(--color-primary)' }}
               >
                 {mutation.isLoading ? (
@@ -394,7 +394,7 @@ const AddSupplierContract = () => {
               <button
                 type="button"
                 onClick={() => navigate("/dashboard/procurement/supplier-contracts")}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                className="flex items-center gap-2 px-6 h-11 rounded-lg border hover:bg-[var(--bg-secondary)] transition"
                 style={{ borderColor: 'var(--border-color)', color: 'var(--text-color)' }}
               >
                 <X size={20} />

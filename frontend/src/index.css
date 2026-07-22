@@ -52,10 +52,30 @@
 }
 
 :root {
-  --surface-color: var(--surface-color, #ffffff);
-  --text-muted: var(--text-muted, var(--color-secondary));
-  --radius: var(--radius, 10px);
-  --shadow: var(--shadow, 0 20px 45px -22px rgba(15, 23, 42, 0.28));
+  /* Base theme tokens (overridden at runtime by applyDesignTheme) */
+  --color-primary: #2563eb;
+  --color-secondary: #64748b;
+  --color-accent: #059669;
+  --bg-color: #f8fafc;
+  --text-color: #1e293b;
+  --button-bg: #2563eb;
+  --button-text: #ffffff;
+  --border-color: #e2e8f0;
+  --footer-bg: #ffffff;
+
+  /* Derived tokens + aliases used across pages */
+  --surface-color: #ffffff;
+  --card-bg: #ffffff;
+  --bg-secondary: #f1f5f9;
+  --text-secondary: var(--color-secondary);
+  --text-color-secondary: var(--color-secondary);
+  --text-muted: var(--color-secondary);
+  --color-danger: #ef4444;
+  --color-primary-light: #dbeafe;
+  --color-primary-rgb: 37, 99, 235;
+  --color-accent-rgb: 5, 150, 105;
+  --radius: 10px;
+  --shadow: 0 20px 45px -22px rgba(15, 23, 42, 0.28);
 }
 
 body {

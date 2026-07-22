@@ -70,7 +70,7 @@ const DeliveryTracking = () => {
     "Out for Delivery": "bg-purple-100 text-purple-800",
     Delivered: "bg-green-100 text-green-800",
     Exception: "bg-red-100 text-red-800",
-    Returned: "bg-gray-100 text-gray-800",
+    Returned: "bg-[var(--bg-secondary)] text-[var(--text-color)]",
   };
 
   const statusLabels = {
@@ -92,7 +92,7 @@ const DeliveryTracking = () => {
   }
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: "var(--bg-color)" }}>
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8" style={{ backgroundColor: "var(--bg-color)" }}>
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div>
@@ -117,7 +117,7 @@ const DeliveryTracking = () => {
               placeholder="חפש לפי מספר מעקב או חברת משלוחים..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-4 pr-10 py-2 rounded-lg border"
+              className="w-full h-11 pl-4 pr-10 rounded-xl border"
               style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
             />
           </div>
@@ -125,7 +125,7 @@ const DeliveryTracking = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 rounded-lg border"
+            className="h-11 px-4 rounded-xl border"
             style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
           >
             <option value="all">כל הסטטוסים</option>
@@ -140,7 +140,7 @@ const DeliveryTracking = () => {
           <select
             value={carrierFilter}
             onChange={(e) => setCarrierFilter(e.target.value)}
-            className="px-4 py-2 rounded-lg border"
+            className="h-11 px-4 rounded-xl border"
             style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}
           >
             <option value="all">כל החברות</option>
@@ -186,7 +186,7 @@ const DeliveryTracking = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 className="p-4 rounded-xl border cursor-pointer hover:shadow-lg transition-all"
-                style={{ borderColor: "var(--border-color)", backgroundColor: "var(--bg-color)" }}
+                style={{ borderColor: "var(--border-color)", backgroundColor: "var(--surface-color)" }}
                 onClick={() => navigate(`/dashboard/orders/tracking/${tracking._id}`)}
               >
                 <div className="flex items-start justify-between mb-3">
@@ -199,7 +199,7 @@ const DeliveryTracking = () => {
                     </h3>
                   </div>
                   <span
-                    className={`px-2 py-1 rounded text-xs font-medium ${statusColors[tracking.shippingStatus] || "bg-gray-100 text-gray-800"}`}
+                    className={`px-2 py-1 rounded text-xs font-medium ${statusColors[tracking.shippingStatus] || "bg-[var(--bg-secondary)] text-[var(--text-color)]"}`}
                   >
                     {statusLabels[tracking.shippingStatus] || tracking.shippingStatus}
                   </span>
@@ -303,7 +303,7 @@ const TrackingDetailsModal = ({ tracking, onClose, onUpdateStatus, isLoading }) 
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-[var(--surface-color)] rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
       >
         <h2 className="text-xl font-semibold mb-4" style={{ color: "var(--text-color)" }}>

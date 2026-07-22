@@ -139,7 +139,7 @@ const AddSickDay = () => {
       <div className="max-w-6xl mx-auto">
         <motion.div className="mb-8" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-pink-500 to-rose-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <HeartPulse size={28} color="white" />
             </div>
             <div>
@@ -155,7 +155,7 @@ const AddSickDay = () => {
 
         <motion.div
           className="rounded-2xl shadow-lg p-6 border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
           variants={cardVariant}
           initial="hidden"
           animate="visible"
@@ -221,7 +221,7 @@ const AddSickDay = () => {
                       <td className="py-3 px-6 text-right">
                         <button
                           onClick={() => openModal(employee)}
-                          className="px-4 py-2 rounded-xl font-medium transition-all hover:scale-105"
+                          className="px-4 h-11 rounded-lg font-medium transition-all hover:scale-105"
                           style={{ backgroundColor: 'var(--color-primary)', color: 'var(--button-text)' }}
                           disabled={isLoadingPolicies}
                         >
@@ -246,7 +246,7 @@ const AddSickDay = () => {
           >
             <motion.div
               className="rounded-2xl shadow-2xl p-6 max-w-md w-full border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: 'var(--border-color)' }}
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               onClick={(e) => e.stopPropagation()}

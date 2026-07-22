@@ -219,7 +219,7 @@ const OrdersPreparation = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-cyan-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Truck size={28} color="white" />
             </div>
             <div>
@@ -236,7 +236,7 @@ const OrdersPreparation = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -256,7 +256,7 @@ const OrdersPreparation = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -276,7 +276,7 @@ const OrdersPreparation = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -296,7 +296,7 @@ const OrdersPreparation = () => {
 
             <motion.div
               className="p-4 rounded-xl shadow-md border"
-              style={{ backgroundColor: "var(--bg-color)", borderColor: "var(--border-color)" }}
+              style={{ backgroundColor: "var(--surface-color)", borderColor: "var(--border-color)" }}
               whileHover={{ scale: 1.02 }}
             >
               <div className="flex items-center gap-3">
@@ -401,7 +401,7 @@ const OrdersPreparation = () => {
                   className="p-6 rounded-xl border cursor-pointer transition-all hover:shadow-lg"
                   style={{
                     borderColor: "var(--border-color)",
-                    backgroundColor: "var(--bg-color)",
+                    backgroundColor: "var(--surface-color)",
                   }}
                   onClick={() => toggleOrder(order._id)}
                 >

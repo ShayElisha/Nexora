@@ -199,7 +199,7 @@ const BudgetDetails = () => {
             {t("finance.budget.back_to_list")}
           </Link>
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-indigo-500 to-purple-600">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg" style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}>
               <Wallet size={28} color="white" />
             </div>
             <div>
@@ -227,7 +227,7 @@ const BudgetDetails = () => {
               animate="visible"
               transition={{ delay: index * 0.1 }}
               className="rounded-2xl shadow-lg p-6 border"
-              style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+              style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: stat.color + '20' }}>
@@ -247,7 +247,7 @@ const BudgetDetails = () => {
         {/* Chart */}
         <motion.div
           className="rounded-2xl shadow-lg p-6 border mb-8"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
           variants={cardVariant}
           initial="hidden"
           animate="visible"
@@ -261,7 +261,7 @@ const BudgetDetails = () => {
         {/* Items Table */}
         <motion.div
           className="rounded-2xl shadow-lg overflow-hidden border"
-          style={{ backgroundColor: 'var(--bg-color)', borderColor: 'var(--border-color)' }}
+          style={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)' }}
           variants={cardVariant}
           initial="hidden"
           animate="visible"
@@ -275,7 +275,7 @@ const BudgetDetails = () => {
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full">
-              <thead style={{ backgroundColor: 'var(--border-color)' }}>
+              <thead style={{ backgroundColor: 'var(--bg-secondary)' }}>
                 <tr>
                   <th className="py-3 px-6 text-left text-sm font-bold" style={{ color: 'var(--text-color)' }}>
                     {t("finance.budget.date")}

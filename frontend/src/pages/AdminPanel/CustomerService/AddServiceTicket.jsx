@@ -135,7 +135,7 @@ const AddServiceTicket = () => {
           onSubmit={handleSubmit}
           className="rounded-2xl shadow-lg border p-6 md:p-8"
           style={{
-            backgroundColor: "var(--bg-color)",
+            backgroundColor: "var(--surface-color)",
             borderColor: "var(--border-color)",
           }}
           initial={{ opacity: 0, y: 20 }}
@@ -347,7 +347,7 @@ const AddServiceTicket = () => {
               className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl border shadow-md hover:shadow-lg transition-all"
               style={{
                 borderColor: "var(--border-color)",
-                backgroundColor: "var(--bg-color)",
+                backgroundColor: "var(--surface-color)",
                 color: "var(--text-color)",
               }}
               whileHover={{ scale: 1.02 }}

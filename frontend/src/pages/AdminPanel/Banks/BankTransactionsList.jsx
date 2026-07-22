@@ -70,7 +70,7 @@ const BankTransactionsList = () => {
       Reconciled: "bg-green-100 text-green-800",
       Cleared: "bg-blue-100 text-blue-800",
     };
-    return colors[status] || "bg-gray-100 text-gray-800";
+    return colors[status] || "bg-[var(--bg-secondary)] text-[var(--text-color)]";
   };
 
   return (
@@ -98,10 +98,10 @@ const BankTransactionsList = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+        <div className="bg-[var(--surface-color)] bg-[var(--surface-color)] rounded-lg shadow-lg p-6 mb-6">
           <div className="flex gap-4 mb-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--color-secondary)]" size={20} />
               <input
                 type="text"
                 placeholder={t("banks.search_transactions") || "Search transactions..."}
@@ -156,7 +156,7 @@ const BankTransactionsList = () => {
                   {filteredTransactions.map((transaction) => (
                     <motion.tr
                       key={transaction._id}
-                      className="border-b hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="border-b hover:bg-[var(--bg-secondary)] hover:bg-[var(--bg-secondary)]"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                     >
